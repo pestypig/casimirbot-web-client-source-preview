@@ -1,0 +1,60 @@
+import {registerSolarModelPlugins} from '@shared/solar-model-plugin';
+
+// Explicit built-in manifests. Adding a model starts with a typed descriptor, not a launch-list card.
+export const SOLAR_MODEL_PLUGINS=registerSolarModelPlugins([
+  {schemaVersion:'solar-model-plugin/1',pluginId:'casimirbot.solar.hydrostatic',version:'1.0.0',
+    panelId:'star-hydrostatic',title:'Hydrostatic Equilibrium',section:'Reduced-order structure',
+    kind:'Reduced-order calculation',description:'Static polytrope and Gamow-window workspace; not an evolved MESA model.',
+    execution:'client_local',acceptedInputs:['operator-controls/1'],outputContract:'unretained-local-state',
+    outputGeometry:'one_dimensional_interior',sceneBinding:'none',maturity:'reduced_order_toy',
+    currentInput:'Local presets and operator inputs',sceneStatus:'No solar-sphere or stellar-scene ID binding',
+    implementationRef:'client/src/pages/star-hydrostatic-panel.tsx',sourceIdentityAuthenticated:false,
+    scientificAdmission:false,independentModelValidation:false},
+  {schemaVersion:'solar-model-plugin/1',pluginId:'casimirbot.solar.fusion-globe',version:'1.0.0',
+    panelId:'solar-globe',title:'Solar Globe',section:'Illustrations & mission concepts',kind:'Illustration',
+    description:'Animated fusion-balance toy; not an observed 3D reconstruction.',execution:'client_local',
+    acceptedInputs:['operator-controls/1'],outputContract:'unretained-local-state',outputGeometry:'illustration',
+    sceneBinding:'none',maturity:'illustration',currentInput:'Local animation state',
+    sceneStatus:'No observational or MESA binding',implementationRef:'client/src/components/SolarGlobePanel.tsx',
+    sourceIdentityAuthenticated:false,scientificAdmission:false,independentModelValidation:false},
+  {schemaVersion:'solar-model-plugin/1',pluginId:'casimirbot.solar.deepmix-route',version:'1.0.0',
+    panelId:'deepmix-solar',title:'DeepMix Solar View',section:'Illustrations & mission concepts',kind:'Mission schematic',
+    description:'Tachocline and route schematic; not a solved transport field.',execution:'client_local',
+    acceptedInputs:['operator-controls/1'],outputContract:'unretained-local-state',outputGeometry:'illustration',
+    sceneBinding:'none',maturity:'illustration',currentInput:'Local route and geometry settings',
+    sceneStatus:'No solar-sphere scene binding',implementationRef:'client/src/components/DeepMixingSolarView.tsx',
+    sourceIdentityAuthenticated:false,scientificAdmission:false,independentModelValidation:false},
+  {schemaVersion:'solar-model-plugin/1',pluginId:'casimirbot.solar.deepmix-scanner',version:'1.0.0',
+    panelId:'deepmix-sweetspot',title:'DeepMix Sweet Spot',section:'Exploratory transport',kind:'One-zone toy',
+    description:'Versioned one-zone toy and assumed hazard index; not a validated lifetime extension.',
+    execution:'client_local',acceptedInputs:['operator-controls/1'],outputContract:'deepmix-toy-run/1',
+    outputGeometry:'time_series',sceneBinding:'none',maturity:'reduced_order_toy',
+    currentInput:'sweetspot-legacy/1 preset and operator controls',sceneStatus:'No G1 MESA baseline or solar-sphere binding',
+    implementationRef:'client/src/components/deepmix/DeepMixSweetSpot.tsx',sourceIdentityAuthenticated:false,
+    scientificAdmission:false,independentModelValidation:false},
+  {schemaVersion:'solar-model-plugin/1',pluginId:'casimirbot.solar.deepmix-toy-globe',version:'1.0.0',
+    panelId:'deepmix-globe',title:'DeepMix Globe',section:'Exploratory transport',kind:'One-zone toy + illustration',
+    description:'Separate legacy preset drives an illustrative globe; not an observed radius or transition risk.',
+    execution:'client_local',acceptedInputs:['operator-controls/1'],outputContract:'deepmix-toy-run/1',
+    outputGeometry:'illustration',sceneBinding:'none',maturity:'reduced_order_toy',
+    currentInput:'globe-legacy/1 preset and operator controls',sceneStatus:'No G1 MESA baseline or solar-sphere binding',
+    implementationRef:'client/src/components/deepmix/DeepMixGlobePanel.tsx',sourceIdentityAuthenticated:false,
+    scientificAdmission:false,independentModelValidation:false},
+  {schemaVersion:'solar-model-plugin/1',pluginId:'casimirbot.solar.ferrofluid-analogue',version:'1.0.0',
+    panelId:'ferrofluid-analogue',title:'Ferrofluid Globe Analogue',section:'Illustrations & mission concepts',
+    kind:'Laboratory geometry toy',description:'Reported apparatus and normalized field-pattern sensitivity; no surface solve or device actuation.',
+    execution:'client_local',acceptedInputs:['operator-controls/1'],outputContract:'ferrofluid-analogue-toy/1',
+    outputGeometry:'two_dimensional_surface',sceneBinding:'none',maturity:'reduced_order_toy',
+    currentInput:'Product specifications and explicitly assumed operator controls',sceneStatus:'No solar magnetic bundle or field-volume binding',
+    implementationRef:'client/src/pages/ferrofluid-analogue-panel.tsx',sourceIdentityAuthenticated:false,
+    scientificAdmission:false,independentModelValidation:false},
+]);
+
+export const SOLAR_SPECIALIST_PANELS=SOLAR_MODEL_PLUGINS.filter(plugin=>plugin.panelId!==null).map(plugin=>({
+  id:plugin.panelId!,title:plugin.title,section:plugin.section,kind:plugin.kind,description:plugin.description,
+  inputStatus:plugin.currentInput,sceneBinding:plugin.sceneStatus,pluginId:plugin.pluginId,
+  version:plugin.version,maturity:plugin.maturity,outputContract:plugin.outputContract,
+}));
+export const SOLAR_SPECIALIST_SECTIONS=['Reduced-order structure','Exploratory transport','Illustrations & mission concepts'] as const;
+const SOLAR_SPECIALIST_IDS=new Set(SOLAR_SPECIALIST_PANELS.map(panel=>panel.id));
+export function isSolarSpecialistLaunchPanel(panelId:string):boolean{return SOLAR_SPECIALIST_IDS.has(panelId);}
