@@ -18,4 +18,4 @@ Third-party packages and external map or scientific data are not bundled here. T
 
 ## Source boundary and license
 
-The selected source files are byte-identical to the committed platform source named in `SOURCE_SELECTION.json`. This clean-history snapshot omits local profiles, captured sessions, imported media, the current in-progress worktree, and the platform's historical Git commits. It does not grant access to hosted services or private developer controls. The first-party content here is released under the [MIT License](LICENSE).
+The selected source files match the committed platform source after CRLF/LF line-ending normalization; 3 of 1,295 public Git blobs are byte-identical to the source-commit Git blobs. The SHA-256 hashes and byte lengths in `SOURCE_SELECTION.json` identify the public snapshot files. This clean-history snapshot omits local profiles, captured sessions, imported media, the current in-progress worktree, and the platform's historical Git commits. It does not grant access to hosted services or private developer controls. The first-party content here is released under the [MIT License](LICENSE).
