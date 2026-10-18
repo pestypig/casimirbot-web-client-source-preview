@@ -1,0 +1,3298 @@
+{
+  "schema": "casimirbot.client_independent_source_addendum.v1",
+  "status": "private-review-only",
+  "sourceCommit": "2729878dee699a975cd8738d123baa0c341dc1ec",
+  "publicParent": "739e33a0aaec948264b81300e494dbec9d9f62d9",
+  "basis": [
+    {
+      "cohort": "remaining-client-src",
+      "manifest": "client-remaining-stacked-source-addendum.json",
+      "sha256": "6132359f996f51b15eba97068711ad14e93cbdc2572bdaf7e9fb758fed463ac1",
+      "files": 340
+    },
+    {
+      "cohort": "companion-client",
+      "manifest": "client-companion-stacked-source-addendum.json",
+      "sha256": "998696517acabb8328f6814791cb26d8376a8a19ddf4dc69d1729dfd0c08a251",
+      "files": 34
+    }
+  ],
+  "files": [
+    {
+      "path": "client/src/App.tsx",
+      "sha256": "4c2ad69fb78d038c917fda778073b2d57afdb2d1dd0f5552138fbfa0e6f1003c",
+      "bytes": 10189,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/pages/desktop.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/DeviceCheckPanel.spec.tsx",
+      "sha256": "a9f2d14ed53cd2382a15c5409b2bca40cc0a6cee7a026a5ad467c80d1d607cc4",
+      "bytes": 24432,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/pages/helix-core.panels.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/doc-viewer-math-copy.spec.ts",
+      "sha256": "6d097f1838506e1327f7844f1626656fdd09e8e129aec0b3cd33e21a9e8c823e",
+      "bytes": 56755,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/DocViewerPanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/doc-viewer-taxonomy-ui.spec.tsx",
+      "sha256": "37deffce60cbf5aaf17698ac4a22e059f7cbd3c81232e7d27aea1caa088e28df",
+      "bytes": 103728,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/docManifest.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-active-turn-display-view-model.spec.ts",
+      "sha256": "2c315e93c98b7921948512a399586f6e82903a08f5e75394f4db83e420c3f79f",
+      "bytes": 6150,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-active-turn-stream.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-diagnostics.spec.ts",
+      "sha256": "547a9e5ad3f602326ce4c98e1cdc0da32991df44abfdb5cabca93ae81b9aa633",
+      "bytes": 69360,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-active-turn-stream.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-recrown.spec.ts",
+      "sha256": "c35cc0722406794383973415c401b553445c9d9394a6c81a2a8975807f25ca3d",
+      "bytes": 523530,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/index.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-live-runtime-debug-state.spec.ts",
+      "sha256": "be585d246041a2372aef993bce8d876ce4f3962464a50373d1ec36ea53bd129f",
+      "bytes": 21732,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskDebugExportSizeControl.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-live-runtime-worker-relay-status.spec.ts",
+      "sha256": "0badaac768713b85a7c4edb327355ff10d4c539653dfa997c5cbae8d1c760c3f",
+      "bytes": 994,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskLiveRuntimeControls.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-minimal-runtime-shell.spec.tsx",
+      "sha256": "18fdbce987bdbb0ca02fd24d25d5e0d3726ded5d5f6c4da2e49af0f111c3744c",
+      "bytes": 36653,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskMinimalRuntimeShell.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-e63-debug-copy-atomicity.spec.tsx",
+      "sha256": "677537e18f05791c9c483ec63ebf22b152b36d581a6877b2c41f9057a42d5ca3",
+      "bytes": 12814,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/HelixAskPill.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-e63-terminal-projection.spec.tsx",
+      "sha256": "1c71985b063b2f593bf690af62b81b878b3fadd9d700569669c19d55660e54ac",
+      "bytes": 20908,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/HelixAskPill.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-e65-rendering-invariants.spec.tsx",
+      "sha256": "d8aa63f9ea7a0b7adb3d163784a6cfa283fed8321055a69fab8187dadcc660be",
+      "bytes": 2904,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/HelixAskPill.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-e68-debug-export.spec.tsx",
+      "sha256": "dd42571f5c0076aa694513825fc7491aa5ac9d410dd6d24c9803cb13c13283e4",
+      "bytes": 42829,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/debugExport.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-e68-debug-fallback.spec.tsx",
+      "sha256": "f5ab1267217ac6eb155fef982f7629e6ed74da2d4038ed268958924f6b9ef54e",
+      "bytes": 710,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/debugExport.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-e69-composite-debug.spec.tsx",
+      "sha256": "27737f2b297ae1d8728d9d494149768d8f9a586cdf51c722eb6493683acf00e3",
+      "bytes": 2024,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/debugExport.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-e70-composite-followup-debug.spec.tsx",
+      "sha256": "7d23d3c0a8e6327235e8c2f73c734fd8f221f1fd343fba906b9da8455b5532d7",
+      "bytes": 4542,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/debugExport.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-ui.spec.tsx",
+      "sha256": "aa560fa6c0ae536d05c268702fd8f1debb679daa89f2e47a9e19e8fa300bf490",
+      "bytes": 288307,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/HelixAskPill.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-queued-input-parser.spec.ts",
+      "sha256": "fa0d9e126c7d55b1c701b36409f35efc2daa3ddf836cb74ab0e00b31deb90f36",
+      "bytes": 29306,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/HelixAskPill.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-runtime-goal-wake-emitter.spec.ts",
+      "sha256": "e99928f421ed2e1231c7f32117e388a017dc3b178265ebf791b0a3f7379093d1",
+      "bytes": 14750,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskRuntimeGoalWakeEmitter.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-turn-stream-lane-rendering.spec.tsx",
+      "sha256": "af51f989880b6b7c2cf2135c9a15991194c6f0291deb6207a1c94aa08a7fb698",
+      "bytes": 80064,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-active-turn-stream.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-voice-confirmation-runtime.spec.tsx",
+      "sha256": "100f41e97ba854dc4fccf633f3b02e255e15f61fa3fc3f355bba6de61c95c3f0",
+      "bytes": 7183,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskVoiceConfirmationRuntime.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-voice-playback-tool-controller.spec.ts",
+      "sha256": "31d4a0c15d591156e0c1bb2efbb5e0ceb47f2b562fc2480f2b33123f087496f1",
+      "bytes": 13366,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskVoicePlaybackToolController.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-voice-turn-assembly-controller.spec.ts",
+      "sha256": "76ab7f2d23bf5dfc2d9becae9da3c301211086daad5ff18c8895b93a1c8d2556",
+      "bytes": 25273,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskVoiceTurnAssemblyController.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-context-capsule-ledger.spec.ts",
+      "sha256": "2549def64e56c933498bd5560aa31242f85fce1d5b54708190f97aee70cec593",
+      "bytes": 6948,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/HelixAskPill.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-read-aloud-state.spec.ts",
+      "sha256": "0f917d064e5a07972077b1b6a6a4df59d46eed275fbde56053f5be1700fc2380",
+      "bytes": 31413,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/HelixAskPill.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-s-live-source-watch-transcript.spec.tsx",
+      "sha256": "ef5f85710418198cb218304655b8e2337ac4684eea0eb64fe6ddb78f8d0b0987",
+      "bytes": 5524,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-live-source-display.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-workstation-shell-layout.spec.ts",
+      "sha256": "85cf48f1597c4e632470bf10d047b1b40025c060e03e271fa67956292a1438f5",
+      "bytes": 4509,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/workstation/HelixWorkstationShell.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/helix-workstation-shell-mobile.spec.tsx",
+      "sha256": "cdccac1f0abaf40eaec2cfbc1e01f0016ed226478652b63088957f8b8d52faac",
+      "bytes": 9028,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/workstation/HelixWorkstationShell.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/image-lens-panel.spec.tsx",
+      "sha256": "288a6abf0338d7e01fae720da2b778141251f1a5f6ebae7001333e300d1028ec",
+      "bytes": 18379,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/moral-graph-panel.spec.tsx",
+      "sha256": "6ec6c89f078f802cd1b114114f4030db590a54f905226f0559bd8e3e24d34a39",
+      "bytes": 20311,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/panels/MoralGraphPanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/solar-observation-raster.spec.tsx",
+      "sha256": "40c001fe3bb3ac4de8fc23b63763d83d88608b24860e70a27b353f5111385f28",
+      "bytes": 2278,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:public/solar-workstation-comparison.js"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/solar-profile-comparison.spec.tsx",
+      "sha256": "fbbbc4feac4d8aa9555d976b142e10b6e370fcd8eb08d0682eeb4dc5ba31d34c",
+      "bytes": 5337,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/SolarProfileComparison.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/solar-research-comparison-record.spec.tsx",
+      "sha256": "4ffec1a75136796ac56ac28245f3f050f297308d7982fac97d383efd4207e6dc",
+      "bytes": 20117,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:server/services/solar-research/primary-observation",
+        "outside:tests/fixtures/solar-portable-package"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/solar-research-evidence-index.spec.tsx",
+      "sha256": "8d3ca2ce9be160c1bf53df1539d684121d15b9aebb9b593576cff4bf8ea3a629",
+      "bytes": 7893,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:server/services/solar-research/primary-observation",
+        "outside:tests/fixtures/solar-portable-package"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/solar-research-evidence-replay-ownership.spec.tsx",
+      "sha256": "d31e0a6b8265dd36ac6153b889c62795b81e49d41e29873aa476c652a5ede43e",
+      "bytes": 4083,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/SolarResearchEvidenceReplay.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/solar-research-evidence-replay.spec.tsx",
+      "sha256": "d53adc860226e19953583dbce3329cad831d5c67467a18f098f659f25252371b",
+      "bytes": 11336,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:server/services/solar-research/primary-observation",
+        "outside:tests/fixtures/solar-portable-package"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/solar-research-package-storage.spec.tsx",
+      "sha256": "8381911acc09db426f080d1af655d539e6d3501da12468c51291f9f374322724",
+      "bytes": 8783,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:tests/fixtures/solar-portable-package"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/solar-research-workbench-catalog.spec.tsx",
+      "sha256": "920a3a7a8597cbfef906b86f66434e89e2e6b35ffd9bfb0ffd6e614c6bf1ef21",
+      "bytes": 10060,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:server/services/solar-research/primary-observation"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/stage-play-badge-graph-panel.spec.tsx",
+      "sha256": "6c55c781d047cd72a60ec04c80524bc47b1ddd88bcfd49a9dda1fe97717100d3",
+      "bytes": 213185,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/panels/StagePlayBadgeGraphPanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/star-watcher-navigation.spec.tsx",
+      "sha256": "3a54534796573e3cbff47ea63dffcd58ab99b4ab00ac11e89cf3398bde70ff87",
+      "bytes": 34281,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:tests/fixtures/solar-portable-package"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/theory-achievement-map-panel.spec.tsx",
+      "sha256": "a493b10051dcf028c6f6fd6fa9a3889f94a64d301050e94dd6d28e6e7f997f50",
+      "bytes": 44355,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/panels/TheoryBadgeGraphPanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/theory-badge-graph-panel.spec.tsx",
+      "sha256": "33b9217ca9fa37c1a13bdff6a61a5c9c03715b39015c33a1dca409ba9f439c71",
+      "bytes": 2126,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/panels/TheoryBadgeGraphPanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/theory-badge-graph-playback-panel.spec.tsx",
+      "sha256": "6da43aaa07ca7629c9a631901cbd60ae47397f800f852a070105489742f5d275",
+      "bytes": 1525,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/panels/TheoryBadgeGraphPanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/__tests__/warp-proof-ts-strict.spec.tsx",
+      "sha256": "b26a8559edcf633fd7a649f61f086549e1386a091b034931968693cee65ce1db",
+      "bytes": 9584,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/WarpProofPanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/LocalPersonalConnectionSetup.spec.tsx",
+      "sha256": "0f4cf1b10353b0a108ccbc46a5e7d9d97bd37b25b9437bf7ba94f4feb24c6b28",
+      "bytes": 7282,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:tests/fixtures/local-personal-connection"
+      ]
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/sessionActivityProjection.spec.ts",
+      "sha256": "350621278bcea948d258d1ca111d332281db334aa5cb423ed09e2882263e243b",
+      "bytes": 24192,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:server/services/helix-ask/operator-activity-normalizer"
+      ]
+    },
+    {
+      "path": "client/src/components/agi/DebateView.tsx",
+      "sha256": "0d75865dde3ed9663c05e7743ee6b9ec34af644c76ef9caa593b86725279937a",
+      "bytes": 23155,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/agi/essence.tsx",
+      "sha256": "09993394c06c3c8b3b92189cf1147b542a5ef2f56228e8270d40e592bb836000",
+      "bytes": 83735,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useKnowledgeProjectsStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/agi/MemoryDrawer.tsx",
+      "sha256": "f4fb364937865c453d2ab4fd47967066792b18309ee1f7cbe66f7c692dfa4b04",
+      "bytes": 5375,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/agi/TraceDrawer.tsx",
+      "sha256": "f9a33657bd9813da7582e0d64d2520f0b5365cd9df9e609b3629001b9c34fa4b",
+      "bytes": 38733,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useKnowledgeProjectsStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/AgiKnowledgePanel.tsx",
+      "sha256": "b35e03b669cd8d504efb6cb76fcce70bfbf8634e5eb0726cb2dc711136b97701",
+      "bytes": 27798,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useKnowledgeProjectsStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/AlcubierrePanel.tsx",
+      "sha256": "39139796c48618c6462eb70a40120b8a8060f84ed5fed26385b3f7e807d508ff",
+      "bytes": 488094,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/webgpu/hull-pathtracer.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/civilization/CivilizationDiplomacyOverlay.spec.tsx",
+      "sha256": "c614cb8fa80d768b21d38d52afc154720ec5469dfbb208b90948018f8063fea0",
+      "bytes": 2094,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:server/services/civilization-diplomacy/unga81-evidence",
+        "outside:server/services/civilization-diplomacy/relationship-network"
+      ]
+    },
+    {
+      "path": "client/src/components/common/TheoryBadge.tsx",
+      "sha256": "7278965396baaf01b5a3fd61fba386ead5cb0b5e796f7bac0f53a909f030274e",
+      "bytes": 3854,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/openDocPanel.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/CoreKnowledgePanel.tsx",
+      "sha256": "8adf80fb979f2d99eb4d2e8b89aa844614a3711bee723f0207515fc9e557c95b",
+      "bytes": 4421,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useKnowledgeProjectsStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/desktop/__tests__/DesktopTaskbar.guide.spec.tsx",
+      "sha256": "f77bda89d2815a3017aebea42ccd5d3c158b3e151e676112b41514e3e60efb6f",
+      "bytes": 3941,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/desktop/DesktopTaskbar.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/desktop/DesktopTaskbar.tsx",
+      "sha256": "3b28d4754f0836453043c69e03d411535efe8de8395c79ba4e9b0309a1aa85ed",
+      "bytes": 11734,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useDesktopStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/desktop/DesktopWindow.tsx",
+      "sha256": "418937c961271607ddce9cad89810c801c75935e802413ff41ea7a9caf7d1914",
+      "bytes": 22737,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useDesktopStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/desktop/EndpointsPanel.tsx",
+      "sha256": "afae2bed04121d409ea6e55e0942440afd02109412903d2be2feb3cf0501073c",
+      "bytes": 3015,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/desktop/TaskbarPanel.tsx",
+      "sha256": "057787293b54cc19ee3ffc432137f23fad63237a3297440d4150fd4630bb3ba8",
+      "bytes": 7983,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/DocViewerPanel.tsx",
+      "sha256": "9ee7f5060a728daa14ec06db6c5acb8bfc95acb03426c2e88bc21c5ca085c84c",
+      "bytes": 216725,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/docManifest.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/ElectronOrbitalPanel.tsx",
+      "sha256": "17b3496cfb708735a90ea6758a94c557bf47fc8dcfcc5b3fcad1bc60f81e85cf",
+      "bytes": 43343,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/openDocPanel.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/AdapterAiActivityPanel.spec.tsx",
+      "sha256": "a3895a6f4c5e553d5b642ab89f655e825bd3dfdf291c2940a1b5a9673ad40c42",
+      "bytes": 3750,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:server/services/helix-ask/operator-activity-normalizer"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/BoundAgentPromptDisplay.spec.tsx",
+      "sha256": "7c86d77c105e25dbb557100d0017a3457336f717f56f01d62ff4cd8bb43edf7b",
+      "bytes": 6716,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleRuntimeShell.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskAdmissionContinuationDebugProjection.spec.ts",
+      "sha256": "8e4eb4d7c191221e30b5d5b4a330b411e710400a266e2ac81d8253760a4d709b",
+      "bytes": 2427,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskDebugCopyProjection.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskBoundAgentDestination.spec.tsx",
+      "sha256": "7e39ce6bf76c25f42f546a0b3082dbbd3ce660c99bc2027fb143da262893dfc3",
+      "bytes": 16501,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskMinimalRuntimeShell.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskComposerActionToolbarState.private-connection.spec.ts",
+      "sha256": "c2c4c0eb102d43c58cd0d526ed686b62259f3a98599d953e431db7c10391321c",
+      "bytes": 1341,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskComposerActionToolbarState.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskComposerActionToolbarSurface.visual-live.spec.tsx",
+      "sha256": "014269f385a6862dda7217e8bf0fa934def600205f4bf8d936c590bba445da70",
+      "bytes": 3990,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskComposerActionToolbarSurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskComposerDestination.spec.tsx",
+      "sha256": "b30a497bda1548839c9388039cf1d8a06b84f7674526b1e6df714e253383e018",
+      "bytes": 8703,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskLegacyComposerState.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskConsoleLayout.spec.tsx",
+      "sha256": "b971366b3443f0964edadadb82c7a22b13b59967f458df25d32336613dc535f3",
+      "bytes": 2998,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleRuntimeShell.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeControls.visual-source.spec.tsx",
+      "sha256": "ff95611f9d80d55bba76200e8a09f66a521c067d647192f25f6d347ec0be0869",
+      "bytes": 9408,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskLiveRuntimeControls.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskMinimalRuntimeWorkspaceContext.spec.ts",
+      "sha256": "1651be06ca545f5f2b384a9954061f7732e218301d0996819b64c1d34fab690a",
+      "bytes": 3693,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskMinimalRuntimeWorkspaceContext.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskWorkstationActionDispatch.spec.ts",
+      "sha256": "fabf821d999a3aede6d374e6d63aaf7f7190624efd54545d34f84da1f65555fc",
+      "bytes": 7582,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionExecutor.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixConsoleConversationWorkspace.spec.tsx",
+      "sha256": "101aaf28df2d5c538e4ce1cd330b65b0e2101fbd5066819c43b3ac07c0d9cf5e",
+      "bytes": 54582,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixConsoleConversationWorkspace.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixConsoleSelectedComposer.spec.tsx",
+      "sha256": "d590b084a5f019409fb45a269524bb882c6538f108ce896cd738060acb2441bd",
+      "bytes": 10019,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixConsoleConversationWorkspace.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/message-cloud-visible-updates.spec.ts",
+      "sha256": "35170d0d420e4b41bbfe469b633ef1140a62ec5c450d511216fc550c76080467",
+      "bytes": 2218,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:apps/desktop/src/message-cloud-renderer"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/PrivateAskConsoleFormatting.spec.tsx",
+      "sha256": "686fd0cb249a57c62c69ce795d13f779f388583e0456d5c84fe6e376be9e7ee8",
+      "bytes": 2951,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixConsoleConversationWorkspace.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/useHelixAskLiveRuntimeSession.visual-consent.spec.tsx",
+      "sha256": "ea92dd2900313255a56714e22abe6ec9190325285be5429aca989e884ef86e80",
+      "bytes": 11184,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/useHelixAskLiveRuntimeSession.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskActiveTurnDisplayViewModel.ts",
+      "sha256": "26450b311a15cf1fc494a3f2ffd788096317e0899d16da569db2de2e103607c1",
+      "bytes": 2573,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-active-turn-stream.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskActiveTurnListState.ts",
+      "sha256": "5da194549e0cf9d9150b79571764fb2f6f222571bf7a06e1b0f99c638c59c417",
+      "bytes": 2117,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskActiveTurnReplySurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskActiveTurnReply.tsx",
+      "sha256": "9290312eece9009cba1640977eaf30219543b2bbf47e180feb7f8b6700d02d83",
+      "bytes": 2549,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskTurnStreamPanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskActiveTurnReplySurface.tsx",
+      "sha256": "afcbcb52d1301e77d29fcbdfef2b893b4295074f22ef488f9f976b28120dc406",
+      "bytes": 335,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskActiveTurnReply.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskActiveTurnStreamPanel.tsx",
+      "sha256": "8020f7090edb69c21cd4fac7449571cbd4eb4c2c39bbb402e4885dc3f1b85b10",
+      "bytes": 22253,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-active-turn-stream.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskAttachmentStripState.ts",
+      "sha256": "004d6709f23d8b32d8ce677f28498c9eed4ae2b5bdbe4b2c68d4026470b39408",
+      "bytes": 544,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleSupplementSurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskClipboard.ts",
+      "sha256": "8399a52ccb742934212200c15f105c816b3d059f2ca59579f87f5af2c7d592a5",
+      "bytes": 7388,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/debugExport.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskCompletedReplyStreamState.ts",
+      "sha256": "3553028bc9c334e20f8aa8893edd580b1898e14795df18b94e4e2396f42c4eaf",
+      "bytes": 384,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskTurnStreamPanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskCompletedReplyTurnSurface.tsx",
+      "sha256": "20823e3272c73785621f780bdf48484fc6796c9138b80a93ce9f834424a14d9f",
+      "bytes": 511,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskReplyTurnSurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskComposerActionToolbarState.ts",
+      "sha256": "cef1737d39bdb5a85dc676caaa1d2fa339235428bb6d0d0c7f230a105f9cf57a",
+      "bytes": 2961,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskLiveRuntimeControls.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskComposerActionToolbarSurface.tsx",
+      "sha256": "419e5db29541a1db5c0cc789b5afe50b90c9900f374e41fe74f18a6c5f715eb1",
+      "bytes": 9492,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskLiveRuntimeControls.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsole.tsx",
+      "sha256": "09143638990a64e75611a23d30923908d637deadeb353037191ea79388c2ccf2",
+      "bytes": 1034,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleState.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleDiagnostics.ts",
+      "sha256": "2f84658aee0f0c54069d1de65a22a486d428717422321cd97c2fc740ee4f1313",
+      "bytes": 63854,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-active-turn-stream.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleRuntimeShell.tsx",
+      "sha256": "348d1c9f4559c7fb9c91d02789cd1eef277250baf1f780d8fd84086acaa51f44",
+      "bytes": 4248,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskMinimalRuntimeShell.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleRuntimeShellProps.ts",
+      "sha256": "7e139f9484ef62ce6179cba7487d7e952fa1efc5889ac6b777d7faccf09e3ada",
+      "bytes": 750,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleState.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleState.ts",
+      "sha256": "22a345b01a20f63ecd587f7701e61507ee7e32f54327a564390457ef71a1aca3",
+      "bytes": 12263,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleSupplementState.ts",
+      "sha256": "cb90389e170e3f44bc2d3f5ab9b1a91b5821f5069c7d4b24f067d46aa9f562a7",
+      "bytes": 1095,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleSupplementSurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleSupplementSurface.tsx",
+      "sha256": "865c4f024de9cc5497993541cb5aa77d31370ae5fcf08699b809a7c0052549d5",
+      "bytes": 6016,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskObserverLane.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskContextCapsuleState.ts",
+      "sha256": "c8d59087453f22bf32ef76fb65b872610f914185d53278dec75482eae1503478",
+      "bytes": 1944,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleSupplementSurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskContextChooserState.ts",
+      "sha256": "ecf93b6a885465da8fcba6b99cc3f4f65e5fa83140a32753e2494420c6379f49",
+      "bytes": 570,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleSupplementSurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskContextMemoryStatusState.ts",
+      "sha256": "7bca63953f542eef6b37aaba329bc006f3a1c263b22dad502767060b3012c096",
+      "bytes": 523,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleSupplementSurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskDebugCopyLocalPayload.ts",
+      "sha256": "df6645bdf0c4858098b2cd7ada14e0b0ea1713b24842390d9d2aef1c82e299a6",
+      "bytes": 3512,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-runtime-authority-readers.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskDebugCopyProjection.ts",
+      "sha256": "2b52efc133393c6ad1497d2ba0c8fe765198e2c035b867f7be4b1548d47a4c66",
+      "bytes": 13808,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-runtime-authority-readers.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskDebugDrawerState.ts",
+      "sha256": "d6feebb99d3275348dae3a06360a778f69a9afdb30c07f819cdfbfbb8e824855",
+      "bytes": 2904,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/debugExport.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskDebugDrawerSurface.tsx",
+      "sha256": "4eda1a12bbdf50af6913b8754844b220132dca1f5300cc26f156b3e4b6a55a32",
+      "bytes": 887,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskDebugDrawerState.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskDebugExportSizeControl.ts",
+      "sha256": "b56ec9f3b4582ad53e02a9ca2b70741725c13ceea97676cfcb2dc9f90bb6b1cd",
+      "bytes": 13348,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-runtime-authority-readers.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyCompletedReplySlot.tsx",
+      "sha256": "ef75e80611b8e4828f0f814e8ac5e833fd5264585172a78bbe0aa133d894b57e",
+      "bytes": 453,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskCompletedReplyTurnSurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyCompletedReplyState.ts",
+      "sha256": "7cc1e458eed896575071bec501ee1d8eceecbd0b3326268c58ce84f9cdfe7aad",
+      "bytes": 396,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskLegacyCompletedReplySlot.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyComposerState.ts",
+      "sha256": "0ea2d33101a1254e3d2910a86f4fabb72f504feab1fa0b365f60a710205c2dca",
+      "bytes": 566,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskLegacyComposerSurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyComposerSurface.tsx",
+      "sha256": "edb4bbb57cc35dd5b8126520cb488c55f7569ba60d0b17719e17f5e64e820e9c",
+      "bytes": 1696,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskComposerActionToolbarSurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyConsoleRootState.ts",
+      "sha256": "3b6cce3db15e98232a818198b65e7b7f38338e6757707026bc4e048142b7159a",
+      "bytes": 502,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskLegacyConsoleView.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyConsoleView.tsx",
+      "sha256": "d7c49de1cc5da5f7375ba83cb2331680519c2f47031f8fb3e77d53b2761a2a29",
+      "bytes": 5368,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixConsoleConversationWorkspace.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyConsoleViewState.ts",
+      "sha256": "6f04e8cf1e21c0905a6710b943dbd01ab0c7f0c27d5c941ea3958e520015d3f7",
+      "bytes": 819,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskLegacyConsoleView.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyProceduralTimelineProjection.tsx",
+      "sha256": "a65282c2cd6e4c6e7060727bf0e109bb99f45c0ba50cbcada943df4d20611e77",
+      "bytes": 13433,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-runtime-authority-readers.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyRuntimeBridge.tsx",
+      "sha256": "c0b6ebb6233cbf5d173397dd6200ab9524fbd1df6f5f4c0ae272384de2e51965",
+      "bytes": 248,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/HelixAskPill.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacySurfaceContent.tsx",
+      "sha256": "e3791425402d2d144375139ba223ad79e552face84720270a2abd98a1a6d8693",
+      "bytes": 1777,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixConsoleConversationWorkspace.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacySurfaceContentState.ts",
+      "sha256": "a43cdb0ec3e4de79331b791d2d029abe37a838adfb74960d7e7fd0e1d0adf7bc",
+      "bytes": 436,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskLegacySurfaceContent.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyTurnControls.ts",
+      "sha256": "6e173b88b89b509f9bfc3d6758c2e913eadd568d4dbba3f21fd202a1ae99fc14",
+      "bytes": 34309,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-runtime-authority-readers.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLiveRuntimeControls.tsx",
+      "sha256": "cdc43973cf9f3bf18fc22b98adf57dc85fd3415d982731553bd10bb015f0e4bc",
+      "bytes": 33625,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/useHelixAskLiveRuntimeSession.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeBackendRunner.ts",
+      "sha256": "8ae651b3c82a67ef7880032130680af714c687100a4f3b37a1eba8fbe3adb2bd",
+      "bytes": 1644,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeShell.tsx",
+      "sha256": "8ad4419335cd4bfe92a77c2c1ab6836ff5ee07e868c286b931c4cabc0ec79c29",
+      "bytes": 50733,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleState.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeWorkspaceContext.ts",
+      "sha256": "1dc73984ad7af481f683221f644fcc54700797a7d0e1fdb986a362ac51c467b4",
+      "bytes": 3666,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-workspace-context-snapshot.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskObserverLane.tsx",
+      "sha256": "fd398437e39af3e8da5e36e42491e79504dbc2ae1ed53e47e7b340ff2bf19bc1",
+      "bytes": 4973,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskObserverLaneEvents.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskObserverLaneEvents.ts",
+      "sha256": "7747a5a676b4dcc74a11e425bd3c339f6a9f8cdfa06f346e8c9aaa9a8b029f63",
+      "bytes": 2610,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-runtime-authority-readers.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskObserverSupplementState.ts",
+      "sha256": "d8445aec0460fd7de898684e15c49ab72e45c324f700e52780de9276d7bfc413",
+      "bytes": 715,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleSupplementSurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskOperatorSurfaceBrowserCapture.ts",
+      "sha256": "3359ccc8a2e2c6eb683fa63625b9fd86ee6e68120eaa3d201ddff504e4101886",
+      "bytes": 5738,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskOperatorSurfaceLayoutParity.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskOperatorSurfaceLayoutParity.ts",
+      "sha256": "9ef8373efd496b75967e3e88b035682a210ffcc7dd8b9f6df893f0ed225fd6b5",
+      "bytes": 11774,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleState.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskOperatorSurfaceParityChecklist.ts",
+      "sha256": "d56ae97fc6920c19b8316f7477cc6f12eacd8784b43b7302f330c4faad15f35c",
+      "bytes": 7954,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskOperatorSurfaceLayoutParity.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskOperatorSurfaceParityEvidencePanel.tsx",
+      "sha256": "b7daa5a87c21ce4bcd0fceda2016b188eadadf92cea85ea2e9a46e74a0ef997a",
+      "bytes": 9384,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskOperatorSurfaceParityChecklist.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskOperatorSurfaceParityHarness.tsx",
+      "sha256": "ae151215d3577ddcd835f163f898a2528fd308206c2a5a1b9b4cefd0f58a78d7",
+      "bytes": 2526,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleState.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskQueuedTurn.ts",
+      "sha256": "ef4014b83bee3652c320f52633635f34ba57a3b98b5cae438e27a411205133a1",
+      "bytes": 2259,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskRenderedReplyDebugExport.ts",
+      "sha256": "248616e98b82ff41b87b0fa9024fa4ad4ec889e0de8417d457d9b290969044a3",
+      "bytes": 10140,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-runtime-authority-readers.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskReplyTurn.tsx",
+      "sha256": "ab110d3ac59c44b3c8d0df1b8d1b97cec187ab3b959579e60d99ea0a77c0a991",
+      "bytes": 679,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskTurnStreamPanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskReplyTurnState.ts",
+      "sha256": "9fa4ab6388cd68b73dcbc365fb731d6782929adbaef6e8ca9a469791649e3c29",
+      "bytes": 337,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskReplyTurn.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskReplyTurnSurface.tsx",
+      "sha256": "000c4502ee1065aa2a18b05b6d465a2c3e3b6f0fb6cab7eb5fc7fea6eb84b61e",
+      "bytes": 287,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskReplyTurn.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskRuntimeGoalWakeEmitter.ts",
+      "sha256": "69aa6fe2e2392e14b73051b6b55e542299ab39caa5e028a3bdbc2a85f2cff19e",
+      "bytes": 18093,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskRuntimeGoalWakeSubscriptions.ts",
+      "sha256": "b48e94298334717397209a472fbd83dc437f3ec79a8e20258a248427d7269d76",
+      "bytes": 9575,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskSituationRoomSourceState.ts",
+      "sha256": "88e6d644ebfbe9210569b33e5e429818e3a56f8d88be76d08642a24a16dcfb7c",
+      "bytes": 3739,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleSupplementSurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskSupplementClipTextState.ts",
+      "sha256": "1223717c7ccb8f777a833e7ddaecbf8569ddd41448a181d555f4e18879dbd25b",
+      "bytes": 472,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleSupplementSurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskTimelineFeed.ts",
+      "sha256": "0873d5b718cd4b97256a9b35fd38ce9b297a3ecfa7e2eb484d1aff0556c3f3b1",
+      "bytes": 1944,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-runtime-authority-readers.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskTurnListSurface.tsx",
+      "sha256": "fe9c1f2171e31d10536a1a7093517af77d86a2b9754b02ee5fc4a1fe50320822",
+      "bytes": 1086,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskActiveTurnReplySurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskTurnStreamPanel.tsx",
+      "sha256": "9abd40170283765afd7474e1d75431dca1e3233c8b3c157c11331e6bbeceddd3",
+      "bytes": 28880,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-active-turn-stream.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskVoiceConfirmationRuntime.tsx",
+      "sha256": "cb229d6ad85705e9c3ffe80fb05caf7282dfcd0584cfef1143a697a79f46d217",
+      "bytes": 14675,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskVoiceTurnAssemblyController.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskVoiceConfirmationState.ts",
+      "sha256": "02defc9f571d4d11816521f89d3b9a15c2106097bb64db4e01c3e375d4baf5ac",
+      "bytes": 1169,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleSupplementSurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskVoicePlaybackToolController.ts",
+      "sha256": "479c0ce711ec645f5fe8ed03bfba8033ba57ccef8f5bddd382b1fb4a0ad8bba4",
+      "bytes": 14182,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskVoiceStatusState.ts",
+      "sha256": "74db9f110cdc67db15c7ed2cc36e1fab50591cc7e1e4e66a3742027247ed3217",
+      "bytes": 1159,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskConsoleSupplementSurface.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskVoiceTurnAssemblyController.ts",
+      "sha256": "1fd1e494b4230688ae537dcb03c3764afa51b277511142c1f377b7609e912605",
+      "bytes": 35155,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskWorkflowDebugProjection.ts",
+      "sha256": "215109214886f7199f071293c1166acd3a3030d7ad33d539db005ffed54a361d",
+      "bytes": 4761,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskDebugExportSizeControl.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskWorkspaceContextBinding.ts",
+      "sha256": "2f5189aab5d1a3cdff49ead0ba3b78f6b25ac151be7923ff748a8b73a81a0661",
+      "bytes": 807,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-workspace-context-snapshot.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskWorkstationActionBridge.ts",
+      "sha256": "4de9b1701ba8334268e32fddf2d359c007099163499d1542515a5b7ba48e4547",
+      "bytes": 4522,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionContract.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskWorkstationActionDispatch.ts",
+      "sha256": "8a63f76695e577b65131971beccaa8e01274562c0c54833f33643c745e713de0",
+      "bytes": 4607,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixConsoleConversationWorkspace.tsx",
+      "sha256": "2c8c7ad377b99a014fd50c414ee2ae3b89171a888b3194bf62c53bc229df82ca",
+      "bytes": 77060,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "missing:client/src/components/helix/ask-console/HelixConsoleConversationWorkspace.css"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixConsoleSelectedComposer.tsx",
+      "sha256": "6a3c14b0ba6e1692139ae7f535527a9db0f1716ee46a8f7239f1b3fb7533e925",
+      "bytes": 7226,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixConsoleConversationWorkspace.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/index.ts",
+      "sha256": "566bd6f3e627c430f1975a9bc43803a0a05f02b3edfc14767ade2b1b0d53e98b",
+      "bytes": 49236,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskLegacyConsoleView.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/HelixAskSharedLiveRoomControls.spec.tsx",
+      "sha256": "35287d900ae8fc3cd70c29c6ffa7796844f6591af3b806657053f83769fa246f",
+      "bytes": 10046,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/shared-live-room/HelixAskSharedLiveRoomControls.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomDebugArtifact.spec.ts",
+      "sha256": "03a171d1dc7356c84580a1d2844c0f760d855eaf98b9020e12b550c142d99376",
+      "bytes": 4019,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskWorkflowDebugProjection.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomDialog.spec.tsx",
+      "sha256": "0a85c1748e7510663b1d6f1880a106947626da305beb8ee615f7c92893f5e002",
+      "bytes": 15827,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomDialog.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomDialogNavigation.spec.tsx",
+      "sha256": "1f117d51a1b1c3e25f00facf51fab68677569818aa6cb74c41e2a8304be578e2",
+      "bytes": 2872,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomDialog.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/HelixAskSharedLiveRoomControls.tsx",
+      "sha256": "247394d902b68da4480bb67357199f9a7d7980c8ddf3b8fdd5c050e87f58a492",
+      "bytes": 12716,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomDialog.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/HostedRoomConsoleChannel.tsx",
+      "sha256": "6a40f319d70657f9babc28ee87ec70c8c7385be8e4d3e20218bcb40c5b080deb",
+      "bytes": 3391,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/shared-live-room/HelixAskSharedLiveRoomControls.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/index.ts",
+      "sha256": "dec7e8b9bd4c6d58f13f9c8fb90cd8b1379ada3fa0e1ae44d8f5c0ad1f9475a0",
+      "bytes": 693,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/shared-live-room/HelixAskSharedLiveRoomControls.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomActivePanel.tsx",
+      "sha256": "2d0ed53d1471f39dcd84548e5b18e51ebb106db95dc19f811c603b0c12ecbcb6",
+      "bytes": 16291,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomDebugPanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomDebugPanel.tsx",
+      "sha256": "df49c7d415740b85db68a436d67a41aabaac3da2d7b9521c2d0689073cf2cfd7",
+      "bytes": 5445,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskClipboard.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomDialog.tsx",
+      "sha256": "3b0f84afeef3a4215914488b93033f1ce38d0aa0c669b05d77794f748145ad82",
+      "bytes": 10720,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomActivePanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/useHelixAskLiveRuntimeSession.ts",
+      "sha256": "e5d3ff0b343a18347539d214eada29cb8e1bb102c6e61a840095c77e764f454c",
+      "bytes": 38109,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskMinimalRuntimeWorkspaceContext.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/ask-console/useHelixAskVisualSourceCaptureRuntime.ts",
+      "sha256": "39e71d8bb73f43724b8ff8018b08ed14c53b53a28d818e8188f721178b92ccf7",
+      "bytes": 35105,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/display-audio-capture.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/helix/HelixAskPill.tsx",
+      "sha256": "e7533b46ff98c9c339ebdbe9adbcb9aea43bfebd4e02cdf2bdec490b5442b5a5",
+      "bytes": 1048542,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/helix/ask-console/HelixAskLegacyConsoleViewState.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/HelixSettingsDialogContent.tsx",
+      "sha256": "c1f589e2df0d101fd95861464ddea9c0e013b79c9ebab0d4678efea1ed23347d",
+      "bytes": 126313,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/AgiKnowledgePanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/HelixTsnPanel.tsx",
+      "sha256": "6375ab3d8325acfa0fbcd93287d70ab0cd0a88754ad188ebc31a8f896b8d580f",
+      "bytes": 14167,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelTelemetryBus.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/IdeologyPanel.tsx",
+      "sha256": "0bcf05a83faadeebd025caa5b3904ca4ac74f7e70ff97f39b84cde3d7c1ffc02",
+      "bytes": 41012,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelTelemetryBus.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/NeedleIpeakWorksheetPanel.tsx",
+      "sha256": "d04d5d6240e034fcefbcbeec628785f4bea67111803810f85b50237e6979b45f",
+      "bytes": 31272,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "missing:client/src/data/needle_Ipeak_worksheet.csv"
+      ]
+    },
+    {
+      "path": "client/src/components/nhm2/Nhm2DiagnosticShelf.tsx",
+      "sha256": "951e8b805e527825679f78e03517529eb4856bf73f63d34229ed754b498cffb1",
+      "bytes": 10112,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/NeedleIpeakWorksheetPanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/Nhm2SolveStatePanel.tsx",
+      "sha256": "bb5bbd6c6d3274458fff027539d0ac852cd655511652fd3de817bdb7e5fb857d",
+      "bytes": 40091,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/AlcubierrePanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/noise-gen/ProjectAlbumPanel.tsx",
+      "sha256": "58aece9b19a13d030f793f667361ae79e3c46292a58c0a92f24b5c812f0b1c32",
+      "bytes": 31836,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useKnowledgeProjectsStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/noise-gens/AtomLibraryPanel.tsx",
+      "sha256": "6adf320583db54918f37527edf94c74a50f493c6835b73b568a721779cf45306",
+      "bytes": 17512,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useKnowledgeProjectsStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/noise-gens/OriginalsLibraryModal.tsx",
+      "sha256": "89c1a881b76699b7010136fb207148e78d20295485c3e3caa09dd88d65cc95fe",
+      "bytes": 10393,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useKnowledgeProjectsStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/noise-gens/UploadOriginalsModal.tsx",
+      "sha256": "8bd29a687d6dba9c5180e94c1a714622ad1ec3226feda9984a60ca02731e9abc",
+      "bytes": 102476,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useKnowledgeProjectsStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/panels/CasimirTilesPanel.tsx",
+      "sha256": "33b30c3d46be2fe6eb58fb9d1a58fa187e737b9cf4249f5db6f56cc8464eed43",
+      "bytes": 6608,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelTelemetryBus.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/panels/MoralGraphLaunchPanel.tsx",
+      "sha256": "d0cfd9847cd0fcb20d71ada209703e3c29a81bcf75de10b16f53c7372bd65b7d",
+      "bytes": 1999,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/panels/MoralGraphPanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/panels/MoralGraphPanel.tsx",
+      "sha256": "347485603a0f116e41d51f0123214f113f5330d99055ddc76341de00d86c8c4f",
+      "bytes": 96513,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/hooks/useDynamicTextTranslations.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/panels/StagePlayBadgeGraphPanel.tsx",
+      "sha256": "f5d8e0b9238da3d16dcf39b92e1bfc69a4ab72ddaa308d498f0e7495887de676",
+      "bytes": 623340,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useSituationRoomStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/panels/TheoryBadgeGraphPanel.tsx",
+      "sha256": "eecaf4a73215cfe0e37f261a9af214b9da5df4b3bf91cd025a5cb3d7444e7f98",
+      "bytes": 861527,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/panels/WarpGrNhm2Lens.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/panels/WarpGrNhm2Lens.tsx",
+      "sha256": "e8694e2dbdf30ce3f026d444fed33e1a9061958493b68610bfb38f4acd0bd147",
+      "bytes": 14259,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/openDocPanel.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/PipelineProofPanel.tsx",
+      "sha256": "3dface2b144f113f4e21c4c0e839a8a4832010a2269a0de2cacc51d51d98f72d",
+      "bytes": 19811,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useDesktopStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/solar/__tests__/SolarSurfaceRegistrationViewer.spec.tsx",
+      "sha256": "bc40659c137be2a454dba611c194aac18dfc71ca9cc38ed98b9c6fc87b14a54c",
+      "bytes": 3860,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:tests/fixtures/sunpy-hmi-wcs-registration.json"
+      ]
+    },
+    {
+      "path": "client/src/components/SolarProfileComparison.tsx",
+      "sha256": "5e1ec15fd30b0e149e2efa5a918e3f2943b83540d68cb77f36a6b830cf60ca5b",
+      "bytes": 7102,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:public/solar-workstation-comparison.js"
+      ]
+    },
+    {
+      "path": "client/src/components/SolarResearchEvidenceReplay.tsx",
+      "sha256": "b66719da49a03f059f4a8be729bbfe6dbfb6b89dacbdadb124042c9f36c8db21",
+      "bytes": 16336,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:public/solar-workstation-comparison.js"
+      ]
+    },
+    {
+      "path": "client/src/components/WarpProofPanel.tsx",
+      "sha256": "48fde735cf6f7f9db21ab9d6cbd28105e5450dd73a724c361c1cbe1e46c34622",
+      "bytes": 66225,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useDesktopStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/NarratorPanel.copy.spec.ts",
+      "sha256": "fd375314cdc288d6ad277e1854d0752bc6cb109412079b8e04babb959e214c32",
+      "bytes": 1879,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/workstation/NarratorPanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/WorkstationPanelHost.account-policy.spec.tsx",
+      "sha256": "df9ebf665262e42704492334f9d51447c2140afffa86c704d4fb0d6aac0d160b",
+      "bytes": 5445,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/workstation/WorkstationPanelHost.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/WorkstationPathBar.suggestions.spec.tsx",
+      "sha256": "648300256d7900cfe9237d5e6ca033654ea48df5f3ddcf109e910245bb31e4bf",
+      "bytes": 2501,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/workstation/WorkstationPathBar.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/DocumentImageLensPanel.tsx",
+      "sha256": "54e33c0cef0d6a577a2bf8e02684f06e23f98d1e1e5062cfe55863899823229e",
+      "bytes": 44,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/workstation/ImageLensPanel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/guide/__tests__/CasimirGuideOverlay.spec.tsx",
+      "sha256": "5d20ce411cd17c584e16d5a91ea0a567e3c6a48005a4b1f2d8f48e301755ceed",
+      "bytes": 21305,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/workstation/guide/CasimirGuideOverlay.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/guide/CasimirGuideOverlay.tsx",
+      "sha256": "e288bee983a5559ffd92cda73de8ccb7dee79c1befb7dd986da1832c86e87b0b",
+      "bytes": 40838,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/HelixAskDock.tsx",
+      "sha256": "5934b5c9749138e7d98227db73c1ac0e976378f24834c681b72b80beb55819cc",
+      "bytes": 1642,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/HelixWorkstationShell.tsx",
+      "sha256": "4f479476e7ff3b51a4387954837a154915fbe08ac4a47a47617df8038c467072",
+      "bytes": 29790,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/workstation/HelixAskDock.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/ImageLensPanel.tsx",
+      "sha256": "50eba9bdac8c0e9b5e547098c1be32f7690c954e585291a29f3f5b29fdc1dff5",
+      "bytes": 41552,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/LiveAnswerEnvironmentPanel.tsx",
+      "sha256": "a8a0f9258fdb39a0a4c1550e5f73e571e894443cc85a3140226160ab539996ee",
+      "bytes": 329786,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/display-audio-capture.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/mobile/MobileHelixAskDrawer.tsx",
+      "sha256": "7057ac9592917f77a0b67d6e6be0f90994c7e7faf32543be03e433b08386346d",
+      "bytes": 4279,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/mobile/MobileWorkstationShell.tsx",
+      "sha256": "09c8a332d7fdd224743e843f2d32309d9a7b50e04bfd48422b92336e63c01cd0",
+      "bytes": 602,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/NarratorPanel.tsx",
+      "sha256": "3040a5997441b6999487de7c4f7d1fff53828849b29778abed8a3b77de8ec93f",
+      "bytes": 20843,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/NarratorReadRegionOverlay.tsx",
+      "sha256": "75caa85d084150dc2d8f90fd04488469d6f27c44a5230c097116918f97c0b92d",
+      "bytes": 2996,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useNarratorStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/SituationRoomPipelinesPanel.tsx",
+      "sha256": "cc599c77ea08e5c1d53665f92b9af47dc6e1ee0bc75f528f1d4a0418124370ea",
+      "bytes": 198032,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionContract.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/SituationRoomSourcesPanel.tsx",
+      "sha256": "92e8648f6d7ad5c6ea517d147376b5d6c7c06704f0b0d0c4373a744a445c8dbc",
+      "bytes": 16674,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useSituationRoomStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationPanelGroupBox.tsx",
+      "sha256": "1e1e3666d1479926546e1108d97b3656ece386c6b260f7d7fdea3c88a0ac0305",
+      "bytes": 1193,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/workstation/WorkstationPanelHost.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationPanelHost.tsx",
+      "sha256": "2f63a015d163fcff54a750e3c096da41fd2738a6929087b20f43e9a6932d7175",
+      "bytes": 6721,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationPanelTabs.tsx",
+      "sha256": "4bd4bb0ccdb56f784c601f92b19976c4e6da63f0c4331d2765bfce133e299858",
+      "bytes": 12442,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationPathBar.tsx",
+      "sha256": "ec23fd85a8ce2605a3212d4ec7f65f2f11a6a893107e35f5854343421fdd35e5",
+      "bytes": 14562,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationStage.tsx",
+      "sha256": "aa5ed95368462ce89b519fb21f7c2bd1141ed5ad64f77cd01da94fbafbf6b428",
+      "bytes": 594,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/workstation/WorkstationPanelGroupBox.tsx"
+      ]
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationTaskManagerPanel.tsx",
+      "sha256": "6f9d18678f6cbbf67da71855c399130fb3dcd6f8f0725c90a34172939d439f5e",
+      "bytes": 33624,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/dev/solar-magnetic-globe-preview.tsx",
+      "sha256": "e6aaeb99da24dd1197f6adbfe4e976673cd7adcf494a3e4882b1bb4e54ba8df9",
+      "bytes": 538,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "missing:client/src/index.css"
+      ]
+    },
+    {
+      "path": "client/src/hooks/useDynamicTextTranslations.ts",
+      "sha256": "c89f633d30dc64d2e93bab0f34d7fb212b8348d5210d0a96813e51ed22410d62",
+      "bytes": 5288,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/documentTranslationClient.ts"
+      ]
+    },
+    {
+      "path": "client/src/hooks/useEssenceProfile.ts",
+      "sha256": "6b35d214aa07059a776812e1b02f62f816dc6f0ff0f3fbdb36564225a8260dea",
+      "bytes": 2083,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/api.ask-turn-admission-continuation.spec.ts",
+      "sha256": "f6c494f511381823ac06eed853d3e3ce9110468cc335aefdb15078a1ccf6d51d",
+      "bytes": 6626,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/api.calculator-receipts.spec.ts",
+      "sha256": "69927927fe58fdc85d5301ae09c8fb1231b4bde7264e31baa00067ea630664ce",
+      "bytes": 4401,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/api.image-lens-region.spec.ts",
+      "sha256": "17a4ac9a2dc3249ce0a2a011d5fea4e738f68019108469b173b99308cf4f5404",
+      "bytes": 10462,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/api.realtime-grounded-feedback-binding.spec.ts",
+      "sha256": "05b16b765a5244a01b415465b396bfb39ff0d599a549957f81e79a6bd4474842",
+      "bytes": 2511,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/api.voice-speak.spec.ts",
+      "sha256": "1acd6c5fc7c72ca342ed8a781797005fa8c78f810168fdca03fe589d5fca7535",
+      "bytes": 4799,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/api.voice-transcribe.spec.ts",
+      "sha256": "e5f135bd486d4a48e18696b03c1e11b03d05e3c726460d792c7ea820029897ae",
+      "bytes": 62145,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/debug-export-capability-lanes.spec.ts",
+      "sha256": "592d51b30c19d376f82e1a98c7052349d028c4beae4b50d7ad431e329cbb6e6b",
+      "bytes": 194606,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/debugExport.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/agi/api.ts",
+      "sha256": "775044be3030e26282e37da0bf3aa21c3eeb28074f0a80b8cbe482881ed30898",
+      "bytes": 145669,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/consoleTelemetry.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/agi/consoleTelemetry.ts",
+      "sha256": "7f3e8baa87cc1f1f5901bff35f501e87bb54747bf5c0990a399af137230ae56f",
+      "bytes": 3382,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/agi/debugExport.ts",
+      "sha256": "e7dfa3eaf5bfa16f35e78b22b5b680a9a472584bc81aacc93114f71324038063",
+      "bytes": 212905,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/narrator/narratorDebug.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/desktop/panelRegistry.ts",
+      "sha256": "9c15e4a1e0d7558667b1daaf16c329f9ec2d4ed66b9cc71b07f5a1a73f5298ce",
+      "bytes": 16046,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/pages/star-watcher-panel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/lib/desktop/panelTelemetryBus.ts",
+      "sha256": "ace980346ef6e968001a9e26b968c3254e5346c5fee9aeed28513d196d6de0fb",
+      "bytes": 1490,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/desktop/shareState.ts",
+      "sha256": "8ddbc88d89412c7574e0fb2dc290ee75c84a9282ec31333e620883ea08dccc22",
+      "bytes": 746,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationDeepLink.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/docManifest.spec.ts",
+      "sha256": "6fb9fc7b1930a01cfbbbdfb54cb98983c02bb40c0f0711921db9efe86b6f8931",
+      "bytes": 9363,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/docManifest.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/documentTranslationClient.spec.ts",
+      "sha256": "69af59f61917f694eb2f721a4ab84555a5c05e8c4c7d9b0c2b03a011993e260d",
+      "bytes": 44540,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/documentTranslationClient.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/liveTranslationInlineProjection.spec.ts",
+      "sha256": "720c0646f0e6bb0bf6526910a325acbf587b42eb6b4881e6958be76bf50ed88a",
+      "bytes": 97929,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/liveTranslationInlineProjection.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/liveTranslationInlineRenderer.spec.ts",
+      "sha256": "ced1edddfabfd9494c9d6a044d7c275370c8aafdbf68c3f72637950342e39bf8",
+      "bytes": 40474,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/liveTranslationInlineRenderer.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/liveTranslationProjectionEventIngestion.spec.ts",
+      "sha256": "15a0279bc23980c6489c980e66035de0a17b966fb47c933db2dba472a9155891",
+      "bytes": 67523,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/liveTranslationProjectionRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/liveTranslationProjectionRegistry.spec.ts",
+      "sha256": "10ed49e7071e1148362b27c8153fcccec953984b021b0ebaeae5ac9369f6d008",
+      "bytes": 164388,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/liveTranslationInlineProjection.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/paperReadCommand.spec.ts",
+      "sha256": "16596fc259485d5697f811e22ed21936df94aad2509125aff9121b682a6aaa3e",
+      "bytes": 3895,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/docManifest.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/visibleTranslationContext.spec.ts",
+      "sha256": "df34d481cbb07779bf238d9f2e52ab4ce93d453545e5e84997709fdb4ed736bc",
+      "bytes": 23427,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/visibleTranslationContext.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/docManifest.ts",
+      "sha256": "c090f442d4997a6eb03545e16918c861792fe8afe6febd87b686ec62eff92c5c",
+      "bytes": 16588,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:docs/doc-taxonomy.v1.json"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/documentTranslationClient.ts",
+      "sha256": "ddf95330eb2bfd372244714cfa08a4976d7bd361be2fd32d482dbb8826922942",
+      "bytes": 42390,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/liveTranslationInlineProjection.ts",
+      "sha256": "147f3f6a96ed4babe447ceef54e168313483445b91079ae8f75630da0977fb12",
+      "bytes": 59816,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/documentTranslationClient.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/liveTranslationInlineRenderer.ts",
+      "sha256": "c4af7bcb920d2cd02a0e6a0c9bbabbb8fa351660c866336c0a0bce44603cc09d",
+      "bytes": 5813,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/liveTranslationInlineProjection.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/liveTranslationProjectionEventIngestion.ts",
+      "sha256": "d4f816b9589931e2df1cee92f9cb88cf280bee522f4831120eac147ba3c5b16b",
+      "bytes": 2093,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/liveTranslationProjectionRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/liveTranslationProjectionRegistry.ts",
+      "sha256": "e733bc484609ad527a09750e25be1fbdf0c3b720c8d1c52a18625e11c91c158f",
+      "bytes": 107697,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/liveTranslationInlineProjection.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/openDocPanel.ts",
+      "sha256": "f2183ebfda95f3ef64ad2f62574819718975990f9609096c1a52ce76d10a4613",
+      "bytes": 1432,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useDesktopStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/paperReadCommand.ts",
+      "sha256": "fd5fe0b558ccb3e68b800c5c3949c818b0a8952cd2c8d1667b02dc2f358baf67",
+      "bytes": 9433,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/docManifest.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/docs/visibleTranslationContext.ts",
+      "sha256": "a58e8d6464a6c22193ee131fc82b4c8f30cf03691ca404af590cef1b39601299",
+      "bytes": 24550,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/liveTranslationInlineProjection.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-active-turn-stream.spec.ts",
+      "sha256": "4a1cd18db9e23cf084b1496d13d6307eb792f920dff2f1299c28dc47f1df9059",
+      "bytes": 9291,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-active-turn-stream.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-continuous-turn-display.spec.ts",
+      "sha256": "c7137b7dd57d0399ac0d6a6ee7ad9a615749c3f373a5b4ceb81cd4bc10a82538",
+      "bytes": 7440,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-continuous-turn-display.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-live-source-display.spec.ts",
+      "sha256": "98adff89c33c5d83465e70f4aa578baf2f15dbce8ebbd22710f339e3593f763a",
+      "bytes": 3607,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-live-source-display.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-pending-input-readers.spec.ts",
+      "sha256": "dafd40d4c78e03c2665b2b933715fb36f5d0c2a53b3f4ad4af3ea540e2b4f4d2",
+      "bytes": 4023,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-pending-input-readers.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-runtime-authority-readers.spec.ts",
+      "sha256": "84bd82ca4e3fbb8079636cf495be2d48fec4475d7bcd53b6d35289605498ae1c",
+      "bytes": 5549,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-runtime-authority-readers.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-theory-runtime-context-snapshot.spec.ts",
+      "sha256": "109a05f57c0e62914444bf7ffe22d17efc67f3ae7435811c4960b87300db679e",
+      "bytes": 1171,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-workspace-context-snapshot.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-voice-command-lane-policy.spec.ts",
+      "sha256": "d511a9f51d640f8a996aeb53ef2014cd0548ed319628983aefe84a1b983383c2",
+      "bytes": 4435,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-voice-command-lane-policy.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-voice-reasoning-dispatch-prompt.spec.ts",
+      "sha256": "7b528792526e2ef2f22095dbfff4dacf27ae13a0d76975678c5cf072e773e2a5",
+      "bytes": 6324,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-voice-reasoning-dispatch-prompt.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-workspace-context-snapshot.spec.ts",
+      "sha256": "8192583c4325c6e29dfd77180761381690c696683c6d8d1f82edec0f752db30f",
+      "bytes": 45279,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/visibleTranslationContext.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-workstation-fast-path.spec.ts",
+      "sha256": "06ee7b5bdf882f56750bd6db2574a35f76b2bd805127581207cfd02bd6dd08b3",
+      "bytes": 2463,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionContract.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-workstation-pending-input.spec.ts",
+      "sha256": "53faa3bd55067969556acc6c68b65309682d38051cbd867fde690a2c68b3da4e",
+      "bytes": 3464,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionContract.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/display-audio-capture.spec.ts",
+      "sha256": "01f294c78d0c5e08f9a9045a01aeebfe0ae3877ad7dee27cfefc4e296077b998",
+      "bytes": 7447,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/display-audio-capture.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/imageAttachmentLensRun.spec.ts",
+      "sha256": "92a7595a0149a07f6f8e9af2a071c07804bea0628058e2a546e8f85a1326a2ff",
+      "bytes": 4611,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionExecutor.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/micAudioSituationCapture.spec.ts",
+      "sha256": "a33f01f5d7bfe2936597c4d23bd3a8689ef4ec3a858acfb85cfb63dd35e075f5",
+      "bytes": 2295,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/mic-audio-situation-capture.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/reasoning-theater-zones.spec.ts",
+      "sha256": "af518ad6e956cfb176443567b82fb3d88b02fbb25a6bc9952c037ef37ac652df",
+      "bytes": 16551,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/situation-room-account-language.spec.ts",
+      "sha256": "7bb34136c03c8932d439ebc20d2c2954b50126fedb96d6087744517e608f5bd1",
+      "bytes": 1511,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/situation-room-account-language.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/situation-room-job-drafts.spec.ts",
+      "sha256": "8d92def0cae888d568d861aef300eedf653e4875f46f35d9b79922414f07aef7",
+      "bytes": 2964,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/situation-room-job-drafts.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/standbyVoiceDelivery.spec.ts",
+      "sha256": "5664792f0122e40a8fefcb1ee74f83b7a9c689299ff9cadb4637148599a249e5",
+      "bytes": 4339,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/standbyVoiceDelivery.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/ask-active-turn-stream.ts",
+      "sha256": "552c92905101d95a2fd9fca1abd4104b8ebbaa670e2065329812e9afc861afb9",
+      "bytes": 21903,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-observer-events.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/ask-continuous-turn-display.ts",
+      "sha256": "9f7394bd49a1923c7d334e7b94903b3697d62ef1c395d4b41bc5a1b870972623",
+      "bytes": 11297,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-active-turn-stream.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/ask-live-source-display.ts",
+      "sha256": "8aa96a4846d90d97d1502e8adb6e3d4dd44ee2350e482e4b056974098d1c8a90",
+      "bytes": 18805,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-active-turn-stream.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/ask-observer-events.ts",
+      "sha256": "e2ba1c3f74677e9d80a1b25bfba37f8669366c873a1b21a0ccb75b5cb40d131d",
+      "bytes": 10162,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionContract.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/ask-pending-input-readers.ts",
+      "sha256": "11247c8f41098245e819ccc987d92915a7fa8e77b3ef8e2fd6198002efbd9d43",
+      "bytes": 5131,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/ask-runtime-authority-readers.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/ask-runtime-authority-readers.ts",
+      "sha256": "ebb380955813abc59b72edc685ae50b5cdde04d1357b8023ed021929b0e34e2f",
+      "bytes": 13812,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionContract.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/ask-voice-command-lane-policy.ts",
+      "sha256": "a814e758aae48ee3c471f1e379704c3ed0563748fdc9a50b5e951cd9e4bfe30f",
+      "bytes": 3305,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/ask-voice-reasoning-dispatch-prompt.ts",
+      "sha256": "90eaa393866893b781e59f84487a061a2b9c6938103c30dbdde30dea735189c1",
+      "bytes": 7349,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/ask-workspace-context-snapshot.ts",
+      "sha256": "3ccee63e57edd451ce68a66874285297d156cff4d160bc34379080b268fba3da",
+      "bytes": 25489,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/visibleTranslationContext.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/ask-workstation-fast-path.ts",
+      "sha256": "90c32e8d1718b23ac055f90b1ba1f4148b848907fd7cb1f8c3920a76c5e6173c",
+      "bytes": 1939,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionContract.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/ask-workstation-pending-input.ts",
+      "sha256": "9e9e8e36498fbe323d0836a74425b5a4e8e515f773878a06b90472623f04dd2d",
+      "bytes": 3015,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionContract.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/display-audio-capture.ts",
+      "sha256": "a63095b1a4f217d30dec947f8afdc92f584e647468e9bb5c81c7a8a69b11ffbf",
+      "bytes": 11087,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/imageAttachmentLensRun.ts",
+      "sha256": "137f2406adcb5077e62d886ff2224dd60e3d8d1775f7fd298e73541a43e811da",
+      "bytes": 6510,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionExecutor.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/mic-audio-situation-capture.ts",
+      "sha256": "ec2a1972a26f8a13587bc4a87a1633a712c063382128e573b39ce1d38999325d",
+      "bytes": 8348,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/reasoning-theater-zones.ts",
+      "sha256": "c7df92c479a7dc66673d7f2c227cc2d11552fc7875ad1b22cd85b9ce608d18f9",
+      "bytes": 43818,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/situation-capture-context.ts",
+      "sha256": "8263592474a5c7c05bc01ef8856a5d2ae9f5f0fc6b6198ccad9148ed38ed7458",
+      "bytes": 4309,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useSituationRoomStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/situation-room-account-language.ts",
+      "sha256": "69cd7a630b6009d7ae726250970e33b386fbb7868bf51be0a2a59df54416d291",
+      "bytes": 1004,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/documentTranslationClient.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/situation-room-job-drafts.ts",
+      "sha256": "0767302d43246ae82a33ca8b75aa2b8d4744399e6eca9eb0823ebbf5eb00ede3",
+      "bytes": 6458,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useSituationRoomJobStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/situation-room-job-recipes.ts",
+      "sha256": "027feef91207143a69ced557f57228b5c588e21ad620ea36352feef2f6d90bd2",
+      "bytes": 7719,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useSituationRoomJobStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/standbyVoiceDelivery.ts",
+      "sha256": "b8bacb784e8748507091541b213cf5992ec4879560bce3c49c1e3eb2374d73af",
+      "bytes": 2724,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/helix/workflow-demos/__tests__/workflow-demo-debug-export.spec.ts",
+      "sha256": "53c79d759e46c2e3d09a94e8f7713df2527be2af876dda8781a2ac93cf558fbd",
+      "bytes": 2932,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/debugExport.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/narrator/__tests__/hoverFocusInspector.spec.ts",
+      "sha256": "8efb7b8dc3ad606ca22a987856d0df6c0b7c45cf292078bb1b73e9d2c4791077",
+      "bytes": 6550,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/narrator/hoverFocusInspector.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/narrator/__tests__/narratorAudioPlayback.spec.ts",
+      "sha256": "a8531a2343905b6293629c40383167e38e0a54ade8d25ca0ebda6ab0983101a9",
+      "bytes": 3095,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/narrator/__tests__/narratorDebug.spec.ts",
+      "sha256": "af2f8f3a06be59fe49ebdc303b6f8eea249ebe978020ea021de908d0bb108dcc",
+      "bytes": 1740,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useNarratorStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/narrator/__tests__/narratorVoiceBridge.spec.ts",
+      "sha256": "533e85dd022b8207351e2cee8006c19a0960c84ab14cbde30bd271b3f13a0697",
+      "bytes": 2231,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/narrator/narratorVoiceBridge.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/narrator/hoverFocusInspector.ts",
+      "sha256": "52e224c62840b5579c96e72be605e8e67983f0b133aa40253714f106f88f1172",
+      "bytes": 20336,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/narrator/narratorAudioPlayback.ts",
+      "sha256": "4b0a143181e2da1b79f577d8ffde8518d77d30a4d4b16b65cc5a6b620f863eb4",
+      "bytes": 17327,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/narrator/narratorDebug.ts",
+      "sha256": "173a02e3ffca3f8c680ac97d3f52bb29e0e0a3576100450b64f309163ebe31d2",
+      "bytes": 4114,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useNarratorStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/narrator/narratorVoiceBridge.ts",
+      "sha256": "beab7203b7a1fbc7b7ceedf1064d64af82c59805afadecd12f76a53a14168762",
+      "bytes": 2244,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/agi/api.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/surfacekit/generateSurface.ts",
+      "sha256": "c83dc00e909abd91cb8afda6654500c6f4461de541a58ca64c7930c21a7dffc9",
+      "bytes": 6241,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/surfacekit/slates.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/surfacekit/slates.ts",
+      "sha256": "17aad0305c13edee10f05b130962c0455a173a72249e84f5b583c67a7426ff8d",
+      "bytes": 1326,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "missing:client/src/assets/surfacekit/gradients/bw-linear-01.svg",
+        "missing:client/src/assets/surfacekit/gradients/bw-linear-02.svg",
+        "missing:client/src/assets/surfacekit/gradients/bw-radial-01.svg",
+        "missing:client/src/assets/surfacekit/laminates/laminate-01.svg",
+        "missing:client/src/assets/surfacekit/laminates/laminate-02.svg",
+        "missing:client/src/assets/surfacekit/meanders/meander-01.svg",
+        "missing:client/src/assets/surfacekit/meanders/meander-02.svg",
+        "missing:client/src/assets/surfacekit/micro/micro-grid-01.svg",
+        "missing:client/src/assets/surfacekit/micro/micro-dots-01.svg"
+      ]
+    },
+    {
+      "path": "client/src/lib/webgpu/hull-pathtracer.ts",
+      "sha256": "6d5055e6731b77d4ef393cca2ec42ae06c46dbc8ab4c7aa9d77d06cf93c1f9fa",
+      "bytes": 28026,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "missing:client/src/lib/webgpu/hull-pathtracer.wgsl"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/ideologyPanelActions.spec.ts",
+      "sha256": "1daee564e42a77e8901a074bd0b8095e9306a9ac85e2330518bba98487aeabf6",
+      "bytes": 4654,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/ideologyPanelActions.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/intentClassifier.spec.ts",
+      "sha256": "e12cf93a15b1f3a6471ca0bd1691654659a32ebb3e19af4adb12035ad557d1fa",
+      "bytes": 11238,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/intentClassifier.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/panelActionAdapters.compound-theory-run.spec.ts",
+      "sha256": "d490e4dc8595974eb0ac3f3ff9c7e6b2831fae00ffb9d7d788b13cc7d0df9d2f",
+      "bytes": 6880,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/panelActionAdapters.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/panelActionAdapters.image-lens-focus.spec.ts",
+      "sha256": "4cf6d9aece7d0dbb3a7e659c0ef277303c295fca783b124dc9d93e5a12e7460e",
+      "bytes": 3054,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/panelActionAdapters.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/panelActionAdapters.live-pipelines.spec.ts",
+      "sha256": "80b8225d95f9e561251e965e13ca2bc02c0bbd2ddf3d32301ad484f5560b2bc9",
+      "bytes": 1403,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/panelActionAdapters.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/panelActionAdapters.physics-context-plan.spec.ts",
+      "sha256": "7834d09f40a9be9539c273bc2edc0c55b1fa31e1ad0fbaa93f715a16f557af1e",
+      "bytes": 3802,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/panelActionAdapters.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/panelActionAdapters.spec.ts",
+      "sha256": "5117f3921447eee3d24200233cda9f0a375f3bd6758e41f04550f25bfa01eb74",
+      "bytes": 109996,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/panelActionAdapters.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/setupExecutionReceiptPost.spec.ts",
+      "sha256": "c331a0d621b71b44e4d0e9a9aaf17d1c12b4235771e1222a4acb657bd0997872",
+      "bytes": 2543,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/setupExecutionReceiptPost.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/workstationActionExecutor.spec.ts",
+      "sha256": "c5a5ba3b39c1e50de0cc74e54c528344f986f3b1620522e688109e76fe610420",
+      "bytes": 2556,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionExecutor.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/workstationDeepLink.spec.ts",
+      "sha256": "e2ea06961713b162211a409fcd54836e42f8f0bab0586a1a7cf9164104516543",
+      "bytes": 6445,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/shareState.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/workstationDynamicTools.spec.ts",
+      "sha256": "cc42b5a8ba170f1e9ac1faf84d0a4238b81ef1d7d84784c7f96dabed546bba08",
+      "bytes": 10220,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationDynamicTools.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/ask-workstation-parser.ts",
+      "sha256": "77b8d157c2226f20c6a712708d5853dd71d97703bbe241b1591d0ba2fc6ff74a",
+      "bytes": 3540,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionContract.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/ideologyPanelActions.ts",
+      "sha256": "37e8856929a102c649e2cc8751f8e3c4fe6567bc4cd7916466c78139a4fdcff8",
+      "bytes": 14591,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/panelActionAdapters.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/intentClassifier.ts",
+      "sha256": "852263dec82297ab9d6a5465f03aa0ef78e5ce0828cd4265ab30829cdc34cdf0",
+      "bytes": 22398,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/paperReadCommand.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/jobExecutor.ts",
+      "sha256": "8106236e189b067f657eb71695a902b12365402b24466edf361f965d7737a62e",
+      "bytes": 20578,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/panelActionAdapters.ts",
+      "sha256": "4922daf6a46f8ca633145a92057f00b6f7e36d1c8baa2a9f5a830afad07cb57b",
+      "bytes": 282367,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/docs/docManifest.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/performance/startWorkstationPerformanceSampler.ts",
+      "sha256": "2951960aa8bc05d6f92e971ff7fd99265a4b5db27c4fb13cd03b571b18d39554",
+      "bytes": 12532,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useMobileAppStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/processGraph/__tests__/processGraphCapture.spec.ts",
+      "sha256": "691d5fe5911518a812b2371881c6323bfe1ee7214a1b2547c342c2162382faa0",
+      "bytes": 1158,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/processGraph/startProcessGraphCapture.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/processGraph/startProcessGraphCapture.ts",
+      "sha256": "5288c136ced5ca8c72bacf839a560887b1ccb8fc8584cf9acd539df136f3f4c3",
+      "bytes": 10379,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/setupExecutionReceiptPost.ts",
+      "sha256": "c8ea988d28d37163ef0c06d242a1e405d86b8d4d54ab3db89aeae2aa57f32294",
+      "bytes": 2599,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionContract.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/situationRoomSetupActions.ts",
+      "sha256": "d1ed8a23a4f85d50d395df642cd4dc0168623db3ec4d7e04556631c0a4eb5ac1",
+      "bytes": 8668,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useSituationRoomStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/workstationActionContract.ts",
+      "sha256": "35202213290ee13c1c4a2b90ed94646c5ad71ba731181043e185c624dc87eaf5",
+      "bytes": 9891,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationDeepLink.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/workstationActionExecutor.ts",
+      "sha256": "625ee660e79a1b6f9ad248900bf3a368c8d77cdcb7283f580f94998f94b0333e",
+      "bytes": 6333,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/panelActionAdapters.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/workstationActionLiveEvents.ts",
+      "sha256": "f9631deb8f0305ccaf59093e0ee76c6527e976905d5aaea96e5fb1d8fec84c1d",
+      "bytes": 2506,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionContract.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/workstationDeepLink.ts",
+      "sha256": "8f37333b761fe1ad7f3fab081cac17289a14c8c3444c9a31f4dc43fec0730aef",
+      "bytes": 8454,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/lib/workstation/workstationDynamicTools.ts",
+      "sha256": "6067407ac4672c418cbe7d1a9ca3408e2eb585a713e744af205fd5be51af2aae",
+      "bytes": 2324,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/situation-room-job-recipes.ts"
+      ]
+    },
+    {
+      "path": "client/src/main.tsx",
+      "sha256": "7f799e389357f3980d8b0d9f4a803984c96bea98f66a73117c74b8ca361327b0",
+      "bytes": 7467,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "missing:client/src/index.css"
+      ]
+    },
+    {
+      "path": "client/src/pages/__tests__/site-connect.spec.tsx",
+      "sha256": "fddd26c1e225496ab952e8871f49b0f973e1c43a769fe2a7ab49d5ec136acd2d",
+      "bytes": 3617,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:client/site/site-connect"
+      ]
+    },
+    {
+      "path": "client/src/pages/desktop.tsx",
+      "sha256": "ab45268fcde2c923563247f561f63223f6e479889cfff157d9e1f6f042a793ec",
+      "bytes": 44841,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/pages/helix-core.panels.ts",
+      "sha256": "2e1550795c3e1c47d55037441ee20d54aa0b13e787f188fb9bd83945a03251c5",
+      "bytes": 19815,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/pages/star-watcher-panel.tsx"
+      ]
+    },
+    {
+      "path": "client/src/pages/helix-noise-gens.tsx",
+      "sha256": "9992ed7f61a572112c016a19b99b81c27a58d3f102be8e5c0b220703afc49566",
+      "bytes": 50702,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/shareState.ts"
+      ]
+    },
+    {
+      "path": "client/src/pages/mobile-start.tsx",
+      "sha256": "7b3e67536dca88593d461bb654f6385c5d7d59ef491d8ea271aa75f8f492b7a2",
+      "bytes": 46035,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/pages/noisegen.tsx",
+      "sha256": "6e0fa725a91eadccf626f246c94e8c25cf988a59ffc1957c61ee45d42d42c98c",
+      "bytes": 1044,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/pages/helix-noise-gens.tsx"
+      ]
+    },
+    {
+      "path": "client/src/pages/star-watcher-panel.tsx",
+      "sha256": "6fdc13e058422d8d36847547516c7fd2995bc6c52260e6d96e45ce144f2f4b29",
+      "bytes": 176005,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "outside:public/sunpy-icon.svg"
+      ]
+    },
+    {
+      "path": "client/src/pages/start.tsx",
+      "sha256": "cfcfd4dacca6fe013bc32894ee0a5593fd947238cb9a665295be95350e0784eb",
+      "bytes": 19871,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/components/HelixSettingsDialogContent.tsx"
+      ]
+    },
+    {
+      "path": "client/src/store/__tests__/useWorkstationActionExecutionStore.spec.ts",
+      "sha256": "78f604cb809ce80199501fc306f650cfcd74e83efaed9b0ce304693dc45ef0a9",
+      "bytes": 3369,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/workstation/workstationActionExecutor.ts"
+      ]
+    },
+    {
+      "path": "client/src/store/useDesktopStore.recent-panels.spec.ts",
+      "sha256": "eafe9d922078d11230458d1893f110376d234ebda92c699adf3b8896a6cb1fe6",
+      "bytes": 1397,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/store/useDesktopStore.ts",
+      "sha256": "790f8bcebb2c60c80e43f15459a1c53cd8b905f82476e8db133440304adc82c6",
+      "bytes": 16275,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/store/useKnowledgeProjectsStore.ts",
+      "sha256": "7db909c50b925f3649ea23bc0d2eebbb8b19f6f611ca8edf49eca41a02aba313",
+      "bytes": 13988,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/shareState.ts"
+      ]
+    },
+    {
+      "path": "client/src/store/useMobileAppStore.ts",
+      "sha256": "5c4a5a3b86ae20199df4abe24205f2aa57b2acbeaae80b38ce89757b60ff7f65",
+      "bytes": 4260,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/desktop/panelRegistry.ts"
+      ]
+    },
+    {
+      "path": "client/src/store/useNarratorStore.test.ts",
+      "sha256": "3d4f9ba81cdb6a753756757e582c68e7145f76d880b9395e4927dccb7c532957",
+      "bytes": 7977,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useNarratorStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/store/useNarratorStore.ts",
+      "sha256": "e0a53719c7efebe6040a2570cf380b6f16c44491aaeb324b4b83b38a9b9e45af",
+      "bytes": 11906,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/narrator/narratorAudioPlayback.ts"
+      ]
+    },
+    {
+      "path": "client/src/store/useSituationRoomGraphStore.spec.ts",
+      "sha256": "15096485b3b5ba824996544ceb5a66f7e868b857138f1ebf441108775c4e853b",
+      "bytes": 9631,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useSituationRoomStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/store/useSituationRoomGraphStore.ts",
+      "sha256": "9a3afed798db71dfd2941b17caab6d6e97a3e97bee1f332fe979e6b608dad5c1",
+      "bytes": 27214,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useSituationRoomJobStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/store/useSituationRoomJobStore.spec.ts",
+      "sha256": "4c50e8b6d5ff21e7978a7a78b3647a85fa08c32787a2ad3bb92aeac32d9d9884",
+      "bytes": 13344,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useSituationRoomStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/store/useSituationRoomJobStore.ts",
+      "sha256": "6f250ce01816aa4cf4125fc716d84c7be61b5ce9c4e3975fd9d823b9a9c3bc95",
+      "bytes": 43678,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/store/useSituationRoomStore.ts"
+      ]
+    },
+    {
+      "path": "client/src/store/useSituationRoomStore.spec.ts",
+      "sha256": "c8e9bb0d59811b2dbb295d016ba3eb240e693ed2987b0c914eb5b71205c94c75",
+      "bytes": 8857,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/display-audio-capture.ts"
+      ]
+    },
+    {
+      "path": "client/src/store/useSituationRoomStore.ts",
+      "sha256": "46c82f5a316019dc733b6a9453dd13218f30b088ef9db3f42ace85f56c2bfa05",
+      "bytes": 30325,
+      "cohort": "remaining-client-src",
+      "reason": [
+        "depends-on-excluded:client/src/lib/helix/display-audio-capture.ts"
+      ]
+    },
+    {
+      "path": "client/e2e/ask-action-carousel.e2e.spec.ts",
+      "sha256": "f902b538ee9a97c0aaf4e20d541ebcc2dd912685e0135cd07d55903a557c22b4",
+      "bytes": 6457,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/mobile-workstation-navigation.e2e.spec.ts",
+      "sha256": "6259c9bb97ddcfbc0817501e18453698b945eddb753a19b017dda592a64d51f9",
+      "bytes": 6585,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/binding-input.spec.ts",
+      "sha256": "8a55dda5993045c3e3fb3e52cb3ad66a07d00010a0dc1255f52c60e062a2a574",
+      "bytes": 15907,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/durable-entry.tsx",
+      "sha256": "7e57764ef5e381c3f2b29cf325c45b074865565efa0dce3b7731936a8c09a04a",
+      "bytes": 351,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/durable-pairing.spec.ts",
+      "sha256": "82f3a5582c60166a784ffc5b17f9141d34973114a5b399d109f9403c496b3fa5",
+      "bytes": 15624,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/durable-real-entry.tsx",
+      "sha256": "0a20ff038cb6f631abc0ee511bb0c282a21ff60bcc76711004307d662fa4271f",
+      "bytes": 1810,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/durable-real-handlers.spec.ts",
+      "sha256": "7d127b2ab2fc4d7775ca6937ebebcb17b910cdeb81e9d1b8f116221092d8d4da",
+      "bytes": 44682,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/entry.tsx",
+      "sha256": "b5e2cd60523ae6bb1f7408e021e3bec62e1758ed1d6d7a8bd004a89e8ab9f6e8",
+      "bytes": 742,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/environment-database-port.ts",
+      "sha256": "43e5203f9a03f6f1895512811ead616133e667d8947e0a5c39eb7bcb6783e8d1",
+      "bytes": 579,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/oauth-wait-recovery.spec.ts",
+      "sha256": "f8352a2fb2b8e673d05aecea700844e4f76baa562993aae2571d583f76786987",
+      "bytes": 5648,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/origin-recovery-boundary.spec.ts",
+      "sha256": "cf101ff832197936c1d4f1922ed5e16ecc32e80eb1982394588a9bf5519c50bf",
+      "bytes": 3415,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/pairing-origin-entry.tsx",
+      "sha256": "9d813fdaaa87db2e2773d3a0b64a4ce85bd01f7416398ae841f5cdbebb79832b",
+      "bytes": 718,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/pairing-origin-exports.ts",
+      "sha256": "4c86ffe7da27d1ba0b3407dad298579107d5b82e2842803111a4b0bfc87c6e0b",
+      "bytes": 265,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/pairing-origin-recovery.spec.ts",
+      "sha256": "be9ce1c89873f1b398c97609f6ddb6a0951335b28c2d323e4ffaae4cd4a3a583",
+      "bytes": 13426,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/player-review-entry.tsx",
+      "sha256": "ea1abf6858d1a6886bf30e8c49300d927e937511669b619e5324fae447310ea8",
+      "bytes": 579,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/player-review-recovery.spec.ts",
+      "sha256": "67df27ab267530734d9b230397e7e8d5862d08eebc5c52db5b27ce436078549d",
+      "bytes": 5937,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/production-styles.ts",
+      "sha256": "980dc229ecea504c3fd91172e278543bcb1339b74e2f5a4cf4d2f09d886a82c0",
+      "bytes": 649,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/profile-origin-recovery.spec.ts",
+      "sha256": "9573dfc9679b26fc0d67d4fce429938f98426c30c70b874871d71476fb597592",
+      "bytes": 9610,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/profile-recovery-entry.tsx",
+      "sha256": "b391dfed2fe7854b407d5cdc98fa2ef86ebc5791f5f32f8559c56799c9955ca5",
+      "bytes": 1939,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/profile-recovery-exports.ts",
+      "sha256": "a3ebe733a56ad2f0d00a7320c1a50725aaffe1e26e275b828bdb93a8228d4bb5",
+      "bytes": 620,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/real-handler-exports.ts",
+      "sha256": "4639582b55deaaf5d78447b005ac577d63e213b1ecc807485167b2a7cd4c163b",
+      "bytes": 1978,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/trust-real-handler-exports.ts",
+      "sha256": "9c417e68d78d8c16288e0819410df05e756808a483269b74787974550eb4d2df",
+      "bytes": 770,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/trust-real-handlers.spec.ts",
+      "sha256": "dfc64689eefca7cb05f87d3e86be0edd406f5b56dac4630aaca79771e34e626d",
+      "bytes": 8343,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/trust-session-fixture.ts",
+      "sha256": "85a13a7087e270a3328673c6431319c8b9670c40e033cf2f669ed6fb45bad5cf",
+      "bytes": 394,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/spacetime-grid.e2e.spec.ts",
+      "sha256": "56dc388a76bab3308e4b7605ec71c9adde2bbb428bf838988fd09b64949919c3",
+      "bytes": 6129,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/e2e/warpfield-lattice.e2e.spec.ts",
+      "sha256": "8faae84404977c5a608ca1b56f0d591b065d622585f2a8ffd2b1227cb918ddaa",
+      "bytes": 4621,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/public/discord-voice-bridge-worklet.js",
+      "sha256": "373791a8183c426afe934867db8b6ae05ad0cc778f5c09798860c85effca6f0d",
+      "bytes": 2133,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/public/mobile-sw.js",
+      "sha256": "e66ca519848b21e36232f7d4e9d95c910d540676f5c09a5c385d732feb2de903",
+      "bytes": 3158,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/public/warp-engine.js",
+      "sha256": "b3b2a49bdc00dc77924b4701cb29205015ede8b6c22490413c6b1098b0058996",
+      "bytes": 11472,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/site/main.tsx",
+      "sha256": "1039e37c03e2241f47aa764e02710067733de3ae23648135eb9287c748a89e41",
+      "bytes": 878,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/site/site-connect.tsx",
+      "sha256": "5cd41ee5a842ae7a819f7683f8727a9a01aeb26d647178cce6469194208e8ee3",
+      "bytes": 8010,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/site/site-download.tsx",
+      "sha256": "3b57e1164d9e8488082463235f0db79db084e6fee576d56d793495e7a0395df5",
+      "bytes": 4080,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/site/site-reset-password.tsx",
+      "sha256": "ac311f448b1e30c13525a641ceff6137fb77d8f1f312974d54eddd2225962a92",
+      "bytes": 2426,
+      "cohort": "companion-client"
+    },
+    {
+      "path": "client/src/utils/units.js",
+      "sha256": "b687846f8c7be627ce2cc5727da75c0cf22190a64e010b1084bb11a5e1aaa158",
+      "bytes": 2259,
+      "cohort": "companion-client"
+    }
+  ]
+}

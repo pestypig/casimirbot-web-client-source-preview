@@ -1,3 +1,11 @@
+# PRIVATE DRAFT — independent web-client source addendum
+
+This local, unpushed candidate adds 374 exact committed source files above Public web-client commit `739e33a0aaec948264b81300e494dbec9d9f62d9`: 340 remaining `client/src` files and 34 companion `client/` files. The [exact addendum inventory](SOURCE_ADDENDUM_INDEPENDENT.json) identifies the pinned private source commit and every raw Git blob. This route does not include the separately held 262 shared-dependent files or their 11 large translation catalogs.
+
+The existing 1,295-file Public selection retains its MIT license and upstream shadcn/ui notice below. **This private draft makes no license grant or public-release claim for the 374 added files.** Exact-file owner rights, copied-content and dependency review, final notices, and approval of this exact publication commit remain open. The additions reference omitted modules, styles, media, fixtures, and build inputs. This source-only snapshot is not a runnable workstation, website, service worker, voice bridge, or E2E suite.
+
+---
+
 # CasimirBot web-client source preview
 
 This MIT-licensed source-only snapshot contains 1,295 selected TypeScript and TSX files from CasimirBot's web-client tree at private platform commit `2729878dee699a975cd8738d123baa0c341dc1ec`. The [exact inventory](SOURCE_SELECTION.json) records each file's SHA-256 and byte length and the 602 client files excluded by static import closure.
