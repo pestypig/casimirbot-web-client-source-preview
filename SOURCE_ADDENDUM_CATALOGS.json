@@ -1,0 +1,65 @@
+{
+  "schema": "casimirbot.client_message_catalog_addendum.v1",
+  "status": "public-source-selection",
+  "sourceCommit": "2729878dee699a975cd8738d123baa0c341dc1ec",
+  "parentCommit": "0dd1c75034ebf968118316fda40ed4e35d7fa919",
+  "sourceFiles": 11,
+  "sourceBytes": 10864737,
+  "files": [
+    {
+      "path": "client/src/lib/i18n/messages/ar.ts",
+      "sha256": "fa5d0aeefaa4d25ee235825dcc85485af4440d68c3dc239d8164afb469fb3819",
+      "bytes": 1106398
+    },
+    {
+      "path": "client/src/lib/i18n/messages/de.ts",
+      "sha256": "3b889d9a1b14284ef556e7176970eb2d8ac5b52a9ed2722aac65afc9c0ff71d3",
+      "bytes": 939006
+    },
+    {
+      "path": "client/src/lib/i18n/messages/es.ts",
+      "sha256": "8644f50b684ce67ac56a5340e15d92d87ea270cae38e5c67614c71d1a80e9d5d",
+      "bytes": 193144
+    },
+    {
+      "path": "client/src/lib/i18n/messages/fr.ts",
+      "sha256": "13fb452436dc0ba1b995cdffb78c095d36e3d697cec4486b658b1521e47aae48",
+      "bytes": 975859
+    },
+    {
+      "path": "client/src/lib/i18n/messages/haw.ts",
+      "sha256": "ec0eab4b3556154bf57a978c3619e333d491bf1eafbd1f9979f73e7c9c3ee61a",
+      "bytes": 180207
+    },
+    {
+      "path": "client/src/lib/i18n/messages/ja.ts",
+      "sha256": "e76183ea0a32138dfb562b82ff16d31bea78526529b5b142ad6544d5949b2988",
+      "bytes": 999658
+    },
+    {
+      "path": "client/src/lib/i18n/messages/ko.ts",
+      "sha256": "c06c6a6cd8d0ced69f944684deb5eed978c7c70fa975d85ee03789c14b72c89c",
+      "bytes": 919425
+    },
+    {
+      "path": "client/src/lib/i18n/messages/pt.ts",
+      "sha256": "7d283879a919c900943a68e6d9c6c7e595b6b21f6a797a2741e0b139123698f7",
+      "bytes": 940378
+    },
+    {
+      "path": "client/src/lib/i18n/messages/source.ts",
+      "sha256": "67f5a4b0072252372cefa32376652249411c34c487890e9a53c9ba3dfe184ef0",
+      "bytes": 2951557
+    },
+    {
+      "path": "client/src/lib/i18n/messages/wo.ts",
+      "sha256": "8e6126cf6737ebce46b8781f6f8d2f604c84550312a919b5bca3e71ab4ea5cc3",
+      "bytes": 874703
+    },
+    {
+      "path": "client/src/lib/i18n/messages/zh.ts",
+      "sha256": "cb9b2fc409cd86e3a7114383ae5986c24d9519f9e7cc425d948e5610a2971198",
+      "bytes": 784402
+    }
+  ]
+}
