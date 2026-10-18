@@ -1,17 +1,17 @@
 {
   "schema": "casimirbot.client_independent_combined_addendum.v1",
-  "status": "private-review-only",
+  "status": "public-source-selection",
   "sourceCommit": "2729878dee699a975cd8738d123baa0c341dc1ec",
   "publicParent": "739e33a0aaec948264b81300e494dbec9d9f62d9",
   "basis": [
     {
       "manifest": "SOURCE_ADDENDUM_INDEPENDENT.json",
-      "sha256": "ad08a0849d53c047a6082e3f0587a09427661ad00d17b031ecb9ae022ee8a648",
+      "sha256": "61acebf78e58f76a5f12aea9b1bfd0cc7d2e8a82a22b7ed3fbf098bacf623b3e",
       "files": 374
     },
     {
       "manifest": "SOURCE_ADDENDUM_INDEPENDENT_251.json",
-      "sha256": "4eff064cdcb74857d2d27d363e04bc02b28bcc4cf586ac56b6f815e83d932f55",
+      "sha256": "3551f5db0938adcae958d376a537c36889bd3445125cbde8a7e5cf1a96389669",
       "files": 251
     }
   ],

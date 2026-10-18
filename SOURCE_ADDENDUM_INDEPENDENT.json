@@ -1,6 +1,6 @@
 {
   "schema": "casimirbot.client_independent_source_addendum.v1",
-  "status": "private-review-only",
+  "status": "public-source-selection",
   "sourceCommit": "2729878dee699a975cd8738d123baa0c341dc1ec",
   "publicParent": "739e33a0aaec948264b81300e494dbec9d9f62d9",
   "basis": [
