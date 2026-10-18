@@ -1,0 +1,3783 @@
+{
+  "schema": "casimirbot.client_independent_combined_addendum.v1",
+  "status": "private-review-only",
+  "sourceCommit": "2729878dee699a975cd8738d123baa0c341dc1ec",
+  "publicParent": "739e33a0aaec948264b81300e494dbec9d9f62d9",
+  "basis": [
+    {
+      "manifest": "SOURCE_ADDENDUM_INDEPENDENT.json",
+      "sha256": "ad08a0849d53c047a6082e3f0587a09427661ad00d17b031ecb9ae022ee8a648",
+      "files": 374
+    },
+    {
+      "manifest": "SOURCE_ADDENDUM_INDEPENDENT_251.json",
+      "sha256": "4eff064cdcb74857d2d27d363e04bc02b28bcc4cf586ac56b6f815e83d932f55",
+      "files": 251
+    }
+  ],
+  "heldCatalogPaths": [
+    "client/src/lib/i18n/messages/ar.ts",
+    "client/src/lib/i18n/messages/de.ts",
+    "client/src/lib/i18n/messages/es.ts",
+    "client/src/lib/i18n/messages/fr.ts",
+    "client/src/lib/i18n/messages/haw.ts",
+    "client/src/lib/i18n/messages/ja.ts",
+    "client/src/lib/i18n/messages/ko.ts",
+    "client/src/lib/i18n/messages/pt.ts",
+    "client/src/lib/i18n/messages/source.ts",
+    "client/src/lib/i18n/messages/wo.ts",
+    "client/src/lib/i18n/messages/zh.ts"
+  ],
+  "files": [
+    {
+      "path": "client/e2e/ask-action-carousel.e2e.spec.ts",
+      "sha256": "f902b538ee9a97c0aaf4e20d541ebcc2dd912685e0135cd07d55903a557c22b4",
+      "bytes": 6457,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/mobile-workstation-navigation.e2e.spec.ts",
+      "sha256": "6259c9bb97ddcfbc0817501e18453698b945eddb753a19b017dda592a64d51f9",
+      "bytes": 6585,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/binding-input.spec.ts",
+      "sha256": "8a55dda5993045c3e3fb3e52cb3ad66a07d00010a0dc1255f52c60e062a2a574",
+      "bytes": 15907,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/durable-entry.tsx",
+      "sha256": "7e57764ef5e381c3f2b29cf325c45b074865565efa0dce3b7731936a8c09a04a",
+      "bytes": 351,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/durable-pairing.spec.ts",
+      "sha256": "82f3a5582c60166a784ffc5b17f9141d34973114a5b399d109f9403c496b3fa5",
+      "bytes": 15624,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/durable-real-entry.tsx",
+      "sha256": "0a20ff038cb6f631abc0ee511bb0c282a21ff60bcc76711004307d662fa4271f",
+      "bytes": 1810,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/durable-real-handlers.spec.ts",
+      "sha256": "7d127b2ab2fc4d7775ca6937ebebcb17b910cdeb81e9d1b8f116221092d8d4da",
+      "bytes": 44682,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/entry.tsx",
+      "sha256": "b5e2cd60523ae6bb1f7408e021e3bec62e1758ed1d6d7a8bd004a89e8ab9f6e8",
+      "bytes": 742,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/environment-database-port.ts",
+      "sha256": "43e5203f9a03f6f1895512811ead616133e667d8947e0a5c39eb7bcb6783e8d1",
+      "bytes": 579,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/oauth-wait-recovery.spec.ts",
+      "sha256": "f8352a2fb2b8e673d05aecea700844e4f76baa562993aae2571d583f76786987",
+      "bytes": 5648,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/origin-recovery-boundary.spec.ts",
+      "sha256": "cf101ff832197936c1d4f1922ed5e16ecc32e80eb1982394588a9bf5519c50bf",
+      "bytes": 3415,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/pairing-origin-entry.tsx",
+      "sha256": "9d813fdaaa87db2e2773d3a0b64a4ce85bd01f7416398ae841f5cdbebb79832b",
+      "bytes": 718,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/pairing-origin-exports.ts",
+      "sha256": "4c86ffe7da27d1ba0b3407dad298579107d5b82e2842803111a4b0bfc87c6e0b",
+      "bytes": 265,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/pairing-origin-recovery.spec.ts",
+      "sha256": "be9ce1c89873f1b398c97609f6ddb6a0951335b28c2d323e4ffaae4cd4a3a583",
+      "bytes": 13426,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/player-review-entry.tsx",
+      "sha256": "ea1abf6858d1a6886bf30e8c49300d927e937511669b619e5324fae447310ea8",
+      "bytes": 579,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/player-review-recovery.spec.ts",
+      "sha256": "67df27ab267530734d9b230397e7e8d5862d08eebc5c52db5b27ce436078549d",
+      "bytes": 5937,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/production-styles.ts",
+      "sha256": "980dc229ecea504c3fd91172e278543bcb1339b74e2f5a4cf4d2f09d886a82c0",
+      "bytes": 649,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/profile-origin-recovery.spec.ts",
+      "sha256": "9573dfc9679b26fc0d67d4fce429938f98426c30c70b874871d71476fb597592",
+      "bytes": 9610,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/profile-recovery-entry.tsx",
+      "sha256": "b391dfed2fe7854b407d5cdc98fa2ef86ebc5791f5f32f8559c56799c9955ca5",
+      "bytes": 1939,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/profile-recovery-exports.ts",
+      "sha256": "a3ebe733a56ad2f0d00a7320c1a50725aaffe1e26e275b828bdb93a8228d4bb5",
+      "bytes": 620,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/real-handler-exports.ts",
+      "sha256": "4639582b55deaaf5d78447b005ac577d63e213b1ecc807485167b2a7cd4c163b",
+      "bytes": 1978,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/trust-real-handler-exports.ts",
+      "sha256": "9c417e68d78d8c16288e0819410df05e756808a483269b74787974550eb4d2df",
+      "bytes": 770,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/trust-real-handlers.spec.ts",
+      "sha256": "dfc64689eefca7cb05f87d3e86be0edd406f5b56dac4630aaca79771e34e626d",
+      "bytes": 8343,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/onboarding-isolated/trust-session-fixture.ts",
+      "sha256": "85a13a7087e270a3328673c6431319c8b9670c40e033cf2f669ed6fb45bad5cf",
+      "bytes": 394,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/spacetime-grid.e2e.spec.ts",
+      "sha256": "56dc388a76bab3308e4b7605ec71c9adde2bbb428bf838988fd09b64949919c3",
+      "bytes": 6129,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/e2e/warpfield-lattice.e2e.spec.ts",
+      "sha256": "8faae84404977c5a608ca1b56f0d591b065d622585f2a8ffd2b1227cb918ddaa",
+      "bytes": 4621,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/public/discord-voice-bridge-worklet.js",
+      "sha256": "373791a8183c426afe934867db8b6ae05ad0cc778f5c09798860c85effca6f0d",
+      "bytes": 2133,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/public/mobile-sw.js",
+      "sha256": "e66ca519848b21e36232f7d4e9d95c910d540676f5c09a5c385d732feb2de903",
+      "bytes": 3158,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/public/warp-engine.js",
+      "sha256": "b3b2a49bdc00dc77924b4701cb29205015ede8b6c22490413c6b1098b0058996",
+      "bytes": 11472,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/site/main.tsx",
+      "sha256": "1039e37c03e2241f47aa764e02710067733de3ae23648135eb9287c748a89e41",
+      "bytes": 878,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/site/site-connect.tsx",
+      "sha256": "5cd41ee5a842ae7a819f7683f8727a9a01aeb26d647178cce6469194208e8ee3",
+      "bytes": 8010,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/site/site-download.tsx",
+      "sha256": "3b57e1164d9e8488082463235f0db79db084e6fee576d56d793495e7a0395df5",
+      "bytes": 4080,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/site/site-reset-password.tsx",
+      "sha256": "ac311f448b1e30c13525a641ceff6137fb77d8f1f312974d54eddd2225962a92",
+      "bytes": 2426,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/App.tsx",
+      "sha256": "4c2ad69fb78d038c917fda778073b2d57afdb2d1dd0f5552138fbfa0e6f1003c",
+      "bytes": 10189,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/AgiKnowledgePanel.tsx",
+      "sha256": "b35e03b669cd8d504efb6cb76fcce70bfbf8634e5eb0726cb2dc711136b97701",
+      "bytes": 27798,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/AlcubierrePanel.tsx",
+      "sha256": "39139796c48618c6462eb70a40120b8a8060f84ed5fed26385b3f7e807d508ff",
+      "bytes": 488094,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/CoreKnowledgePanel.tsx",
+      "sha256": "8adf80fb979f2d99eb4d2e8b89aa844614a3711bee723f0207515fc9e557c95b",
+      "bytes": 4421,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/DeviceCheckPanel.tsx",
+      "sha256": "0e5fa3358b92b13bdcd50668795ea4b3e2708d7b6bad59a1456a62cd70ef31f1",
+      "bytes": 42739,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/DocViewerPanel.tsx",
+      "sha256": "9ee7f5060a728daa14ec06db6c5acb8bfc95acb03426c2e88bc21c5ca085c84c",
+      "bytes": 216725,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/DriveGuardsPanel.tsx",
+      "sha256": "4236210b855c11860b01d2340526f22885747ccab274dc15be8769d5bbddb75b",
+      "bytes": 11524,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/ElectronOrbitalPanel.tsx",
+      "sha256": "17b3496cfb708735a90ea6758a94c557bf47fc8dcfcc5b3fcad1bc60f81e85cf",
+      "bytes": 43343,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/FrontProofsLedger.tsx",
+      "sha256": "e2451b768de3f7d0bedc958e3f3c20aa6f3f180e3d640e3dd22708c7774b8ff7",
+      "bytes": 28349,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/HelixSettingsDialogContent.tsx",
+      "sha256": "c1f589e2df0d101fd95861464ddea9c0e013b79c9ebab0d4678efea1ed23347d",
+      "bytes": 126313,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/HelixTsnPanel.tsx",
+      "sha256": "6375ab3d8325acfa0fbcd93287d70ab0cd0a88754ad188ebc31a8f896b8d580f",
+      "bytes": 14167,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/IdeologyPanel.tsx",
+      "sha256": "0bcf05a83faadeebd025caa5b3904ca4ac74f7e70ff97f39b84cde3d7c1ffc02",
+      "bytes": 41012,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/NeedleIpeakWorksheetPanel.tsx",
+      "sha256": "d04d5d6240e034fcefbcbeec628785f4bea67111803810f85b50237e6979b45f",
+      "bytes": 31272,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/Nhm2SolveStatePanel.tsx",
+      "sha256": "bb5bbd6c6d3274458fff027539d0ac852cd655511652fd3de817bdb7e5fb857d",
+      "bytes": 40091,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/PipelineProofPanel.tsx",
+      "sha256": "3dface2b144f113f4e21c4c0e839a8a4832010a2269a0de2cacc51d51d98f72d",
+      "bytes": 19811,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/SolarComparisonInventory.tsx",
+      "sha256": "b35bcfea81aee5c82215d7b0ae96885c529557f8e1cba7df47fee415a90c1851",
+      "bytes": 2620,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/SolarComparisonReadiness.tsx",
+      "sha256": "00ec0d23c65cd5f190f49b03c6cb35a492695c817849fe65363699ff3e64070e",
+      "bytes": 4025,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/SolarKhiNativeOverlay.tsx",
+      "sha256": "22d8d53272c2e72f06814f288237907b69f55dede37c8b0d8f481e4cb25e1c89",
+      "bytes": 11883,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/SolarMagneticArchiveDirectory.test.tsx",
+      "sha256": "569a5fe0dcd4f579e44271dfa3c86f854a8b4b8b58484a0c4046ada70692e846",
+      "bytes": 12208,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/SolarMagneticArchiveDirectory.tsx",
+      "sha256": "ec9acac8578b6a32da896c42483e5840238f00dbc64554ba65ab87e74f114e89",
+      "bytes": 16485,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/SolarMagneticBundleStorage.test.tsx",
+      "sha256": "7c4bb64defd286ea0317f7c9971de48fb578d0d91e53cf5c4ec0afe109c9a073",
+      "bytes": 2796,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/SolarMagneticBundleStorage.tsx",
+      "sha256": "24131dd99e64f7d43787b491dba337a82bec8548b88f446f7a412c7f3c645038",
+      "bytes": 5018,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/SolarMagneticGlobe.presentation.spec.tsx",
+      "sha256": "cd9c3b48b0d4bf4e221f8bb41527599750ca9639f00e96469c84296712404bea",
+      "bytes": 11242,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/SolarMagneticGlobe.spec.tsx",
+      "sha256": "23c00116d7f87051cd2b7ad8d133e44ee371cfd8e85611baee963ecee0bc45a3",
+      "bytes": 18624,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/SolarMagneticGlobe.tsx",
+      "sha256": "a75695f65c3782b9e48e350b7d84bdf49b46800bda73eb56191c15f732e38568",
+      "bytes": 68386,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/SolarProfileComparison.tsx",
+      "sha256": "5e1ec15fd30b0e149e2efa5a918e3f2943b83540d68cb77f36a6b830cf60ca5b",
+      "bytes": 7102,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/SolarResearchComparisonRecord.tsx",
+      "sha256": "ecd22f43271309e89b5545a902083e3e814623ebb5fcaeae89b6957b56933cf3",
+      "bytes": 22085,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/SolarResearchEvidenceIndex.tsx",
+      "sha256": "1236a2dc0b902058e4a3c53ea936f9c1a0161c447bec8663689207f22916eff0",
+      "bytes": 5015,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/SolarResearchEvidenceReplay.tsx",
+      "sha256": "b66719da49a03f059f4a8be729bbfe6dbfb6b89dacbdadb124042c9f36c8db21",
+      "bytes": 16336,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/SolarResearchPackageStorage.tsx",
+      "sha256": "cee8025f1c0069d3f6aca03fc4b0a3fe5ade0e59ec4d79acc362cffc79e22ec6",
+      "bytes": 8079,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/SolarResearchWorkbenchCatalog.tsx",
+      "sha256": "8a0958c5950b5b5632bcf98d25cce327430b0a0ab6c29510ed04968233e5f68f",
+      "bytes": 15368,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/TimeDilationLatticePanel.tsx",
+      "sha256": "c15c0072396e748e40e614b729cc39f2337e5e43e9a518aadb5ea9a9edde948b",
+      "bytes": 307890,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/WarpProofPanel.tsx",
+      "sha256": "48fde735cf6f7f9db21ab9d6cbd28105e5450dd73a724c361c1cbe1e46c34622",
+      "bytes": 66225,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/DeviceCheckPanel.spec.tsx",
+      "sha256": "a9f2d14ed53cd2382a15c5409b2bca40cc0a6cee7a026a5ad467c80d1d607cc4",
+      "bytes": 24432,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/doc-viewer-math-copy.spec.ts",
+      "sha256": "6d097f1838506e1327f7844f1626656fdd09e8e129aec0b3cd33e21a9e8c823e",
+      "bytes": 56755,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/doc-viewer-taxonomy-ui.spec.tsx",
+      "sha256": "37deffce60cbf5aaf17698ac4a22e059f7cbd3c81232e7d27aea1caa088e28df",
+      "bytes": 103728,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-active-turn-display-view-model.spec.ts",
+      "sha256": "2c315e93c98b7921948512a399586f6e82903a08f5e75394f4db83e420c3f79f",
+      "bytes": 6150,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-diagnostics.spec.ts",
+      "sha256": "547a9e5ad3f602326ce4c98e1cdc0da32991df44abfdb5cabca93ae81b9aa633",
+      "bytes": 69360,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-recrown.spec.ts",
+      "sha256": "c35cc0722406794383973415c401b553445c9d9394a6c81a2a8975807f25ca3d",
+      "bytes": 523530,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-live-runtime-debug-state.spec.ts",
+      "sha256": "be585d246041a2372aef993bce8d876ce4f3962464a50373d1ec36ea53bd129f",
+      "bytes": 21732,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-live-runtime-worker-relay-status.spec.ts",
+      "sha256": "0badaac768713b85a7c4edb327355ff10d4c539653dfa997c5cbae8d1c760c3f",
+      "bytes": 994,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-minimal-runtime-shell.spec.tsx",
+      "sha256": "18fdbce987bdbb0ca02fd24d25d5e0d3726ded5d5f6c4da2e49af0f111c3744c",
+      "bytes": 36653,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-e63-debug-copy-atomicity.spec.tsx",
+      "sha256": "677537e18f05791c9c483ec63ebf22b152b36d581a6877b2c41f9057a42d5ca3",
+      "bytes": 12814,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-e63-terminal-projection.spec.tsx",
+      "sha256": "1c71985b063b2f593bf690af62b81b878b3fadd9d700569669c19d55660e54ac",
+      "bytes": 20908,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-e65-rendering-invariants.spec.tsx",
+      "sha256": "d8aa63f9ea7a0b7adb3d163784a6cfa283fed8321055a69fab8187dadcc660be",
+      "bytes": 2904,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-e68-debug-export.spec.tsx",
+      "sha256": "dd42571f5c0076aa694513825fc7491aa5ac9d410dd6d24c9803cb13c13283e4",
+      "bytes": 42829,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-e68-debug-fallback.spec.tsx",
+      "sha256": "f5ab1267217ac6eb155fef982f7629e6ed74da2d4038ed268958924f6b9ef54e",
+      "bytes": 710,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-e69-composite-debug.spec.tsx",
+      "sha256": "27737f2b297ae1d8728d9d494149768d8f9a586cdf51c722eb6493683acf00e3",
+      "bytes": 2024,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-e70-composite-followup-debug.spec.tsx",
+      "sha256": "7d23d3c0a8e6327235e8c2f73c734fd8f221f1fd343fba906b9da8455b5532d7",
+      "bytes": 4542,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-ui.spec.tsx",
+      "sha256": "aa560fa6c0ae536d05c268702fd8f1debb679daa89f2e47a9e19e8fa300bf490",
+      "bytes": 288307,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-queued-input-parser.spec.ts",
+      "sha256": "fa0d9e126c7d55b1c701b36409f35efc2daa3ddf836cb74ab0e00b31deb90f36",
+      "bytes": 29306,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-realtime-provider-event-handler.spec.ts",
+      "sha256": "f575a164ba2c0a3825a27f097201a59bdbbdf8356b925232781da260461fa764",
+      "bytes": 49472,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-runtime-goal-wake-emitter.spec.ts",
+      "sha256": "e99928f421ed2e1231c7f32117e388a017dc3b178265ebf791b0a3f7379093d1",
+      "bytes": 14750,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-slash-command-menu.spec.tsx",
+      "sha256": "09232658a8709038977d2a8203cbc678d33b393ffcac61f32c9c928571e6a4b1",
+      "bytes": 9846,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-turn-stream-lane-rendering.spec.tsx",
+      "sha256": "af51f989880b6b7c2cf2135c9a15991194c6f0291deb6207a1c94aa08a7fb698",
+      "bytes": 80064,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-voice-confirmation-runtime.spec.tsx",
+      "sha256": "100f41e97ba854dc4fccf633f3b02e255e15f61fa3fc3f355bba6de61c95c3f0",
+      "bytes": 7183,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-voice-playback-tool-controller.spec.ts",
+      "sha256": "31d4a0c15d591156e0c1bb2efbb5e0ceb47f2b562fc2480f2b33123f087496f1",
+      "bytes": 13366,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-voice-turn-assembly-controller.spec.ts",
+      "sha256": "76ab7f2d23bf5dfc2d9becae9da3c301211086daad5ff18c8895b93a1c8d2556",
+      "bytes": 25273,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-workflow-suggestion-runtime.spec.tsx",
+      "sha256": "b31ee507d8c75922cc7b497c16334306811c48e089bb21fa484413d64b865438",
+      "bytes": 21404,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-context-capsule-ledger.spec.ts",
+      "sha256": "2549def64e56c933498bd5560aa31242f85fce1d5b54708190f97aee70cec593",
+      "bytes": 6948,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-read-aloud-state.spec.ts",
+      "sha256": "0f917d064e5a07972077b1b6a6a4df59d46eed275fbde56053f5be1700fc2380",
+      "bytes": 31413,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-s-live-source-watch-transcript.spec.tsx",
+      "sha256": "ef5f85710418198cb218304655b8e2337ac4684eea0eb64fe6ddb78f8d0b0987",
+      "bytes": 5524,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-workstation-shell-layout.spec.ts",
+      "sha256": "85cf48f1597c4e632470bf10d047b1b40025c060e03e271fa67956292a1438f5",
+      "bytes": 4509,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-workstation-shell-mobile.spec.tsx",
+      "sha256": "cdccac1f0abaf40eaec2cfbc1e01f0016ed226478652b63088957f8b8d52faac",
+      "bytes": 9028,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/image-lens-panel.spec.tsx",
+      "sha256": "288a6abf0338d7e01fae720da2b778141251f1a5f6ebae7001333e300d1028ec",
+      "bytes": 18379,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/moral-graph-panel.spec.tsx",
+      "sha256": "6ec6c89f078f802cd1b114114f4030db590a54f905226f0559bd8e3e24d34a39",
+      "bytes": 20311,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/needle-hull-preset.contract.spec.tsx",
+      "sha256": "837ae237f2128d83d8390eb6f899861f7520794f1436d84b90c15c83658ec72b",
+      "bytes": 3463,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/__tests__/nhm2-cavity-contract.spec.ts",
+      "sha256": "dd8691cdf501dbc54818702dd44c5e25c934d8a4be20da3b0ee09e08b4fd320b",
+      "bytes": 1016,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/__tests__/realtime-texture-pack-controls.spec.tsx",
+      "sha256": "f2f34dbcb29a2885f773986f7ec27c081ef4535fb07811ee3a05c0512dd25108",
+      "bytes": 14425,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/__tests__/scientific-calculator-panel-debug-parity.spec.tsx",
+      "sha256": "a8212285b80ecf8ec1454fe8c87df3649c6b6de6134adc5dec4185b7072fdaa9",
+      "bytes": 2778,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/__tests__/scientific-calculator-theory-run-panel.spec.tsx",
+      "sha256": "86c90d2e586395a4088ece12596271db6979434fcb21633951c41716d556066e",
+      "bytes": 24639,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-comparison-inventory.spec.tsx",
+      "sha256": "561a600c4551c3e7c3edda52955a206f0e9a1aa8d4cc0c771912f0dd4a45fea7",
+      "bytes": 2032,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-comparison-readiness.spec.tsx",
+      "sha256": "b738aa383874fbaa785485b62e4217dcde4cafd73442a1f3e8e64aa68ee621e0",
+      "bytes": 1648,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-khi-native-overlay.spec.tsx",
+      "sha256": "e2c228fd2eacfca85f21fcbc2760ec9a13c66ed2476ca433d2f81a6bdd34c0b5",
+      "bytes": 3916,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-observation-raster.spec.tsx",
+      "sha256": "40c001fe3bb3ac4de8fc23b63763d83d88608b24860e70a27b353f5111385f28",
+      "bytes": 2278,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-observation-view-store.spec.tsx",
+      "sha256": "48e6e596b573b1535d308c000a593853674f8e040a7882004aebf865a9b31892",
+      "bytes": 2315,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-profile-comparison.spec.tsx",
+      "sha256": "fbbbc4feac4d8aa9555d976b142e10b6e370fcd8eb08d0682eeb4dc5ba31d34c",
+      "bytes": 5337,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-research-comparison-record.spec.tsx",
+      "sha256": "4ffec1a75136796ac56ac28245f3f050f297308d7982fac97d383efd4207e6dc",
+      "bytes": 20117,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-research-evidence-index.spec.tsx",
+      "sha256": "8d3ca2ce9be160c1bf53df1539d684121d15b9aebb9b593576cff4bf8ea3a629",
+      "bytes": 7893,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-research-evidence-replay-ownership.spec.tsx",
+      "sha256": "d31e0a6b8265dd36ac6153b889c62795b81e49d41e29873aa476c652a5ede43e",
+      "bytes": 4083,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-research-evidence-replay.spec.tsx",
+      "sha256": "d53adc860226e19953583dbce3329cad831d5c67467a18f098f659f25252371b",
+      "bytes": 11336,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-research-package-storage.spec.tsx",
+      "sha256": "8381911acc09db426f080d1af655d539e6d3501da12468c51291f9f374322724",
+      "bytes": 8783,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-research-workbench-catalog.spec.tsx",
+      "sha256": "920a3a7a8597cbfef906b86f66434e89e2e6b35ffd9bfb0ffd6e614c6bf1ef21",
+      "bytes": 10060,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/stage-play-badge-graph-panel.spec.tsx",
+      "sha256": "6c55c781d047cd72a60ec04c80524bc47b1ddd88bcfd49a9dda1fe97717100d3",
+      "bytes": 213185,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/star-watcher-navigation.spec.tsx",
+      "sha256": "3a54534796573e3cbff47ea63dffcd58ab99b4ab00ac11e89cf3398bde70ff87",
+      "bytes": 34281,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/theory-achievement-map-panel.spec.tsx",
+      "sha256": "a493b10051dcf028c6f6fd6fa9a3889f94a64d301050e94dd6d28e6e7f997f50",
+      "bytes": 44355,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/theory-badge-graph-panel.spec.tsx",
+      "sha256": "33b9217ca9fa37c1a13bdff6a61a5c9c03715b39015c33a1dca409ba9f439c71",
+      "bytes": 2126,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/theory-badge-graph-playback-panel.spec.tsx",
+      "sha256": "6da43aaa07ca7629c9a631901cbd60ae47397f800f852a070105489742f5d275",
+      "bytes": 1525,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/__tests__/warp-proof-ts-strict.spec.tsx",
+      "sha256": "b26a8559edcf633fd7a649f61f086549e1386a091b034931968693cee65ce1db",
+      "bytes": 9584,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/agent-access/AgentConnectionSetup.tsx",
+      "sha256": "1070aa51ee07b074564d6d6c4d317516cdfe706a6e7eaa1d2edf2edbb44595d6",
+      "bytes": 107105,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/GeminiConnectionSettings.tsx",
+      "sha256": "cf57de16306c682c732dfd3378865bad60ef1ede26482b545372b25eb89b8559",
+      "bytes": 8428,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/LiveConnectionSettings.tsx",
+      "sha256": "dc2eace20c8be5ee1e4285aab4e27311eb4a7e3f56f193599202911c676b4302",
+      "bytes": 12857,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/LocalPersonalConnectionSetup.tsx",
+      "sha256": "058cf9cf10fa95724165fd708bb352284ec3d6e25a9f1bd45cccd1209b3269fd",
+      "bytes": 9837,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/ManagedConversationConsoleHistory.tsx",
+      "sha256": "981350014db7660ba98bb67e63f856e4484ec527a9f668ebfe783158b1f6a765",
+      "bytes": 30500,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/ManagedConversationOwnerBoundary.tsx",
+      "sha256": "1e01c1340653e534f7cc145f420b94ac6130e70ef168c8696f5e6198d76bb282",
+      "bytes": 1599,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/ManagedConversationPillSurface.tsx",
+      "sha256": "2c685e54149873433161cb51797d5677d39d7656c9b015154aaeacaaf2fda4f4",
+      "bytes": 3026,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/ManagedConversationPreview.tsx",
+      "sha256": "f618885ea571c949f7a6350bc4319146230447a523f8fae1fec1fcb9b6f210d3",
+      "bytes": 4487,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/PrivateConnectionInspector.tsx",
+      "sha256": "464489368cf518f09c0135673bc41525d7f3e5f6967af286e306244590981de8",
+      "bytes": 7016,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/AgentConnectionSetup.spec.tsx",
+      "sha256": "86918326b2db93b2ca89198a3fbf424695826478f9b0d26e828dbf4cdd53d524",
+      "bytes": 111050,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/DurablePairingProfileRecovery.spec.tsx",
+      "sha256": "d8a75b20ebd9c5fad4e83118bb72d72edcd282cfca741f993e5ed6f77740afd0",
+      "bytes": 2766,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/GeminiConnectionSettings.spec.tsx",
+      "sha256": "2affeae17200a7d7479a53eb528134eb7c2a452273e7563f2fa9a5cb83e537e9",
+      "bytes": 3159,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/LiveConnectionSettings.spec.tsx",
+      "sha256": "a9375237180f5b6acff14e40c44d3946dc516b1407742e2e97da9c55def6d374",
+      "bytes": 5961,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/LocalPersonalConnectionSetup.spec.tsx",
+      "sha256": "0f4cf1b10353b0a108ccbc46a5e7d9d97bd37b25b9437bf7ba94f4feb24c6b28",
+      "bytes": 7282,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/ManagedConversationCodexHandoff.spec.tsx",
+      "sha256": "03ce22d44fa0475f97714329f88e6765b44e290bb70490bfe42b16b3a1d74d02",
+      "bytes": 23412,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/ManagedConversationPreview.spec.tsx",
+      "sha256": "115b0cb967e35f9f8d60fb05c2d453cc0eb7e0b07587e49d0b23d980c3fe2769",
+      "bytes": 19319,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/ManagedConversationVoiceRoute.spec.tsx",
+      "sha256": "a7c51f70c80dc98cfca137d3e22a882c40be960d05a35811926204d6ad4d2881",
+      "bytes": 2457,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/PrivateConnectionInspector.spec.tsx",
+      "sha256": "d0787fb3c27288182ad7d65f3eed9c38856f7daa25578ffdd5e1e0ef19df8435",
+      "bytes": 8201,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/PrivateConnectionWorkflow.spec.tsx",
+      "sha256": "4e40af1a4d08e3dcd4d76c4ddd0ba4b4c16fa4a4f7eca0e9ff63d51d232c5684",
+      "bytes": 5578,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/sessionActivityProjection.spec.ts",
+      "sha256": "350621278bcea948d258d1ca111d332281db334aa5cb423ed09e2882263e243b",
+      "bytes": 24192,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/agent-access/useManagedConversation.ts",
+      "sha256": "5bc9900d6ddf4bc523494fc92892c4c639543561da787c2a5f9f7dc9aa058e06",
+      "bytes": 12831,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agi/DebateView.tsx",
+      "sha256": "0d75865dde3ed9663c05e7743ee6b9ec34af644c76ef9caa593b86725279937a",
+      "bytes": 23155,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/agi/EssenceProposalsPanel.tsx",
+      "sha256": "a2d088c01affe6eab05640f1708704895f0fda3a2d073d1eee80d03ec2a749c0",
+      "bytes": 30178,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agi/MemoryDrawer.tsx",
+      "sha256": "f4fb364937865c453d2ab4fd47967066792b18309ee1f7cbe66f7c692dfa4b04",
+      "bytes": 5375,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/agi/TaskHistoryPanel.tsx",
+      "sha256": "a4661bfc9d0730a9e66249dcf293910789b8c127a007f59884ca6760fdf5b061",
+      "bytes": 3197,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/agi/TraceDrawer.tsx",
+      "sha256": "f9a33657bd9813da7582e0d64d2520f0b5365cd9df9e609b3629001b9c34fa4b",
+      "bytes": 38733,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/agi/essence.tsx",
+      "sha256": "09993394c06c3c8b3b92189cf1147b542a5ef2f56228e8270d40e592bb836000",
+      "bytes": 83735,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/auth/GoogleSignInButton.test.tsx",
+      "sha256": "c573300dd891bcbfbc9b53cf116d941cbcda4ab6c04fa0728848a1bc2a7ac865",
+      "bytes": 3989,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/auth/GoogleSignInButton.tsx",
+      "sha256": "c85599adacc3fb56589bcd8bbcb4311483db9a6795c76b2197a6d9abd224382d",
+      "bytes": 5507,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/civilization/CivilizationDiplomacyOverlay.spec.tsx",
+      "sha256": "c614cb8fa80d768b21d38d52afc154720ec5469dfbb208b90948018f8063fea0",
+      "bytes": 2094,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/common/TheoryBadge.tsx",
+      "sha256": "7278965396baaf01b5a3fd61fba386ead5cb0b5e796f7bac0f53a909f030274e",
+      "bytes": 3854,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/desktop/DesktopTaskbar.tsx",
+      "sha256": "3b28d4754f0836453043c69e03d411535efe8de8395c79ba4e9b0309a1aa85ed",
+      "bytes": 11734,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/desktop/DesktopWindow.tsx",
+      "sha256": "418937c961271607ddce9cad89810c801c75935e802413ff41ea7a9caf7d1914",
+      "bytes": 22737,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/desktop/EndpointsPanel.tsx",
+      "sha256": "afae2bed04121d409ea6e55e0942440afd02109412903d2be2feb3cf0501073c",
+      "bytes": 3015,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/desktop/TaskbarPanel.tsx",
+      "sha256": "057787293b54cc19ee3ffc432137f23fad63237a3297440d4150fd4630bb3ba8",
+      "bytes": 7983,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/desktop/__tests__/DesktopTaskbar.guide.spec.tsx",
+      "sha256": "f77bda89d2815a3017aebea42ccd5d3c158b3e151e676112b41514e3e60efb6f",
+      "bytes": 3941,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/HelixAskPill.tsx",
+      "sha256": "e7533b46ff98c9c339ebdbe9adbcb9aea43bfebd4e02cdf2bdec490b5442b5a5",
+      "bytes": 1048542,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskActiveTurnDisplayViewModel.ts",
+      "sha256": "26450b311a15cf1fc494a3f2ffd788096317e0899d16da569db2de2e103607c1",
+      "bytes": 2573,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskActiveTurnListState.ts",
+      "sha256": "5da194549e0cf9d9150b79571764fb2f6f222571bf7a06e1b0f99c638c59c417",
+      "bytes": 2117,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskActiveTurnReply.tsx",
+      "sha256": "9290312eece9009cba1640977eaf30219543b2bbf47e180feb7f8b6700d02d83",
+      "bytes": 2549,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskActiveTurnReplySurface.tsx",
+      "sha256": "afcbcb52d1301e77d29fcbdfef2b893b4295074f22ef488f9f976b28120dc406",
+      "bytes": 335,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskActiveTurnStreamPanel.tsx",
+      "sha256": "8020f7090edb69c21cd4fac7449571cbd4eb4c2c39bbb402e4885dc3f1b85b10",
+      "bytes": 22253,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskAttachmentStripState.ts",
+      "sha256": "004d6709f23d8b32d8ce677f28498c9eed4ae2b5bdbe4b2c68d4026470b39408",
+      "bytes": 544,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskClipboard.ts",
+      "sha256": "8399a52ccb742934212200c15f105c816b3d059f2ca59579f87f5af2c7d592a5",
+      "bytes": 7388,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskCompletedReplyStreamState.ts",
+      "sha256": "3553028bc9c334e20f8aa8893edd580b1898e14795df18b94e4e2396f42c4eaf",
+      "bytes": 384,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskCompletedReplyTurnSurface.tsx",
+      "sha256": "20823e3272c73785621f780bdf48484fc6796c9138b80a93ce9f834424a14d9f",
+      "bytes": 511,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskComposerActionToolbarState.ts",
+      "sha256": "cef1737d39bdb5a85dc676caaa1d2fa339235428bb6d0d0c7f230a105f9cf57a",
+      "bytes": 2961,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskComposerActionToolbarSurface.tsx",
+      "sha256": "419e5db29541a1db5c0cc789b5afe50b90c9900f374e41fe74f18a6c5f715eb1",
+      "bytes": 9492,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsole.tsx",
+      "sha256": "09143638990a64e75611a23d30923908d637deadeb353037191ea79388c2ccf2",
+      "bytes": 1034,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleDiagnostics.ts",
+      "sha256": "2f84658aee0f0c54069d1de65a22a486d428717422321cd97c2fc740ee4f1313",
+      "bytes": 63854,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleRuntimeShell.tsx",
+      "sha256": "348d1c9f4559c7fb9c91d02789cd1eef277250baf1f780d8fd84086acaa51f44",
+      "bytes": 4248,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleRuntimeShellProps.ts",
+      "sha256": "7e139f9484ef62ce6179cba7487d7e952fa1efc5889ac6b777d7faccf09e3ada",
+      "bytes": 750,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleState.ts",
+      "sha256": "22a345b01a20f63ecd587f7701e61507ee7e32f54327a564390457ef71a1aca3",
+      "bytes": 12263,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleSupplementState.ts",
+      "sha256": "cb90389e170e3f44bc2d3f5ab9b1a91b5821f5069c7d4b24f067d46aa9f562a7",
+      "bytes": 1095,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleSupplementSurface.tsx",
+      "sha256": "865c4f024de9cc5497993541cb5aa77d31370ae5fcf08699b809a7c0052549d5",
+      "bytes": 6016,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskContextCapsuleState.ts",
+      "sha256": "c8d59087453f22bf32ef76fb65b872610f914185d53278dec75482eae1503478",
+      "bytes": 1944,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskContextChooserState.ts",
+      "sha256": "ecf93b6a885465da8fcba6b99cc3f4f65e5fa83140a32753e2494420c6379f49",
+      "bytes": 570,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskContextMemoryStatusState.ts",
+      "sha256": "7bca63953f542eef6b37aaba329bc006f3a1c263b22dad502767060b3012c096",
+      "bytes": 523,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskDebugCopyLocalPayload.ts",
+      "sha256": "df6645bdf0c4858098b2cd7ada14e0b0ea1713b24842390d9d2aef1c82e299a6",
+      "bytes": 3512,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskDebugCopyProjection.ts",
+      "sha256": "2b52efc133393c6ad1497d2ba0c8fe765198e2c035b867f7be4b1548d47a4c66",
+      "bytes": 13808,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskDebugDrawerState.ts",
+      "sha256": "d6feebb99d3275348dae3a06360a778f69a9afdb30c07f819cdfbfbb8e824855",
+      "bytes": 2904,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskDebugDrawerSurface.tsx",
+      "sha256": "4eda1a12bbdf50af6913b8754844b220132dca1f5300cc26f156b3e4b6a55a32",
+      "bytes": 887,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskDebugExportSizeControl.ts",
+      "sha256": "b56ec9f3b4582ad53e02a9ca2b70741725c13ceea97676cfcb2dc9f90bb6b1cd",
+      "bytes": 13348,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLanguageModelPicker.tsx",
+      "sha256": "cd9e598d0a64497ae23661397b233c75d8f2192bd5934732c959fa352e3d1e40",
+      "bytes": 5601,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLanguageModelPreference.ts",
+      "sha256": "367a8ba2c2a59290cfae0c22eaf236acd75f535caef3dad1cd3e3c4c710a984a",
+      "bytes": 2579,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyCompletedReplySlot.tsx",
+      "sha256": "ef75e80611b8e4828f0f814e8ac5e833fd5264585172a78bbe0aa133d894b57e",
+      "bytes": 453,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyCompletedReplyState.ts",
+      "sha256": "7cc1e458eed896575071bec501ee1d8eceecbd0b3326268c58ce84f9cdfe7aad",
+      "bytes": 396,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyComposerState.ts",
+      "sha256": "0ea2d33101a1254e3d2910a86f4fabb72f504feab1fa0b365f60a710205c2dca",
+      "bytes": 566,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyComposerSurface.tsx",
+      "sha256": "edb4bbb57cc35dd5b8126520cb488c55f7569ba60d0b17719e17f5e64e820e9c",
+      "bytes": 1696,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyConsoleRootState.ts",
+      "sha256": "3b6cce3db15e98232a818198b65e7b7f38338e6757707026bc4e048142b7159a",
+      "bytes": 502,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyConsoleView.tsx",
+      "sha256": "d7c49de1cc5da5f7375ba83cb2331680519c2f47031f8fb3e77d53b2761a2a29",
+      "bytes": 5368,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyConsoleViewState.ts",
+      "sha256": "6f04e8cf1e21c0905a6710b943dbd01ab0c7f0c27d5c941ea3958e520015d3f7",
+      "bytes": 819,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyProceduralTimelineProjection.tsx",
+      "sha256": "a65282c2cd6e4c6e7060727bf0e109bb99f45c0ba50cbcada943df4d20611e77",
+      "bytes": 13433,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyRuntimeBridge.tsx",
+      "sha256": "c0b6ebb6233cbf5d173397dd6200ab9524fbd1df6f5f4c0ae272384de2e51965",
+      "bytes": 248,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacySurfaceContent.tsx",
+      "sha256": "e3791425402d2d144375139ba223ad79e552face84720270a2abd98a1a6d8693",
+      "bytes": 1777,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacySurfaceContentState.ts",
+      "sha256": "a43cdb0ec3e4de79331b791d2d029abe37a838adfb74960d7e7fd0e1d0adf7bc",
+      "bytes": 436,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyTurnControls.ts",
+      "sha256": "6e173b88b89b509f9bfc3d6758c2e913eadd568d4dbba3f21fd202a1ae99fc14",
+      "bytes": 34309,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLiveRuntimeControls.tsx",
+      "sha256": "cdc43973cf9f3bf18fc22b98adf57dc85fd3415d982731553bd10bb015f0e4bc",
+      "bytes": 33625,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLiveRuntimeDebugState.ts",
+      "sha256": "6f1f034ed3f009703609f70d4774ce1d92694d0bbeb8d91b560f2df6eb07cf87",
+      "bytes": 33340,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLiveRuntimeLifecycle.ts",
+      "sha256": "0cecf2190cb9e4bfb046305cc8fb8c42a650ad5179a8cedfd54b7cb10e67ce72",
+      "bytes": 30605,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLiveRuntimeTransportController.ts",
+      "sha256": "6e3b88371c599d01eb631e1b143a738c2a2974f31a96a5824f0ea9abad21bd9f",
+      "bytes": 38413,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeBackendRunner.ts",
+      "sha256": "8ae651b3c82a67ef7880032130680af714c687100a4f3b37a1eba8fbe3adb2bd",
+      "bytes": 1644,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeChatSession.ts",
+      "sha256": "829f9e9525c6aa833cd24cc1c939444949f23aba1533327347536f2d2989a766",
+      "bytes": 3304,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeControls.ts",
+      "sha256": "9553f942d5fb76c9544ac925003ff895e55e5eab083b93b7be13ade4417a6702",
+      "bytes": 3686,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeDebugExport.ts",
+      "sha256": "962c9b100fe0aebbc6d3e9319a271ab7679f70e85cfb5bafe7d822b325aed625",
+      "bytes": 4238,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeLifecycle.ts",
+      "sha256": "799a6dd9204058b2e0efba1166375af57d5eacf44a511f1c4de28f4e617894d3",
+      "bytes": 7493,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeShell.tsx",
+      "sha256": "8ad4419335cd4bfe92a77c2c1ab6836ff5ee07e868c286b931c4cabc0ec79c29",
+      "bytes": 50733,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeSubmitPlan.ts",
+      "sha256": "c9f6f535de5478ffc476f64e9dc6c8303a14e7de73ae3d4c3af38a0d86055e63",
+      "bytes": 3388,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeTransport.ts",
+      "sha256": "42214df64eae85469939f761dc7a9ef4e8dc66f181701c27d1e95e4b5354fc13",
+      "bytes": 7240,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeTurnList.tsx",
+      "sha256": "13df5bb98c1e10f1c1eaaa42decd5f8d361e46f792fd2e7c727c29988109926c",
+      "bytes": 10181,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeWorkspaceContext.ts",
+      "sha256": "1dc73984ad7af481f683221f644fcc54700797a7d0e1fdb986a362ac51c467b4",
+      "bytes": 3666,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskObserverLane.tsx",
+      "sha256": "fd398437e39af3e8da5e36e42491e79504dbc2ae1ed53e47e7b340ff2bf19bc1",
+      "bytes": 4973,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskObserverLaneEvents.ts",
+      "sha256": "7747a5a676b4dcc74a11e425bd3c339f6a9f8cdfa06f346e8c9aaa9a8b029f63",
+      "bytes": 2610,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskObserverSupplementState.ts",
+      "sha256": "d8445aec0460fd7de898684e15c49ab72e45c324f700e52780de9276d7bfc413",
+      "bytes": 715,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskOperatorSurfaceBrowserCapture.ts",
+      "sha256": "3359ccc8a2e2c6eb683fa63625b9fd86ee6e68120eaa3d201ddff504e4101886",
+      "bytes": 5738,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskOperatorSurfaceLayoutParity.ts",
+      "sha256": "9ef8373efd496b75967e3e88b035682a210ffcc7dd8b9f6df893f0ed225fd6b5",
+      "bytes": 11774,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskOperatorSurfaceParityChecklist.ts",
+      "sha256": "d56ae97fc6920c19b8316f7477cc6f12eacd8784b43b7302f330c4faad15f35c",
+      "bytes": 7954,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskOperatorSurfaceParityEvidencePanel.tsx",
+      "sha256": "b7daa5a87c21ce4bcd0fceda2016b188eadadf92cea85ea2e9a46e74a0ef997a",
+      "bytes": 9384,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskOperatorSurfaceParityHarness.tsx",
+      "sha256": "ae151215d3577ddcd835f163f898a2528fd308206c2a5a1b9b4cefd0f58a78d7",
+      "bytes": 2526,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskPersonalVoiceStatus.tsx",
+      "sha256": "353b3a3fd0ca3db07a5a1727be9c78b46136aeb5768c34a7353452811460ea75",
+      "bytes": 2052,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskQueuedTurn.ts",
+      "sha256": "ef4014b83bee3652c320f52633635f34ba57a3b98b5cae438e27a411205133a1",
+      "bytes": 2259,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskRealtimeProviderEventHandler.ts",
+      "sha256": "b9f1910b9020ab38fbd1bed40e1ca31ce7b4fd7464f54e6cf6a4264767d794f8",
+      "bytes": 39674,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskRealtimeVisualFrameAcknowledgement.ts",
+      "sha256": "ea28c32c56d41aee04b724a3cc2ce4c4cd9e3e6be92d2c728824ef05897a4005",
+      "bytes": 6528,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskRenderedReplyDebugExport.ts",
+      "sha256": "248616e98b82ff41b87b0fa9024fa4ad4ec889e0de8417d457d9b290969044a3",
+      "bytes": 10140,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskReplyTurn.tsx",
+      "sha256": "ab110d3ac59c44b3c8d0df1b8d1b97cec187ab3b959579e60d99ea0a77c0a991",
+      "bytes": 679,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskReplyTurnState.ts",
+      "sha256": "9fa4ab6388cd68b73dcbc365fb731d6782929adbaef6e8ca9a469791649e3c29",
+      "bytes": 337,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskReplyTurnSurface.tsx",
+      "sha256": "000c4502ee1065aa2a18b05b6d465a2c3e3b6f0fb6cab7eb5fc7fea6eb84b61e",
+      "bytes": 287,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskRequestEnvelope.ts",
+      "sha256": "cabd398383b466fccf8ee3fb883196e4aa555eb40ade2b7325fc7cf0cfc89357",
+      "bytes": 6078,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskRuntimeGoalWakeEmitter.ts",
+      "sha256": "69aa6fe2e2392e14b73051b6b55e542299ab39caa5e028a3bdbc2a85f2cff19e",
+      "bytes": 18093,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskRuntimeGoalWakeSubscriptions.ts",
+      "sha256": "b48e94298334717397209a472fbd83dc437f3ec79a8e20258a248427d7269d76",
+      "bytes": 9575,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskSituationRoomSourceState.ts",
+      "sha256": "88e6d644ebfbe9210569b33e5e429818e3a56f8d88be76d08642a24a16dcfb7c",
+      "bytes": 3739,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskSlashCommandCatalog.ts",
+      "sha256": "3c0b11ae2ab4d98cb1ae4f34b5c49e8240f5cbe34184529accd8f20d59fde65c",
+      "bytes": 12545,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskSlashCommandMenu.tsx",
+      "sha256": "0df5526518e63ed0c2fdc66311c30b0a49bb1cec5feb89375c5431ff3eb981e1",
+      "bytes": 5119,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskSlashCommandMenuState.ts",
+      "sha256": "df53ee2a78e4e50794a8ea42a1b1e2894331b8e27fd83a23519b805338179a65",
+      "bytes": 2477,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskSubmitBackendEntrypointOptions.ts",
+      "sha256": "f25378c0914222be5dbbb0ead00f81a621e2ad1838d641d946f1588d9ac07817",
+      "bytes": 3775,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskSupplementClipTextState.ts",
+      "sha256": "1223717c7ccb8f777a833e7ddaecbf8569ddd41448a181d555f4e18879dbd25b",
+      "bytes": 472,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskTimelineFeed.ts",
+      "sha256": "0873d5b718cd4b97256a9b35fd38ce9b297a3ecfa7e2eb484d1aff0556c3f3b1",
+      "bytes": 1944,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskTurnListSurface.tsx",
+      "sha256": "fe9c1f2171e31d10536a1a7093517af77d86a2b9754b02ee5fc4a1fe50320822",
+      "bytes": 1086,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskTurnStreamPanel.tsx",
+      "sha256": "9abd40170283765afd7474e1d75431dca1e3233c8b3c157c11331e6bbeceddd3",
+      "bytes": 28880,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskVisualFramePromotion.ts",
+      "sha256": "bc1b8f3875695787064fddb36f51f2cc4da677dbcdc8dfdab297bc69e8decbd4",
+      "bytes": 3117,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskVoiceConfirmationRuntime.tsx",
+      "sha256": "cb229d6ad85705e9c3ffe80fb05caf7282dfcd0584cfef1143a697a79f46d217",
+      "bytes": 14675,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskVoiceConfirmationState.ts",
+      "sha256": "02defc9f571d4d11816521f89d3b9a15c2106097bb64db4e01c3e375d4baf5ac",
+      "bytes": 1169,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskVoicePlaybackToolController.ts",
+      "sha256": "479c0ce711ec645f5fe8ed03bfba8033ba57ccef8f5bddd382b1fb4a0ad8bba4",
+      "bytes": 14182,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskVoiceStatusState.ts",
+      "sha256": "74db9f110cdc67db15c7ed2cc36e1fab50591cc7e1e4e66a3742027247ed3217",
+      "bytes": 1159,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskVoiceTurnAssemblyController.ts",
+      "sha256": "1fd1e494b4230688ae537dcb03c3764afa51b277511142c1f377b7609e912605",
+      "bytes": 35155,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskWorkflowDebugProjection.ts",
+      "sha256": "215109214886f7199f071293c1166acd3a3030d7ad33d539db005ffed54a361d",
+      "bytes": 4761,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskWorkspaceContextBinding.ts",
+      "sha256": "2f5189aab5d1a3cdff49ead0ba3b78f6b25ac151be7923ff748a8b73a81a0661",
+      "bytes": 807,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskWorkstationActionBridge.ts",
+      "sha256": "4de9b1701ba8334268e32fddf2d359c007099163499d1542515a5b7ba48e4547",
+      "bytes": 4522,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskWorkstationActionDispatch.ts",
+      "sha256": "8a63f76695e577b65131971beccaa8e01274562c0c54833f33643c745e713de0",
+      "bytes": 4607,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixConsoleConversationWorkspace.tsx",
+      "sha256": "2c8c7ad377b99a014fd50c414ee2ae3b89171a888b3194bf62c53bc229df82ca",
+      "bytes": 77060,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixConsoleSelectedComposer.tsx",
+      "sha256": "6a3c14b0ba6e1692139ae7f535527a9db0f1716ee46a8f7239f1b3fb7533e925",
+      "bytes": 7226,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/PrivateAskConnectionMenu.tsx",
+      "sha256": "b1b4e8e9f56930407f6d42c7742accef40fd14f7b57d2e681a0689c0da5b13bc",
+      "bytes": 8500,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/AdapterAiActivityPanel.spec.tsx",
+      "sha256": "a3895a6f4c5e553d5b642ab89f655e825bd3dfdf291c2940a1b5a9673ad40c42",
+      "bytes": 3750,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/BoundAgentPromptDisplay.spec.tsx",
+      "sha256": "7c86d77c105e25dbb557100d0017a3457336f717f56f01d62ff4cd8bb43edf7b",
+      "bytes": 6716,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskAdmissionContinuationDebugProjection.spec.ts",
+      "sha256": "8e4eb4d7c191221e30b5d5b4a330b411e710400a266e2ac81d8253760a4d709b",
+      "bytes": 2427,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskBackendEntrypointPolicy.spec.ts",
+      "sha256": "8ae3aa3a3da17581016aed959f507b1196140911dc86341d6ccc1698d91715a4",
+      "bytes": 21485,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskBoundAgentDestination.spec.tsx",
+      "sha256": "7e39ce6bf76c25f42f546a0b3082dbbd3ce660c99bc2027fb143da262893dfc3",
+      "bytes": 16501,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskComposerActionToolbarState.private-connection.spec.ts",
+      "sha256": "c2c4c0eb102d43c58cd0d526ed686b62259f3a98599d953e431db7c10391321c",
+      "bytes": 1341,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskComposerActionToolbarSurface.visual-live.spec.tsx",
+      "sha256": "014269f385a6862dda7217e8bf0fa934def600205f4bf8d936c590bba445da70",
+      "bytes": 3990,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskComposerDestination.spec.tsx",
+      "sha256": "b30a497bda1548839c9388039cf1d8a06b84f7674526b1e6df714e253383e018",
+      "bytes": 8703,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskConsoleLayout.spec.tsx",
+      "sha256": "b971366b3443f0964edadadb82c7a22b13b59967f458df25d32336613dc535f3",
+      "bytes": 2998,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeControls.visual-source.spec.tsx",
+      "sha256": "ff95611f9d80d55bba76200e8a09f66a521c067d647192f25f6d347ec0be0869",
+      "bytes": 9408,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.failure-stage.spec.ts",
+      "sha256": "aed4be046d9995af7fb94c4037dce2ae75da2a7b2e3172d0cbac48c10e5daf6d",
+      "bytes": 2555,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.media-restore.spec.ts",
+      "sha256": "20afe8bcf2dfb559c96392b525a223a4556e93de0bc9fb8fc02f11ed31297179",
+      "bytes": 3086,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.visual-frame.spec.ts",
+      "sha256": "ad8c3a1d2d5ed4567c9c586a8be0c24d09d6ad752014fe682e6ec7877321c47b",
+      "bytes": 9950,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskMinimalRuntimeWorkspaceContext.spec.ts",
+      "sha256": "1651be06ca545f5f2b384a9954061f7732e218301d0996819b64c1d34fab690a",
+      "bytes": 3693,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskPersonalVoiceStatus.spec.tsx",
+      "sha256": "e420e7b63e362f7bd126253e0735ed976b1bd278b35a468a52d075ad3adc35b8",
+      "bytes": 1698,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskRealtimeGroundedFeedbackBinding.spec.ts",
+      "sha256": "c7320b50a612b0705bea2560892c648595afc4b43e16d92b3c12b58904b07597",
+      "bytes": 2816,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskRealtimeProviderEventHandler.test.ts",
+      "sha256": "530c99ed32637b05361b82d2f51ac4b728c76b036fa808def4b12cfee881a66d",
+      "bytes": 4186,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskRealtimeVisualFrameAcknowledgement.spec.ts",
+      "sha256": "54d6b85ec910aee5f3894c087877ac28fbcd2a65bae307317f497a91a72d549d",
+      "bytes": 5057,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskWorkstationActionDispatch.spec.ts",
+      "sha256": "fabf821d999a3aede6d374e6d63aaf7f7190624efd54545d34f84da1f65555fc",
+      "bytes": 7582,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixConsoleConversationWorkspace.spec.tsx",
+      "sha256": "101aaf28df2d5c538e4ce1cd330b65b0e2101fbd5066819c43b3ac07c0d9cf5e",
+      "bytes": 54582,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixConsoleSelectedComposer.spec.tsx",
+      "sha256": "d590b084a5f019409fb45a269524bb882c6538f108ce896cd738060acb2441bd",
+      "bytes": 10019,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/PrivateAskConnectionMenu.spec.tsx",
+      "sha256": "67a3c06907fc8012a520e36b331bdc9dcb0a53c2cfb2609b1065867e2a96df96",
+      "bytes": 14335,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/PrivateAskConsoleFormatting.spec.tsx",
+      "sha256": "686fd0cb249a57c62c69ce795d13f779f388583e0456d5c84fe6e376be9e7ee8",
+      "bytes": 2951,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/message-cloud-visible-updates.spec.ts",
+      "sha256": "35170d0d420e4b41bbfe469b633ef1140a62ec5c450d511216fc550c76080467",
+      "bytes": 2218,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/useHelixAskLiveRuntimeSession.visual-consent.spec.tsx",
+      "sha256": "ea92dd2900313255a56714e22abe6ec9190325285be5429aca989e884ef86e80",
+      "bytes": 11184,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/useHelixAskVisualFrameAttachmentIngress.spec.tsx",
+      "sha256": "47ef86a9624a0fc192183df92e96664837ca179ea42ac0bd9c4a2563f8b2e238",
+      "bytes": 2909,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/agent-run-observer/AgentRunObserverBindingSurface.tsx",
+      "sha256": "4c93be00cf9f76cbb05a4dd6aea8688663380a38f06417f22b71fa5d139d7966",
+      "bytes": 18482,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/agent-run-observer/__tests__/AgentRunObserverBindingSurface.spec.tsx",
+      "sha256": "e8170eff9a7dbe17ab09a0c50726cd745e0d0756e77cb2ebbf8e31ba177b89be",
+      "bytes": 19439,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/agent-run-observer/index.ts",
+      "sha256": "6fb18379489649a4c2b3a5aec5bceecc553fd516ac8da503745028b8bf0df5e9",
+      "bytes": 1695,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/index.ts",
+      "sha256": "566bd6f3e627c430f1975a9bc43803a0a05f02b3edfc14767ade2b1b0d53e98b",
+      "bytes": 49236,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/DiscordVoiceGptLiveBridge.ts",
+      "sha256": "6ea0a03a9db82ccdab37a0ad0b59299a3ba6adf8e4be7b38440b038af7223089",
+      "bytes": 11669,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/HelixAskSharedLiveRoomControls.tsx",
+      "sha256": "247394d902b68da4480bb67357199f9a7d7980c8ddf3b8fdd5c050e87f58a492",
+      "bytes": 12716,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/HostedRoomConsoleChannel.tsx",
+      "sha256": "6a40f319d70657f9babc28ee87ec70c8c7385be8e4d3e20218bcb40c5b080deb",
+      "bytes": 3391,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/HostedRoomConsoleMission.tsx",
+      "sha256": "fd18bf8a978dbd9a81423966b04a114bca885405b7472131c09425e29007e182",
+      "bytes": 1903,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/LocalRoomConsoleChannel.tsx",
+      "sha256": "368ee13342120d782692dfa126a733a640a5b697b2929e8100addb5142b5f730",
+      "bytes": 3580,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/LocalRoomConsoleMission.tsx",
+      "sha256": "d1f4db2fe9939a5eb0462ad8554619a1625ec63864007b6b039825894c9200c3",
+      "bytes": 1509,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/LocalRoomTextOwnerBridge.tsx",
+      "sha256": "7d964ff1eb6eb4f35b184ec7e8971a5d81e3978877a7a8340674b027c9fdf336",
+      "bytes": 1961,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomInterpreterProposalReview.tsx",
+      "sha256": "7415436534995c9c6e4248056c53ca78c481a5b8ca49c1199b88b740231609d4",
+      "bytes": 11783,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomInterpreterResultsPanel.tsx",
+      "sha256": "ca44cf27542eb0b335c399e6bfef218949634001578c33b56818de42caa656ad",
+      "bytes": 8086,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomInterpreterStatus.tsx",
+      "sha256": "1910ce267472eefc20cfe10d99764716ee28fe423eb4727e08d8a745453c7f16",
+      "bytes": 9488,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomInterpreterTurnHistory.tsx",
+      "sha256": "790da507afcc5268ea502be2d3bd66580a79f3d6b2d6527af30b344514a8e68c",
+      "bytes": 22045,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomResultsPanel.tsx",
+      "sha256": "16c95ff102c097391ac29aad25eac385c7eeef44a41d451e24c51beae25d127c",
+      "bytes": 7755,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomTaskPanel.tsx",
+      "sha256": "574ccb748dd2b6ea861fc946cfe0dad70f029eb0cf8a4aab10b170a0db5c7417",
+      "bytes": 6883,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomTextConversation.tsx",
+      "sha256": "8e13f9e9c4b472bb5710708336ba896d5d6d43df56f39602ff8a675ccdc99989",
+      "bytes": 11227,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomTextOwnerBridge.tsx",
+      "sha256": "6a48345a22afd2e8b32302e4508e5e37699af27ff0aa5efcd615a16f34beecd0",
+      "bytes": 2113,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomTextReleaseControls.tsx",
+      "sha256": "421b7974e1f2777ef92fc1133dd3b9d63f7f3f22a29218bfb42fdbc75492a6e2",
+      "bytes": 14479,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeRoomConnectionPanel.tsx",
+      "sha256": "c2b0657561735bfa761c20eb2621dddad283eaf5532384d6a4afec65d9864bbe",
+      "bytes": 25547,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeRoomInstructionsPanel.tsx",
+      "sha256": "60c984e88dcc6017f08b7c29be7a8a25130e05443a6296ca6cfd12a4c8b0c237",
+      "bytes": 5389,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeSharedInterpreterReportsPanel.tsx",
+      "sha256": "8f9b1a4fa022ea37725aa40dcb31c6e866d0b4d4c04dbe73ff551bc933475e89",
+      "bytes": 5322,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeSharedRoomReportsPanel.tsx",
+      "sha256": "f6b132f08bbca3dbbcf1b57e29c3dffb6a8f129b85962dd283a1cb4e6c530a95",
+      "bytes": 5252,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/ReviewedRoomInstructionPanel.tsx",
+      "sha256": "87cf8ba6338aa5750a1b3833ac5874b5c751f3a93b95b41a5613cff696682d78",
+      "bytes": 6872,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/RoomMissionTextOwnerReviewPanel.tsx",
+      "sha256": "317db677b2154e203a348ca89f1a8e4de5e2997224df4e0d1675c3a781d466a8",
+      "bytes": 11335,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/RoomServiceEntry.tsx",
+      "sha256": "6f509d902db350c8630c73ffb55044a1f9bd563be0ec9fe9f750989c6b63bd4d",
+      "bytes": 3375,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomActivePanel.tsx",
+      "sha256": "2d0ed53d1471f39dcd84548e5b18e51ebb106db95dc19f811c603b0c12ecbcb6",
+      "bytes": 16291,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomBrokerageBindingsPanel.tsx",
+      "sha256": "42cd0a8a6a6ba43458caea2f4ea0ffa88ea352383da6cbc4b7626ff5ab363ee4",
+      "bytes": 9256,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomConsentPanel.tsx",
+      "sha256": "343dcaa558f93fcd4a30b6c6350c0433c1d05c19da51386292d4a38ae99a3a01",
+      "bytes": 4155,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomDebugArtifact.ts",
+      "sha256": "a304c347c1f56340d51125726365126a4d6368b27327e492f984791ac02c996e",
+      "bytes": 5674,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomDebugPanel.tsx",
+      "sha256": "df49c7d415740b85db68a436d67a41aabaac3da2d7b9521c2d0689073cf2cfd7",
+      "bytes": 5445,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomDialog.tsx",
+      "sha256": "3b0f84afeef3a4215914488b93033f1ce38d0aa0c669b05d77794f748145ad82",
+      "bytes": 10720,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomManualFrame.ts",
+      "sha256": "c700026ab058051eda26a3c9c96a55e6f0e13572a6f4c4376270bcce28949b17",
+      "bytes": 1926,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomMissionPanel.tsx",
+      "sha256": "bb8f65ad5d53661165a0f1f8d3c8c57158af40254af37a5ba9670de244957047",
+      "bytes": 16641,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomOwnerResultsPanel.tsx",
+      "sha256": "b85ddcb7a511f9d87b103b9bbfdeae89e718df5b4dfb67f20e3052b2ff7c6bbf",
+      "bytes": 9826,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomOwnerWorkflow.tsx",
+      "sha256": "1e90aa39544c96132914504ca62ce22b4440987fe9ad7ca75d5c1f2715c8b70f",
+      "bytes": 1574,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomParticipantsPanel.tsx",
+      "sha256": "5514c4206672c3185071c4545f2afa548eaa22a0fc64edfead00189ae7d46bb2",
+      "bytes": 5987,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomRuntimePanel.tsx",
+      "sha256": "840183808eadf411ebdc50eb196621c327d9e55199b0bf249337365bfd074fab",
+      "bytes": 5338,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomSetupPanel.tsx",
+      "sha256": "a60dde9d886bcb7979a72aea73f94d47866f75547ee9d962c93b2d112a014341",
+      "bytes": 6931,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomTextConversation.tsx",
+      "sha256": "29d385f631dda248dbdadd9272d8c987104b41f5a429f6d2a1d1d636e5db1cfc",
+      "bytes": 11902,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomVisualLanes.tsx",
+      "sha256": "73f1160d1896e0d710b6ea66516bcb8308844843b6e9d8bae7d4e9c3492c6d1b",
+      "bytes": 6034,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedRoomInterpreterPreparationPanel.tsx",
+      "sha256": "4206f6609e5f027b1b608c675c5971dada41953a3ef6010831fc355d5d6171a1",
+      "bytes": 10717,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedRoomInterpreterTurnHistory.tsx",
+      "sha256": "334565afde2501c0b37e4e53ce4ffdd682153b031c29f378d1a981b6c2533ffd",
+      "bytes": 5307,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedRoomMissionTextChoices.tsx",
+      "sha256": "3144a878ba5d1482b889bf42f2ed8af67b59a8d378ea79502fa03edad9594354",
+      "bytes": 10554,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedRoomTextReleaseControls.tsx",
+      "sha256": "c891d7362e69288765809088b862bb9c841ce7dd8544a712afa281fe497ce7df",
+      "bytes": 13091,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/DiscordVoiceGptLiveBridge.spec.ts",
+      "sha256": "b168cbe56e2e382a513ac6de7212717da014f48e4027581624c4d0d7cd20a9b2",
+      "bytes": 737,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/HelixAskSharedLiveRoomControls.spec.tsx",
+      "sha256": "35287d900ae8fc3cd70c29c6ffa7796844f6591af3b806657053f83769fa246f",
+      "bytes": 10046,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/LocalRoomTextOwnerBridge.spec.tsx",
+      "sha256": "190853507d921619d8e4a9a028f40fc45387ac45ad650f062a4272cb72673b04",
+      "bytes": 3222,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeHostedRoomInterpreterProposalReview.spec.tsx",
+      "sha256": "af0ffe8e7b2e476a879643cbb3c883c2240eb611ab638bbd2a95d03d9fa9c464",
+      "bytes": 12066,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeHostedRoomInterpreterResultsPanel.spec.tsx",
+      "sha256": "2b606efcaeebc18374c1416c2375deda876e73bc6ce096fe5d94635d8b904b3b",
+      "bytes": 6633,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeHostedRoomInterpreterStatus.spec.tsx",
+      "sha256": "096d55c7b3961aa1a28c5f5f74d29f711c666cf14ba28c583a79170802160df7",
+      "bytes": 10674,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeHostedRoomInterpreterTurnHistory.spec.tsx",
+      "sha256": "741477bf695b3af094ef7962358a3bb5c615431c8e8520316ff9158583e7371d",
+      "bytes": 28265,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeHostedRoomResultsPanel.spec.tsx",
+      "sha256": "48cc904ed94ea6ae8f82a322be10d2e5bb90dd9140648012c840be56d5a48d2b",
+      "bytes": 9970,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeHostedRoomTaskPanel.spec.tsx",
+      "sha256": "8bc3a0b23d83257c8f613b846edfd82204e141cbcf923feb37fca6448941eece",
+      "bytes": 5620,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeHostedRoomTextConversation.spec.tsx",
+      "sha256": "704f5b24b62fe13068142ae39d069170ccbbb7ffde0857e82ee026063bec63d8",
+      "bytes": 11923,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeHostedRoomTextReleaseControls.spec.tsx",
+      "sha256": "4efb3ae915f13fb40be40ed2c89dec291df118a4d1ef3fa872675ce0574388b8",
+      "bytes": 15753,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeRoomConnectionPanel.spec.tsx",
+      "sha256": "62c7f3cc309a6f6db06108b48edab93434c3f7eb9623beb99eafe0ec84b07c8b",
+      "bytes": 19742,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeSharedInterpreterReportsPanel.spec.tsx",
+      "sha256": "87b5096871926c9d9efa6cbd17e99becf7461c00e5d360b69203d1df751b3750",
+      "bytes": 3332,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeSharedRoomReportsPanel.spec.tsx",
+      "sha256": "23d07f9e13724d07dcb0b7bd327ef06318b94978e38e68a722b71f4b8490747b",
+      "bytes": 6985,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/ReviewedRoomInstructionPanel.spec.tsx",
+      "sha256": "a3c90094afb12167e2743e31097137e6fea07edf2d6bac3b81ed31aaf2d43de4",
+      "bytes": 7860,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/RoomMissionTextOwnerReviewPanel.spec.tsx",
+      "sha256": "658f4abe2524e6005df1097ca0d485f4998f3bc8b9ae17aa2ec6bea57b57df06",
+      "bytes": 8621,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/RoomServiceEntry.spec.tsx",
+      "sha256": "9b20049c6a66f1de084c4b6e43b630d7db91c20f48cf3a12d3e09828a159710f",
+      "bytes": 4234,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomBrokerageBindingsPanel.spec.tsx",
+      "sha256": "5b96756079aa5706932822a692efd7bd586b5edbc16d0834203f20526e699f13",
+      "bytes": 10129,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomDebugArtifact.spec.ts",
+      "sha256": "03a171d1dc7356c84580a1d2844c0f760d855eaf98b9020e12b550c142d99376",
+      "bytes": 4019,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomDialog.spec.tsx",
+      "sha256": "0a85c1748e7510663b1d6f1880a106947626da305beb8ee615f7c92893f5e002",
+      "bytes": 15827,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomDialogNavigation.spec.tsx",
+      "sha256": "1f117d51a1b1c3e25f00facf51fab68677569818aa6cb74c41e2a8304be578e2",
+      "bytes": 2872,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomMissionPanel.spec.tsx",
+      "sha256": "f12d29b2fc915e62c387108e321b6407415da1cad66e4bd2f25e5d743710ca6d",
+      "bytes": 23621,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomOwnerResultsPanel.spec.tsx",
+      "sha256": "db1153ed48b3417a54ae4df2e006a7d2c30582b51d9ce54263ecdf1ab23a835d",
+      "bytes": 12079,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomOwnerWorkflow.spec.tsx",
+      "sha256": "b77bac21141b395d54cf06a2a4e20714891fcf7041e980e8a7d57bbb71dda2c8",
+      "bytes": 5323,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomParticipantsPanel.capacity.spec.tsx",
+      "sha256": "17fd472e1d7488559a2b73a46d417373fd6e71610013c5736b861961a945020a",
+      "bytes": 2926,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomRuntimePanel.spec.tsx",
+      "sha256": "24a2d9f29fdfd3e2d3ab269a227c7c6debeb21d72dd79633bb1875fa8919059a",
+      "bytes": 1643,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomSetupPanel.capacity.spec.tsx",
+      "sha256": "60f97a8759358eeb56153e7cdc40ddd2f3546a43509cac54bbf0c0d11d965033",
+      "bytes": 2004,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomTextConversation.spec.tsx",
+      "sha256": "161f84b32285c32100976d5b915b303e487c50ca99b99cee0d65327a39684a47",
+      "bytes": 16306,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomVisualLanes.spec.tsx",
+      "sha256": "9ec7789e3905391f8d8eced9bf23dc0a8dee8977903f6c3fbc9ad118f6ee9b90",
+      "bytes": 2188,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedRoomInterpreterPreparationPanel.spec.tsx",
+      "sha256": "bd6ca89056bd1ea1992b6d100aea00dd7b0df09cda81e017b45e3d5c0525a9e9",
+      "bytes": 6866,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedRoomInterpreterTurnHistory.spec.tsx",
+      "sha256": "49b0d3b284d4d4fa4433e3cb642f84643d746de0fea02c3990c40790a2b0bc34",
+      "bytes": 2823,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedRoomMissionTextChoices.spec.tsx",
+      "sha256": "782cb5c9de024a1c0c99b03115184cc4cb04ed4d430013cf915ce9afff3b92e8",
+      "bytes": 6536,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedRoomTextReleaseControls.spec.tsx",
+      "sha256": "cccd35fce22844eecf38c1b8c8e4cf603f50c0b9cbe59a7a22567835051d9302",
+      "bytes": 7384,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/index.ts",
+      "sha256": "dec7e8b9bd4c6d58f13f9c8fb90cd8b1379ada3fa0e1ae44d8f5c0ad1f9475a0",
+      "bytes": 693,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/HelixAskLiveMediaBoundary.ts",
+      "sha256": "047e15083b7b56665665c1119adab685416217ecebd07aa389b30557c571a92e",
+      "bytes": 2462,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/RoomMediaBridge.ts",
+      "sha256": "7d9ac801d709e77dd1f7f52a263562b654aa50fcd36460cc3574e8b755ef967e",
+      "bytes": 16479,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/__tests__/useSharedLiveRoomMediaBridge.spec.tsx",
+      "sha256": "472542612bdc8a47a147b9cb7558b325f8b662b7b21507e2c6637a2598688aed",
+      "bytes": 5572,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/useSharedLiveRoomMediaBridge.ts",
+      "sha256": "5f3cb1d0c14295b2d081df5748c156bd1df06ec42c210000e454ec751c954980",
+      "bytes": 4799,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/useHelixSharedLiveRoom.ts",
+      "sha256": "f38af7fc8a53b3ec121e061d8b841116cc59223a42a220bd7d2599478f695c32",
+      "bytes": 14130,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/useHelixAskLiveRuntimeSession.ts",
+      "sha256": "e5d3ff0b343a18347539d214eada29cb8e1bb102c6e61a840095c77e764f454c",
+      "bytes": 38109,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/useHelixAskVisualFrameAttachmentIngress.ts",
+      "sha256": "3ef159bb24290417dc615145e560ed8632d4516abac07631723130ab02d46119",
+      "bytes": 2101,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/useHelixAskVisualSourceCaptureRuntime.ts",
+      "sha256": "39e71d8bb73f43724b8ff8018b08ed14c53b53a28d818e8188f721178b92ccf7",
+      "bytes": 35105,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/needle-hull-preset.tsx",
+      "sha256": "7cbd0769fb23a9bec2356e5a803449c8ce86d3743fed3e9457d00261c25e3d33",
+      "bytes": 2126,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/nhm2/GeometrySourceDeveloperCard.tsx",
+      "sha256": "39da77b7f4dea5d882496fb67c7e5010ac6b51b059d78d63a5475c97185a17c5",
+      "bytes": 7496,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/nhm2/Nhm2DiagnosticShelf.tsx",
+      "sha256": "951e8b805e527825679f78e03517529eb4856bf73f63d34229ed754b498cffb1",
+      "bytes": 10112,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/nhm2/TimeDilationActivationDeveloperCard.tsx",
+      "sha256": "0219492a7dad208dec575928e0e6d1fc2b9d8e415cc8094a1386eb7f984b7636",
+      "bytes": 9387,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/noise-gen/ProjectAlbumPanel.tsx",
+      "sha256": "58aece9b19a13d030f793f667361ae79e3c46292a58c0a92f24b5c812f0b1c32",
+      "bytes": 31836,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/noise-gens/AtomLibraryPanel.tsx",
+      "sha256": "6adf320583db54918f37527edf94c74a50f493c6835b73b568a721779cf45306",
+      "bytes": 17512,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/noise-gens/OriginalsLibraryModal.tsx",
+      "sha256": "89c1a881b76699b7010136fb207148e78d20295485c3e3caa09dd88d65cc95fe",
+      "bytes": 10393,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/noise-gens/UploadOriginalsModal.tsx",
+      "sha256": "8bd29a687d6dba9c5180e94c1a714622ad1ec3226feda9984a60ca02731e9abc",
+      "bytes": 102476,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/panels/CasimirTilesPanel.tsx",
+      "sha256": "33b30c3d46be2fe6eb58fb9d1a58fa187e737b9cf4249f5db6f56cc8464eed43",
+      "bytes": 6608,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/panels/MoralGraphLaunchPanel.tsx",
+      "sha256": "d0cfd9847cd0fcb20d71ada209703e3c29a81bcf75de10b16f53c7372bd65b7d",
+      "bytes": 1999,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/panels/MoralGraphPanel.tsx",
+      "sha256": "347485603a0f116e41d51f0123214f113f5330d99055ddc76341de00d86c8c4f",
+      "bytes": 96513,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/panels/ScientificCalculatorLiveSourceControls.tsx",
+      "sha256": "25ab43a3b33e389fbf0326bf1c1421428d5c534833e72257ff2b264c205cb7f6",
+      "bytes": 12756,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/panels/ScientificCalculatorPanel.tsx",
+      "sha256": "9eae53f9b86ddefe9f512de4966c822874024d917c36f6fc3be0220838a290e4",
+      "bytes": 85421,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/panels/StagePlayBadgeGraphPanel.tsx",
+      "sha256": "f5d8e0b9238da3d16dcf39b92e1bfc69a4ab72ddaa308d498f0e7495887de676",
+      "bytes": 623340,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/panels/TheoryBadgeGraphPanel.tsx",
+      "sha256": "eecaf4a73215cfe0e37f261a9af214b9da5df4b3bf91cd025a5cb3d7444e7f98",
+      "bytes": 861527,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/panels/WarpGrNhm2Lens.tsx",
+      "sha256": "e8694e2dbdf30ce3f026d444fed33e1a9061958493b68610bfb38f4acd0bd147",
+      "bytes": 14259,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/parameter-panel.tsx",
+      "sha256": "e3ae82b52f39fc57f66fd5eb77989ed2f1dd244d520af0286cf38c758bad9262",
+      "bytes": 26685,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/solar/__tests__/SolarSurfaceRegistrationViewer.spec.tsx",
+      "sha256": "bc40659c137be2a454dba611c194aac18dfc71ca9cc38ed98b9c6fc87b14a54c",
+      "bytes": 3860,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/AccountSessionPanel.tsx",
+      "sha256": "e3ccd780bdf9ddf30d5a19d3b7449e1fdb97e5fbf906022cb65c1b71d2e3aad8",
+      "bytes": 79871,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/AgentAccessPanel.tsx",
+      "sha256": "0817c7f7baef8c59935d74121a4bf6c96d9b28a215d31f65e9d6e126aae96b02",
+      "bytes": 861,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/DocumentImageLensPanel.tsx",
+      "sha256": "54e33c0cef0d6a577a2bf8e02684f06e23f98d1e1e5062cfe55863899823229e",
+      "bytes": 44,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/EnvironmentHomePanel.tsx",
+      "sha256": "19315e027456947a02bee7a12a8b0c10d1451560fde52bf0492861375cac024c",
+      "bytes": 27635,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/HelixAskDock.tsx",
+      "sha256": "5934b5c9749138e7d98227db73c1ac0e976378f24834c681b72b80beb55819cc",
+      "bytes": 1642,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/HelixWorkstationShell.tsx",
+      "sha256": "4f479476e7ff3b51a4387954837a154915fbe08ac4a47a47617df8038c467072",
+      "bytes": 29790,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/ImageLensPanel.tsx",
+      "sha256": "50eba9bdac8c0e9b5e547098c1be32f7690c954e585291a29f3f5b29fdc1dff5",
+      "bytes": 41552,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/InstalledServicesPanel.tsx",
+      "sha256": "f3adfdccb5381c7bf0ac1b98a268208695871b6c8a053651143b0f4bbf644356",
+      "bytes": 38389,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/LiveAnswerEnvironmentPanel.tsx",
+      "sha256": "a8a0f9258fdb39a0a4c1550e5f73e571e894443cc85a3140226160ab539996ee",
+      "bytes": 329786,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/MotorcycleHudLabPanel.tsx",
+      "sha256": "1e5faf4fc8362cfa1c3ff4d1e4bed305051685b93e1ecad1beeaa7cf930a1965",
+      "bytes": 21824,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/NarratorPanel.tsx",
+      "sha256": "3040a5997441b6999487de7c4f7d1fff53828849b29778abed8a3b77de8ec93f",
+      "bytes": 20843,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/NarratorReadRegionOverlay.tsx",
+      "sha256": "75caa85d084150dc2d8f90fd04488469d6f27c44a5230c097116918f97c0b92d",
+      "bytes": 2996,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/PostulateBoardPanel.tsx",
+      "sha256": "67c72e847c42bb400d564378bc080e864469dca63b13619a4e809f5eed656dc4",
+      "bytes": 21779,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/PrivateClockCheck.tsx",
+      "sha256": "007b11aeb5e7b51720b92c1cf08f3a13c0de041fe971988e3f5e11484c0fabae",
+      "bytes": 11246,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/PrivateClockMcpPermission.tsx",
+      "sha256": "fdbfd0c8676b0a1855d1964bb1ccd9e94dafb1ba594e1e9705a6cf2a2869273a",
+      "bytes": 5828,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/PrivatePackageRemoval.tsx",
+      "sha256": "e9d84afa677513f27d527e12373d7cca399467079d6f97d642dc6a182f23060c",
+      "bytes": 4681,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/RealtimeTexturePackControls.tsx",
+      "sha256": "532cab93308820e91bd74ec42b6008c83727923d57d1c221cb53979135ef4500",
+      "bytes": 44021,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/SituationRoomPipelinesPanel.tsx",
+      "sha256": "cc599c77ea08e5c1d53665f92b9af47dc6e1ee0bc75f528f1d4a0418124370ea",
+      "bytes": 198032,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/SituationRoomSourcesPanel.tsx",
+      "sha256": "92e8648f6d7ad5c6ea517d147376b5d6c7c06704f0b0d0c4373a744a445c8dbc",
+      "bytes": 16674,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/VisualEvidencePanel.tsx",
+      "sha256": "ca92071a2b1a7ffbcfaa296ceb3d3854f720e37671d6b59f395152c17dcc61a1",
+      "bytes": 10883,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/WorkflowDemoLabPanel.tsx",
+      "sha256": "1bc93a0c6ce2f130f3e913ea866d4a3f3910977be0be74d9a6759f294772800b",
+      "bytes": 41022,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationPanelGroupBox.tsx",
+      "sha256": "1e1e3666d1479926546e1108d97b3656ece386c6b260f7d7fdea3c88a0ac0305",
+      "bytes": 1193,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationPanelHost.tsx",
+      "sha256": "2f63a015d163fcff54a750e3c096da41fd2738a6929087b20f43e9a6932d7175",
+      "bytes": 6721,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationPanelTabs.tsx",
+      "sha256": "4bd4bb0ccdb56f784c601f92b19976c4e6da63f0c4331d2765bfce133e299858",
+      "bytes": 12442,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationPathBar.tsx",
+      "sha256": "ec23fd85a8ce2605a3212d4ec7f65f2f11a6a893107e35f5854343421fdd35e5",
+      "bytes": 14562,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationStage.tsx",
+      "sha256": "aa5ed95368462ce89b519fb21f7c2bd1141ed5ad64f77cd01da94fbafbf6b428",
+      "bytes": 594,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationStorageMapPanel.tsx",
+      "sha256": "a68ba6c8de097f12c39b8290a90d69b5fa39b7d3a0489234ca4bb6c67f46eb82",
+      "bytes": 22902,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationTaskManagerPanel.tsx",
+      "sha256": "6f9d18678f6cbbf67da71855c399130fb3dcd6f8f0725c90a34172939d439f5e",
+      "bytes": 33624,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/AccountLocalHostedEntry.spec.tsx",
+      "sha256": "70b248a6f48559c666c3b93e61d9cc01f956d2af7981e18d6fd5b9cd0000e4ab",
+      "bytes": 4195,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/AccountSessionPanel.i18n.spec.tsx",
+      "sha256": "39e1458997c4ddd4f4ae3d02ea0ad7023dd4525108f205eec08911271cd0bd12",
+      "bytes": 17862,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/EnvironmentHomePanel.spec.tsx",
+      "sha256": "541ce3113ed277b04ba4c2885f6b3030a35448f291a17e05b93fc78ca64b3c3c",
+      "bytes": 28627,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/InstalledServicesPanel.spec.tsx",
+      "sha256": "8425b2724a20a884e7bf40945d62f644ac39e9f141a2e323d07056bda5b72830",
+      "bytes": 21203,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/MotorcycleHudLabPanel.spec.tsx",
+      "sha256": "e41023ee8be88da31db7eb3a9ddbe223b45b413b8f2adebdcc99960b38e84ec1",
+      "bytes": 2239,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/NarratorPanel.copy.spec.ts",
+      "sha256": "fd375314cdc288d6ad277e1854d0752bc6cb109412079b8e04babb959e214c32",
+      "bytes": 1879,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/PostulateBoardPanel.spec.tsx",
+      "sha256": "8f8dc57188433c715ec4750edb67919da4ee5c9e96388d03cd0d74604006c085",
+      "bytes": 5067,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/PrivateClockCheck.spec.tsx",
+      "sha256": "75752a66bd2be18f57ec1ad0ecfe9efcd6dca10cdfb9e03156e267403dbb7467",
+      "bytes": 14340,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/PrivateClockMcpPermission.spec.tsx",
+      "sha256": "07ca79a6cca83c6ca7e976051938ecb3e65572a3b2480e0b99ea82b7b74fc3e7",
+      "bytes": 5357,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/PrivatePackageRemoval.spec.tsx",
+      "sha256": "750b8fe6fe0e9ad96732ee5387e3780ccde73d82d0ae2e21f76ccc7942e5e861",
+      "bytes": 6497,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/WorkflowDemoLabPanel.execution-closure.spec.tsx",
+      "sha256": "611c7762fbad11ada0d2526a05a88987ff3717fbc8060e187ac1e3b7d942add2",
+      "bytes": 4307,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/WorkstationPanelHost.account-policy.spec.tsx",
+      "sha256": "df9ebf665262e42704492334f9d51447c2140afffa86c704d4fb0d6aac0d160b",
+      "bytes": 5445,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/WorkstationPathBar.suggestions.spec.tsx",
+      "sha256": "648300256d7900cfe9237d5e6ca033654ea48df5f3ddcf109e910245bb31e4bf",
+      "bytes": 2501,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/environmentHomeController.spec.ts",
+      "sha256": "023d299effbe7a6f7a03b4d637f9f4488c15f3cf819f6cef9c716ed0d8198e10",
+      "bytes": 4542,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/environmentHomeController.ts",
+      "sha256": "0f2d4a5bad16c63bb5d408db4b28a84cefa0798f5ea4726469beeea95e475fdd",
+      "bytes": 3366,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/guide/CasimirGuideOverlay.tsx",
+      "sha256": "e288bee983a5559ffd92cda73de8ccb7dee79c1befb7dd986da1832c86e87b0b",
+      "bytes": 40838,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/guide/__tests__/CasimirGuideLocalization.spec.ts",
+      "sha256": "2c0a7e5e2cf17cfeeca8866deac5407b42a3edcac710695806e6d99ed62ba471",
+      "bytes": 1459,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/guide/__tests__/CasimirGuideOverlay.spec.tsx",
+      "sha256": "5d20ce411cd17c584e16d5a91ea0a567e3c6a48005a4b1f2d8f48e301755ceed",
+      "bytes": 21305,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/mobile/MobileHelixAskDrawer.tsx",
+      "sha256": "7057ac9592917f77a0b67d6e6be0f90994c7e7faf32543be03e433b08386346d",
+      "bytes": 4279,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/mobile/MobileWorkstationShell.tsx",
+      "sha256": "09c8a332d7fdd224743e843f2d32309d9a7b50e04bfd48422b92336e63c01cd0",
+      "bytes": 602,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/components/workstation/visual-sequence/BoundedCaptureControls.tsx",
+      "sha256": "629aa3d81dfc7e247e5b938c37d77d3f5db86df0a1e0e9c16fbfd00980eaf3f1",
+      "bytes": 9851,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/visual-sequence/VisualSequenceInspector.tsx",
+      "sha256": "7dd0405c73195bd1030adb746ead20c8668a54809fbdda20758206335b5a90fd",
+      "bytes": 9113,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/visual-sequence/__tests__/BoundedCaptureControls.spec.tsx",
+      "sha256": "1e979755780b28817868f85f5ca595fc3cf0ad5ca9992e5d9e5d62a0125473bf",
+      "bytes": 4495,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/components/workstation/visual-sequence/__tests__/VisualSequenceInspector.spec.tsx",
+      "sha256": "4ec5cce514d5c370c8c848a120650662b2dcf3aa63e8a4c76840711482596980",
+      "bytes": 3207,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/dev/solar-magnetic-globe-preview.tsx",
+      "sha256": "e6aaeb99da24dd1197f6adbfe4e976673cd7adcf494a3e4882b1bb4e54ba8df9",
+      "bytes": 538,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/hooks/useDynamicTextTranslations.ts",
+      "sha256": "c89f633d30dc64d2e93bab0f34d7fb212b8348d5210d0a96813e51ed22410d62",
+      "bytes": 5288,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/hooks/useEssenceProfile.ts",
+      "sha256": "6b35d214aa07059a776812e1b02f62f816dc6f0ff0f3fbdb36564225a8260dea",
+      "bytes": 2083,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/hooks/useHelixSettingsDialog.ts",
+      "sha256": "1b7cce45d592de5d367d01ac32171cb6c8c42774c70a03c5510f9bb1e42f543b",
+      "bytes": 1868,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/hooks/useHelixStartSettings.spec.ts",
+      "sha256": "eeb01321e9468a0f7b8d3e0f52ad24728a2f053ad71441fd9070f09a77bbc62e",
+      "bytes": 2383,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/hooks/useHelixStartSettings.ts",
+      "sha256": "af00fd836d193a6fd9d5c20f3a52b2a296edb136842a7c2db829f32a539eb243",
+      "bytes": 6654,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/hooks/useNhm2SolveState.ts",
+      "sha256": "8c18c4de8f23c9fafc8b9f33923aa5807906c02303a16aac1d15edb9de5ce6ba",
+      "bytes": 1815,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/hooks/useProofPack.ts",
+      "sha256": "f53657baa1c7bb7357217efe6a3c7e4a1598e75e7ee6fffa4d42efbbeb7a86e3",
+      "bytes": 1682,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/agent-access/__tests__/pairingRecoveryStorage.spec.ts",
+      "sha256": "32b1e11b6af75ec42dd6be5587a48a34cb7fd20cdcd4aec44947c900e93bff85",
+      "bytes": 6257,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/api.ask-turn-admission-continuation.spec.ts",
+      "sha256": "f6c494f511381823ac06eed853d3e3ce9110468cc335aefdb15078a1ccf6d51d",
+      "bytes": 6626,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/api.calculator-receipts.spec.ts",
+      "sha256": "69927927fe58fdc85d5301ae09c8fb1231b4bde7264e31baa00067ea630664ce",
+      "bytes": 4401,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/api.image-lens-region.spec.ts",
+      "sha256": "17a4ac9a2dc3249ce0a2a011d5fea4e738f68019108469b173b99308cf4f5404",
+      "bytes": 10462,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/api.realtime-grounded-feedback-binding.spec.ts",
+      "sha256": "05b16b765a5244a01b415465b396bfb39ff0d599a549957f81e79a6bd4474842",
+      "bytes": 2511,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/api.voice-speak.spec.ts",
+      "sha256": "1acd6c5fc7c72ca342ed8a781797005fa8c78f810168fdca03fe589d5fca7535",
+      "bytes": 4799,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/api.voice-transcribe.spec.ts",
+      "sha256": "e5f135bd486d4a48e18696b03c1e11b03d05e3c726460d792c7ea820029897ae",
+      "bytes": 62145,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/debug-export-capability-lanes.spec.ts",
+      "sha256": "592d51b30c19d376f82e1a98c7052349d028c4beae4b50d7ad431e329cbb6e6b",
+      "bytes": 194606,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/agi/api.ts",
+      "sha256": "775044be3030e26282e37da0bf3aa21c3eeb28074f0a80b8cbe482881ed30898",
+      "bytes": 145669,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/agi/consoleTelemetry.ts",
+      "sha256": "7f3e8baa87cc1f1f5901bff35f501e87bb54747bf5c0990a399af137230ae56f",
+      "bytes": 3382,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/agi/debugExport.ts",
+      "sha256": "e7dfa3eaf5bfa16f35e78b22b5b680a9a472584bc81aacc93114f71324038063",
+      "bytes": 212905,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/desktop/panelRegistry.ts",
+      "sha256": "9c15e4a1e0d7558667b1daaf16c329f9ec2d4ed66b9cc71b07f5a1a73f5298ce",
+      "bytes": 16046,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/desktop/panelTelemetryBus.ts",
+      "sha256": "ace980346ef6e968001a9e26b968c3254e5346c5fee9aeed28513d196d6de0fb",
+      "bytes": 1490,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/desktop/shareState.ts",
+      "sha256": "8ddbc88d89412c7574e0fb2dc290ee75c84a9282ec31333e620883ea08dccc22",
+      "bytes": 746,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/docEquationActions.spec.ts",
+      "sha256": "fec98d81bd7963655d88ff9c718b60bbd5ac01cf094340532eded90df0fec05b",
+      "bytes": 19862,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/docManifest.spec.ts",
+      "sha256": "6fb9fc7b1930a01cfbbbdfb54cb98983c02bb40c0f0711921db9efe86b6f8931",
+      "bytes": 9363,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/documentTranslationClient.spec.ts",
+      "sha256": "69af59f61917f694eb2f721a4ab84555a5c05e8c4c7d9b0c2b03a011993e260d",
+      "bytes": 44540,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/liveTranslationInlineProjection.spec.ts",
+      "sha256": "720c0646f0e6bb0bf6526910a325acbf587b42eb6b4881e6958be76bf50ed88a",
+      "bytes": 97929,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/liveTranslationInlineRenderer.spec.ts",
+      "sha256": "ced1edddfabfd9494c9d6a044d7c275370c8aafdbf68c3f72637950342e39bf8",
+      "bytes": 40474,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/liveTranslationProjectionEventIngestion.spec.ts",
+      "sha256": "15a0279bc23980c6489c980e66035de0a17b966fb47c933db2dba472a9155891",
+      "bytes": 67523,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/liveTranslationProjectionRegistry.spec.ts",
+      "sha256": "10ed49e7071e1148362b27c8153fcccec953984b021b0ebaeae5ac9369f6d008",
+      "bytes": 164388,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/paperReadCommand.spec.ts",
+      "sha256": "16596fc259485d5697f811e22ed21936df94aad2509125aff9121b682a6aaa3e",
+      "bytes": 3895,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/visibleTranslationContext.spec.ts",
+      "sha256": "df34d481cbb07779bf238d9f2e52ab4ce93d453545e5e84997709fdb4ed736bc",
+      "bytes": 23427,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/docEquationActions.ts",
+      "sha256": "6a4065c405422450fd849d3155fd5a20474e06cc761e1b538351439b418f9863",
+      "bytes": 16312,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/docs/docManifest.ts",
+      "sha256": "c090f442d4997a6eb03545e16918c861792fe8afe6febd87b686ec62eff92c5c",
+      "bytes": 16588,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/documentTranslationClient.ts",
+      "sha256": "ddf95330eb2bfd372244714cfa08a4976d7bd361be2fd32d482dbb8826922942",
+      "bytes": 42390,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/liveTranslationInlineProjection.ts",
+      "sha256": "147f3f6a96ed4babe447ceef54e168313483445b91079ae8f75630da0977fb12",
+      "bytes": 59816,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/liveTranslationInlineRenderer.ts",
+      "sha256": "c4af7bcb920d2cd02a0e6a0c9bbabbb8fa351660c866336c0a0bce44603cc09d",
+      "bytes": 5813,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/liveTranslationProjectionEventIngestion.ts",
+      "sha256": "d4f816b9589931e2df1cee92f9cb88cf280bee522f4831120eac147ba3c5b16b",
+      "bytes": 2093,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/liveTranslationProjectionRegistry.ts",
+      "sha256": "e733bc484609ad527a09750e25be1fbdf0c3b720c8d1c52a18625e11c91c158f",
+      "bytes": 107697,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/openDocPanel.ts",
+      "sha256": "f2183ebfda95f3ef64ad2f62574819718975990f9609096c1a52ce76d10a4613",
+      "bytes": 1432,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/paperReadCommand.ts",
+      "sha256": "fd5fe0b558ccb3e68b800c5c3949c818b0a8952cd2c8d1667b02dc2f358baf67",
+      "bytes": 9433,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/docs/visibleTranslationContext.ts",
+      "sha256": "a58e8d6464a6c22193ee131fc82b4c8f30cf03691ca404af590cef1b39601299",
+      "bytes": 24550,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-active-turn-stream.spec.ts",
+      "sha256": "4a1cd18db9e23cf084b1496d13d6307eb792f920dff2f1299c28dc47f1df9059",
+      "bytes": 9291,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-continuous-turn-display.spec.ts",
+      "sha256": "c7137b7dd57d0399ac0d6a6ee7ad9a615749c3f373a5b4ceb81cd4bc10a82538",
+      "bytes": 7440,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-live-source-display.spec.ts",
+      "sha256": "98adff89c33c5d83465e70f4aa578baf2f15dbce8ebbd22710f339e3593f763a",
+      "bytes": 3607,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-pending-input-readers.spec.ts",
+      "sha256": "dafd40d4c78e03c2665b2b933715fb36f5d0c2a53b3f4ad4af3ea540e2b4f4d2",
+      "bytes": 4023,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-runtime-authority-readers.spec.ts",
+      "sha256": "84bd82ca4e3fbb8079636cf495be2d48fec4475d7bcd53b6d35289605498ae1c",
+      "bytes": 5549,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-theory-runtime-context-snapshot.spec.ts",
+      "sha256": "109a05f57c0e62914444bf7ffe22d17efc67f3ae7435811c4960b87300db679e",
+      "bytes": 1171,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-voice-command-lane-policy.spec.ts",
+      "sha256": "d511a9f51d640f8a996aeb53ef2014cd0548ed319628983aefe84a1b983383c2",
+      "bytes": 4435,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-voice-reasoning-dispatch-prompt.spec.ts",
+      "sha256": "7b528792526e2ef2f22095dbfff4dacf27ae13a0d76975678c5cf072e773e2a5",
+      "bytes": 6324,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-workspace-context-snapshot.spec.ts",
+      "sha256": "8192583c4325c6e29dfd77180761381690c696683c6d8d1f82edec0f752db30f",
+      "bytes": 45279,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-workstation-fast-path.spec.ts",
+      "sha256": "06ee7b5bdf882f56750bd6db2574a35f76b2bd805127581207cfd02bd6dd08b3",
+      "bytes": 2463,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-workstation-pending-input.spec.ts",
+      "sha256": "53faa3bd55067969556acc6c68b65309682d38051cbd867fde690a2c68b3da4e",
+      "bytes": 3464,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/display-audio-capture.spec.ts",
+      "sha256": "01f294c78d0c5e08f9a9045a01aeebfe0ae3877ad7dee27cfefc4e296077b998",
+      "bytes": 7447,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/imageAttachmentLensRun.spec.ts",
+      "sha256": "92a7595a0149a07f6f8e9af2a071c07804bea0628058e2a546e8f85a1326a2ff",
+      "bytes": 4611,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/micAudioSituationCapture.spec.ts",
+      "sha256": "a33f01f5d7bfe2936597c4d23bd3a8689ef4ec3a858acfb85cfb63dd35e075f5",
+      "bytes": 2295,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/reasoning-theater-zones.spec.ts",
+      "sha256": "af518ad6e956cfb176443567b82fb3d88b02fbb25a6bc9952c037ef37ac652df",
+      "bytes": 16551,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/situation-room-account-language.spec.ts",
+      "sha256": "7bb34136c03c8932d439ebc20d2c2954b50126fedb96d6087744517e608f5bd1",
+      "bytes": 1511,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/situation-room-job-drafts.spec.ts",
+      "sha256": "8d92def0cae888d568d861aef300eedf653e4875f46f35d9b79922414f07aef7",
+      "bytes": 2964,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/standbyVoiceDelivery.spec.ts",
+      "sha256": "5664792f0122e40a8fefcb1ee74f83b7a9c689299ff9cadb4637148599a249e5",
+      "bytes": 4339,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/ask-active-turn-stream.ts",
+      "sha256": "552c92905101d95a2fd9fca1abd4104b8ebbaa670e2065329812e9afc861afb9",
+      "bytes": 21903,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/ask-continuous-turn-display.ts",
+      "sha256": "9f7394bd49a1923c7d334e7b94903b3697d62ef1c395d4b41bc5a1b870972623",
+      "bytes": 11297,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/ask-live-source-display.ts",
+      "sha256": "8aa96a4846d90d97d1502e8adb6e3d4dd44ee2350e482e4b056974098d1c8a90",
+      "bytes": 18805,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/ask-observer-events.ts",
+      "sha256": "e2ba1c3f74677e9d80a1b25bfba37f8669366c873a1b21a0ccb75b5cb40d131d",
+      "bytes": 10162,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/ask-pending-input-readers.ts",
+      "sha256": "11247c8f41098245e819ccc987d92915a7fa8e77b3ef8e2fd6198002efbd9d43",
+      "bytes": 5131,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/ask-runtime-authority-readers.ts",
+      "sha256": "ebb380955813abc59b72edc685ae50b5cdde04d1357b8023ed021929b0e34e2f",
+      "bytes": 13812,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/ask-voice-command-lane-policy.ts",
+      "sha256": "a814e758aae48ee3c471f1e379704c3ed0563748fdc9a50b5e951cd9e4bfe30f",
+      "bytes": 3305,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/ask-voice-reasoning-dispatch-prompt.ts",
+      "sha256": "90eaa393866893b781e59f84487a061a2b9c6938103c30dbdde30dea735189c1",
+      "bytes": 7349,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/ask-workspace-context-snapshot.ts",
+      "sha256": "3ccee63e57edd451ce68a66874285297d156cff4d160bc34379080b268fba3da",
+      "bytes": 25489,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/ask-workstation-fast-path.ts",
+      "sha256": "90c32e8d1718b23ac055f90b1ba1f4148b848907fd7cb1f8c3920a76c5e6173c",
+      "bytes": 1939,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/ask-workstation-pending-input.ts",
+      "sha256": "9e9e8e36498fbe323d0836a74425b5a4e8e515f773878a06b90472623f04dd2d",
+      "bytes": 3015,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/display-audio-capture.ts",
+      "sha256": "a63095b1a4f217d30dec947f8afdc92f584e647468e9bb5c81c7a8a69b11ffbf",
+      "bytes": 11087,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/imageAttachmentLensRun.ts",
+      "sha256": "137f2406adcb5077e62d886ff2224dd60e3d8d1775f7fd298e73541a43e811da",
+      "bytes": 6510,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/mic-audio-situation-capture.ts",
+      "sha256": "ec2a1972a26f8a13587bc4a87a1633a712c063382128e573b39ce1d38999325d",
+      "bytes": 8348,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/personal-voice-route.ts",
+      "sha256": "267128f93eeb27e8519962d2887baf7083ccc80c72a036286821a9cfac246b18",
+      "bytes": 2689,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/helix/reasoning-theater-zones.ts",
+      "sha256": "c7df92c479a7dc66673d7f2c227cc2d11552fc7875ad1b22cd85b9ce608d18f9",
+      "bytes": 43818,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/situation-capture-context.ts",
+      "sha256": "8263592474a5c7c05bc01ef8856a5d2ae9f5f0fc6b6198ccad9148ed38ed7458",
+      "bytes": 4309,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/situation-room-account-language.ts",
+      "sha256": "69cd7a630b6009d7ae726250970e33b386fbb7868bf51be0a2a59df54416d291",
+      "bytes": 1004,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/situation-room-job-drafts.ts",
+      "sha256": "0767302d43246ae82a33ca8b75aa2b8d4744399e6eca9eb0823ebbf5eb00ede3",
+      "bytes": 6458,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/situation-room-job-recipes.ts",
+      "sha256": "027feef91207143a69ced557f57228b5c588e21ad620ea36352feef2f6d90bd2",
+      "bytes": 7719,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/standbyVoiceDelivery.ts",
+      "sha256": "b8bacb784e8748507091541b213cf5992ec4879560bce3c49c1e3eb2374d73af",
+      "bytes": 2724,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/helix/voice-steering-finalized.ts",
+      "sha256": "55ec6df22f17dd3038af537b10bdda5fd2a8f33a856b56bb35617f99aed054b2",
+      "bytes": 859,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/helix/workflow-demos/__tests__/research-paper-to-proposal.spec.ts",
+      "sha256": "c7524df0f5ccace9d5a21f4035cd32d3524b111b2d7bcf11383643711ea1b2ce",
+      "bytes": 18779,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/helix/workflow-demos/__tests__/workflow-demo-debug-export.spec.ts",
+      "sha256": "53c79d759e46c2e3d09a94e8f7713df2527be2af876dda8781a2ac93cf558fbd",
+      "bytes": 2932,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/i18n/__tests__/interfaceCatalog.spec.ts",
+      "sha256": "0cbe6515439c4b234a92bfabfe3b2bdaefd9284d33f72ac5ba601c0d89a1b888",
+      "bytes": 5024,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/i18n/__tests__/runtimeCatalogs.spec.tsx",
+      "sha256": "1d0c3217bb17655499ef6616eb2b40ad39154b8498f05d8ca286aecc82e16433",
+      "bytes": 1080,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/i18n/interfaceLanguage.ts",
+      "sha256": "4f0eca628565e6c445c4234e64f4252de46abe9a6bea673687f380d888ddfb7e",
+      "bytes": 5643,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/i18n/interfaceLanguagePreference.ts",
+      "sha256": "9d2a6191ccc6fca313ce9ecb52e65677944153ca1eedbbb2393d6f36edc51244",
+      "bytes": 2563,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/i18n/interfaceText.ts",
+      "sha256": "a5ef3af7635c2f4400c717065697fc0cd85dde18a460f686f4b91b9e3c1dc378",
+      "bytes": 3394,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/i18n/messages/catalogTypes.ts",
+      "sha256": "30d7f8e628c6534b858c0157b9abeba6419f8cf66ef919e6dd8e7932e37d1202",
+      "bytes": 735,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/i18n/messages/en.ts",
+      "sha256": "5191eef2277984355b7a98add815284dea0eb9e478a844bad89936957cd05f2f",
+      "bytes": 311,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/i18n/messages/runtimeCatalogs.ts",
+      "sha256": "85a4553dba1bca110369b8dd8c79a433a0b314f9ee994d6f743896c9604c7cdb",
+      "bytes": 2375,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/i18n/messages/targetCatalogs.ts",
+      "sha256": "cab8b70c39a5350a8049096612d7e2429e53f2a47179b00cb432ffdef7c95b2a",
+      "bytes": 1468,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/i18n/messages/types.ts",
+      "sha256": "7e49e445d6cbe6fa5583a493180574502e508e91e33a6aabd477c633b5b310e2",
+      "bytes": 488,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/i18n/panelTitles.ts",
+      "sha256": "7916a349e65b33c0762b65f444159da872b23028915e0b6e05d7c69f06bc65cc",
+      "bytes": 2300,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/narrator/__tests__/hoverFocusInspector.spec.ts",
+      "sha256": "8efb7b8dc3ad606ca22a987856d0df6c0b7c45cf292078bb1b73e9d2c4791077",
+      "bytes": 6550,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/narrator/__tests__/narratorAudioPlayback.spec.ts",
+      "sha256": "a8531a2343905b6293629c40383167e38e0a54ade8d25ca0ebda6ab0983101a9",
+      "bytes": 3095,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/narrator/__tests__/narratorDebug.spec.ts",
+      "sha256": "af2f8f3a06be59fe49ebdc303b6f8eea249ebe978020ea021de908d0bb108dcc",
+      "bytes": 1740,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/narrator/__tests__/narratorVoiceBridge.spec.ts",
+      "sha256": "533e85dd022b8207351e2cee8006c19a0960c84ab14cbde30bd271b3f13a0697",
+      "bytes": 2231,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/narrator/hoverFocusInspector.ts",
+      "sha256": "52e224c62840b5579c96e72be605e8e67983f0b133aa40253714f106f88f1172",
+      "bytes": 20336,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/narrator/narratorAudioPlayback.ts",
+      "sha256": "4b0a143181e2da1b79f577d8ffde8518d77d30a4d4b16b65cc5a6b620f863eb4",
+      "bytes": 17327,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/narrator/narratorDebug.ts",
+      "sha256": "173a02e3ffca3f8c680ac97d3f52bb29e0e0a3576100450b64f309163ebe31d2",
+      "bytes": 4114,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/narrator/narratorVoiceBridge.ts",
+      "sha256": "beab7203b7a1fbc7b7ceedf1064d64af82c59805afadecd12f76a53a14168762",
+      "bytes": 2244,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/nhm2/__tests__/blocks.spec.ts",
+      "sha256": "2f5f9feebf04256143952855ea37e7a6aec2ddbc9fe34b1047b989c6ee9ccc1d",
+      "bytes": 5623,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/nhm2/__tests__/solve-state.spec.ts",
+      "sha256": "c6add7edbfe6d3afe09968bf116cd7ebbb896fd50d9e0799011f675a2ee8b28f",
+      "bytes": 16880,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/nhm2/solve-state.ts",
+      "sha256": "b8fe4b32d48e8517d26605bad0fcda4e763a4b713c675655b091f0742bf121b4",
+      "bytes": 263,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/proof-pack.ts",
+      "sha256": "1c8109e01c4877bf7463385727b17d734aba55a3b52e33336ca998c72a4bc206",
+      "bytes": 19739,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/solar-observation-export.spec.ts",
+      "sha256": "add2c3a36650f84cb0c5ce52c25a0e9445d337375cf30f455e9d017788473a54",
+      "bytes": 3015,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/solar-observation-export.ts",
+      "sha256": "813b010857463eeafd2fa9d49c57941abb9df8fc3c8699b92b38106691fe5a1a",
+      "bytes": 2102,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/solar-observation-replay.spec.ts",
+      "sha256": "55ddcd6881d8e15eb3b47267f94ac3028e801f28a570d539556adb8e0dfb9876",
+      "bytes": 5960,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/solar-observation-replay.ts",
+      "sha256": "ae50f42301ebc78e6025d32ae4ec75766b90f9b527ddb349e39fc5240b437447",
+      "bytes": 965,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/solar-observation-view-store.ts",
+      "sha256": "478df497f3e7fda3ed2cdfe79c79c6a3640e4d2f702aa49968a95043fd791d8f",
+      "bytes": 1967,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/surfacekit/generateSurface.ts",
+      "sha256": "c83dc00e909abd91cb8afda6654500c6f4461de541a58ca64c7930c21a7dffc9",
+      "bytes": 6241,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/surfacekit/slates.ts",
+      "sha256": "17aad0305c13edee10f05b130962c0455a173a72249e84f5b583c67a7426ff8d",
+      "bytes": 1326,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/theory/__tests__/theoryAchievementLayout.spec.ts",
+      "sha256": "0a9b84497715c7343adced0d99ffcd95daf2d4784e4a421a4eb7dbe488428d20",
+      "bytes": 1222,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/theory/__tests__/theoryBadgeCombinationReader.spec.ts",
+      "sha256": "4f6d85efc4dd56f80ed94d5f06a2a8ef6b4626425d8bce14929a507cc5fd6362",
+      "bytes": 3241,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/theory/__tests__/theoryBadgeConnectionTrace.spec.ts",
+      "sha256": "56f412b35dc268dd87c0e51901ea8b4637578063a75c5752b5c4d8e28d03f23e",
+      "bytes": 1000,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/theory/__tests__/theoryBadgeGraphAskContext.spec.ts",
+      "sha256": "7604440efcb8dd7c00d7bf5ab6438b64539b59613313bde44b7fb34dd9668e38",
+      "bytes": 3335,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/theory/__tests__/theoryBadgePlaybackPlan.spec.ts",
+      "sha256": "e9464cba747f102f4779dd7d5935d93ba6a58a88a8aeb3e4d811502765ec25df",
+      "bytes": 1274,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/theory/__tests__/theoryBadgePlaybackRunner.spec.ts",
+      "sha256": "286ab9babe2b0484905a01ec2e7aa5e94edaab565ffb860742c739aa5c2db931",
+      "bytes": 1343,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/theory/__tests__/theoryBiomeLayout.spec.ts",
+      "sha256": "26b8c54f422c44474905bb129601c7d123a9552d7d195ac927a6d501519eb5d8",
+      "bytes": 5774,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/theory/__tests__/theoryCalculatorLoadoutRunner.runtime.spec.ts",
+      "sha256": "ec4a2b03118807958887aeb95df55bce044ca5489102acf2024225e16e300a82",
+      "bytes": 1685,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/theory/__tests__/theoryMapOverlay.spec.ts",
+      "sha256": "fc4e89a49be3aca8e5e148a9b178bba96a7839047300382d44e1119cd5b54baf",
+      "bytes": 1259,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/theory/theoryBadgeGraphAskContext.ts",
+      "sha256": "820fc0d253e1824d322ef6f2416b7f84882289a896b09bb22e2648cace0d0ed2",
+      "bytes": 4971,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/webgpu/hull-pathtracer.ts",
+      "sha256": "6d5055e6731b77d4ef393cca2ec42ae06c46dbc8ab4c7aa9d77d06cf93c1f9fa",
+      "bytes": 28026,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/accountCapabilityPolicy.spec.ts",
+      "sha256": "e476705e2af9b1c5e36cb97b57727d9d27433adf15b097b491529ede86e6f462",
+      "bytes": 6952,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/ideologyPanelActions.spec.ts",
+      "sha256": "1daee564e42a77e8901a074bd0b8095e9306a9ac85e2330518bba98487aeabf6",
+      "bytes": 4654,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/intentClassifier.spec.ts",
+      "sha256": "e12cf93a15b1f3a6471ca0bd1691654659a32ebb3e19af4adb12035ad557d1fa",
+      "bytes": 11238,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/launchPanelPolicy.spec.ts",
+      "sha256": "1c6fce79abf550f920c0ea94291732cae728f62b0eef336db9b4734af81e1144",
+      "bytes": 4427,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/panelActionAdapters.compound-theory-run.spec.ts",
+      "sha256": "d490e4dc8595974eb0ac3f3ff9c7e6b2831fae00ffb9d7d788b13cc7d0df9d2f",
+      "bytes": 6880,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/panelActionAdapters.image-lens-focus.spec.ts",
+      "sha256": "4cf6d9aece7d0dbb3a7e659c0ef277303c295fca783b124dc9d93e5a12e7460e",
+      "bytes": 3054,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/panelActionAdapters.live-pipelines.spec.ts",
+      "sha256": "80b8225d95f9e561251e965e13ca2bc02c0bbd2ddf3d32301ad484f5560b2bc9",
+      "bytes": 1403,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/panelActionAdapters.physics-context-plan.spec.ts",
+      "sha256": "7834d09f40a9be9539c273bc2edc0c55b1fa31e1ad0fbaa93f715a16f557af1e",
+      "bytes": 3802,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/panelActionAdapters.spec.ts",
+      "sha256": "5117f3921447eee3d24200233cda9f0a375f3bd6758e41f04550f25bfa01eb74",
+      "bytes": 109996,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/profileStorageSync.spec.ts",
+      "sha256": "540a0c5cbdffab4fc8f70a844a5ddb4532681a6e1df2a2caa94ef199bf227ab2",
+      "bytes": 34797,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/setupExecutionReceiptPost.spec.ts",
+      "sha256": "c331a0d621b71b44e4d0e9a9aaf17d1c12b4235771e1222a4acb657bd0997872",
+      "bytes": 2543,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/theoryContextReflectionToolAdapter.spec.ts",
+      "sha256": "7c7d96bbeefa12012e831d9a2e691a4fa9813f9c18c8964fce31fba2db8a03ee",
+      "bytes": 2892,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/workstationActionExecutor.spec.ts",
+      "sha256": "c5a5ba3b39c1e50de0cc74e54c528344f986f3b1620522e688109e76fe610420",
+      "bytes": 2556,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/workstationDeepLink.spec.ts",
+      "sha256": "e2ea06961713b162211a409fcd54836e42f8f0bab0586a1a7cf9164104516543",
+      "bytes": 6445,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/workstationDynamicTools.spec.ts",
+      "sha256": "cc42b5a8ba170f1e9ac1faf84d0a4238b81ef1d7d84784c7f96dabed546bba08",
+      "bytes": 10220,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "sha256": "f05608d0d6070d7409dce28647f86d5610efd5dc63ffd6c1021703cf56380f00",
+      "bytes": 7370,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/workstation/ask-workstation-parser.ts",
+      "sha256": "77b8d157c2226f20c6a712708d5853dd71d97703bbe241b1591d0ba2fc6ff74a",
+      "bytes": 3540,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/ideologyPanelActions.ts",
+      "sha256": "37e8856929a102c649e2cc8751f8e3c4fe6567bc4cd7916466c78139a4fdcff8",
+      "bytes": 14591,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/intentClassifier.ts",
+      "sha256": "852263dec82297ab9d6a5465f03aa0ef78e5ce0828cd4265ab30829cdc34cdf0",
+      "bytes": 22398,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/jobExecutor.ts",
+      "sha256": "8106236e189b067f657eb71695a902b12365402b24466edf361f965d7737a62e",
+      "bytes": 20578,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/launchPanelPolicy.ts",
+      "sha256": "29d82b20bcc19ffd9881a421db56e53c585a7403fd6208be906776bdbfc960c2",
+      "bytes": 1368,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/workstation/panelActionAdapters.ts",
+      "sha256": "4922daf6a46f8ca633145a92057f00b6f7e36d1c8baa2a9f5a830afad07cb57b",
+      "bytes": 282367,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/performance/startWorkstationPerformanceSampler.ts",
+      "sha256": "2951960aa8bc05d6f92e971ff7fd99265a4b5db27c4fb13cd03b571b18d39554",
+      "bytes": 12532,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/processGraph/__tests__/processGraphCapture.spec.ts",
+      "sha256": "691d5fe5911518a812b2371881c6323bfe1ee7214a1b2547c342c2162382faa0",
+      "bytes": 1158,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/processGraph/startProcessGraphCapture.ts",
+      "sha256": "5288c136ced5ca8c72bacf839a560887b1ccb8fc8584cf9acd539df136f3f4c3",
+      "bytes": 10379,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/profileStorageSync.ts",
+      "sha256": "c052e7351d05f11ff991cf9e30fa20a51431f0bee06cb8a33235be25f485c9f1",
+      "bytes": 29975,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/workstation/setupExecutionReceiptPost.ts",
+      "sha256": "c8ea988d28d37163ef0c06d242a1e405d86b8d4d54ab3db89aeae2aa57f32294",
+      "bytes": 2599,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/situationRoomSetupActions.ts",
+      "sha256": "d1ed8a23a4f85d50d395df642cd4dc0168623db3ec4d7e04556631c0a4eb5ac1",
+      "bytes": 8668,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/theoryContextReflectionToolAdapter.ts",
+      "sha256": "c507b7404f44dd6f2e826353d6f69283d304da639197f8e9e8ae567b9ebfdb31",
+      "bytes": 3961,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/lib/workstation/workstationActionContract.ts",
+      "sha256": "35202213290ee13c1c4a2b90ed94646c5ad71ba731181043e185c624dc87eaf5",
+      "bytes": 9891,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/workstationActionExecutor.ts",
+      "sha256": "625ee660e79a1b6f9ad248900bf3a368c8d77cdcb7283f580f94998f94b0333e",
+      "bytes": 6333,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/workstationActionLiveEvents.ts",
+      "sha256": "f9631deb8f0305ccaf59093e0ee76c6527e976905d5aaea96e5fb1d8fec84c1d",
+      "bytes": 2506,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/workstationDeepLink.ts",
+      "sha256": "8f37333b761fe1ad7f3fab081cac17289a14c8c3444c9a31f4dc43fec0730aef",
+      "bytes": 8454,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/lib/workstation/workstationDynamicTools.ts",
+      "sha256": "6067407ac4672c418cbe7d1a9ca3408e2eb585a713e744af205fd5be51af2aae",
+      "bytes": 2324,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/main.tsx",
+      "sha256": "7f799e389357f3980d8b0d9f4a803984c96bea98f66a73117c74b8ca361327b0",
+      "bytes": 7467,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/pages/__tests__/account-portal.spec.tsx",
+      "sha256": "adbd5c14a3d885f7fe6315ffb20bdddd1fc19d084e21a5af7c1e8ef30bc7895a",
+      "bytes": 13040,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/pages/__tests__/site-connect.spec.tsx",
+      "sha256": "fddd26c1e225496ab952e8871f49b0f973e1c43a769fe2a7ab49d5ec136acd2d",
+      "bytes": 3617,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/pages/account-portal.tsx",
+      "sha256": "72f43edc58342395647703af5c18256d8b4a2e3862c6202c013840e180d93964",
+      "bytes": 30587,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/pages/agent-access.tsx",
+      "sha256": "85aa12fc51a68aaabffd92c1f8159d57d5b92d3a5a49669999da43361364a96e",
+      "bytes": 1939,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/pages/desktop.tsx",
+      "sha256": "ab45268fcde2c923563247f561f63223f6e479889cfff157d9e1f6f042a793ec",
+      "bytes": 44841,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/pages/helix-core.panels.ts",
+      "sha256": "2e1550795c3e1c47d55037441ee20d54aa0b13e787f188fb9bd83945a03251c5",
+      "bytes": 19815,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/pages/helix-noise-gens.tsx",
+      "sha256": "9992ed7f61a572112c016a19b99b81c27a58d3f102be8e5c0b220703afc49566",
+      "bytes": 50702,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/pages/mobile-start.tsx",
+      "sha256": "7b3e67536dca88593d461bb654f6385c5d7d59ef491d8ea271aa75f8f492b7a2",
+      "bytes": 46035,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/pages/noisegen.tsx",
+      "sha256": "6e0fa725a91eadccf626f246c94e8c25cf988a59ffc1957c61ee45d42d42c98c",
+      "bytes": 1044,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/pages/simulation.tsx",
+      "sha256": "3026713a39c00760f33f9edbfad6864d2be30d4f1e980800467fdc1ad43012d2",
+      "bytes": 10899,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/pages/star-watcher-panel.tsx",
+      "sha256": "6fdc13e058422d8d36847547516c7fd2995bc6c52260e6d96e45ce144f2f4b29",
+      "bytes": 176005,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/pages/start.tsx",
+      "sha256": "cfcfd4dacca6fe013bc32894ee0a5593fd947238cb9a665295be95350e0784eb",
+      "bytes": 19871,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/store/__tests__/useTheoryCompoundRunStore.spec.ts",
+      "sha256": "d3071daf6ad0ad99da8bcd40f4b732a7c297dd88930ecd6d988bf8858175b0f6",
+      "bytes": 5057,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/store/__tests__/useWorkstationActionExecutionStore.spec.ts",
+      "sha256": "78f604cb809ce80199501fc306f650cfcd74e83efaed9b0ce304693dc45ef0a9",
+      "bytes": 3369,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/store/useDesktopStore.recent-panels.spec.ts",
+      "sha256": "eafe9d922078d11230458d1893f110376d234ebda92c699adf3b8896a6cb1fe6",
+      "bytes": 1397,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/store/useDesktopStore.ts",
+      "sha256": "790f8bcebb2c60c80e43f15459a1c53cd8b905f82476e8db133440304adc82c6",
+      "bytes": 16275,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/store/useKnowledgeProjectsStore.ts",
+      "sha256": "7db909c50b925f3649ea23bc0d2eebbb8b19f6f611ca8edf49eca41a02aba313",
+      "bytes": 13988,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/store/useMobileAppStore.ts",
+      "sha256": "5c4a5a3b86ae20199df4abe24205f2aa57b2acbeaae80b38ce89757b60ff7f65",
+      "bytes": 4260,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/store/useNarratorStore.test.ts",
+      "sha256": "3d4f9ba81cdb6a753756757e582c68e7145f76d880b9395e4927dccb7c532957",
+      "bytes": 7977,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/store/useNarratorStore.ts",
+      "sha256": "e0a53719c7efebe6040a2570cf380b6f16c44491aaeb324b4b83b38a9b9e45af",
+      "bytes": 11906,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/store/useSituationRoomGraphStore.spec.ts",
+      "sha256": "15096485b3b5ba824996544ceb5a66f7e868b857138f1ebf441108775c4e853b",
+      "bytes": 9631,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/store/useSituationRoomGraphStore.ts",
+      "sha256": "9a3afed798db71dfd2941b17caab6d6e97a3e97bee1f332fe979e6b608dad5c1",
+      "bytes": 27214,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/store/useSituationRoomJobStore.spec.ts",
+      "sha256": "4c50e8b6d5ff21e7978a7a78b3647a85fa08c32787a2ad3bb92aeac32d9d9884",
+      "bytes": 13344,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/store/useSituationRoomJobStore.ts",
+      "sha256": "6f250ce01816aa4cf4125fc716d84c7be61b5ce9c4e3975fd9d823b9a9c3bc95",
+      "bytes": 43678,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/store/useSituationRoomStore.spec.ts",
+      "sha256": "c8e9bb0d59811b2dbb295d016ba3eb240e693ed2987b0c914eb5b71205c94c75",
+      "bytes": 8857,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/store/useSituationRoomStore.ts",
+      "sha256": "46c82f5a316019dc733b6a9453dd13218f30b088ef9db3f42ace85f56c2bfa05",
+      "bytes": 30325,
+      "cohort": "remaining-or-companion"
+    },
+    {
+      "path": "client/src/store/useTheoryExperimentWorkflowStore.spec.ts",
+      "sha256": "9a15b8bc8fc265eed01065a310ee296cb082665a106c876904ab70e3d940a7e9",
+      "bytes": 22964,
+      "cohort": "shared-dependent-code-without-catalog"
+    },
+    {
+      "path": "client/src/utils/units.js",
+      "sha256": "b687846f8c7be627ce2cc5727da75c0cf22190a64e010b1084bb11a5e1aaa158",
+      "bytes": 2259,
+      "cohort": "remaining-or-companion"
+    }
+  ]
+}

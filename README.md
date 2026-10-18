@@ -1,8 +1,8 @@
-# PRIVATE DRAFT — independent web-client source addendum
+# PRIVATE DRAFT — combined 625-file web-client source addendum
 
-This local, unpushed candidate adds 374 exact committed source files above Public web-client commit `739e33a0aaec948264b81300e494dbec9d9f62d9`: 340 remaining `client/src` files and 34 companion `client/` files. The [exact addendum inventory](SOURCE_ADDENDUM_INDEPENDENT.json) identifies the pinned private source commit and every raw Git blob. This route does not include the separately held 262 shared-dependent files or their 11 large translation catalogs.
+This local, unpushed candidate adds 625 exact committed source files above Public web-client commit `739e33a0aaec948264b81300e494dbec9d9f62d9`: 374 remaining and companion client files, followed by 251 shared-dependent client files without the 11 held English and translation catalogs. The [combined inventory](SOURCE_COMBINED_INDEPENDENT.json) and the two stage inventories pin every raw Git blob from the private platform source commit.
 
-The existing 1,295-file Public selection retains its MIT license and upstream shadcn/ui notice below. **This private draft makes no license grant or public-release claim for the 374 added files.** Exact-file owner rights, copied-content and dependency review, final notices, and approval of this exact publication commit remain open. The additions reference omitted modules, styles, media, fixtures, and build inputs. This source-only snapshot is not a runnable workstation, website, service worker, voice bridge, or E2E suite.
+The original 1,295-file Public selection retains its MIT license and upstream shadcn/ui notice below. **This private draft makes no license grant or public-release claim for the added 625 files.** Exact-file owner rights, copied-content and dependency review, final notices, and approval of this exact publication stack remain open. The source-only snapshot omits catalog text, other modules, styles, media, fixtures, and build inputs; it does not claim static import closure or a runnable workstation, website, service worker, voice bridge, or E2E suite.
 
 ---
 
