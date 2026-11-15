@@ -6,6 +6,15 @@ import {LiveConnectionSettings} from "../LiveConnectionSettings";
 import {HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT} from "@/lib/workstation/accountCapabilityPolicy";
 afterEach(()=>{cleanup();delete window.casimirDesktop;});
 describe("GPT Live connection settings",()=>{
+  it.each(["room_hosted_interpreter_not_enabled", "future_connection_result", "toString"])("shows bounded recovery for an unhandled %s inspection result", async code => {
+    const invoke=vi.fn(async()=>({ok:false,code,detail:"private upstream diagnostic"}));
+    window.casimirDesktop={getRuntimeSnapshot:vi.fn(),liveConnection:invoke as never};
+    render(<LiveConnectionSettings showManagedConversation={false}/>);
+    await screen.findByText("Connection status could not be confirmed. Reopen settings and try again.");
+    expect(screen.queryByText(/private upstream diagnostic/)).toBeNull();
+    expect(invoke.mock.calls).toEqual([[{action:"inspect"}]]);
+  });
+
   it("labels launcher-supplied credentials without claiming they were saved for the profile",async()=>{
     window.casimirDesktop={getRuntimeSnapshot:vi.fn(),liveConnection:vi.fn(async(request:{action:string})=>
       request.action==="inspect"?{ok:true,code:"saved",state:{configured:true,source:"launcher"}}:

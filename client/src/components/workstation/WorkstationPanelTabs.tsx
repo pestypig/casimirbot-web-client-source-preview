@@ -1,14 +1,13 @@
+import { isExperimentalLaunchPanelVisible, useExperimentalLaunchPanels } from "@/lib/workstation/experimentalLaunchPanels";
 import { useEffect, useMemo, useState } from "react";
-import { Lock } from "lucide-react";
 import { ENVIRONMENT_HOME_PANEL_ID } from "@shared/desktop-environment-home";
-import { resolveHelixAccountPanelAccess } from "@shared/helix-account-session";
 import type { HelixAccountCapabilityPolicy } from "@shared/helix-account-session";
 import { useHelixStartSettings } from "@/hooks/useHelixStartSettings";
 import { panelRegistry } from "@/lib/desktop/panelRegistry";
 import { getInterfaceLanguageOption } from "@/lib/i18n/interfaceLanguage";
 import { useInterfaceText } from "@/lib/i18n/interfaceText";
 import { getInterfacePanelTitle } from "@/lib/i18n/panelTitles";
-import { isUserLaunchPanel } from "@/lib/workstation/launchPanelPolicy";
+import { isAccountLaunchPanel } from "@/lib/workstation/launchPanelPolicy";
 import { isSolarSpecialistLaunchPanel } from "@/lib/workstation/solarSpecialistPanels";
 import {
   HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
@@ -38,6 +37,7 @@ export function WorkstationPanelTabs({ groupId }: { groupId: string }) {
   const [accountPolicy, setAccountPolicy] = useState<HelixAccountCapabilityPolicy | null>(() =>
     readCachedAccountCapabilityPolicy(),
   );
+  const experimentalLaunchPanels = useExperimentalLaunchPanels();
   const { userSettings } = useHelixStartSettings();
   const interfaceLanguage = getInterfaceLanguageOption(userSettings.interfaceLanguage);
   const { t } = useInterfaceText(interfaceLanguage.code);
@@ -46,8 +46,8 @@ export function WorkstationPanelTabs({ groupId }: { groupId: string }) {
     () =>
       panelRegistry
         .filter((panel) =>
-          !panel.startHidden && !isSolarSpecialistLaunchPanel(String(panel.id)) &&
-          (accountPolicy?.account_type === "developer" || isUserLaunchPanel(String(panel.id)))
+          !panel.startHidden && isExperimentalLaunchPanelVisible(String(panel.id), experimentalLaunchPanels) && !isSolarSpecialistLaunchPanel(String(panel.id)) &&
+          isAccountLaunchPanel(String(panel.id), accountPolicy)
         )
         .sort((a, b) => {
           const aReady = a.workstationCapabilities?.v1_job_ready ? 1 : 0;
@@ -57,7 +57,7 @@ export function WorkstationPanelTabs({ groupId }: { groupId: string }) {
           const bTitle = getInterfacePanelTitle(t, String(b.id), b.title);
           return aTitle.localeCompare(bTitle, undefined, { sensitivity: "base" });
         }),
-    [accountPolicy?.account_type, t],
+    [experimentalLaunchPanels, accountPolicy, t],
   );
   const filteredPanels = useMemo(() => {
     const query = panelSearch.trim().toLocaleLowerCase();
@@ -214,7 +214,7 @@ export function WorkstationPanelTabs({ groupId }: { groupId: string }) {
             <div className="mb-2 text-[11px] uppercase tracking-wide text-slate-400">
               {t("workstation.panelPicker.title")}
             </div>
-            <input
+            <input data-helix-control-id="workstation.shell.workstation-panel-tabs.input" data-helix-interaction-kind="configure" data-helix-authority-state="client_local"
               value={panelSearch}
               onChange={(event) => setPanelSearch(event.target.value)}
               className="mb-2 w-full rounded border border-white/15 bg-black/30 px-2 py-1.5 text-xs text-slate-100 outline-none placeholder:text-slate-500 focus:border-cyan-300/50"
@@ -226,9 +226,6 @@ export function WorkstationPanelTabs({ groupId }: { groupId: string }) {
             <div className="max-h-72 space-y-1 overflow-y-auto">
               {filteredPanels.map((panel) => {
                 const panelTitle = getInterfacePanelTitle(t, String(panel.id), panel.title);
-                const panelAccess = resolveHelixAccountPanelAccess(accountPolicy, String(panel.id));
-                const publicLaunchPanel = isUserLaunchPanel(String(panel.id));
-                const locked = panelAccess.state === "locked" && !publicLaunchPanel;
                 return (
                   <button data-helix-interaction-kind="configure" data-helix-authority-state="client_local" data-helix-control-id="workstation.shell.workstation-panel-tabs.open-panel-in-group-group-id-panel-id-focus-group-group-id-set-picker-op"
                     key={panel.id}
@@ -246,7 +243,6 @@ export function WorkstationPanelTabs({ groupId }: { groupId: string }) {
                     }`}
                   >
                     <span className="inline-flex items-center gap-2">
-                      {locked ? <Lock className="h-3.5 w-3.5 text-amber-200" aria-hidden="true" /> : null}
                       <span>{panelTitle}</span>
                     </span>
                   </button>

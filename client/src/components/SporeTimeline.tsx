@@ -176,7 +176,7 @@ export default function SporeTimeline(): JSX.Element {
   async function finishExport() {
     try {
       const module = await import(
-        /* @vite-ignore */ "https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.esm.js"
+        /* @vite-ignore */ "https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/+esm"
       );
       const node = containerRef.current;
       if (!node) return;
@@ -676,7 +676,7 @@ function signed(value: number, dp = 1) {
 async function readExifDate(file: File): Promise<number | undefined> {
   try {
     const exifr = await import(
-      /* @vite-ignore */ "https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/lite.umd.min.js"
+      /* @vite-ignore */ "https://cdn.jsdelivr.net/npm/exifr@7.1.3/+esm"
     );
     const meta = await (exifr as any).parse(file, {
       tiff: true,
@@ -700,7 +700,7 @@ type Id3Result = { date?: number; duration?: number };
 async function readId3(file: File): Promise<Id3Result | undefined> {
   try {
     const mm = await import(
-      /* @vite-ignore */ "https://cdn.jsdelivr.net/npm/music-metadata-browser@2.5.10/dist/music-metadata-browser.min.js"
+      /* @vite-ignore */ "https://cdn.jsdelivr.net/npm/music-metadata-browser@2.5.10/+esm"
     );
     const meta: any = await (mm as any).parseBlob(file);
     const tdrc = meta?.common?.date || meta?.common?.year;

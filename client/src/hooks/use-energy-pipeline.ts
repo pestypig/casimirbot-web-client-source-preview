@@ -313,6 +313,17 @@ export type GrPipelineDiagnostics = {
   };
 };
 
+export type MetricConstraintAudit = {
+  updatedAt: number;
+  source: string;
+  chart?: string;
+  family?: string;
+  observer?: string;
+  normalization?: string;
+  unitSystem?: string;
+  rho_constraint: GrConstraintDiagnostics;
+};
+
 export type GrInvariantBaseline = {
   invariants?: GrInvariantStatsSet;
   source?: string;
@@ -533,6 +544,10 @@ export interface EnergyPipelineState {
   // GR diagnostics (optional)
   grEnabled?: boolean;
   gr?: GrPipelineDiagnostics;
+  metricConstraint?: MetricConstraintAudit;
+  congruence_missing_parts?: PipelineSnapshot["congruence_missing_parts"];
+  congruence_missing_count?: PipelineSnapshot["congruence_missing_count"];
+  congruence_missing_reason?: PipelineSnapshot["congruence_missing_reason"];
   grBaseline?: GrInvariantBaseline;
   grRequest?: GrRequestPayload;
 

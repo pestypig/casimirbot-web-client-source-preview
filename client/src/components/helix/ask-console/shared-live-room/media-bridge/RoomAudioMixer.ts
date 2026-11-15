@@ -55,16 +55,22 @@ export const createSharedLiveRoomAudioMixer = (input: {
   };
   const outputTrack = requireAudioTrack(destination.stream, "mixed");
   let closed = false;
+  const isRunning = (): boolean => !closed && context.state === "running";
 
   return {
     outputTrack,
     outputStream: destination.stream,
     async resume() {
       if (closed || context.state === "closed") return false;
-      if (context.state === "suspended") {
-        await context.resume();
+      try {
+        if (context.state === "suspended") {
+          await context.resume();
+        }
+      } catch (error) {
+        if (closed) return false;
+        throw error;
       }
-      return context.state !== "suspended" && context.state !== "closed";
+      return isRunning();
     },
     setSourceAdmitted(source, admitted) {
       if (closed) return;

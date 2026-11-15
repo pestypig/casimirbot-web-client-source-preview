@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { HELIX_USER_ACCOUNT_POLICY, HELIX_DEVELOPER_ACCOUNT_POLICY } from "@shared/helix-account-session";
+import { HELIX_USER_ACCOUNT_POLICY, HELIX_DEVELOPER_ACCOUNT_POLICY, HELIX_SIGNED_OUT_ACCOUNT_POLICY } from "@shared/helix-account-session";
 import {
   HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
   HELIX_ACCOUNT_PROFILE_CHANGE_STORAGE_KEY,
@@ -29,9 +29,9 @@ describe("account capability policy identity events", () => {
   });
 
   it("shares one in-flight account policy request across concurrent consumers", async () => {
-    let releaseResponse: ((value: Response) => void) | null = null;
+    const responseGate: { resolve?: (value: Response) => void } = {};
     const fetchMock = vi.fn(() => new Promise<Response>((resolve) => {
-      releaseResponse = resolve;
+      responseGate.resolve = resolve;
     }));
     vi.stubGlobal("fetch", fetchMock);
 
@@ -39,7 +39,7 @@ describe("account capability policy identity events", () => {
     const second = fetchAccountCapabilityPolicy();
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
-    releaseResponse?.({
+    responseGate.resolve?.({
       ok: true,
       json: async () => ({
         account_policy: HELIX_USER_ACCOUNT_POLICY,
@@ -49,6 +49,19 @@ describe("account capability policy identity events", () => {
 
     await expect(first).resolves.toEqual(HELIX_USER_ACCOUNT_POLICY);
     await expect(second).resolves.toEqual(HELIX_USER_ACCOUNT_POLICY);
+  });
+
+  it("uses the finite signed-out policy when account discovery is unavailable", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => ({ ok: false })));
+    await expect(fetchAccountCapabilityPolicy()).resolves.toEqual(HELIX_SIGNED_OUT_ACCOUNT_POLICY);
+    expect(HELIX_SIGNED_OUT_ACCOUNT_POLICY.allowed_workstation_capabilities).not.toContain("*");
+    expect(HELIX_SIGNED_OUT_ACCOUNT_POLICY.feature_flags).not.toContain("runtime_agent_controls");
+  });
+
+  it("uses the signed-out policy when a successful response omits policy data", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, json: async () => ({ session: null }) })));
+    await expect(fetchAccountCapabilityPolicy()).resolves.toEqual(HELIX_SIGNED_OUT_ACCOUNT_POLICY);
+    expect(readCachedAccountCapabilityPolicy()).toEqual(HELIX_SIGNED_OUT_ACCOUNT_POLICY);
   });
 
   it("marks an account profile switch even when the capability policy is unchanged", () => {
@@ -117,7 +130,11 @@ describe("account capability policy identity events", () => {
       }));
       finish({ account_policy: HELIX_DEVELOPER_ACCOUNT_POLICY,
         session: { profile: { profile_id: "profile:old" } } });
-      await expect(pending).resolves.toEqual(HELIX_USER_ACCOUNT_POLICY);
+      await expect(pending).resolves.toEqual(
+        boundary === "sign-out" || boundary === "cross-tab"
+          ? HELIX_SIGNED_OUT_ACCOUNT_POLICY
+          : HELIX_USER_ACCOUNT_POLICY,
+      );
       expect(readCachedAccountCapabilityPolicy()?.account_type).not.toBe("developer");
       expect(readCachedAccountProfileIdentity().profileId).toBe(
         boundary === "role-downgrade" ? "profile:old" : boundary === "profile-switch" ? "profile:new" : boundary === "cross-tab" ? undefined : null,
@@ -136,7 +153,7 @@ describe("account capability policy identity events", () => {
     const fresh = fetchAccountCapabilityPolicy();
     expect(fetcher).toHaveBeenCalledTimes(2);
     finishOld({ok:true,json:async()=>({account_policy:HELIX_DEVELOPER_ACCOUNT_POLICY,session:{profile:{profile_id:"profile:old"}}})});
-    await expect(old).resolves.toEqual(HELIX_USER_ACCOUNT_POLICY);
+    await expect(old).resolves.toEqual(HELIX_SIGNED_OUT_ACCOUNT_POLICY);
     const joined = fetchAccountCapabilityPolicy();
     expect(fetcher).toHaveBeenCalledTimes(2);
     finishNew({ok:true,json:async()=>({account_policy:HELIX_USER_ACCOUNT_POLICY,session:{profile:{profile_id:"profile:new"}}})});

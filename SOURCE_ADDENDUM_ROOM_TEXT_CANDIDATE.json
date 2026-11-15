@@ -1,0 +1,53 @@
+{
+  "observed_at": "2026-11-13T15:58:52.266910+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomTextConversation.tsx",
+      "canonical_sha256": "165e0b895b3e98411a85d5d28ef0cd395d921a5017c2d2fab77cdb6ae4758799",
+      "export_sha256": "165e0b895b3e98411a85d5d28ef0cd395d921a5017c2d2fab77cdb6ae4758799",
+      "previous_proposal_sha256": "8e13f9e9c4b472bb5710708336ba896d5d6d43df56f39602ff8a675ccdc99989",
+      "bytes": 12362,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomTextOwnerBridge.tsx",
+      "canonical_sha256": "dbf7602842eb520ce392fc3c8f69f737fc5563fe62a7fa5f0bbc6ba2b0fc1f38",
+      "export_sha256": "dbf7602842eb520ce392fc3c8f69f737fc5563fe62a7fa5f0bbc6ba2b0fc1f38",
+      "previous_proposal_sha256": "6a48345a22afd2e8b32302e4508e5e37699af27ff0aa5efcd615a16f34beecd0",
+      "bytes": 2136,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeHostedRoomTextConversation.spec.tsx",
+      "canonical_sha256": "b0d59003653b11fa95b516dd28b6afe9f19bf3112492bf50c169a253a3aeac98",
+      "export_sha256": "b0d59003653b11fa95b516dd28b6afe9f19bf3112492bf50c169a253a3aeac98",
+      "previous_proposal_sha256": "704f5b24b62fe13068142ae39d069170ccbbb7ffde0857e82ee026063bec63d8",
+      "bytes": 13553,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/RoomTextDraftStore.ts",
+      "canonical_sha256": "62a06afb64e7002c4b4ce3afab09f9134c617c1c80ca42b1f0824156bd33d397",
+      "export_sha256": "ef38316f572e4949d6bc75c3d44db637dbe0b2fb840ba2321586eb59a7b6608b"
+    }
+  ],
+  "review": [
+    "Read complete conversation hook/view, text-owner bridge, test file and unchanged draft store. First-party React/TypeScript with synthetic room/message fixtures; no third-party assets, private transcripts, credentials or runtime state.",
+    "Human room text uses only text_list and text_send; neither model nor task submission is implied. AI release controls remain a separate explicit view and dependency.",
+    "Read generation, request sequence, room receipt validation and abort checks prevent old history from appearing for another room/account. Safe diagnostic allowlist avoids exposing arbitrary service details.",
+    "Room/source/authority/participant identity scopes in-memory drafts; account changes clear them. An uncertain unchanged send retains its client request identity across remounts. Native/server deduplication remains independently enforced.",
+    "One text owner stays mounted across dialog changes. Console navigation uses its current admitted member projection; visibility alone grants no room access.",
+    "No canonical source changes. Export transformation is CRLF to LF only."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal, not a standalone client or installed acceptance.",
+    "Shared contracts, native/server membership and send handling, and AI release controls remain separate dependencies.",
+    "Mocked unit tests do not prove live room delivery, two-profile account isolation, server deduplication, consent or Minecraft/GPT Live continuity."
+  ]
+}

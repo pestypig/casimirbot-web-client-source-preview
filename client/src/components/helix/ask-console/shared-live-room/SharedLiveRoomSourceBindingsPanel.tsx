@@ -37,6 +37,7 @@ import type {
 } from "@shared/helix-shared-realtime-room";
 import { SharedLiveRoomPlayerEmbodimentPanel, type PlayerAuthorityReviewDraft } from "./SharedLiveRoomPlayerEmbodimentPanel";
 import { MinecraftLocalLifecycleCard } from "./MinecraftLocalLifecycleCard";
+import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/accountCapabilityPolicy";
 
 const sourceBindingsPath = (roomId: string): string =>
   `/api/agi/realtime/rooms/${encodeURIComponent(roomId)}/source-bindings`;
@@ -221,7 +222,66 @@ const configYaml = (config: HelixRoomSourcePluginConfig): string =>
     "  execution_enabled: false",
   ].join("\n");
 
-export function SharedLiveRoomSourceBindingsPanel({
+// Each identity owns its drafts, revealed setup and in-flight requests. Account
+// events also invalidate pending work before React mounts the replacement panel.
+export function SharedLiveRoomSourceBindingsPanel(props: React.ComponentProps<typeof ScopedRoomSourceBindingsPanel>) {
+  const [accountEpoch, setAccountEpoch] = useState(0);
+  useEffect(() => {
+    const changed = () => setAccountEpoch(value => value + 1);
+    window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, changed);
+    return () => window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, changed);
+  }, []);
+  return <ScopedRoomSourceBindingsPanel key={JSON.stringify([
+    accountEpoch, props.roomId, props.roomClosed, props.selfParticipantId, props.isOwner,
+  ])} {...props} />;
+}
+
+function useScopedRoomFetch() {
+  const lifecycle = useRef({ epoch: 0, active: false, requests: new Set<AbortController>() });
+  useEffect(() => {
+    const state = lifecycle.current;
+    state.active = true;
+    const invalidate = () => {
+      state.active = false;
+      state.epoch += 1;
+      for (const controller of state.requests) controller.abort();
+      state.requests.clear();
+    };
+    window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, invalidate);
+    return () => {
+      invalidate();
+      window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, invalidate);
+    };
+  }, []);
+  return useCallback(async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const state = lifecycle.current, epoch = state.epoch;
+    const controller = new AbortController();
+    const assertCurrent = () => {
+      if (!state.active || state.epoch !== epoch || controller.signal.aborted || init?.signal?.aborted)
+        throw new DOMException("Room selection changed", "AbortError");
+    };
+    assertCurrent();
+    const abort = () => controller.abort();
+    init?.signal?.addEventListener("abort", abort, { once: true });
+    state.requests.add(controller);
+    try {
+      const response = await fetch(input, { ...init, signal: controller.signal });
+      assertCurrent();
+      const readJson = response.json.bind(response);
+      Object.defineProperty(response, "json", { value: async () => {
+        const value = await readJson();
+        assertCurrent();
+        return value;
+      } });
+      return response;
+    } finally {
+      state.requests.delete(controller);
+      init?.signal?.removeEventListener("abort", abort);
+    }
+  }, []);
+}
+
+function ScopedRoomSourceBindingsPanel({
   roomId,
   roomClosed,
   isOwner,
@@ -234,6 +294,7 @@ export function SharedLiveRoomSourceBindingsPanel({
   selfParticipantId: string;
   participants?: HelixSharedRealtimeRoomParticipant[];
 }) {
+  const fetchScoped = useScopedRoomFetch();
   const [available, setAvailable] = useState<boolean | null>(null);
   // Retain only unsaved choices while a stale subject temporarily unmounts its
   // controls. The cache lives only as long as this room panel, never in profile
@@ -296,7 +357,7 @@ export function SharedLiveRoomSourceBindingsPanel({
       }
       try {
         const environmentReceipt = await readEnvironmentReceipt(
-          await fetch(roomEnvironmentsPath, {
+          await fetchScoped(roomEnvironmentsPath, {
             signal,
             credentials: "include",
           }),
@@ -307,7 +368,7 @@ export function SharedLiveRoomSourceBindingsPanel({
           roomEnvironments.map(async (environment) => {
             try {
               const authority = await readCommandAuthorityReceipt(
-                await fetch(
+                await fetchScoped(
                   commandAuthorityPath(
                     roomId,
                     environment.environment_binding_id,
@@ -373,8 +434,8 @@ export function SharedLiveRoomSourceBindingsPanel({
         });
         if (isOwner) {
           const [sourceResponse, pairingResponse] = await Promise.all([
-            fetch(basePath, { signal, credentials: "include" }),
-            fetch(pairingPath, { signal, credentials: "include" }),
+            fetchScoped(basePath, { signal, credentials: "include" }),
+            fetchScoped(pairingPath, { signal, credentials: "include" }),
           ]);
           if (sourceResponse.status !== 403) {
             const sourceReceipt = await readReceipt(sourceResponse);
@@ -401,7 +462,7 @@ export function SharedLiveRoomSourceBindingsPanel({
         return false;
       }
     },
-    [basePath, isOwner, pairingPath, roomClosed, roomEnvironmentsPath, roomId],
+    [basePath, fetchScoped, isOwner, pairingPath, roomClosed, roomEnvironmentsPath, roomId],
   );
 
   useEffect(() => {
@@ -452,7 +513,7 @@ export function SharedLiveRoomSourceBindingsPanel({
     delivery: SafeCredentialDelivery,
   ): Promise<SafeSourceBindingReceipt> => {
     const claimed = await readReceipt(
-      await fetch(credentialClaimPath, {
+      await fetchScoped(credentialClaimPath, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -495,7 +556,7 @@ export function SharedLiveRoomSourceBindingsPanel({
     ) ?? MINECRAFT_SOURCE_ADAPTERS[0];
     return run("create", async () =>
       readReceipt(
-        await fetch(basePath, {
+        await fetchScoped(basePath, {
           method: "POST",
           credentials: "include",
           headers: {
@@ -534,7 +595,7 @@ export function SharedLiveRoomSourceBindingsPanel({
     setPairingExpiresAt(null);
     setPairingCopyState("idle");
     try {
-      const response = await fetch(pairingPath, {
+      const response = await fetchScoped(pairingPath, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -582,7 +643,7 @@ export function SharedLiveRoomSourceBindingsPanel({
     setPairingExpiresAt(null);
     setPairingCopyState("idle");
     try {
-      const response = await fetch(`${pairingPath}/local-server-handoff`, {
+      const response = await fetchScoped(`${pairingPath}/local-server-handoff`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -630,7 +691,7 @@ export function SharedLiveRoomSourceBindingsPanel({
     setPairingExpiresAt(null);
     setPairingCopyState("idle");
     try {
-      const response = await fetch(`${pairingPath}/local-source-handoff`, {
+      const response = await fetchScoped(`${pairingPath}/local-source-handoff`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -670,7 +731,7 @@ export function SharedLiveRoomSourceBindingsPanel({
     setMessage(null);
     try {
       const revoked = await readPairingReceipt(
-        await fetch(
+        await fetchScoped(
           `${pairingPath}/${encodeURIComponent(pairing.pairing_id)}`,
           { method: "DELETE", credentials: "include" },
         ),
@@ -710,7 +771,7 @@ export function SharedLiveRoomSourceBindingsPanel({
     setSensitiveActionArmed((prior) => ({ ...prior, [actionKey]: false }));
     return run(`revoke:${binding.binding_id}`, async () =>
       readReceipt(
-        await fetch(`${basePath}/${encodeURIComponent(binding.binding_id)}`, {
+        await fetchScoped(`${basePath}/${encodeURIComponent(binding.binding_id)}`, {
           method: "DELETE",
         }),
       ),
@@ -725,7 +786,7 @@ export function SharedLiveRoomSourceBindingsPanel({
     setMessage(null);
     try {
       const result = await readEnvironmentReceipt(
-        await fetch(
+        await fetchScoped(
           `${roomEnvironmentsPath}/${encodeURIComponent(environment.environment_binding_id)}/me`,
           {
             method: "PUT",
@@ -755,7 +816,7 @@ export function SharedLiveRoomSourceBindingsPanel({
     setMessage(null);
     try {
       const result = await readEnvironmentReceipt(
-        await fetch(
+        await fetchScoped(
           `${roomEnvironmentsPath}/${encodeURIComponent(environment.environment_binding_id)}/me`,
           { method: "DELETE", credentials: "include" },
         ),
@@ -797,7 +858,7 @@ export function SharedLiveRoomSourceBindingsPanel({
     setMessage(null);
     try {
       const receipt = await readCommandAuthorityReceipt(
-        await fetch(commandAuthorityPath(roomId, environmentId), {
+        await fetchScoped(commandAuthorityPath(roomId, environmentId), {
           method: "PUT",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -843,7 +904,7 @@ export function SharedLiveRoomSourceBindingsPanel({
     setMessage(null);
     try {
       const receipt = await readCommandAuthorityReceipt(
-        await fetch(commandAuthorityPath(roomId, environmentId), {
+        await fetchScoped(commandAuthorityPath(roomId, environmentId), {
           method: "DELETE",
           credentials: "include",
         }),
@@ -872,7 +933,7 @@ export function SharedLiveRoomSourceBindingsPanel({
     setMessage(null);
     try {
       const receipt = await readCommandAuthorityReceipt(
-        await fetch(
+        await fetchScoped(
           commandMemberGrantPath(
             roomId,
             environmentId,
@@ -1599,7 +1660,8 @@ export function SharedLiveRoomSourceBindingsPanel({
             >
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[10px] font-semibold text-slate-200">
-                  {binding.source_label} - {binding.status}
+                  {binding.source_label} - {binding.status === "pending_credential_claim"
+                    ? "waiting for sensor pairing" : binding.status}
                 </p>
                 <p className="mt-0.5 break-all text-[9px] text-slate-500">
                   {binding.public_ingress_base_url}
@@ -1615,7 +1677,8 @@ export function SharedLiveRoomSourceBindingsPanel({
                     : " · never used"}
                 </p>
               </div>
-              {binding.status === "active" || binding.status === "expired" ? (
+              {binding.status === "active" || binding.status === "expired" ||
+                  binding.status === "pending_credential_claim" ? (
                 <>
                   <button data-helix-interaction-kind="act" data-helix-authority-state="blocked_pending_contract" data-helix-control-id="helix.ask.shared_live_room.shared-live-room-source-bindings-panel.re-pair"
                     type="button"
@@ -1634,7 +1697,8 @@ export function SharedLiveRoomSourceBindingsPanel({
                       onClick={() => void pairLocalSource(binding)}
                     >
                       <RefreshCw className="h-2.5 w-2.5" />
-                      Re-pair local sensing privately
+                      {binding.status === "pending_credential_claim"
+                        ? "Pair local sensing privately" : "Re-pair local sensing privately"}
                     </button>
                   ) : null}
                   <button data-helix-interaction-kind="act" data-helix-authority-state="blocked_pending_contract" data-helix-control-id="helix.ask.shared_live_room.shared-live-room-source-bindings-panel.void-revoke-binding"

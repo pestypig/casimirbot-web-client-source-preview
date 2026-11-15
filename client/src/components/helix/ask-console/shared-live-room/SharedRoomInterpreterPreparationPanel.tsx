@@ -150,14 +150,14 @@ export function SharedRoomInterpreterPreparationPanel({ room, isOwner }: {
       "The host's OpenAI project is the expected payer. The current key will be rechecked before any later turn. Each author must approve text for this generation. No provider turn or room AI is active yet." :
       "Preparing a room identity does not send text to AI, start a model, share a key or select a Codex task. If configured later, the host's OpenAI project is the expected payer."}</p>
     {preparation ? <p className="mt-1 font-mono text-slate-500">Generation {preparation.generation}</p> : null}
-    {isOwner ? <button type="button" disabled={busy || room.status === "closed"}
+    {isOwner ? <button data-helix-control-id="helix.ask.shared_live_room.shared-room-interpreter-preparation-panel.void-change-boolean-preparation" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || room.status === "closed"}
       onClick={() => void change(Boolean(preparation))}
       className="mt-2 rounded border border-fuchsia-300/30 px-3 py-1.5 text-fuchsia-100 disabled:opacity-40">
       {preparation?.state === "configured" ? "Remove room AI setup" :
         preparation ? "Remove preparation" : "Prepare room AI evaluation"}
     </button> : <p className="mt-2 text-slate-400">Only the host can change this preparation.</p>}
     {isOwner && preparation?.state === "configuration_pending" && window.casimirDesktop?.liveConnection ?
-      <button type="button" disabled={busy || room.status === "closed"} onClick={() => void configure()}
+      <button data-helix-control-id="helix.ask.shared_live_room.shared-room-interpreter-preparation-panel.use-my-configured-api-key-for-room-ai-evaluation" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || room.status === "closed"} onClick={() => void configure()}
         className="ml-2 mt-2 rounded border border-fuchsia-300/30 px-3 py-1.5 text-fuchsia-100 disabled:opacity-40">
         Use my configured API key for room AI evaluation
       </button> : null}

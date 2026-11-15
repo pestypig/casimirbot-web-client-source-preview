@@ -3770,7 +3770,7 @@ export function buildHelixCapabilityLaneTranscriptEvents(reply: HelixAskTranscri
     return events;
   }
   if (calls.length === 0 && debugEvents.length > 0) {
-    const events = debugEvents.slice(0, 40).map((event, index) => {
+    const events: Record<string, unknown>[] = debugEvents.slice(0, 40).map((event, index) => {
       const stage = coerceText(event.stage).trim();
       const laneId = coerceText(event.lane_id).trim() || "capability_lane";
       const capabilityId = coerceText(event.capability).trim() || laneId;
@@ -4755,7 +4755,14 @@ export function buildHelixTurnTranscriptRows(reply: HelixAskTranscriptReply): He
 }
 
 export function isDurableHelixAskMailTranscriptGroup(
-  entries: StagePlayLiveSourceMailTranscriptEntryV1[],
+  entries: ReadonlyArray<{
+    row: {
+      // Saved display rows can retain these legacy terminal labels. This
+      // projection does not widen the current live-mail authority contract.
+      rowKind: StagePlayLiveSourceMailTranscriptEntryV1["row"]["rowKind"]
+        | "final_answer" | "terminal_answer" | "typed_failure";
+    };
+  }>,
 ): boolean {
   if (!entries.length) return false;
   return entries.some((entry) => {

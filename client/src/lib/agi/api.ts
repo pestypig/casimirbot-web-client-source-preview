@@ -1,4 +1,5 @@
 import type { TCollapseTraceEntry, TMemorySearchHit } from "@shared/essence-persona";
+import { attachPhysicsGlyphAskContext } from "@/lib/workstation/physicsGlyphAskContext";
 import type { ResonanceBundle, ResonanceCollapse } from "@shared/code-lattice";
 import type { KnowledgeProjectExport } from "@shared/knowledge";
 import type { WhyBelongs } from "@shared/rationale";
@@ -1855,6 +1856,12 @@ export type ConversationTurnResponse = {
   classification?: ConversationTurnClassification;
   brief?: ConversationBrief;
   dispatch?: ConversationDispatchDecision;
+  pending_server_request?: {
+    request_id: string;
+    kind: "clarify" | "confirm";
+    reason: string;
+    prompt: string;
+  } | null;
   route_reason_code?: string;
   exploration_turn?: boolean;
   clarifier_policy?: ConversationClarifierPolicy;
@@ -2441,6 +2448,10 @@ const buildRunAskTurnBody = (payload: RunAskTurnPayload): Record<string, unknown
     payload.capability_lane_session_call ?? payload.capabilityLaneSessionCall;
   if (capabilityLaneSessionCall) body.capability_lane_session_call = capabilityLaneSessionCall;
   appendHelixAskRouteMetadataToBody(body, payload.routeMetadata ?? payload.route_metadata);
+  const physicsWorkspaceContext = attachPhysicsGlyphAskContext(payload.workspaceContextSnapshot, payload.contextMode);
+  if (Object.keys(physicsWorkspaceContext).length || payload.workspaceContextSnapshot) {
+    body.workspace_context_snapshot = physicsWorkspaceContext;
+  }
   return body;
 };
 
@@ -3445,6 +3456,7 @@ export async function askLocal(
     topK?: number;
     context?: string;
     contextFiles?: string[];
+    workspaceContextSnapshot?: Record<string, unknown>;
     signal?: AbortSignal;
     mode?: "read" | "observe" | "act" | "verify";
     allowTools?: string[];
@@ -3546,6 +3558,13 @@ export async function askLocal(
       .map((entry) => String(entry ?? "").trim())
       .filter((entry) => entry.length > 0)
       .slice(0, 48);
+  }
+  if (
+    options?.workspaceContextSnapshot &&
+    typeof options.workspaceContextSnapshot === "object" &&
+    !Array.isArray(options.workspaceContextSnapshot)
+  ) {
+    body.workspace_context_snapshot = options.workspaceContextSnapshot;
   }
   if (options?.mode) body.mode = options.mode;
   if (options?.allowTools?.length) body.allowTools = options.allowTools;

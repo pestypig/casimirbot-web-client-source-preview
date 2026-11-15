@@ -17,11 +17,21 @@ describe("desktop account policy startup guards", () => {
   });
 
   it("filters restored, opened, focused, and synced panels through account policy", () => {
-    expect(desktopSource).toContain("resolveHelixAccountPanelAccess(accountPolicyRef.current, panelId)");
+    expect(desktopSource).toContain("isAccountPanelAccessible(panelId, accountPolicyRef.current)");
     expect(desktopSource).toContain('if (panelId === "device-check") return true;');
     expect(desktopSource).toContain("if (!canOpenPanelForAccount(panelId)) return;");
     expect(desktopSource).toContain("const panels = filterPanelsForAccount(viewState.panels);");
     expect(desktopSource).toContain("requestedFocusPanel && canOpenPanelForAccount(requestedFocusPanel)");
     expect(desktopSource).toContain("getPanelDef(panelId) && canOpenPanelForAccount(panelId)");
   });
+});
+
+it("guards desktop job completion and failure publication with the initiating account", () => {
+  const job = desktopSource.slice(desktopSource.indexOf('case "run_job":'), desktopSource.indexOf('case "toggle_mobile_drawer":'));
+  expect(job).toContain("const isJobAccountCurrent = captureAccountOperationScope();");
+  expect(job.match(/if \(!isJobAccountCurrent\(\)\) return;/g)).toHaveLength(2);
+  expect(job.indexOf("if (!isJobAccountCurrent()) return;")).toBeLessThan(job.indexOf("publish({"));
+  expect(job.slice(job.indexOf("catch (error)")).indexOf("if (!isJobAccountCurrent()) return;")).toBeLessThan(
+    job.slice(job.indexOf("catch (error)")).indexOf("publish({"),
+  );
 });

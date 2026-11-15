@@ -2,6 +2,10 @@ import { createWithEqualityFn } from "zustand/traditional";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { ChatMessage, ChatRole, ChatSession } from "@shared/agi-chat";
 import { useWorkspaceMemoryRegistryStore } from "@/store/useWorkspaceMemoryRegistryStore";
+import {
+  HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
+  readCachedAccountProfileIdentity,
+} from "@/lib/workstation/accountCapabilityPolicy";
 
 export type { ChatMessage, ChatRole, ChatSession };
 
@@ -69,7 +73,16 @@ const rawBudget = Number(
 export const CHAT_CONTEXT_BUDGET =
   Number.isFinite(rawBudget) && rawBudget > 0 ? Math.floor(rawBudget) : 8192;
 
-export const AGI_CHAT_STORAGE_KEY = "agi-chat-sessions-v1";
+export const LEGACY_SHARED_AGI_CHAT_STORAGE_KEY = "agi-chat-sessions-v1";
+const AGI_CHAT_STORAGE_PREFIX = "agi-chat-sessions:v2:";
+export const agiChatStorageKeyForProfile = (profileId: string | null | undefined): string =>
+  `${AGI_CHAT_STORAGE_PREFIX}${profileId === undefined
+    ? "unresolved" : profileId === null ? "guest" : `profile:${encodeURIComponent(profileId)}`}`;
+
+const initialAgiChatProfileId = readCachedAccountProfileIdentity().profileId;
+let currentAgiChatStorageKey = agiChatStorageKeyForProfile(initialAgiChatProfileId);
+export const getCurrentAgiChatStorageKey = (): string => currentAgiChatStorageKey;
+
 const DEFAULT_CHAT_TITLES = new Set(["New chat", "Helix Ask"]);
 const AGI_CHAT_MAX_PERSISTED_SESSIONS = 18;
 const AGI_CHAT_MAX_PERSISTED_MESSAGES_PER_SESSION = 80;
@@ -89,13 +102,15 @@ function titleFromFirstMessage(content: string): string {
 }
 
 function registerChatMemoryArtifact(session: ChatSession) {
+  const profileId = readCachedAccountProfileIdentity().profileId;
   useWorkspaceMemoryRegistryStore.getState().upsertArtifact({
     artifact_id: `helix-chat-session:${session.id}`,
     artifact_type: "helix_chat_session",
-    storage_key: AGI_CHAT_STORAGE_KEY,
+    storage_key: currentAgiChatStorageKey,
     storage_backend: "localStorage",
-    owner_scope: "browser_guest",
+    owner_scope: profileId ? "profile" : "browser_guest",
     sync_status: "profile_candidate",
+    profile_id: profileId ?? null,
     chat_session_id: session.id,
     title: session.title,
     updated_at: session.updatedAt,
@@ -380,13 +395,32 @@ const safeAgiChatStorage = createJSONStorage<PersistedAgiChatState>(() => ({
   },
 }));
 
+function readStoredAgiChat(key: string): PersistedAgiChatState {
+  try {
+    const raw = typeof window === "undefined" ? null : window.localStorage.getItem(key);
+    const state = (JSON.parse(raw ?? "null") as { state?: Partial<PersistedAgiChatState> } | null)?.state;
+    const sessions = state?.sessions && typeof state.sessions === "object" && !Array.isArray(state.sessions)
+      ? state.sessions : {};
+    return {
+      sessions,
+      activeId: typeof state?.activeId === "string" && sessions[state.activeId]
+        ? state.activeId : undefined,
+      reasoningTaskBindings: state?.reasoningTaskBindings &&
+        typeof state.reasoningTaskBindings === "object" && !Array.isArray(state.reasoningTaskBindings)
+        ? state.reasoningTaskBindings : {},
+    };
+  } catch {
+    return { sessions: {}, activeId: undefined, reasoningTaskBindings: {} };
+  }
+}
+
+const initialAgiChat = readStoredAgiChat(currentAgiChatStorageKey);
+
 export const useAgiChatStore = createWithEqualityFn<AgiChatStore>()(
   persist<AgiChatStore, [], [], PersistedAgiChatState>(
     (set, get) => ({
-      sessions: {},
-      activeId: undefined,
-      reasoningTaskBindings: {},
-      hydrated: false,
+      ...initialAgiChat,
+      hydrated: initialAgiChatProfileId !== undefined,
       setHydrated: (hydrated) => set({ hydrated }),
       rememberReasoningTaskBinding: (binding) => set((state) => ({
         reasoningTaskBindings: {
@@ -688,15 +722,28 @@ export const useAgiChatStore = createWithEqualityFn<AgiChatStore>()(
       },
     }),
     {
-      name: AGI_CHAT_STORAGE_KEY,
+      name: currentAgiChatStorageKey,
       storage: safeAgiChatStorage,
+      skipHydration: true,
       partialize: buildPersistedChatState,
       onRehydrateStorage: () => (state) => {
-        Object.values(state?.sessions ?? {}).forEach(
-          registerChatMemoryArtifact,
-        );
+        Object.values(state?.sessions ?? {}).forEach(registerChatMemoryArtifact);
         state?.setHydrated(true);
       },
     },
   ),
 );
+
+Object.values(initialAgiChat.sessions).forEach(registerChatMemoryArtifact);
+if (typeof window !== "undefined") {
+  window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, () => {
+    const profileId = readCachedAccountProfileIdentity().profileId;
+    const nextKey = agiChatStorageKeyForProfile(profileId);
+    if (nextKey === currentAgiChatStorageKey) return;
+    const nextChat = readStoredAgiChat(nextKey);
+    currentAgiChatStorageKey = nextKey;
+    useAgiChatStore.persist.setOptions({ name: nextKey });
+    useAgiChatStore.setState({ ...nextChat, hydrated: profileId !== undefined });
+    Object.values(nextChat.sessions).forEach(registerChatMemoryArtifact);
+  });
+}

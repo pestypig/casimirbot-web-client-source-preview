@@ -1,0 +1,153 @@
+{
+  "observed_at": "2026-11-13T17:42:09.389543+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/agent-access/setupContractPairingFacts.ts",
+      "canonical_sha256": "bc0e60f75406c54a12a28062f6f77377351f131e427bbcb07772bfa5ebc88536",
+      "export_sha256": "bc0e60f75406c54a12a28062f6f77377351f131e427bbcb07772bfa5ebc88536",
+      "bytes": 551,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/setupContractPairingRequest.ts",
+      "canonical_sha256": "4438cb4b961ca5b0f5af546f45e62d12ef1a63b3cac511672e2936be79f65055",
+      "export_sha256": "4438cb4b961ca5b0f5af546f45e62d12ef1a63b3cac511672e2936be79f65055",
+      "bytes": 4830,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/setupContractNativeFacts.ts",
+      "canonical_sha256": "384f229dcd1834edc809734e4ee72cf5b6682471ab0729aa88c2066ac4809d63",
+      "export_sha256": "384f229dcd1834edc809734e4ee72cf5b6682471ab0729aa88c2066ac4809d63",
+      "bytes": 128,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/setupContractRoomFacts.ts",
+      "canonical_sha256": "aed9b63aef30d52339b302c8dd10da5ffa7bcb2284eb248f84808653eeef40fb",
+      "export_sha256": "aed9b63aef30d52339b302c8dd10da5ffa7bcb2284eb248f84808653eeef40fb",
+      "bytes": 200,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/setupContractMinecraftFacts.ts",
+      "canonical_sha256": "7dcf4bc39a0d2afb88cb06d146dec89bb130ee8e46870c3226d290170280ee50",
+      "export_sha256": "7dcf4bc39a0d2afb88cb06d146dec89bb130ee8e46870c3226d290170280ee50",
+      "bytes": 170,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/setupContractResponsesFacts.ts",
+      "canonical_sha256": "157cea366f42e62fb7ad700353e4001d68790e4a52284144eea8433a2a304023",
+      "export_sha256": "157cea366f42e62fb7ad700353e4001d68790e4a52284144eea8433a2a304023",
+      "bytes": 103,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/setupContractDiscordFacts.ts",
+      "canonical_sha256": "ab9a79226b7605b627c4d00b1d5b67366efd1bc42b22a73ecc521613c8a8859a",
+      "export_sha256": "ab9a79226b7605b627c4d00b1d5b67366efd1bc42b22a73ecc521613c8a8859a",
+      "bytes": 204,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/setupContractDiscordApply.ts",
+      "canonical_sha256": "86b4e4df54c71d583d51bb20109541fb99f04c3bbbf214548911f99b1ac30d44",
+      "export_sha256": "86b4e4df54c71d583d51bb20109541fb99f04c3bbbf214548911f99b1ac30d44",
+      "bytes": 8828,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/setupContractPairingFacts.spec.ts",
+      "canonical_sha256": "b87601f386476a72041589cde0c274e5b26a271d2aeeb1efe7eaeddd71f017b8",
+      "export_sha256": "b87601f386476a72041589cde0c274e5b26a271d2aeeb1efe7eaeddd71f017b8",
+      "bytes": 3608,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/setupContractPairingRequest.spec.ts",
+      "canonical_sha256": "569b98596c416f81e3696825e49bf708d9077faa0b0a2826b1944209a3826194",
+      "export_sha256": "569b98596c416f81e3696825e49bf708d9077faa0b0a2826b1944209a3826194",
+      "bytes": 7487,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/setupContractNativeFacts.spec.ts",
+      "canonical_sha256": "828efaf41dc860bb299b00c6c20eadc98eb098a0345fb23ed51b89ea309e0bff",
+      "export_sha256": "828efaf41dc860bb299b00c6c20eadc98eb098a0345fb23ed51b89ea309e0bff",
+      "bytes": 3386,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/setupContractRoomFacts.spec.ts",
+      "canonical_sha256": "7928b8addac73ca2771d8ee48a5bf826bae7917af083860ea42c7bf7940505d1",
+      "export_sha256": "7928b8addac73ca2771d8ee48a5bf826bae7917af083860ea42c7bf7940505d1",
+      "bytes": 4636,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/setupContractMinecraftFacts.spec.ts",
+      "canonical_sha256": "b050ae6f9d87130af5ddcff2b31b773841d263aec8fe86e9f0ce93d5156fcbf4",
+      "export_sha256": "b050ae6f9d87130af5ddcff2b31b773841d263aec8fe86e9f0ce93d5156fcbf4",
+      "bytes": 10664,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/setupContractResponsesFacts.spec.ts",
+      "canonical_sha256": "104fd3179afa6ef89994e49201c9bd04c3fac2607d1d4cf4fd293e97115c16a3",
+      "export_sha256": "104fd3179afa6ef89994e49201c9bd04c3fac2607d1d4cf4fd293e97115c16a3",
+      "bytes": 5689,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/setupContractDiscordFacts.spec.ts",
+      "canonical_sha256": "f9de45af69cad697cd2112e001acb8095b5e3342187cb967ee6791b98272bfe3",
+      "export_sha256": "f9de45af69cad697cd2112e001acb8095b5e3342187cb967ee6791b98272bfe3",
+      "bytes": 5591,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/setupContractDiscordApply.spec.ts",
+      "canonical_sha256": "4797fff81af72877ed522c0ee0bbf5ed47fa576f172dbda0ad33ae81cc3c0637",
+      "export_sha256": "4797fff81af72877ed522c0ee0bbf5ed47fa576f172dbda0ad33ae81cc3c0637",
+      "bytes": 9644,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Read all eight setup helper modules and eight tests. First-party code and explicitly synthetic identities, dates, source UUIDs, example room authority, model/rate labels and game projections; no real account, credential, local file contents or third-party assets.",
+    "Six modules re-export shared projections; pairing facts also hashes opaque references with Web Crypto. Shared implementations remain separate unexported dependencies; passing these tests does not clear their source for publication.",
+    "Pairing preparation matches owner-reviewed revision and remaining finite lease, selected exact task/chat, admitted optional sibling, installation and MCP-client hashes, and a nonambiguous registered destination. Existing endpoint remains responsible for fresh account/device/contract validation.",
+    "Discord apply verifies exact local source grants and current contract approval before mutations, rejects a changed all-approved snapshot, reads only selected exact chats, saves a bounded resume selection and retires its temporary publishing revision. The existing publisher owns baseline and delivery; this helper does not publish text.",
+    "Fixed a malformed-expiry acceptance gap: the selection receipt must have an expiry strictly later than now, which rejects both expired values and Date.parse NaN before resume-save. Reproduced the failed boundary test before the one-line correction.",
+    "Fixture tests distinguish room membership from live presence, pairing from execution authority, player identity from action lease/connector readiness, and bounded own-key budget from generic native allowance. No actual grant, paid run or game action occurs."
+  ],
+  "limits": [
+    "Private unfrozen source candidate only; no public publication or installed restart.",
+    "Shared setup-contract modules, intent/schema authority and server/native implementations are omitted dependencies. Tests execute canonical shared implementations; these are not newly reviewed exports.",
+    "The 1805-line SetupContractInbox, SetupContractDialog, CompanionResidentControl and Agent Access entry remain held pending full UI review.",
+    "This receipt-expiry fix is newer than running R380 and needs installed validation in a later exact candidate.",
+    "Source-only helper tests do not establish live Discord delivery, paid model funding, room admission, game-action safety or attended GPT Live handoff."
+  ]
+}

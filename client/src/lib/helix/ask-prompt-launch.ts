@@ -88,6 +88,9 @@ export type HelixAskGenericRouteMetadata = {
   compact_context?: Record<string, unknown>;
   context_resume_frame?: Record<string, unknown> | null;
   contextResumeFrame?: Record<string, unknown> | null;
+  evidenceContext?: Record<string, unknown> | null;
+  scientificEvidenceWorkflowStatus?: Record<string, unknown> | null;
+  scientific_evidence_workflow_status?: Record<string, unknown> | null;
   selectedRuntimeAgentProvider?: string | null;
   selected_runtime_agent_provider?: string | null;
   realtimeGroundedFeedbackBinding?: HelixRealtimeGroundedFeedbackBindingV1;

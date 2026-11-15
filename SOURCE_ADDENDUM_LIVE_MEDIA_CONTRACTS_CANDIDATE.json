@@ -1,0 +1,64 @@
+{
+  "observed_at": "2026-11-14T04:20:45.670438+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/lib/helix/imageLensFocusRun.ts",
+      "canonical_sha256": "31dbf543ebd17cbbd19f1c9fff544322fd9570df029c0ca68dde9c4e51da85cb",
+      "export_sha256": "31dbf543ebd17cbbd19f1c9fff544322fd9570df029c0ca68dde9c4e51da85cb",
+      "previous_public_sha256": "100d690263366af49c4cd29dcb186c7d5ed14fed4446a7be1bc7d49486cf34c0",
+      "bytes": 8220,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/lib/helix/visualFrameProducer.ts",
+      "canonical_sha256": "0d7d22b45244656ebf2ecf0a8e126ead7bed8027043ca82e0b7e6e538e0e17e2",
+      "export_sha256": "0d7d22b45244656ebf2ecf0a8e126ead7bed8027043ca82e0b7e6e538e0e17e2",
+      "previous_public_sha256": "579f6ab6996e1256ffd350327059f8cf685920c08164e30f05b2659da107a185",
+      "bytes": 47234,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/lib/narrator/narratorAudioPlayback.ts",
+      "canonical_sha256": "9b2b23dec8f2046333b6fe1a93eeb8bbb59f60ff910ad34bf52c602ac153ae21",
+      "export_sha256": "9b2b23dec8f2046333b6fe1a93eeb8bbb59f60ff910ad34bf52c602ac153ae21",
+      "previous_public_sha256": "4b0a143181e2da1b79f577d8ffde8518d77d30a4d4b16b65cc5a6b620f863eb4",
+      "bytes": 17390,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/visual-frame-producer.spec.ts",
+      "canonical_sha256": "01605c73cf9cb94b292a2b528b34bb19ec85a4f335b24cf86d56d4c23d3f2d04",
+      "export_sha256": "84519b68dae6d77305c912426f10ac168b62f5b9c9aa086df3761f687ccad293",
+      "previous_public_sha256": "6120fdfd60571a77bfec13e7433c4a0f330ff2cad00f5f16327163f3e8549ab1",
+      "bytes": 21952,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/lib/helix/__tests__/imageLensFocusRun.spec.ts",
+      "canonical_sha256": "523297440f9b93bbac838d142a917f3e95bcdd5b8fb468ea6a06b5747db580fe"
+    },
+    {
+      "path": "client/src/lib/narrator/__tests__/narratorAudioPlayback.spec.ts",
+      "canonical_sha256": "a8531a2343905b6293629c40383167e38e0a54ade8d25ca0ebda6ab0983101a9"
+    }
+  ],
+  "classification": "presentation",
+  "source_frozen": false,
+  "published": false,
+  "review": [
+    "All four files matched the existing preview before editing.",
+    "An absent interval activation flag now returns false from the boolean source-status query; true, paused, stopped and error states retain their existing behavior.",
+    "Image Lens thread ID explicitly allows its existing live-source chat value rather than inferring only the desktop literal.",
+    "Audio source-open callback captures the already-validated MIME string, preserving the existing unsupported-format rejection.",
+    "One regression failed before the source fix: missing interval activation returned undefined.",
+    "Adding the regression fixture to compiler inputs exposed four existing mock typing errors; the mock now declares its existing request body argument and its canvas callback overload."
+  ],
+  "limits": [
+    "Source/export fixtures do not establish installed media, GPT Live or Minecraft behavior.",
+    "Existing image-focus and narrator tests cover document crop flow and blob playback, not live camera chat handoff or MediaSource streaming. Type-only changes do not constitute live acceptance."
+  ]
+}

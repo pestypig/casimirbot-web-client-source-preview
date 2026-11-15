@@ -12,9 +12,10 @@ import {
   HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
   fetchAccountCapabilityPolicy,
   readCachedAccountCapabilityPolicy,
+  readCachedAccountProfileIdentity,
 } from "@/lib/workstation/accountCapabilityPolicy";
 import { markInteraction } from "@/lib/workstation/performance/workstationInteractionScheduler";
-import { isUserLaunchPanel } from "@/lib/workstation/launchPanelPolicy";
+import { isAccountPanelAccessible } from "@/lib/workstation/launchPanelPolicy";
 import {
   HELIX_SURFACE_PANEL_ROUTE_EVENT,
   readLatestSurfacePanelRoute,
@@ -26,6 +27,9 @@ export function WorkstationPanelHost({ panelId }: { panelId: string }) {
   const def = getPanelDef(panelId);
   const [accountPolicy, setAccountPolicy] = useState<HelixAccountCapabilityPolicy | null>(() =>
     readCachedAccountCapabilityPolicy(),
+  );
+  const [profileIdentity, setProfileIdentity] = useState(() =>
+    readCachedAccountProfileIdentity().profileId,
   );
   const [surfaceRoute, setSurfaceRoute] = useState<SurfacePanelRouteReceipt | null>(() =>
     readLatestSurfacePanelRoute(panelId),
@@ -39,7 +43,7 @@ export function WorkstationPanelHost({ panelId }: { panelId: string }) {
     return React.lazy(def.loader);
   }, [def]);
   const panelAccess = resolveHelixAccountPanelAccess(accountPolicy, panelId);
-  const publicLaunchPanel = isUserLaunchPanel(panelId);
+  const panelAvailable = isAccountPanelAccessible(panelId, accountPolicy);
 
   useEffect(() => {
     let active = true;
@@ -47,6 +51,7 @@ export function WorkstationPanelHost({ panelId }: { panelId: string }) {
       const policy = (event as CustomEvent<{ account_policy?: HelixAccountCapabilityPolicy | null }>).detail
         ?.account_policy;
       setAccountPolicy(policy ?? readCachedAccountCapabilityPolicy());
+      setProfileIdentity(readCachedAccountProfileIdentity().profileId);
     };
     if (typeof window !== "undefined") {
       window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, handlePolicyChange as EventListener);
@@ -85,7 +90,7 @@ export function WorkstationPanelHost({ panelId }: { panelId: string }) {
     );
   }
 
-  if (panelAccess.state === "locked" && !publicLaunchPanel) {
+  if (!panelAvailable) {
     return (
       <div
         className="flex h-full min-h-0 items-center justify-center overflow-auto bg-slate-950 p-6"
@@ -149,7 +154,9 @@ export function WorkstationPanelHost({ panelId }: { panelId: string }) {
               surface {surfaceRoute.surface_instance_id.slice(0, 12)} · r{surfaceRoute.surface_revision} · {surfaceRoute.context.source_id ?? "unbound"}
             </div>
           ) : null}
-          <LazyPanel />
+          <LazyPanel key={panelId === "workstation-notes" || panelId === "scientific-calculator"
+            ? (profileIdentity === undefined ? "unresolved" : profileIdentity ?? "guest")
+            : undefined} />
         </SurfacePanelRouteProvider>
       </Suspense>
     </div>

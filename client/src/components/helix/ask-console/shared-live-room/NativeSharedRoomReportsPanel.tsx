@@ -6,6 +6,29 @@ import { DESKTOP_AUTH0_ROOM_CONTROL_PATH } from "@shared/desktop-auth0-account-l
 import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/accountCapabilityPolicy";
 
 type Summary = z.infer<typeof sharedRoomReportSummarySchema>;
+const unavailableMessage = "Shared reports are unavailable or permission changed. Load reports again to check current access.";
+// Use only known codes, never remote error messages or arbitrary response text.
+const reportRecoveryMessage = (raw: unknown): string => {
+  const code = raw && typeof raw === "object" && "error" in raw ? raw.error : null;
+  switch (code) {
+    case "room_connection_required":
+    case "room_connection_changed":
+      return "Refresh the connection in Hosted service rooms. If it is no longer authorized, authorize this account again, then reload reports.";
+    case "insufficient_scope":
+      return "Room report read permission is missing. Review the authorization in Hosted service rooms for this account, then reload reports.";
+    case "account_policy_blocked":
+      return "Shared Live Rooms access is disabled for this account on the room service. Enable it there, then refresh the room connection.";
+    case "room_forbidden":
+      return "Room access was denied. Confirm this account and the room owner are present in the selected hosted room, then reload reports.";
+    case "room_runtime_conflict":
+    case "room_report_changed":
+      return "The shared report is no longer current. Reload reports and select a currently available report.";
+    case "room_transport_failed":
+      return "The room service could not be reached. Check the connection, then reload reports.";
+    default:
+      return unavailableMessage;
+  }
+};
 export function NativeSharedRoomReportsPanel({ roomId, authority, disabled = false }: {
   roomId: string; authority: string; disabled?: boolean;
 }) {
@@ -26,6 +49,7 @@ export function NativeSharedRoomReportsPanel({ roomId, authority, disabled = fal
     if (disabled || busy || pending.current || (selected && !catalog)) return;
     const epoch = ++generation.current, controller = new AbortController(); pending.current = controller;
     const timeout = setTimeout(() => controller.abort(), 20000);
+    let failureMessage = unavailableMessage;
     setBusy(true); setMessage(null); setOpened(null); setCatalog(null);
     try {
       const response = await fetch(DESKTOP_AUTH0_ROOM_CONTROL_PATH, { method: "POST", credentials: "same-origin", cache: "no-store",
@@ -35,7 +59,11 @@ export function NativeSharedRoomReportsPanel({ roomId, authority, disabled = fal
       });
       const raw = await response.json();
       if (epoch !== generation.current) return;
-      if (!response.ok || controller.signal.aborted) throw new Error("report_unavailable");
+      if (!response.ok) {
+        failureMessage = reportRecoveryMessage(raw);
+        throw new Error("report_unavailable");
+      }
+      if (controller.signal.aborted) throw new Error("report_unavailable");
       if (selected) {
         const value = nativeSharedRoomReportObservationSchema.parse(raw);
         if (value.authority !== authority || value.receipt.room.room_id !== roomId ||
@@ -51,7 +79,7 @@ export function NativeSharedRoomReportsPanel({ roomId, authority, disabled = fal
         setCatalog(value);
       }
     } catch {
-      if (epoch === generation.current) setMessage("Shared reports are unavailable or permission changed. Load reports again to check current access.");
+      if (epoch === generation.current) setMessage(failureMessage);
     } finally {
       clearTimeout(timeout);
       if (epoch === generation.current) { pending.current = null; setBusy(false); }
@@ -61,13 +89,13 @@ export function NativeSharedRoomReportsPanel({ roomId, authority, disabled = fal
   return <section aria-label="Shared room reports" className="mt-3 border-t border-white/20 pt-3">
     <p>Owner-approved reports</p>
     <p>Read reports the owner has shared with this room. Opening one sends no instructions and generates no answer.</p>
-    <button type="button" disabled={busy || disabled} onClick={() => void load()}>Load shared reports</button>
+    <button data-helix-control-id="helix.ask.shared_live_room.native-shared-room-reports-panel.load-shared-reports" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || disabled} onClick={() => void load()}>Load shared reports</button>
     {message ? <p role="status">{message}</p> : null}
     {catalog ? <>
       {!catalog.receipt.reports.length ? <p>No currently available shared reports.</p> : null}
       {catalog.receipt.reports.map((report, index) => <div key={report.disclosure_ref}>
         <span>Report {index + 1} · task reported {report.task_status} · {report.created_at}</span>{" "}
-        <button type="button" disabled={busy || disabled} onClick={() => void load(report)}>Open shared report {index + 1}</button>
+        <button data-helix-control-id="helix.ask.shared_live_room.native-shared-room-reports-panel.open-shared-report" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || disabled} onClick={() => void load(report)}>Open shared report {index + 1}</button>
       </div>)}
       {catalog.receipt.has_more ? <p>Showing recent reports only.</p> : null}
     </> : null}

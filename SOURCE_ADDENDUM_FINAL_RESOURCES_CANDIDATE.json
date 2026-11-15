@@ -1,0 +1,50 @@
+{
+  "observed_at": "2026-11-13T22:43:51.699586+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/HelixConsoleConversationWorkspace.css",
+      "canonical_sha256": "619cf4d6ded263a391bef3c9589f888cf70a7bac142ad806ffef3f7d9327043a",
+      "export_sha256": "619cf4d6ded263a391bef3c9589f888cf70a7bac142ad806ffef3f7d9327043a",
+      "bytes": 2903,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "held_inputs": [
+    {
+      "path": "client/src/data/needle_Ipeak_worksheet.csv",
+      "disposition": "held_for_review",
+      "reason": "Dataset omitted by existing preview; numerical worksheet content is outside this selected source export. No physics or dataset qualification performed.",
+      "canonical_sha256": "2bf8eef37ca1dc7774e9087e72c99a8255b8eccfd1e85451eabe74dddf136b51",
+      "preview_sha256": null
+    },
+    {
+      "path": "client/src/lib/webgpu/hull-pathtracer.wgsl",
+      "disposition": "held_for_review",
+      "reason": "Previously omitted shader asset. Complete content, derivation and rights review has not been performed; raw-text bundling does not validate GPU compilation or rendering.",
+      "canonical_sha256": "72c04908a7f2eb4c5017d1c8c9da73bdfac1caa9f4bdb340d4acc09639429d65",
+      "preview_sha256": null
+    },
+    {
+      "path": "client/src/lib/docs/docMetadata.generated.ts",
+      "disposition": "held_for_review",
+      "reason": "Existing public metadata retained at its older preview bytes. Current generated file exposes 1602 additional document paths and has stale/missing source stats; hold pending exact path review and source freeze. No document bodies copied.",
+      "canonical_sha256": "18ec2fad4eaec9ae30187dd8b7028ff2ce9e253a55dd369fbe3767a3be768dbe",
+      "preview_sha256": "87b87ca6ec7da5d682ba02d417b03e582eb50cfddbfca9f5cf11fcb7691af95b"
+    }
+  ],
+  "review": [
+    "Complete 32-line first-party conversation workspace stylesheet reviewed: container/grid/flex sizing, scrolling and colors only; no external URLs, imported assets, credentials, executable code or data.",
+    "Export uses existing canonical bytes with line-ending normalization only; no runtime behavior edited in this cohort."
+  ],
+  "limits": [
+    "Source-only preview intentionally lacks the two raw assets and retains older generated document metadata. It is not a complete app build and does not match all inputs in a new private package.",
+    "CSS syntax checking does not establish responsive rendering or installed acceptance.",
+    "Shared, server, native and test-only dependency inventories remain separately scoped. Source freeze and publication approval remain open."
+  ]
+}

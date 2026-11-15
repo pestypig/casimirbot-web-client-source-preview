@@ -54,6 +54,7 @@ const buildController = (): HelixSharedLiveRoomController => ({
     error: null,
   },
   mediaBridge: {
+    provider_attachment_mode: "required",
     state: "idle",
     role: "participant",
     peer_audio_connected: false,
@@ -89,9 +90,73 @@ afterEach(() => {
   cleanup();
   document.body.style.overflow = "";
   delete window.casimirDesktop;
+  vi.unstubAllGlobals();
 });
 
 describe("Shared Live Room dialog plane", () => {
+  it("keeps standalone native room connection aligned with the current GPT Live session without starting it", async () => {
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(), openAuth0AccountLink: vi.fn(async () => undefined) };
+    const nativeRoom = { room_id: "shared_realtime_room:dialog-session", title: "Dialog session room", status: "open",
+      self_participant_id: "participant:host", participants: [
+        { participant_id: "participant:host", display_name: "Host", role: "owner", presence: "present" },
+      ] };
+    const operations: string[] = [];
+    vi.stubGlobal("fetch", vi.fn(async (url: unknown, init?: RequestInit) => {
+      const json = (body: unknown) => new Response(JSON.stringify(body), { status: 200 });
+      if (String(url).endsWith("/status")) return json({ schema: "casimir_desktop_room_connection_status/1", configured: true, ready: true,
+        bearer_included: false, subject_included: false,
+        authority: "https://rooms.test", expires_at: "2099-01-01T00:00:00Z" });
+      if (String(url).endsWith("/control")) {
+        const request = JSON.parse(String(init?.body));operations.push(request.operation);
+        if (request.operation === "list") return json({ rooms: [nativeRoom] });
+        if (request.operation === "inspect") return json({ room: nativeRoom });
+        return new Response(JSON.stringify({ error: "fixture_read_not_available" }), { status: 403 });
+      }
+      throw new Error(`Unexpected fixture request: ${String(url)}`);
+    }));
+    const controller = buildController();
+    controller.runtimeActive = true;controller.realtimeSessionId = "realtime:dialog-first";
+    const display = () => <SharedLiveRoomDialog room={null} controller={{ ...controller }}
+      titleId="session-title" descriptionId="session-description" onClose={vi.fn()} />;
+    const mounted = render(display());
+    fireEvent.click(await screen.findByRole("button", { name: "Load service rooms" }));
+    fireEvent.click(await screen.findByRole("button", { name: nativeRoom.title }));
+    const connect = () => screen.getByRole("button", { name: "Connect Discord call to GPT Live" });
+    await waitFor(() => expect(connect()).not.toBeDisabled());
+    controller.runtimeActive = false;mounted.rerender(display());
+    expect(connect()).toBeDisabled();
+    controller.runtimeActive = true;controller.realtimeSessionId = "realtime:dialog-second";mounted.rerender(display());
+    expect(connect()).not.toBeDisabled();
+    controller.realtimeSessionId = null;mounted.rerender(display());
+    expect(connect()).toBeDisabled();
+    expect(operations).toContain("inspect");
+    expect(operations).not.toContain("discord_voice_bridge_ticket");
+    expect(operations).not.toContain("source_context_select");
+    expect(operations).not.toContain("source_context_read");
+    expect(controller.connectRuntime).not.toHaveBeenCalled();
+    expect(controller.bindRuntime).not.toHaveBeenCalled();
+    expect(controller.patchOwnConsent).not.toHaveBeenCalled();
+  });
+
+  it("keeps developer group consent visible without offering the one-peer audio bridge", () => {
+    const controller = buildController();
+    controller.selfParticipant = { participant_id: "host", display_name: "Host", role: "owner",
+      presence: "present" } as HelixSharedLiveRoomController["selfParticipant"];
+    const room = { room_id: "shared_realtime_room:group", title: "Group evaluation",
+      capacity_profile: "three_person_voice", max_participants: 3, status: "ready",
+      public_terminal_results: [], self_participant_id: "host", participant_context_cards: [],
+      participants: [{ participant_id: "host", display_name: "Host", role: "owner", presence: "present" }],
+      readiness: { ready: true, missing_participant_count: 0, missing_consent_by_participant: {} },
+      runtime: { state: "idle", transport_owner: "unbound", realtime_session_ref_hash: null },
+    } as unknown as HelixSharedRealtimeRoom;
+    controller.room = room;
+    render(<SharedLiveRoomDialog room={room} controller={controller}
+      titleId="group-title" descriptionId="group-description" onClose={vi.fn()} />);
+    expect(screen.getByRole("dialog")).toHaveTextContent("group voice bridge pending");
+    expect(screen.getByRole("dialog")).toHaveTextContent("group GPT Live media pending");
+    expect(screen.queryByRole("button", { name: "Connect room audio" })).not.toBeInTheDocument();
+  });
+
   it("presents a three-human room as text only without a voice-bridge control", () => {
     const controller = buildController();
     controller.selfParticipant = { participant_id: "host", display_name: "Host", role: "owner",
@@ -129,6 +194,7 @@ describe("Shared Live Room dialog plane", () => {
     const room = {
       room_id: "shared_realtime_room:solo",
       title: "Solo room",
+      capacity_profile: "two_person_voice",
       public_terminal_results: [],
       status: "waiting_for_participant",
       readiness: { ready: false, missing_participant_count: 1, missing_consent_by_participant: {} },
@@ -199,6 +265,7 @@ describe("Shared Live Room dialog plane", () => {
     const room = {
       room_id: "shared_realtime_room:guest",
       title: "Dan's room",
+      capacity_profile: "two_person_voice",
       public_terminal_results: [],
       status: "ready",
       readiness: { ready: true, missing_participant_count: 0, missing_consent_by_participant: {} },

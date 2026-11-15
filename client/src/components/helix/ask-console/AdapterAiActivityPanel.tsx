@@ -29,7 +29,7 @@ export function AdapterAiActivityPanel({ pages, chatTitles, requestedChatIds = [
   const runs: AdapterRun[] = pages.flatMap(page => {
     const groups = new Map<string, HelixAdapterAiActivityPage["events"]>();
     for (const event of page.events) {
-      if (!["responses_action", "adapter_action_result"].includes(event.source_kind) ||
+      if (!["responses_action", "responses_monitor", "adapter_action_result"].includes(event.source_kind) ||
           event.run_id !== page.run_id ||
           event.helix_conversation_ref !== page.helix_conversation_id ||
           event.reasoning_binding_ref !== page.reasoning_binding_id ||
@@ -48,14 +48,14 @@ export function AdapterAiActivityPanel({ pages, chatTitles, requestedChatIds = [
   const titles = new Map(chatTitles.map(chat => [chat.id, chat.title]));
   const failures = Object.entries(readFailures);
   return <section aria-label="Adapter AI activity" className="space-y-3 text-xs text-slate-200">
-    <p className="text-slate-400">Owner-private Responses choices and separately validated adapter result receipts for currently verified runs. A shared run alone does not prove a choice caused an action.</p>
+    <p className="text-slate-400">Owner-private Responses choices and observation summaries, with separately validated adapter result receipts for currently verified runs. A shared run alone does not prove a choice caused an action.</p>
     {failures.map(([chatId, failure]) => <p key={chatId} role="status"
       className="rounded-lg border border-amber-300/30 bg-amber-300/5 p-3 text-amber-100">
       {titles.get(chatId) || `Helix chat ${chatId.slice(0, 8)}`}: {failureText[failure]}
     </p>)}
     {runs.length ? <>
       <label className="block text-slate-300">Adapter run
-        <select aria-label="Adapter AI runs" className="mt-1 block max-w-full rounded border border-white/20 bg-slate-950 p-2 text-slate-100"
+        <select data-helix-control-id="helix.ask.adapter-ai-activity-panel.adapter-ai-runs" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Adapter AI runs" className="mt-1 block max-w-full rounded border border-white/20 bg-slate-950 p-2 text-slate-100"
           value={runKey(selected)} onChange={event => setSelectedRunKey(event.target.value)}>
           {runs.map(run => <option key={runKey(run)} value={runKey(run)}>
             Adapter · {run.adapterRef.slice(0, 12)} · {run.page.run_id.slice(0, 12)} · {titles.get(run.page.helix_conversation_id) || "Untitled Helix chat"}
@@ -75,21 +75,25 @@ export function AdapterAiActivityPanel({ pages, chatTitles, requestedChatIds = [
           <div className="flex flex-wrap justify-between gap-2 text-[11px] text-cyan-100">
             <span>{event.source_kind === "adapter_action_result" ?
               "Adapter · validated result receipt" :
-              `Responses worker · ${event.outcome === "blocked" ? "rejected" : "decision checkpoint"}`}</span>
+              event.source_kind === "responses_monitor" ?
+                "Responses worker · observation interpretation" :
+                `Responses worker · ${event.outcome === "blocked" ? "rejected" : "decision checkpoint"}`}</span>
             <time dateTime={event.observed_at}>{event.observed_at}</time>
           </div>
           <p className="mt-2 whitespace-pre-wrap break-words">{event.summary}</p>
           <details className="mt-2 text-[11px] text-slate-400">
-            <summary>{event.source_kind === "adapter_action_result" ? "Result provenance" : "Decision provenance"}</summary>
+            <summary>{event.source_kind === "adapter_action_result" ? "Result provenance" :
+              event.source_kind === "responses_monitor" ? "Observation provenance" : "Decision provenance"}</summary>
             <p className="mt-1 break-all">Event {event.source_event_ref}
               {event.capability_call_ref ? ` · ${event.source_kind === "adapter_action_result" ? "Request" : "Decision"} ${event.capability_call_ref}` : ""}
               {event.workflow_ref ? ` · Workflow ${event.workflow_ref}` : ""}
               {event.evidence_refs[0] ? ` · ${event.source_kind === "adapter_action_result" ? "Plan" :
+                event.source_kind === "responses_monitor" ||
                 event.source_schema === "environment.responses_baseline_activity.v1" ? "Observation" : "Checkpoint"} ${event.evidence_refs[0]}` : ""}</p>
           </details>
         </li>)}
       </ol> : <p role="status" className="rounded-lg border border-white/10 p-3 text-slate-400">
-        This run has no recorded Responses choice or adapter result yet. No model call or adapter action is implied.
+        This run has no recorded Responses interpretation, choice, or adapter result yet. No model call or adapter action is implied.
       </p>}
     </> : failures.length ? null : <p role="status"
       className="rounded-lg border border-white/10 p-3 text-slate-400">

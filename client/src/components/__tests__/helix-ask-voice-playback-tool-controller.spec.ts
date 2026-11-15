@@ -13,6 +13,7 @@ import {
 } from "@/components/helix/ask-console/HelixAskVoicePlaybackToolController";
 import type { VoicePlaybackOutcomeReceipt } from "@/lib/helix/voice-capture-diagnostics";
 import type { VoicePlaybackLifecycleReceiptStatus } from "@/lib/helix/voice-capture-diagnostics";
+import { createVoicePlaybackLifecycleDiagnostic } from "@/lib/helix/voice-playback-diagnostics";
 
 function ttsHandoff(overrides: {
   allowMicOffPlayback?: boolean;
@@ -324,19 +325,31 @@ describe("HelixAskVoicePlaybackToolController", () => {
         calloutKind: "tool_result",
         error: null,
         metrics: {
+          utteranceId: "translation_relay:turn-tts:receipt-tts",
+          turnKey: "turn-tts",
+          kind: "translation_relay",
+          chunkCount: 1,
+          enqueueToFirstAudioMs: 10,
+          synthDurationsMs: [20],
+          chunkGapMs: [],
           providerHeader: "test-provider",
           profileHeader: "test-profile",
           cacheHitCount: 1,
           cacheMissCount: 0,
           totalPlaybackMs: 120,
           cancelReason: null,
-          playbackLifecycle: "ended",
+          playbackLifecycle: {
+            ...createVoicePlaybackLifecycleDiagnostic({ stage: "ended", nowMs: 1234 }),
+            playResolved: true,
+            playingObserved: true,
+            endedObserved: true,
+          },
         },
         atMs: 1234,
       },
       currentReceipts,
       audioUnlocked: true,
-      playbackPath: "chunked",
+      playbackPath: "direct_element",
       commitReceipts: (receipts) => committed.push(receipts),
       postReceipt: (receipt) => posted.push(receipt),
     });
@@ -348,7 +361,7 @@ describe("HelixAskVoicePlaybackToolController", () => {
       sourceReceiptId: "receipt-tts",
       requestId: "request-tts",
       audioUnlocked: true,
-      playbackPath: "chunked",
+      playbackPath: "direct_element",
       assistant_answer: false,
       terminal_eligible: false,
       raw_content_included: false,

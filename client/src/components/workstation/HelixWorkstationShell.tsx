@@ -32,6 +32,8 @@ import { getPanelDef } from "@/lib/desktop/panelRegistry";
 import { useDesktopStore } from "@/store/useDesktopStore";
 import { CasimirGuideOverlay, type CasimirGuideContext } from "@/components/workstation/guide/CasimirGuideOverlay";
 import type { WorkstationEntrySurface } from "@shared/workstation-link-meta";
+import { useWorkstationSocialPresence } from "./friends-parties/useWorkstationSocialPresence";
+import { useFriendStreamPublisher } from "./friends-parties/useFriendStreamPublisher";
 
 const HELIX_CONVERSATION_TRACE_PANEL_ID = "workstation-workflow-timeline";
 const HELIX_CHAT_CONTEXT_PREFIX = "helix-ask-chat:";
@@ -80,6 +82,8 @@ export function HelixWorkstationShell({
   layoutVariant?: "desktop" | "mobile";
   initialMobileSurface?: WorkstationEntrySurface;
 }) {
+  useWorkstationSocialPresence();
+  useFriendStreamPublisher();
   const chatDock = useWorkstationLayoutStore((state) => state.chatDock);
   const workstationGroups = useWorkstationLayoutStore((state) => state.groups);
   const activeGroupId = useWorkstationLayoutStore((state) => state.activeGroupId);

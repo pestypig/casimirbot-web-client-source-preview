@@ -14,17 +14,18 @@ export const createSharedLiveRoomAudioPlayback = (input: {
   const stream = input.createStream?.() ?? new MediaStream();
   const audio = input.createAudioElement?.() ?? document.createElement("audio");
   audio.autoplay = true;
-  audio.playsInline = true;
+  audio.setAttribute("playsinline", "");
   let closed = false;
 
   const resume = async (): Promise<boolean> => {
     if (closed) return false;
     try {
       await audio.play();
+      if (closed) return false;
       input.onPlaying();
       return true;
     } catch {
-      input.onBlocked();
+      if (!closed) input.onBlocked();
       return false;
     }
   };

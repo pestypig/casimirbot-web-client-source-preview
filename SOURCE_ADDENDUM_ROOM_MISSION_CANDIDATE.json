@@ -1,0 +1,80 @@
+{
+  "observed_at": "2026-11-13T15:39:41.399865+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/HostedRoomConsoleMission.tsx",
+      "canonical_sha256": "fd6848cd8e54dfc138757d1c2b52ddf599399c5327d318bf6769640f2da99a53",
+      "export_sha256": "fd6848cd8e54dfc138757d1c2b52ddf599399c5327d318bf6769640f2da99a53",
+      "previous_proposal_sha256": "fd18bf8a978dbd9a81423966b04a114bca885405b7472131c09425e29007e182",
+      "bytes": 2682,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomTaskPanel.tsx",
+      "canonical_sha256": "2bf1c40c8016fb753030dbe5173c2e639511910f64119fd1170971ba46df8cf2",
+      "export_sha256": "2bf1c40c8016fb753030dbe5173c2e639511910f64119fd1170971ba46df8cf2",
+      "previous_proposal_sha256": "574ccb748dd2b6ea861fc946cfe0dad70f029eb0cf8a4aab10b170a0db5c7417",
+      "bytes": 9650,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomResultsPanel.tsx",
+      "canonical_sha256": "644dafb8af7d942ce722527d72407a391524c0b3a0e75fea1a5f83107218ddde",
+      "export_sha256": "644dafb8af7d942ce722527d72407a391524c0b3a0e75fea1a5f83107218ddde",
+      "previous_proposal_sha256": "16c95ff102c097391ac29aad25eac385c7eeef44a41d451e24c51beae25d127c",
+      "bytes": 11562,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeSharedRoomReportsPanel.tsx",
+      "canonical_sha256": "1e2fa0b83fe4cd9c3df67a7e3e2055cd90e91b53fb5a5dbc8e1955bba55637e5",
+      "export_sha256": "1e2fa0b83fe4cd9c3df67a7e3e2055cd90e91b53fb5a5dbc8e1955bba55637e5",
+      "previous_proposal_sha256": "f6b132f08bbca3dbbcf1b57e29c3dffb6a8f129b85962dd283a1cb4e6c530a95",
+      "bytes": 6802,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeHostedRoomTaskPanel.spec.tsx",
+      "canonical_sha256": "4514065fd348f75930ea5c3480f710aea6d400c02baabfb01092affc7a371027",
+      "export_sha256": "4514065fd348f75930ea5c3480f710aea6d400c02baabfb01092affc7a371027",
+      "previous_proposal_sha256": "8bc3a0b23d83257c8f613b846edfd82204e141cbcf923feb37fca6448941eece",
+      "bytes": 11362,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeHostedRoomResultsPanel.spec.tsx",
+      "canonical_sha256": "51f2276946805ea0d8a384a40d63c28cd025b0e8b0d157ef85a49866bb22385d",
+      "export_sha256": "51f2276946805ea0d8a384a40d63c28cd025b0e8b0d157ef85a49866bb22385d",
+      "previous_proposal_sha256": "48cc904ed94ea6ae8f82a322be10d2e5bb90dd9140648012c840be56d5a48d2b",
+      "bytes": 12657,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeSharedRoomReportsPanel.spec.tsx",
+      "canonical_sha256": "fa08a9afa6ead8068aa07c4ee013cc45ce3940a222b4e30793b570eca37c43f3",
+      "export_sha256": "fa08a9afa6ead8068aa07c4ee013cc45ce3940a222b4e30793b570eca37c43f3",
+      "previous_proposal_sha256": "23d07f9e13724d07dcb0b7bd327ef06318b94978e38e68a722b71f4b8490747b",
+      "bytes": 8250,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Read four complete production modules and three tests. First-party React UI and synthetic room/result fixtures; no live room state, credentials, player data, assets or private history exported.",
+    "Hosted mission controls use the selected room and participant identity, expose owner task controls to the owner and member reports separately, and preserve the existing developer-only interpreter evaluation boundary.",
+    "Task selection starts only after inspection and an explicit click, submits both reviewed revisions and an exact candidate, and clears the consumed review. Errors provide bounded recovery guidance without automatic mutations or echoes of arbitrary remote text.",
+    "Private report review binds room, authority, selection revision and exact result metadata, then verifies text SHA-256. Sharing is a separate explicit action. A broker-reconciled shared report can be sent to GPT Live explicitly as context without requesting a reply or speech.",
+    "Member report reads require exact disclosure metadata and text hash. Text renders inertly. Account, room, authority and disabled-state changes invalidate pending observations and clear displayed content. Known error codes map to recovery instructions.",
+    "Fixed a canonical presentation bug: task-selection options and acknowledgements arriving after the 20-second abort deadline were accepted. Two regression tests failed before the abort-state check and all 19 task-selection tests pass after. Existing dirty source edits preserved.",
+    "The two task-panel files are newer than R379 and require the next coherent private package and installed validation. Export transformation is line endings only."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal, not a package or deployment.",
+    "Shared schemas, native/server authorization and other imported UI modules remain separate dependencies.",
+    "Mock tests establish UI boundaries, not current room membership, live task pickup, verified game effects or GPT Live delivery."
+  ]
+}

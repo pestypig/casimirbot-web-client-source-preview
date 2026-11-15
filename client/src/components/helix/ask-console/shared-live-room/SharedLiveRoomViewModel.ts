@@ -68,7 +68,10 @@ export const describeHelixSharedLiveRoomTrigger = (room: HelixSharedRealtimeRoom
   return room.capacity_profile === "three_human_text"
     ? { label: `Room ${members}/3 · Text`,
       title: "Three-person Party Chat. Ask Helix stays separate; GPT Live voice is unavailable." }
-    : { label: `Room ${members}/2`,
+    : room.capacity_profile === "three_person_voice"
+      ? { label: `Room ${members}/3 · Voice pending`,
+        title: "Three-person consent evaluation. GPT Live media is unavailable until the group bridge is installed." }
+    : { label: `Room ${members}/${room.max_participants}`,
       title: "Party Chat is separate from Ask Helix; GPT Live voice can be connected after consent." };
 };
 
@@ -80,6 +83,11 @@ export const describeHelixSharedLiveRoomReadiness = (
     return room.readiness.missing_participant_count > 0
       ? `Text-only developer room · ${room.participants.length}/${room.max_participants} people joined`
       : `Text-only developer room · ${room.participants.length}/${room.max_participants} people joined; voice unavailable`;
+  }
+  if (room.capacity_profile === "three_person_voice") {
+    return room.readiness.ready
+      ? "Three-person consent ready · group GPT Live media pending"
+      : "Three-person consent pending · group GPT Live media unavailable";
   }
   if (room.readiness.ready) return "Ready for one shared model context";
   if (room.readiness.missing_participant_count > 0) {

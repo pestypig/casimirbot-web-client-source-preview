@@ -1,6 +1,6 @@
 import { createWithEqualityFn } from "zustand/traditional";
 import { subscribeNavPose } from "@/lib/nav-pose-channel";
-import type { NavFrame, NavigationPose, MovementEpisodeEvent, MovementEpisodePayload } from "@shared/schema";
+import type { NavFrame, NavigationPose, MovementEpisodeEvent, NavigationDiagnosticPayload } from "@shared/schema";
 
 const AU_M = 149_597_870_000;
 const STALE_FALLBACK_MS = 1500;
@@ -8,33 +8,38 @@ const now = () => Date.now();
 
 type MovementPhase = MovementEpisodeEvent["phase"];
 
-type MovementTraceEnvelope = {
+type NavigationTraceEnvelope = {
   traceId: string;
-  episode: MovementEpisodePayload;
-  pass?: boolean;
+  episode: NavigationDiagnosticPayload;
   deltas?: Array<{ key: string; delta: number }>;
 };
 
-const postMovementTrace = async (payload: MovementTraceEnvelope): Promise<void> => {
-  if (typeof fetch !== "function") return;
-  await fetch("/api/agi/training-trace", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      traceId: payload.traceId,
-      pass: payload.pass ?? true,
-      deltas: payload.deltas ?? [],
-      metrics: {
-        optimism: payload.episode.metrics.optimism,
-        entropy: payload.episode.metrics.entropy,
-      },
-      payload: {
-        kind: "movement_episode",
-        data: payload.episode,
-      },
-      notes: ["phase=3", "replay=deterministic"],
-    }),
-  }).catch(() => undefined);
+const postNavigationTrace = async (payload: NavigationTraceEnvelope): Promise<boolean> => {
+  if (typeof fetch !== "function") return false;
+  try {
+    const response = await fetch("/api/agi/training-trace", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        traceId: payload.traceId,
+        pass: false,
+        source: { component: "nav-pose-driver", proxy: true },
+        deltas: payload.deltas ?? [],
+        metrics: {
+          optimism: payload.episode.metrics.optimism,
+          entropy: payload.episode.metrics.entropy,
+        },
+        payload: {
+          kind: "navigation_diagnostic",
+          data: payload.episode,
+        },
+        notes: ["phase=3", "certification=uncertified", "source=local-navigation-model"],
+      }),
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
 };
 
 /** Simple heliocentric circular sim for placeholder signal. */
@@ -99,6 +104,7 @@ type NavPoseState = {
 };
 
 export const useNavPoseStore = createWithEqualityFn<NavPoseState>((set, get) => {
+  const episodeUploads = new Map<MovementEpisodeEvent[], Promise<void>>();
   const startSimLoop = () => {
     if (typeof window === "undefined" || typeof window.requestAnimationFrame !== "function") {
       return;
@@ -170,6 +176,9 @@ export const useNavPoseStore = createWithEqualityFn<NavPoseState>((set, get) => 
     flushEpisode: async () => {
       const state = get();
       if (!state.episodeTraceId || state.episodeEvents.length === 0) return;
+      const pendingUpload = episodeUploads.get(state.episodeEvents);
+      if (pendingUpload) return pendingUpload;
+      const traceId = state.episodeTraceId;
       const entropySamples = state.episodeEvents
         .map((event) => event.actualDelta ?? event.predictedDelta ?? 0)
         .filter((value) => Number.isFinite(value));
@@ -177,9 +186,12 @@ export const useNavPoseStore = createWithEqualityFn<NavPoseState>((set, get) => 
         ? entropySamples.reduce((sum, value) => sum + Math.abs(value), 0) / entropySamples.length
         : 0;
       const optimism = Math.max(0, 1 - entropy);
-      const episode: MovementEpisodePayload = {
-        episodeId: `${state.episodeTraceId}:episode`,
-        traceId: state.episodeTraceId,
+      const episode: NavigationDiagnosticPayload = {
+        episodeId: `${traceId}:episode`,
+        traceId,
+        provenanceClass: "navigation.local-model",
+        certification: "uncertified",
+        certificateRefs: [],
         primitivePath: state.episodeEvents
           .map((event) => event.candidateId)
           .filter((value): value is string => typeof value === "string" && value.length > 0),
@@ -188,12 +200,22 @@ export const useNavPoseStore = createWithEqualityFn<NavPoseState>((set, get) => 
         replaySeed: state.episodeSeed,
         notes: ["deterministic-ordering"],
       };
-      await postMovementTrace({
-        traceId: state.episodeTraceId,
-        episode,
-        deltas: entropySamples.length ? [{ key: "nav.delta.mean", delta: entropy }] : [],
-      });
-      set({ episodeEvents: [] });
+      const sentEvents = new Set(state.episodeEvents);
+      const upload = (async () => {
+        const accepted = await postNavigationTrace({
+          traceId,
+          episode,
+          deltas: entropySamples.length ? [{ key: "nav.delta.mean", delta: entropy }] : [],
+        });
+        if (!accepted) return;
+        // A response only acknowledges its own snapshot. Events recorded while
+        // it was in flight, including a new episode, still need their own upload.
+        set((current) => current.episodeTraceId === traceId
+          ? { episodeEvents: current.episodeEvents.filter((event) => !sentEvents.has(event)) }
+          : {});
+      })().finally(() => { episodeUploads.delete(state.episodeEvents); });
+      episodeUploads.set(state.episodeEvents, upload);
+      return upload;
     },
 
     start: () => {

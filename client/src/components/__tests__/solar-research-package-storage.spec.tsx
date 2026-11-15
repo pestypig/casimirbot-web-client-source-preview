@@ -40,12 +40,13 @@ it('does not reopen an identity-substituted response',async()=>{
   fireEvent.click(screen.getByText('Reopen retained evidence package'));
   await waitFor(()=>expect(screen.getByText(/response identity/)).toBeTruthy());expect(onReopen).not.toHaveBeenCalled();
 });
-it('rejects user policy before archive requests',async()=>{
-  const fetcher=vi.fn().mockResolvedValue(reply({...account,account_policy:{account_type:'user'}}));setup(fetcher);
+it('lets an ordinary owner retain a verified package',async()=>{
+  const fetcher=vi.fn().mockResolvedValueOnce(reply({...account,account_policy:{account_type:'user'}}))
+    .mockResolvedValueOnce(reply(result));setup(fetcher);
   render(<SolarResearchPackageStorage packageJson={packageJson}/>);
   fireEvent.click(screen.getByText('Retain evidence package in profile'));
-  await waitFor(()=>expect(screen.getByText('A signed-in developer account is required')).toBeTruthy());
-  expect(fetcher).toHaveBeenCalledTimes(1);
+  await waitFor(()=>expect(screen.getByText(/Retained package:/)).toBeTruthy());
+  expect(fetcher).toHaveBeenCalledTimes(2);
 });
 it('cannot publish a late archive response after account change',async()=>{
   let resolve!:(value:any)=>void;const pending=new Promise(done=>{resolve=done;});
@@ -87,7 +88,7 @@ it('rejects a catalog claiming scientific admission',async()=>{
   const fetcher=vi.fn().mockResolvedValueOnce(reply(account)).mockResolvedValueOnce(reply({...catalog,scientificAdmission:true}));setup(fetcher);
   render(<SolarResearchPackageStorage/>);fireEvent.click(screen.getByText('List retained evidence packages'));
   await waitFor(()=>expect(fetcher).toHaveBeenCalledTimes(2));
-  await waitFor(()=>expect(screen.queryByText('Checking signed-in developer account…')).toBeNull());
+  await waitFor(()=>expect(screen.queryByText('Checking signed-in account…')).toBeNull());
   expect(screen.queryByText('Select '+id)).toBeNull();
 });
 it('does not show a late catalog after account change',async()=>{

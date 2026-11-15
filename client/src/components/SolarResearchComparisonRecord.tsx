@@ -59,7 +59,7 @@ export function SolarResearchComparisonRecord({observationArchive,selectedRecord
       const accountResponse=await fetch('/api/account/session',{signal:request.signal});
       if(!accountResponse.ok)throw new Error('Account status unavailable');
       const account=await accountResponse.json();const profileId=account.session?.profile?.profile_id;
-      if(!profileId || account.account_policy?.account_type!=='developer')throw new Error('A signed-in developer account is required for research archive access');
+      if(!profileId)throw new Error('A signed-in account is required for research archive access');
       if(request.signal.aborted || selected!==generation.current)return;
       const query=new URLSearchParams({expected_profile_id:profileId,...(recordId?{recordId}:{offset:String(offset),limit:'10'})});
       const response=await fetch(`/api/account/solar-research/records?${query}`,{signal:request.signal});
@@ -97,13 +97,13 @@ export function SolarResearchComparisonRecord({observationArchive,selectedRecord
     if(!prepared || retaining)return;
     const bundle=prepared;const selected=generation.current;
     const request=new AbortController();retentionRequest.current=request;
-    setRetaining(true);setRetentionMessage('Checking signed-in developer account…');
+    setRetaining(true);setRetentionMessage('Checking signed-in account…');
     try {
       const accountResponse=await fetch('/api/account/session',{signal:request.signal});
       if(!accountResponse.ok)throw new Error('Account status unavailable');
       const account=await accountResponse.json();
       const profileId=account.session?.profile?.profile_id;
-      if(!profileId || account.account_policy?.account_type!=='developer')throw new Error('A signed-in developer account is required for research retention');
+      if(!profileId)throw new Error('A signed-in account is required for research retention');
       if(request.signal.aborted || selected!==generation.current)return;
       const response=await fetch('/api/account/solar-research/records',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({expected_profile_id:profileId,bundle}),signal:request.signal});
@@ -210,7 +210,7 @@ export function SolarResearchComparisonRecord({observationArchive,selectedRecord
       <button type="button" className="border border-slate-600 rounded px-3 py-2 text-sm" onClick={()=>{void prepare();}}>Prepare replay JSON and table CSV</button>
       <p aria-live="polite" className="text-xs text-slate-400">{exportMessage}</p>
       {prepared && <button type="button" disabled={retaining} className="border border-slate-600 rounded px-3 py-2 text-sm"
-        onClick={()=>{void retain();}}>Retain comparison in developer profile</button>}
+        onClick={()=>{void retain();}}>Retain comparison in profile</button>}
       {figure && <figure>
         <img className="w-full max-w-5xl" style={{width:'100%',maxWidth:960,height:'auto'}} src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(figure.figureSvg)}`}
           alt="BiSON primary-term diagnostic: observed point estimates with quoted vertical errors; no joint confidence band or fit decision" />

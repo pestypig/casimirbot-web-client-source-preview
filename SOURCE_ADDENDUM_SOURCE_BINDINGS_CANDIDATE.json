@@ -1,0 +1,40 @@
+{
+  "observed_at": "2026-11-13T16:13:25.485377+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomSourceBindingsPanel.tsx",
+      "canonical_sha256": "6be4c082e0f17d4170ba9bbfc6ec45b48c62ee22ea62a686eef9e7fa30ab114f",
+      "export_sha256": "6be4c082e0f17d4170ba9bbfc6ec45b48c62ee22ea62a686eef9e7fa30ab114f",
+      "previous_proposal_sha256": "afa8912eec3a3a618b03c41fd38689a29edb2c2f0e7ebf521a0a2947aad71665",
+      "bytes": 75743,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomSourceBindingsPanel.spec.tsx",
+      "canonical_sha256": "cb3c205bae2e1147fa19376b3034303aa11e8aa20406c760f6838a74992a975c",
+      "export_sha256": "cb3c205bae2e1147fa19376b3034303aa11e8aa20406c760f6838a74992a975c",
+      "previous_proposal_sha256": "9a3acd95d611fc7a7884b3f58c60d3e6493d8f47a676b62935cd538195ad38c9",
+      "bytes": 35805,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Read the complete source panel and test file. First-party React/TypeScript; synthetic room, player, local route and one-time pairing fixtures. No live credentials, private transcripts, runtime profiles or third-party assets exported.",
+    "Owner controls separate source sensing, one-time setup delivery, command pairing, command authority and member ceilings. Local sensing requests command access false; command access uses its distinct explicit action. Server admission remains authoritative.",
+    "Full command authority and autonomous command mode require an explicit acknowledgement. Revoke and emergency stop use an armed confirmation. Source generation and review drafts do not themselves authorize game work.",
+    "The post-R379 lifecycle fix scopes all rendered setup, drafts and requests by room, participant, role, room closure and account epoch. Stale headers and decoded bodies cannot start a credential claim after account change.",
+    "Reviewed fixtures exercise pending pairing, subject freshness, scoped player drafts, polling serialization and explicit command setup. Literal pairing strings are synthetic mocked receipts.",
+    "Existing account capability policy is already reviewed. Player embodiment, Minecraft local lifecycle and shared schemas remain separately scoped dependencies. Only these two exact files are exported with newline normalization."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal; not a standalone client, installed test or public release.",
+    "The lifecycle fix is not in R379. Aborting renderer work does not prove backend mutation cancellation or credential revocation.",
+    "Mocked HTTP tests cannot establish live player consent, server authority, source ingress, game actions or GPT Live continuity.",
+    "Child player-embodiment and local-lifecycle controls remain canonical test dependencies and are not cleared by this review."
+  ]
+}

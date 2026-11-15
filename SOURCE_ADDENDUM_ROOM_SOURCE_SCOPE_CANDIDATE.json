@@ -1,0 +1,37 @@
+{
+  "observed_at": "2026-11-13T15:56:21.964188+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeRoomConnectionPanel.tsx",
+      "canonical_sha256": "9062b2920997046c5d81a4b7e9a59690f816c86388dafc8cdca4a7edacc01af0",
+      "export_sha256": "9062b2920997046c5d81a4b7e9a59690f816c86388dafc8cdca4a7edacc01af0",
+      "previous_proposal_sha256": "85a96dd4cd2824bed941d513553198fd37db423fd11e72066714d802345876d3",
+      "bytes": 47235,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeRoomConnectionPanel.spec.tsx",
+      "canonical_sha256": "ff0b690489e2ed581c3841400b65d35614569a54f0ef3763c488a0c7ea8c1278",
+      "export_sha256": "ff0b690489e2ed581c3841400b65d35614569a54f0ef3763c488a0c7ea8c1278",
+      "previous_proposal_sha256": "d57a7108d582d29bfc420849c7fb6beeb70fb2905a89b6b60c0245c4c686fa70",
+      "bytes": 50766,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Added room/session/account/bridge generation checks to source inventory and selection callbacks; reject stale successes and errors.",
+    "Session changes close the old bridge. Selection receipts must match the room as well as binding and world.",
+    "A stale successful selection releases only its original room/session when no active replacement uses that scope. Account changes never issue cleanup with another account authority.",
+    "Two valid regression tests failed before the fix. Eight mocked callback scenarios now cover room/session changes, inventory/selection and success/failure. Initial test fixture used an invalid room ID and was corrected before reproducing the bug.",
+    "First-party UI and synthetic fixtures only. No credentials, live profile state, media or new third-party source included."
+  ],
+  "limits": [
+    "Unfrozen unpublished source; not installed in R379.",
+    "Native source leases, consent, voice and GPT Live remain mocked dependencies; live continuity still needs attended qualification."
+  ]
+}

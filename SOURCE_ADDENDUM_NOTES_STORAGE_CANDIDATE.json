@@ -1,0 +1,110 @@
+{
+  "observed_at": "2026-11-13T18:47:06.447267+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/store/useScientificCalculatorStore.ts",
+      "canonical_sha256": "48de8e62b80e6e7a500378fc75a12804a1787be27079aaf145abd880848812c5",
+      "export_sha256": "48de8e62b80e6e7a500378fc75a12804a1787be27079aaf145abd880848812c5",
+      "bytes": 21962,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "1f31fa297b631b37c37a748ae4d934232d4fd30ae248adec1606c812de7faae9"
+    },
+    {
+      "path": "client/src/store/useScientificCalculatorStore.account-scope.spec.ts",
+      "canonical_sha256": "a63455c79789603c0e70a45125eacf0567769dd2b76df00e2123a24f3fce110f",
+      "export_sha256": "a63455c79789603c0e70a45125eacf0567769dd2b76df00e2123a24f3fce110f",
+      "bytes": 1705,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationNotesPanel.tsx",
+      "canonical_sha256": "b889764e17d9281facab845556e2ea9bfe6cf7d5f100b1895298a7840388c72a",
+      "export_sha256": "b889764e17d9281facab845556e2ea9bfe6cf7d5f100b1895298a7840388c72a",
+      "bytes": 23616,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "e2a8c844898da2973961f047579b836adcfaff71df0d9c1f88a9483cac3ab5a8"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/WorkstationNotesPanel.spec.tsx",
+      "canonical_sha256": "8e77e0f880755102ef2be9c545bf3a025365257ab3288e7fb8be7d0c6740779d",
+      "export_sha256": "8e77e0f880755102ef2be9c545bf3a025365257ab3288e7fb8be7d0c6740779d",
+      "bytes": 6407,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "11c6face73b6601732965f5c687bae2624ae082d22ccb17aade1397940ebbdfc"
+    },
+    {
+      "path": "client/src/lib/workstation/profileStorageSync.ts",
+      "canonical_sha256": "2700f8d6680961889b2ce97c3935f5014a10533fdd7aa75a9ec8fe319f2acb8b",
+      "export_sha256": "2700f8d6680961889b2ce97c3935f5014a10533fdd7aa75a9ec8fe319f2acb8b",
+      "bytes": 34042,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "c052e7351d05f11ff991cf9e30fa20a51431f0bee06cb8a33235be25f485c9f1"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/profileStorageSync.spec.ts",
+      "canonical_sha256": "9063a72b65938c216d240a87fba27cfd149d4813ee49c4a012eb7399807d705f",
+      "export_sha256": "9063a72b65938c216d240a87fba27cfd149d4813ee49c4a012eb7399807d705f",
+      "bytes": 48641,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "540a0c5cbdffab4fc8f70a844a5ddb4532681a6e1df2a2caa94ef199bf227ab2"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/store/useWorkstationNotesStore.ts",
+      "canonical_sha256": "9005a65b0a64bc119870a0c6ca62adbee4538b971857e52275fc2e8196d84601",
+      "export_sha256": "9005a65b0a64bc119870a0c6ca62adbee4538b971857e52275fc2e8196d84601",
+      "bytes": 13723,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useWorkstationNotesStore.account-scope.spec.ts",
+      "canonical_sha256": "c659eebe18f46db2515337447bf540f0ee346eead4a85b9602910f514a91a81d",
+      "export_sha256": "c659eebe18f46db2515337447bf540f0ee346eead4a85b9602910f514a91a81d",
+      "bytes": 2293,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useWorkstationNotesStore.live-sink.spec.ts",
+      "canonical_sha256": "fe3c55536e6bb947f62079e43b1340b9b0890737c0feae019ef9f70242e41ba8",
+      "export_sha256": "10dc6c007c48044c17b9b9b9f65e3e80275ebd44cd4b7bc72d5e29f65368965f",
+      "bytes": 1222,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useWorkstationSessionMemoryStore.ts",
+      "canonical_sha256": "79e2d62d8f5c47d0b853517f136f099d587b51d9655b364da8b32502ccae7692",
+      "export_sha256": "79e2d62d8f5c47d0b853517f136f099d587b51d9655b364da8b32502ccae7692",
+      "bytes": 6863,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed account-scoped calculator persistence, notes editor changes, unchanged notes/session memory stores, profile backup/restore changes and their test coverage. Calculator solve and receipt semantics are unchanged; this review does not qualify mathematical claims.",
+    "Notes, draft and calculator storage separate unresolved, guest and identified-profile keys. Legacy shared notes/calculator bytes are preserved without automatically attributing them to the current account. Notes drafts use the matching notes scope within profile-scoped session memory.",
+    "Backup excludes shared legacy notes, clipboard and chat values, and scoped keys belonging to other profiles, even when a registry artifact is relabeled. Restore excludes the same keys. Chat restore applies only to the matching active chat store.",
+    "Restore must succeed for the authenticated profile before upload; failed and hung restores pause backup and retry. Account observations invalidate prior work. Queued upload receipts settle only the sent payload; ownership is checked before send and after response.",
+    "Reproduced two delayed notes-editor saves writing replacement editor content using stale note/scope identifiers. Added current note and storage-scope checks before reading the editor DOM.",
+    "Reproduced attachment revocation failures for debounced and interval uploads. Explicit detachment now persists an opt-out, aborts active upload observation, suppresses queued retries and automatic reattachment on remount, and retains local queued bytes until explicit reattachment. Tests verify late receipts cannot settle the detached queue and reattachment resumes one upload."
+  ],
+  "limits": [
+    "Private unfrozen proposal. Changes are newer than running R380; no installed acceptance or public publication.",
+    "Forty-four tests use local stores and mocked HTTP. They do not prove real account-server storage custody, browser cross-tab behavior or native updater acceptance.",
+    "The existing first-sign-in automatic attachment behavior remains for profiles without an explicit opt-out. Detachment stops uploads; it neither deletes existing server backups nor undoes an upload already accepted by the server. Profile restore remains a separate read path.",
+    "Calculator producer callbacks, imported live-note producers and their asynchronous profile attribution need separate runtime qualification. This editor fix guards the queued DOM save only.",
+    "Unchanged chat/clipboard registry and recovery helpers are canonical test dependencies. Real browser storage denial, multi-tab restore merging and legacy-data recovery remain separate checks.",
+    "Five intentional support-contact matches from earlier cohorts remain in the final owner publication review."
+  ]
+}

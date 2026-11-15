@@ -13,6 +13,7 @@ afterEach(cleanup);
 
 const room = (capacity_profile: "two_person_voice" | "three_human_text", members: number) => ({
   room_id: "shared_realtime_room:test", status: "waiting_for_participant", capacity_profile,
+  max_participants: capacity_profile === "three_human_text" ? 3 : 2,
   participants: Array.from({ length: members }, (_, index) => ({
     participant_id: `p${index}`, display_name: `Person ${index}`, presence: "present", role: index ? "participant" : "owner",
   })),

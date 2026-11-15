@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import React, { useEffect, useState } from "react";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cacheAccountCapabilityPolicy, clearCachedAccountCapabilityPolicy } from
   "@/lib/workstation/accountCapabilityPolicy";
@@ -14,6 +14,8 @@ import { isHostedRoomTextOwnerAdmitted,
 import type { LocalRoomTextOwnerSnapshot } from "../shared-live-room/LocalRoomTextOwnerBridge";
 import { HelixAskLegacyConsoleView } from "../HelixAskLegacyConsoleView";
 import { HelixConsoleConversationWorkspace, type HelixConsoleChannel } from "../HelixConsoleConversationWorkspace";
+import { HELIX_WORKSTATION_GUIDANCE_EVENT } from
+  "@/lib/workstation/workstationGuidance";
 
 const { sendManaged } = vi.hoisted(() => ({ sendManaged: vi.fn() }));
 const { voiceMount, voiceUnmount } = vi.hoisted(() => ({ voiceMount: vi.fn(), voiceUnmount: vi.fn() }));
@@ -103,6 +105,102 @@ function ConsoleFixture({ apiAvailable = true, localRoom = null, hostedRoom = nu
 }
 
 describe("Helix Console conversation workspace", () => {
+  it("discards old-account Discord discovery and discovers the new account", async () => {
+    cacheAccountCapabilityPolicy(buildHelixAccountCapabilityPolicy("user"), "profile:stream-a");
+    const sessionA = "discord_session:11111111-1111-4111-8111-111111111111";
+    const sessionB = "discord_session:22222222-2222-4222-8222-222222222222";
+    const destination = (session_id: string, channel_id: string) => ({
+      session_id, guild_id: "111111111111111111", channel_id });
+    const ready = (result: unknown) => ({ status: "ready", receipt: { ok: true, result } });
+    let finishOld!: (result: unknown) => void;
+    let lists = 0;
+    const personalDiscordStream = vi.fn(async (value: { session_id: string | null; operation: { kind: string } }) => {
+      if (value.operation.kind === "list") {
+        if (++lists === 1) return new Promise(resolve => { finishOld = resolve; });
+        return ready({ destinations: [destination(sessionB, "222222222222222222")] });
+      }
+      return ready({ active: false, revision: 0, device_ref: null, selection: null,
+        destination: { guild_id: "111111111111111111", channel_id:
+          value.session_id === sessionB ? "222222222222222222" : "333333333333333333" } });
+    });
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(), personalDiscordStream,
+      codexStreamGrants: vi.fn(async ({ operation }: { operation: string }) => operation === "list"
+        ? { status: "ready", grants: [], deviceRef: `desktop:${"a".repeat(64)}` }
+        : { status: "ready", selection: null }) } as unknown as NonNullable<Window["casimirDesktop"]>;
+    render(<ConsoleFixture apiAvailable={false} />);
+    await waitFor(() => expect(lists).toBe(1));
+    await act(async () => {
+      cacheAccountCapabilityPolicy(buildHelixAccountCapabilityPolicy("user"), "profile:stream-b");
+      finishOld(ready({ destinations: [destination(sessionA, "333333333333333333")] }));
+    });
+    await waitFor(() => expect(personalDiscordStream).toHaveBeenCalledWith({
+      session_id: sessionB, operation: { kind: "inspect" } }));
+    expect(personalDiscordStream).not.toHaveBeenCalledWith({
+      session_id: sessionA, operation: { kind: "inspect" } });
+  });
+
+  it.each(["switch", "round-trip", "unmount"])("does not forward an old-account local grant after %s", async (transition) => {
+    cacheAccountCapabilityPolicy(buildHelixAccountCapabilityPolicy("user"), "profile:grant-a");
+    const sessionId = "discord_session:11111111-1111-4111-8111-111111111111";
+    const ready = (result: unknown) => ({ status: "ready", receipt: { ok: true, result } });
+    let changed = false;
+    const personalDiscordStream = vi.fn(async ({ operation }: { operation: { kind: string } }) => ready(
+      operation.kind === "list" ? { destinations: changed ? [] : [{ session_id: sessionId,
+        guild_id: "111111111111111111", channel_id: "222222222222222222" }] }
+      : { active: false, revision: 0, device_ref: null, selection: null,
+        destination: { guild_id: "111111111111111111", channel_id: "222222222222222222" } }));
+    let finishGrant!: (result: unknown) => void;
+    const codexStreamGrants = vi.fn(async ({ operation }: { operation: string }) => {
+      if (operation === "grant") return new Promise(resolve => { finishGrant = resolve; });
+      return operation === "list" ? { status: "ready", grants: [], deviceRef: `desktop:${"a".repeat(64)}` }
+        : { status: "ready", selection: null };
+    });
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(), personalDiscordStream,
+      codexStreamGrants } as unknown as NonNullable<Window["casimirDesktop"]>;
+    const view = render(<ConsoleFixture apiAvailable={false} />);
+    const title = await screen.findByLabelText("Chat label");
+    fireEvent.change(title, { target: { value: "Old private source" } });
+    await act(async () => {
+      cacheAccountCapabilityPolicy(buildHelixAccountCapabilityPolicy("user"), "profile:grant-a");
+    });
+    expect(screen.getByLabelText("Chat label")).toHaveValue("Old private source");
+    fireEvent.change(screen.getByLabelText("Exact Codex chat link"),
+      { target: { value: "codex://threads/11111111-1111-4111-8111-111111111111" } });
+    fireEvent.click(screen.getByRole("button", { name: "Grant read access", hidden: true }));
+    await waitFor(() => expect(finishGrant).toBeTypeOf("function"));
+    await act(async () => {
+      changed = true;
+      if (transition === "unmount") view.unmount();
+      else {
+        cacheAccountCapabilityPolicy(buildHelixAccountCapabilityPolicy("user"), "profile:grant-b");
+        if (transition === "round-trip")
+          cacheAccountCapabilityPolicy(buildHelixAccountCapabilityPolicy("user"), "profile:grant-a");
+      }
+      finishGrant({ status: "ready", deviceRef: `desktop:${"a".repeat(64)}`,
+        grant: { sourceRef: "codex-thread:11111111-1111-4111-8111-111111111111",
+          title: "Old private source" } });
+    });
+    expect(personalDiscordStream.mock.calls.some(([call]) => call.operation.kind === "grant")).toBe(false);
+    expect(screen.queryByDisplayValue("Old private source")).toBeNull();
+  });
+
+  it("offers funded text separately from own-key Cloud Agent DM and Codex", async () => {
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(),
+      managedAiTextTurn: vi.fn(), managedAiDeviceLink: vi.fn(async () => ({
+        phase: "unlinked", detail: "Connect this installation.",
+      })) };
+    render(<ConsoleFixture />);
+    fireEvent.click(screen.getByRole("button", { name: "# Managed AI text" }));
+    expect(screen.getByRole("region", { name: "Managed AI text conversation content" }))
+      .toBeInTheDocument();
+    expect(screen.getByText("Original Helix pill").closest('[aria-hidden="true"]'))
+      .toBeInTheDocument();
+    expect(await screen.findByText("Connect this installation.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ask" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "# Cloud Agent DM" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "# Message Codex" })).toBeInTheDocument();
+  });
+
   it("retains separate display preferences without persisting a task identity", () => {
     const view = render(<ConsoleFixture />);
     fireEvent.click(screen.getByRole("button", { name: "# Message Codex" }));
@@ -758,6 +856,52 @@ describe("Helix Console conversation workspace", () => {
     await waitFor(() => expect(showMessageCloud).toHaveBeenCalledWith(expect.objectContaining({
       source: "session_activity", helixConversationId: "hosted:stream",
     })));
+  });
+
+  it("reveals the Discord controls when a setup contract opens that step", async () => {
+    render(<ConsoleFixture />);
+    fireEvent(window, new CustomEvent(HELIX_WORKSTATION_GUIDANCE_EVENT, {
+      detail: { kind: "user_attention", panelId: "helix-ask",
+        targetId: "discord-stream-controls", label: "Review Discord stream" },
+    }));
+    await waitFor(() => expect(screen.getByText("# Cloud Agent DM").parentElement)
+      .toHaveAttribute("aria-current", "page"));
+    const settings = screen.getByText("Pairing & display settings", { selector: "summary" })
+      .closest("details") as HTMLDetailsElement;
+    await waitFor(() => expect(settings.open).toBe(true));
+    expect(screen.getByLabelText("Discord stream sources")).toBeVisible();
+  });
+
+  it("shows an ordinary owner's personal Discord Float without a Hosted Room", async () => {
+    cacheAccountCapabilityPolicy(buildHelixAccountCapabilityPolicy("user"), "profile:personal-stream-owner");
+    const sessionId = "discord_session:ce03ad8e-d0cb-4d73-8324-94b069f8e8c8";
+    const roomId = "discord_personal_stream:ce03ad8e-d0cb-4d73-8324-94b069f8e8c8";
+    const personalDiscordStream = vi.fn(async (value: { operation: { kind: string } }) => ({
+      status: "ready", receipt: { ok: true, result: value.operation.kind === "list"
+        ? { destinations: [{ session_id: sessionId, guild_id: "1326743635819237396",
+          channel_id: "1326743635819237399" }] }
+        : { active: false, revision: 0, device_ref: null,
+          destination: { guild_id: "1326743635819237396", channel_id: "1326743635819237399" },
+          selection: null, pending: null, approval_duration_options: [1, 8, 24] } } }));
+    const showMessageCloud = vi.fn(async () => ({ status: "showing" }));
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(), personalDiscordStream,
+      showMessageCloud, stopMessageCloud: vi.fn(async () => ({ status: "stopped" })),
+      codexStreamGrants: vi.fn(async (value: { operation: string }) => value.operation === "list"
+        ? { status: "ready", grants: [], deviceRef: `desktop:${"a".repeat(64)}` }
+        : { status: "ready", selection: null }),
+    } as unknown as NonNullable<Window["casimirDesktop"]>;
+    const paidFetch = vi.fn();
+    vi.stubGlobal("fetch", paidFetch);
+    render(<ConsoleFixture apiAvailable={false} />);
+    expect(await screen.findByRole("button", { name: "Float activity" })).toBeInTheDocument();
+    await waitFor(() => expect(personalDiscordStream).toHaveBeenCalledWith({
+      session_id: sessionId, operation: { kind: "inspect" },
+    }));
+    fireEvent.click(screen.getByRole("button", { name: "Float activity" }));
+    await waitFor(() => expect(showMessageCloud).toHaveBeenCalledWith(expect.objectContaining({
+      source: "session_activity", helixConversationId: roomId,
+    })));
+    expect(paidFetch.mock.calls.some(([url]) => String(url).includes("room-control"))).toBe(false);
   });
 
   it("shows a hosted guest only shared mission reports, then removes them on lost admission", () => {

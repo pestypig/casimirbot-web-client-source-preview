@@ -8,6 +8,7 @@ import { SharedLiveRoomBrokerageBindingsPanel } from
   "./SharedLiveRoomBrokerageBindingsPanel";
 import { SharedLiveRoomCapabilitiesPanel } from
   "./SharedLiveRoomCapabilitiesPanel";
+import { DiscordRoomSpeakerLinkPanel } from "./DiscordRoomSpeakerLinkPanel";
 
 export function SharedLiveRoomParticipantsPanel({
   room,
@@ -20,7 +21,7 @@ export function SharedLiveRoomParticipantsPanel({
 }) {
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
   const isOwner = controller.selfParticipant?.role === "owner";
-  const memberCapacity = room.capacity_profile === "three_human_text" ? 3 : 2;
+  const memberCapacity = room.max_participants;
   const presentMembers = room.participants.filter(participant => participant.presence !== "left").length;
   const openSeats = Math.max(0, memberCapacity - presentMembers);
   const copyInvite = async (): Promise<void> => {
@@ -99,6 +100,9 @@ export function SharedLiveRoomParticipantsPanel({
           </div>
         ) : null}
       </div>
+      {room.capacity_profile !== "three_human_text" && room.status !== "closed"
+        ? <DiscordRoomSpeakerLinkPanel key={room.room_id}
+            roomId={room.room_id} isOwner={isOwner} /> : null}
       <SharedLiveRoomSourceBindingsPanel
         roomId={room.room_id}
         roomClosed={room.status === "closed"}

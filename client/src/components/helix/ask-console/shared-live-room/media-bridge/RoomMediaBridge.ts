@@ -140,7 +140,7 @@ export const createSharedLiveRoomMediaBridge = (input: {
     channel: transcriptChannel,
   });
   const connectOwnerModelMixer = async (participantTrack: MediaStreamTrack): Promise<void> => {
-    if (!providerAttached || role !== "owner" || mixer || !localMicrophone) return;
+    if (closed || !providerAttached || role !== "owner" || mixer || !localMicrophone) return;
     const boundary = readHelixAskLiveMediaBoundary(input.realtimeSessionId);
     if (!boundary) return terminateForMediaFailure("live_media_boundary_unavailable");
     try {
@@ -151,16 +151,22 @@ export const createSharedLiveRoomMediaBridge = (input: {
     } catch {
       return terminateForMediaFailure("provider_input_replace_failed");
     }
-    if (!await mixer.resume().catch(() => false)) {
-      await mixer.close().catch(() => undefined);
+    const pendingMixer = mixer;
+    const resumed = await pendingMixer.resume().catch(() => false);
+    if (closed || mixer !== pendingMixer) return;
+    if (!resumed) {
+      await pendingMixer.close().catch(() => undefined);
+      if (closed || mixer !== pendingMixer) return;
       mixer = null;
       return terminateForMediaFailure("audio_context_suspended");
     }
     const replaced = await boundary
-      .replaceProviderInputAudioTrack(mixer.outputTrack)
+      .replaceProviderInputAudioTrack(pendingMixer.outputTrack)
       .catch(() => false);
+    if (closed || mixer !== pendingMixer) return;
     if (!replaced) {
-      await mixer.close().catch(() => undefined);
+      await pendingMixer.close().catch(() => undefined);
+      if (closed || mixer !== pendingMixer) return;
       mixer = null;
       return terminateForMediaFailure("provider_input_replace_failed");
     }
@@ -222,12 +228,14 @@ export const createSharedLiveRoomMediaBridge = (input: {
       : Promise.resolve(null);
     signaling?.close(notifyPeer);
     closePromise = (async () => {
-      if (providerAttached && role === "owner" && mixer) {
-        const boundary = readHelixAskLiveMediaBoundary(input.realtimeSessionId);
-        await boundary?.restoreProviderInputAudioTrack().catch(() => false);
-      }
-      await mixer?.close().catch(() => undefined);
+      const closingMixer = mixer;
       mixer = null;
+      const mixerClosed = closingMixer?.close().catch(() => undefined);
+      let inputRestored: Promise<boolean> | undefined;
+      if (providerAttached && role === "owner" && closingMixer) {
+        const boundary = readHelixAskLiveMediaBoundary(input.realtimeSessionId);
+        inputRestored = boundary?.restoreProviderInputAudioTrack(closingMixer.outputTrack).catch(() => false);
+      }
       for (const track of ownedClonedTracks) track.stop();
       if (role === "participant" || !providerAttached) {
         localMicrophone?.getTracks().forEach((track) => track.stop());
@@ -245,7 +253,7 @@ export const createSharedLiveRoomMediaBridge = (input: {
         latest_shared_transcript: null,
         recent_shared_transcripts: [],
       });
-      await Promise.all([floorRelease, runtimeDemotion]);
+      await Promise.all([mixerClosed, inputRestored, floorRelease, runtimeDemotion]);
     })();
     return closePromise;
   };
@@ -276,6 +284,10 @@ export const createSharedLiveRoomMediaBridge = (input: {
   return {
     async start() {
       if (closed || connection) return;
+      if (room.capacity_profile === "three_person_voice") {
+        fail("group_voice_media_unavailable");
+        return;
+      }
       try {
       peer = findPeer(room, input.self.participant_id);
       if (!peer || !input.self.consent.microphone_to_room) {
@@ -290,10 +302,16 @@ export const createSharedLiveRoomMediaBridge = (input: {
         localMicrophone = stream;
       } else {
         try {
-          localMicrophone = await navigator.mediaDevices.getUserMedia({
+          const microphone = await navigator.mediaDevices.getUserMedia({
             audio: microphoneConstraints,
           });
+          if (closed) {
+            microphone.getTracks().forEach((track) => track.stop());
+            return;
+          }
+          localMicrophone = microphone;
         } catch {
+          if (closed) return;
           return fail(role === "owner"
             ? "owner_microphone_unavailable"
             : "participant_microphone_unavailable");

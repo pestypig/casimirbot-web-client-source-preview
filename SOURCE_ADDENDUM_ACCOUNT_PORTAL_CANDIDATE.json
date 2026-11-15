@@ -1,0 +1,57 @@
+{
+  "observed_at": "2026-11-13T18:11:24.144463+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/pages/account-portal.tsx",
+      "canonical_sha256": "59b67590ec48415d45042726b5245e347f4ba733e50f6924feaa8dfb272c366c",
+      "export_sha256": "3f8992a1c5ae57eb9d5079715bff16e2940d4646389228cf30bc35bce7f23491",
+      "bytes": 40682,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "72f43edc58342395647703af5c18256d8b4a2e3862c6202c013840e180d93964"
+    },
+    {
+      "path": "client/src/pages/__tests__/account-portal.spec.tsx",
+      "canonical_sha256": "f0631fabb9569ddad49803df460893d84a980c209ca8f068afccc3ff07483b83",
+      "export_sha256": "09f756831dc1b60b014850330afeb32d0cbcec5fc27439b676b20fe3e817d001",
+      "bytes": 26041,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "adbd5c14a3d885f7fe6315ffb20bdddd1fc19d084e21a5af7c1e8ef30bc7895a"
+    },
+    {
+      "path": "client/src/components/GcnSourceConnection.tsx",
+      "canonical_sha256": "809807e29ce38307617955421e93565fa4605b402b73705a84b4da4488771db7",
+      "export_sha256": "809807e29ce38307617955421e93565fa4605b402b73705a84b4da4488771db7",
+      "bytes": 9514,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/__tests__/gcn-source-connection.spec.tsx",
+      "canonical_sha256": "5087522a9a702b7e3a52187b30a5fd5343d03fd8693716c6a5af4ae5fad15fdd",
+      "export_sha256": "5087522a9a702b7e3a52187b30a5fd5343d03fd8693716c6a5af4ae5fad15fdd",
+      "bytes": 3043,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Reviewed account portal changes and request/render lifecycle, its test suite, the new first-party GCN source connection and both GCN tests. Previously reviewed account-room, authenticator and six billing components are exact-hash checked against the latest candidate index.",
+    "Website identity, verified factor enrollment, room-session enrollment, device credential/text permission, source credential access and paid/provider authority remain separate UI controls. The page labels managed membership, voice and Agent API funding as not publicly available; sandbox controls require admitted status responses.",
+    "Reproduced and fixed a late independent ledger read restoring cap controls after website sign-out. Account refresh increments an observation epoch; cap reads capture it and a latest-read generation, with guards after body reads and errors. Unmount invalidates both. A regression issues a cap read, signs out and resolves the old response; controls remain absent.",
+    "Returned legacy checkout selectors remain untrusted until a same-account reconciliation response. Browser intent identity is reused for an uncertain request; Stripe checkout/management links enforce HTTPS host and omit userinfo. Usage reservations and estimates are displayed separately from own-key usage and processor invoices.",
+    "GCN credentials remain in controlled password inputs and are cleared before submission, refresh or account invalidation. Explicit updates include expected profile identity; late account responses are ignored. Public retained data, saved-inactive credentials and bounded private source leases are distinct. No source save itself grants paid reasoning, Discord delivery or game authority.",
+    "GCN schema and server fixture builder were read as test dependencies but are not exported by this web cohort. The test calls a pure status constructor with explicit storage availability; database/save/encryption functions are not invoked. Synthetic credentials only."
+  ],
+  "limits": [
+    "Private unfrozen source proposal; no publication, sign-in, checkout, provider/source connection, room action or device revocation was performed.",
+    "Twenty-three mocked tests cover account-page behavior and GCN credential UI. They do not prove live Auth0/Stripe/GCN service access, customer funding, encrypted storage, private-worker expiry, installed native or signed-update acceptance.",
+    "The page suite mocks Google sign-in and authenticator rendering. Room owner-presence/invite integration and private GCN activation paths are read/compiled but not qualified end-to-end by these tests.",
+    "Only independent cap observations gained account-epoch isolation. Other page refresh/mutation/poll completions and TOTP state across account replacement remain separate lifecycle acceptance concerns; no broad account-concurrency claim.",
+    "Support contact review inherited from capped membership remains in the final owner publication candidate. Shared/server dependencies and the remaining web changes still require their own review."
+  ]
+}

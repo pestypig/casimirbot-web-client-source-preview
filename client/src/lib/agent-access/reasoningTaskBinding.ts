@@ -1,3 +1,4 @@
+import type { HelixReasoningSteeringEventProjection } from "@shared/helix-reasoning-task-binding";
 import { create } from "zustand";
 
 export type BrowserReasoningBinding = Readonly<{
@@ -119,11 +120,10 @@ export const readLatestReasoningBinding = (): BrowserReasoningBinding | null =>
     null,
   );
 
-type BrowserReasoningSteeringEvent = Readonly<{
-  steering_event_ref: string;
-  delivery_state: "pending" | "acknowledged" | "expired" | "superseded" | "revoked";
-  acknowledged_at: string | null;
-}>;
+type BrowserReasoningSteeringEvent = Readonly<Pick<
+  HelixReasoningSteeringEventProjection,
+  "steering_event_ref" | "delivery_state" | "created_at" | "acknowledged_at"
+>>;
 
 const request = async (path: string, init: RequestInit): Promise<Record<string, unknown>> => {
   const response = await fetch(path, {

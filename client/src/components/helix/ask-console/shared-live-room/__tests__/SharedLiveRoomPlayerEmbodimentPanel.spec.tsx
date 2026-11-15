@@ -1,6 +1,8 @@
 /** @vitest-environment jsdom */
 
 import React from "react";
+import type { HelixRoomSourceBinding } from "@shared/helix-room-source-ingress";
+import type { HelixRoomEnvironmentProjection } from "@shared/helix-environment-subject";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { HELIX_MINECRAFT_PLAYER_ACTION_CAPABILITY_IDS } from
@@ -10,6 +12,7 @@ import { SharedLiveRoomPlayerEmbodimentPanel } from
   "../SharedLiveRoomPlayerEmbodimentPanel";
 import { useAgiChatStore } from "@/store/useAgiChatStore";
 import { useBrowserReasoningBindingStore } from "@/lib/agent-access/reasoningTaskBinding";
+import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/accountCapabilityPolicy";
 import {
   HELIX_BOUND_AGENT_STEERING_REQUEST_EVENT,
   HELIX_BOUND_AGENT_STEERING_RESULT_EVENT,
@@ -20,7 +23,8 @@ const roomId = "shared_realtime_room:player-ui";
 const environmentId = "environment_binding:player-ui";
 const participantId = "shared_realtime_participant:owner";
 
-const environment = {
+const environment: HelixRoomEnvironmentProjection = {
+  schema: "helix.room_environment_projection.v1",
   environment_binding_id: environmentId,
   room_source_binding_id: "room_source_binding:player-ui",
   room_id: roomId,
@@ -34,20 +38,68 @@ const environment = {
   capability_ids: [],
   subject_directory: null,
   self_subject_binding: {
+    schema: "helix.room_environment_subject_binding.v1",
+    room_id: roomId,
+    participant_id: participantId,
+    environment_binding_id: environmentId,
+    room_source_binding_id: "room_source_binding:player-ui",
+    source_id: "source:room-ingress:player-ui",
+    world_id: "minecraft:local:player-ui",
+    subject_kind: "minecraft.player",
+    verification_method: "self_claim",
+    confidence: 1,
+    producer_epoch_ref: "adapter_epoch:player-ui",
+    verified_at: "2026-08-05T22:00:00.000Z",
+    last_confirmed_at: "2026-08-05T22:00:00.000Z",
+    expires_at: null,
+    revoked_at: null,
+    content_role: "environment_subject_identity_not_assistant_answer",
+    answer_authority: false,
+    assistant_answer: false,
+    terminal_eligible: false,
+    raw_content_included: false,
     status: "active",
     subject_binding_id: "environment_subject_binding:player-ui",
     subject_ref: "environment_subject:player-ui",
     subject_label: "DatDamPig",
   },
-  identity_assignment: "active",
-} as never;
+  identity_assignment: "supported",
+  owner_controls_visible: true,
+  content_role: "room_environment_projection_not_assistant_answer",
+  answer_authority: false,
+  assistant_answer: false,
+  terminal_eligible: false,
+  raw_content_included: false,
+};
 
-const sourceBinding = {
+const sourceBinding: HelixRoomSourceBinding = {
+  schema: "helix.room_source_binding.v1",
+  room_id: roomId,
+  owner_profile_id: "profile:player-ui",
+  source_id: "source:room-ingress:player-ui",
+  world_id: "minecraft:local:player-ui",
+  scopes: ["world_events:write", "manifest:write", "heartbeat:write"],
+  public_ingress_base_url: "https://example.test/api/room-source-ingress",
+  credential_id: null,
+  token_prefix: null,
+  created_at: "2026-08-05T22:00:00.000Z",
+  updated_at: "2026-08-05T22:00:00.000Z",
+  expires_at: null,
+  revoked_at: null,
+  last_used_at: null,
+  request_count: 0,
+  execution_policy: { may_execute_live_actions: false, may_perform_read_only_probes: true },
+  content_role: "source_binding_not_assistant_answer",
+  reentry_required: true,
+  answer_authority: false,
+  assistant_answer: false,
+  terminal_eligible: false,
+  raw_content_included: false,
   binding_id: "room_source_binding:player-ui",
   status: "active",
   domain_adapter: "minecraft.fabric_mod.v1",
   source_label: "Local Fabric 1.21.8",
-} as never;
+};
 
 const jsonResponse = (body: unknown): Response =>
   new Response(JSON.stringify(body), {
@@ -113,6 +165,93 @@ afterEach(() => {
 });
 
 describe("Shared Live Room Player Embodiment controls", () => {
+  it.each(["account", "room", "world", "player", "chat", "unmount"])(
+    "does not grant or launch after %s changes during exact-chat inspection", async change => {
+      useAgiChatStore.setState({ activeId: "helix-chat:play-ui" });
+      let finish!: (value: Response) => void;
+      const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        if (String(input).includes("/reasoning-bindings/current")) {
+          return new Promise<Response>(resolve => { finish = resolve; });
+        }
+        return jsonResponse(authorityReceipt(init?.method === "PUT"
+          ? activeAuthority([...HELIX_MINECRAFT_PLAYER_ACTION_CAPABILITY_IDS]) : null));
+      });
+      vi.stubGlobal("fetch", fetchMock);
+      const props = { roomId, environment, selfParticipantId: participantId, sourceBinding, isOwner: true };
+      const view = render(<SharedLiveRoomPlayerEmbodimentPanel {...props} />);
+      fireEvent.click(screen.getByLabelText("Acknowledge Minecraft player control for Local Fabric 1.21.8"));
+      fireEvent.click(screen.getByRole("button", { name: "Play Minecraft with Helix" }));
+      await waitFor(() => expect(finish).toBeTypeOf("function"));
+      if (change === "account") act(() => window.dispatchEvent(new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT)));
+      else if (change === "chat") act(() => useAgiChatStore.setState({ activeId: "helix-chat:other" }));
+      else if (change === "unmount") view.unmount();
+      else view.rerender(<SharedLiveRoomPlayerEmbodimentPanel {...props}
+        roomId={change === "room" ? "shared_realtime_room:other" : roomId}
+        selfParticipantId={change === "player" ? "participant:other" : participantId}
+        environment={change === "world" ? { ...(environment as HelixRoomEnvironmentProjection), world_id: "minecraft:other" } : environment} />);
+      await act(async () => { finish(jsonResponse({ binding: {
+        reasoning_binding_id: "reasoning_binding:play-ui", helix_conversation_id: "helix-chat:play-ui",
+        status: "active", continuation_transport: "polling", binding_epoch: 4,
+      } })); });
+      expect(fetchMock.mock.calls.some(([, init]) => init?.method === "PUT")).toBe(false);
+      expect(fetchMock.mock.calls.some(([input]) => String(input).endsWith("/launch"))).toBe(false);
+    },
+  );
+
+  it.each(["authority", "launch", "pairing"])("stops activation after a late %s response for a departed room", async phase => {
+    useAgiChatStore.setState({ activeId: "helix-chat:play-ui" });
+    let finish!: (value: Response) => void;
+    let pendingBody: unknown;
+    const steering = vi.fn();
+    window.addEventListener(HELIX_BOUND_AGENT_STEERING_REQUEST_EVENT, steering);
+    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.includes("/reasoning-bindings/current")) return jsonResponse({ binding: {
+        reasoning_binding_id: "reasoning_binding:play-ui", helix_conversation_id: "helix-chat:play-ui",
+        status: "active", continuation_transport: "polling", binding_epoch: 4,
+      } });
+      if (url.endsWith("/selection")) return jsonResponse({ ok: true, address: "localhost:25565" });
+      let currentPhase: string | null = null;
+      let body: unknown = authorityReceipt();
+      if (init?.method === "PUT") {
+        currentPhase = "authority";
+        body = authorityReceipt(activeAuthority([...HELIX_MINECRAFT_PLAYER_ACTION_CAPABILITY_IDS]));
+      } else if (url.endsWith("/launch")) {
+        currentPhase = "launch";
+        body = { ok: true, receipt: {
+          schema: HELIX_MINECRAFT_FABRIC_LOOPBACK_LIFECYCLE_RECEIPT_SCHEMA,
+          status: "connected", profile_id: "fixture:player", profile_version: "1.21.8",
+          isolated_game_directory: true, client_process_id: 1234, play_control_point: "fixture:play",
+          mod_loaded: true, memory_used_percent: 20, credentials_exposed: false,
+          server_address: "localhost:25565", launcher_action: "launched_client", connection_action: "autojoin_staged",
+        } };
+      } else if (url.endsWith("/local-player-handoff")) {
+        currentPhase = "pairing"; body = { ok: true, pairing: null };
+      }
+      if (currentPhase === phase) {
+        pendingBody = body;
+        return new Promise<Response>(resolve => { finish = resolve; });
+      }
+      return jsonResponse(body);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    try {
+      const props = { roomId, environment, selfParticipantId: participantId, sourceBinding, isOwner: true };
+      const view = render(<SharedLiveRoomPlayerEmbodimentPanel {...props} />);
+      fireEvent.click(screen.getByLabelText("Acknowledge Minecraft player control for Local Fabric 1.21.8"));
+      fireEvent.click(screen.getByRole("button", { name: "Play Minecraft with Helix" }));
+      await waitFor(() => expect(finish).toBeTypeOf("function"));
+      const mutationsBefore = fetchMock.mock.calls.filter(([, init]) => init?.method && init.method !== "GET").length;
+      view.rerender(<SharedLiveRoomPlayerEmbodimentPanel {...props} roomId="shared_realtime_room:other" />);
+      await act(async () => { finish(jsonResponse(pendingBody)); });
+      expect(fetchMock.mock.calls.filter(([, init]) => init?.method && init.method !== "GET")).toHaveLength(mutationsBefore);
+      expect(steering).not.toHaveBeenCalled();
+      expect(screen.queryByText(/Exact request minecraft-play:/)).toBeNull();
+    } finally {
+      window.removeEventListener(HELIX_BOUND_AGENT_STEERING_REQUEST_EVENT, steering);
+    }
+  });
+
   it("shows the existing exact-chat binding before Play without granting authority", async () => {
     useAgiChatStore.setState({ activeId: "helix-chat:play-ui" });
     const binding = {
@@ -130,7 +269,9 @@ describe("Shared Live Room Player Embodiment controls", () => {
       sourceBinding={sourceBinding} isOwner />);
     expect(screen.getByText("reasoning binding required")).toBeTruthy();
     act(() => useBrowserReasoningBindingStore.setState({ current: binding }));
-    expect(screen.getByText("authority confirmation required")).toBeTruthy();
+    // An exact-chat binding does not create the missing player-control lease.
+    expect(screen.getByText("player authority required")).toBeTruthy();
+    expect(screen.queryByText("authority confirmation required")).toBeNull();
     expect(screen.queryByText("reasoning binding required")).toBeNull();
     expect((screen.getByRole("button", { name: "Save player authority" }) as HTMLButtonElement).disabled).toBe(true);
     act(() => useBrowserReasoningBindingStore.setState({ current: { ...binding, status: "revoked" } }));

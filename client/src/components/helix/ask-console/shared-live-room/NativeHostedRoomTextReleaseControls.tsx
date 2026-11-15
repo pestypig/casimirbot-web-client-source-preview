@@ -179,7 +179,7 @@ export function NativeHostedRoomTextReleaseControls({ roomId, authority, selfPar
       Withdrawing access stops future use of that message. It cannot undo text already sent to OpenAI
       or a reply already seen by room members.
     </p> : null}
-    <button type="button" onClick={() => void read()} className="mt-2 rounded border border-fuchsia-300/30 px-2 py-1">
+    <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-text-release-controls.refresh-my-ai-access" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" onClick={() => void read()} className="mt-2 rounded border border-fuchsia-300/30 px-2 py-1">
       Refresh my AI access
     </button>
     {error ? <p role="status" className="mt-2 text-amber-100">{error}</p> : null}
@@ -192,7 +192,7 @@ export function NativeHostedRoomTextReleaseControls({ roomId, authority, selfPar
         return <div key={message.message_id} className="rounded border border-white/10 p-2">
           <p className="max-h-20 overflow-y-auto whitespace-pre-wrap text-slate-300">{message.text}</p>
           {release?.state === "revoked" ? <p className="mt-1 text-slate-400">Future AI access withdrawn for this generation. Earlier provider use or room replies remain.</p>
-            : <button type="button" disabled={closed || Boolean(busyMessageId)}
+            : <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-text-release-controls.void-change-message-message-id-release-revoke-release" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={closed || Boolean(busyMessageId)}
                 onClick={() => void change(message.message_id, release ? "revoke" : "release")}
                 className="mt-1 rounded border border-fuchsia-300/30 px-2 py-1 disabled:opacity-40">
                 {release ? "Withdraw AI access" : "Allow AI to read this message"}
@@ -201,7 +201,7 @@ export function NativeHostedRoomTextReleaseControls({ roomId, authority, selfPar
             (!evaluationTurns.some(turn => turn.turn_ordinal === 2) &&
               (!evaluationTurns.some(turn => turn.turn_ordinal === 1) ||
                 evaluationTurns.some(turn => turn.turn_ordinal === 1 &&
-                  turn.state === "completed" && turn.trigger_message_id !== message.message_id)))) ? <button type="button"
+                  turn.state === "completed" && turn.trigger_message_id !== message.message_id)))) ? <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-text-release-controls.void-request-turn-message-message-id" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button"
             disabled={closed || Boolean(busyMessageId) || requestedTurns.includes(requestedTurnKey(message.message_id))}
             onClick={() => void requestTurn(message.message_id)}
             className="ml-2 mt-1 rounded border border-fuchsia-300/30 px-2 py-1 disabled:opacity-40">

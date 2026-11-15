@@ -13,6 +13,7 @@ export function Auth0SignInButton({
   returnTo?: string;
 }) {
   const [opening, setOpening] = useState(false);
+  const [awaitingBrowser, setAwaitingBrowser] = useState(false);
   const [desktopError, setDesktopError] = useState<string | null>(null);
   const desktopSignIn = typeof window !== "undefined" &&
     typeof window.casimirDesktop?.openAuth0ProfileSignIn === "function"
@@ -32,8 +33,17 @@ export function Auth0SignInButton({
           disabled: opening,
           onClick: async () => {
             setOpening(true);
+            setAwaitingBrowser(false);
             setDesktopError(null);
-            try { await desktopSignIn(); }
+            try {
+              await desktopSignIn();
+              const current = new URL(window.location.href);
+              if (current.searchParams.has("auth0_account")) {
+                current.searchParams.delete("auth0_account");
+                window.history.replaceState(window.history.state, "", current);
+              }
+              setAwaitingBrowser(true);
+            }
             catch (failure) {
               const callbackBusy = failure instanceof Error &&
                 failure.message.includes("desktop_auth0_callback_port_unavailable");
@@ -47,20 +57,25 @@ export function Auth0SignInButton({
         className: "inline-flex items-center gap-2 rounded border border-cyan-300/35 bg-cyan-400/10 px-3 py-2 text-xs font-medium text-cyan-50 transition hover:bg-cyan-400/20",
       }, <>
         <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-        {opening ? "Opening Chrome…" : "Sign in with Auth0"}
+        {opening ? "Opening browser…" : "Sign in with Auth0"}
         <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
       </>)}
       <p className="text-[11px] leading-4 text-slate-500">
-        {desktopSignIn ? "Opens your default browser for Google sign-in, then returns to this EXE." :
+        {desktopSignIn ? "Opens Auth0 in your default browser, then returns to this app." :
           "Uses public-client PKCE and an HttpOnly CasimirBot session. OAuth tokens are exchanged and verified by the server and are not returned to this page or an AI client."}
       </p>
+      {awaitingBrowser ? (
+        <p className="text-xs text-cyan-200" role="status">
+          Finish signing in through the browser. This window will update when it returns.
+        </p>
+      ) : null}
       {desktopError ? <p className="text-xs text-rose-300" role="alert">{desktopError}</p> : null}
-      {outcome === "linked" ? (
+      {outcome === "linked" && !desktopSignIn ? (
         <p className="text-xs text-emerald-300" role="status">
           Auth0 profile session connected.
         </p>
       ) : null}
-      {error ? (
+      {error && !awaitingBrowser ? (
         <p className="text-xs text-rose-300" role="alert">
           {error === "login_intent_expired"
             ? "This sign-in window expired. Click Sign in with Auth0 again to open a fresh browser page."

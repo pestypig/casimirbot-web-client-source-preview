@@ -1,0 +1,266 @@
+{
+  "observed_at": "2026-11-13T19:11:06.591796+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/physics-glyphs/AtomicEmissionWorkbench.tsx",
+      "canonical_sha256": "15e605adf9adc02ab3a3c7775593867d070a6fb52468e68469413974e0d4d83c",
+      "export_sha256": "15e605adf9adc02ab3a3c7775593867d070a6fb52468e68469413974e0d4d83c",
+      "bytes": 8636,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/physics-glyphs/ParticleGlyph.tsx",
+      "canonical_sha256": "f64ee7b9b2eeb5e54edf9360d7cc5902e8bff72485d4df14f38989cecb738931",
+      "export_sha256": "f64ee7b9b2eeb5e54edf9360d7cc5902e8bff72485d4df14f38989cecb738931",
+      "bytes": 496,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/physics-glyphs/PhysicsGlyphChatConnection.tsx",
+      "canonical_sha256": "94cc9f4024c5fb9f347334c740777e6baa4eb561e542ec7a4e9bd350dcc77da0",
+      "export_sha256": "94cc9f4024c5fb9f347334c740777e6baa4eb561e542ec7a4e9bd350dcc77da0",
+      "bytes": 2927,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/physics-glyphs/PhysicsGlyphDiagram.tsx",
+      "canonical_sha256": "ab5eae444f235b58e421e2b00dbe1c0f0210ea2c9fb148b701a38d8526bb55bf",
+      "export_sha256": "ab5eae444f235b58e421e2b00dbe1c0f0210ea2c9fb148b701a38d8526bb55bf",
+      "bytes": 9376,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/physics-glyphs/PhysicsGlyphSandbox.tsx",
+      "canonical_sha256": "acd4bac5d0d6d661fb41b0612db54b294fe99bb4ada338218d544f828c2a916f",
+      "export_sha256": "acd4bac5d0d6d661fb41b0612db54b294fe99bb4ada338218d544f828c2a916f",
+      "bytes": 9542,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/physics-glyphs/PhysicsScenarioComposer.tsx",
+      "canonical_sha256": "3b2338d3b225ef2409fa1666e66b78f5ac6a70e2c9abee25db76f75809e2264a",
+      "export_sha256": "76cfd8a13bed3dd7182a12797eceb9240e736e3a264b406741a79c2bffca4dfa",
+      "bytes": 6626,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/physics-glyphs/PhysicsScenarioV2Workbench.tsx",
+      "canonical_sha256": "1df703b0fbee798f034632ac7895d8b89e9cb601e92298800963beb9a873ac8a",
+      "export_sha256": "1df703b0fbee798f034632ac7895d8b89e9cb601e92298800963beb9a873ac8a",
+      "bytes": 5572,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/physics-glyphs/PhysicsScenarioV3Workbench.tsx",
+      "canonical_sha256": "75d93a9edd5682aec0621cc482c6c3feaec171c2ac0ebaa451d79c8d985e40af",
+      "export_sha256": "75d93a9edd5682aec0621cc482c6c3feaec171c2ac0ebaa451d79c8d985e40af",
+      "bytes": 3401,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/physics-glyphs/PrepareFriendsSticker.tsx",
+      "canonical_sha256": "4db9af0277d9fcdf59fcffa71e5cdaeed2aeadc79cb1c57b24367e4beeff261b",
+      "export_sha256": "4db9af0277d9fcdf59fcffa71e5cdaeed2aeadc79cb1c57b24367e4beeff261b",
+      "bytes": 2399,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/physics-glyphs/__tests__/atomic-emission-workbench.spec.tsx",
+      "canonical_sha256": "71ce43ad131b362971a5cef4abbb81d2feabd603a2daf49e96ad4e05bfa59e76",
+      "export_sha256": "71ce43ad131b362971a5cef4abbb81d2feabd603a2daf49e96ad4e05bfa59e76",
+      "bytes": 3824,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/physics-glyphs/__tests__/calculation-bridge.spec.tsx",
+      "canonical_sha256": "122c206f99e947e21131e651837c90758422ba4f9ffc5849d5b04d410ec64e2f",
+      "export_sha256": "122c206f99e947e21131e651837c90758422ba4f9ffc5849d5b04d410ec64e2f",
+      "bytes": 5451,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/physics-glyphs/__tests__/generation-details.spec.tsx",
+      "canonical_sha256": "0fe4111570e1eb667a6ac27ec6c54d82e6def9cd3c3011fa2088e995ae06aa18",
+      "export_sha256": "0fe4111570e1eb667a6ac27ec6c54d82e6def9cd3c3011fa2088e995ae06aa18",
+      "bytes": 3671,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/physics-glyphs/__tests__/prepare-friends-sticker.spec.tsx",
+      "canonical_sha256": "590fd4bc27c47b8f489a9e9c8677324f6e593fa4a876e836e1a2704e652355b5",
+      "export_sha256": "590fd4bc27c47b8f489a9e9c8677324f6e593fa4a876e836e1a2704e652355b5",
+      "bytes": 3198,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/physics-glyphs/__tests__/workspace-panel.spec.tsx",
+      "canonical_sha256": "320eec5dbbb04fe71685ed01aa2e681c20ff6988c1577eb5ce57bac3ad96a504",
+      "export_sha256": "320eec5dbbb04fe71685ed01aa2e681c20ff6988c1577eb5ce57bac3ad96a504",
+      "bytes": 22347,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/workstation/PhysicsGlyphWorkspacePanel.tsx",
+      "canonical_sha256": "b8f428ad011397529b6edc82679adf91ba17a20ae8f2b03290bb0f0133ad7251",
+      "export_sha256": "2c629d426332193cf2cbcdf30e080ea41e1b1ea321d2e7289b61b1021c62b755",
+      "bytes": 14579,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/workstation/panelActionAdapters.ts",
+      "canonical_sha256": "308348e4d66e9567ebb6797059c8701d5094b4d5cfeb34f5f9fa4addcbf03de8",
+      "export_sha256": "308348e4d66e9567ebb6797059c8701d5094b4d5cfeb34f5f9fa4addcbf03de8",
+      "bytes": 282571,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "4922daf6a46f8ca633145a92057f00b6f7e36d1c8baa2a9f5a830afad07cb57b"
+    },
+    {
+      "path": "client/src/lib/workstation/panelCapabilities.ts",
+      "canonical_sha256": "0a97cc881affeeaaf954eef952a34b4de8f561720086dbffc13a886f69d5bbf2",
+      "export_sha256": "0a97cc881affeeaaf954eef952a34b4de8f561720086dbffc13a886f69d5bbf2",
+      "bytes": 69314,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "6146131ca08ea0b4700ded8da6c23f5932952023826ba669211d78a622199951"
+    },
+    {
+      "path": "client/src/lib/workstation/physicsGlyphActionAdapter.ts",
+      "canonical_sha256": "7ea96363cbd219317d5acd24fa73af52eec47eef1f7e172c19b03d39e1ef8643",
+      "export_sha256": "7ea96363cbd219317d5acd24fa73af52eec47eef1f7e172c19b03d39e1ef8643",
+      "bytes": 881,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/workstation/physicsGlyphAskContext.ts",
+      "canonical_sha256": "c13310d44b7e705ff735bf75d11e046e7332fcbba434bc578d8b045005f4f781",
+      "export_sha256": "c13310d44b7e705ff735bf75d11e046e7332fcbba434bc578d8b045005f4f781",
+      "bytes": 1288,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/physics-glyphs/PhysicsGenerationDetails.tsx",
+      "canonical_sha256": "fa7a529d33c0790b8bc97f1e597a09a6134b51b0a3ec5583ce78aca4d981cb71",
+      "export_sha256": "fa7a529d33c0790b8bc97f1e597a09a6134b51b0a3ec5583ce78aca4d981cb71",
+      "bytes": 4441,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/physics-glyphs/QuantumGlyphAnswer.tsx",
+      "canonical_sha256": "af640ea413ecf39ed8a9cdd51a1d0ddd03f48944d249140430b4cc04091f402f",
+      "export_sha256": "af640ea413ecf39ed8a9cdd51a1d0ddd03f48944d249140430b4cc04091f402f",
+      "bytes": 4441,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/physics-glyphs/SampledLayers.tsx",
+      "canonical_sha256": "db687a09849f5cbb92b129cf1801cd63105b58f87a358e65f020e084f8242872",
+      "export_sha256": "76a1dd2132ab87a0abade7be23f4eb4ab439f6b42ddce49d73d555c410bf6d5a",
+      "bytes": 1552,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/physics-glyphs/UnifiedQuantumGlyphAnswer.tsx",
+      "canonical_sha256": "b1c41cf856d14c0b5ff798a5aa3f31352aa41e0eafac8e3ca71c6fb2526c1741",
+      "export_sha256": "a2bc019ac90ea35d4ba7569c3052d1e9d0201d56d41660d63c0878bb8d144546",
+      "bytes": 3500,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/physics-glyphs/__tests__/hydrogen-gas-answer.spec.tsx",
+      "canonical_sha256": "aa9bf6a556e31937b15ee6274a921d72486a4304e3aa94f3d7e87ee91844752a",
+      "export_sha256": "aa9bf6a556e31937b15ee6274a921d72486a4304e3aa94f3d7e87ee91844752a",
+      "bytes": 2618,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/physics-glyphs/__tests__/received-workspace-rendering.spec.tsx",
+      "canonical_sha256": "a6bca250e6b2c13b4c92a322189c97ab32b1eddc27f69070022cd8081c704b4b",
+      "export_sha256": "a6bca250e6b2c13b4c92a322189c97ab32b1eddc27f69070022cd8081c704b4b",
+      "bytes": 4590,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/physics-glyphs/__tests__/unified-answer.spec.tsx",
+      "canonical_sha256": "7ecdd8346022e54f63c398e03dfc361d3708eb5b70397af19e877a9790c402c9",
+      "export_sha256": "7ecdd8346022e54f63c398e03dfc361d3708eb5b70397af19e877a9790c402c9",
+      "bytes": 5297,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/usePhysicsGlyphWorkspaceStore.ts",
+      "canonical_sha256": "114c667970988a741eb80133bc8e20553dcbfe8de31b2f86c42220bfdad493ff",
+      "export_sha256": "c993e3ef89ba7f7c8aa85b20c06f1a6c2d8932da6b28cb0152e9176d0b8ed3cd",
+      "bytes": 6531,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/physicsGlyphClientTransport.ts",
+      "canonical_sha256": "b4b81be7f54a8fcecb087c14ca1589fd661d64f099943dee43aa3001682a24f8",
+      "export_sha256": "b4b81be7f54a8fcecb087c14ca1589fd661d64f099943dee43aa3001682a24f8",
+      "bytes": 4859,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountOperationScope.ts",
+      "canonical_sha256": "126c3c774a9d5ac67ae2b2fb577465fca36ccfea4f9b33c915420afec33d8b90",
+      "export_sha256": "13a5c8dab5137d5d0cd5ad70910dc75828634ac59f4405354ee93f7be21c7faf",
+      "bytes": 602,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/panelActionAdapters.spec.ts",
+      "canonical_sha256": "5117f3921447eee3d24200233cda9f0a375f3bd6758e41f04550f25bfa01eb74",
+      "export_sha256": "5117f3921447eee3d24200233cda9f0a375f3bd6758e41f04550f25bfa01eb74",
+      "bytes": 109996,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed the typed Physics Glyph adapter, its small registration diff in the existing workstation adapter/capability catalog, workspace panel and all remaining first-party glyph UI components. Prior reviewed store, transport, rendering modules and account guards are unchanged.",
+    "The adapter accepts inspect with no extra arguments or command with a typed command. Arbitrary prompt text and extra action arguments are rejected by the adapter/shared command validator. The catalog keeps v1_job_ready false. Existing open/focus/close handling remains in the generic adapter; no model text becomes an action.",
+    "The panel uses shared versioned operators and validated documents. Qualitative scenes, supplied inputs, calculation evidence, question coverage and scientific support remain separately labeled. Current-revision results are required for numeric display; stale results are omitted. Local save/reload is profile-scoped.",
+    "External chat connects only through an explicit control and is retired on profile change or incompatible protocol. Attached Ask context carries peer identity only, not the transport credential. Isolated context and the automatic-scenario toggle remove that context. Server admission remains separate.",
+    "Prepare Friends sticker reads the current local candidate, finalizes an exact verified generation/request only on a button action, and describes sending as a separate Friends operation. Profile/scene epochs suppress late preparation. Tests mock the native board and do not establish a live finalized artifact.",
+    "Generated display uses an opaque allow-scripts iframe with exact active-frame/generation/scene checks. Scene commands and bounded deterministic calculation are independent opt-ins. Re-running, unmounting and profile replacement revoke the calculation gate. Shared operator/scheduler contracts are unchanged.",
+    "Reproduced a stale-store capture that could retire the next profile scene during calculation request admission. The sandbox now re-reads the synchronized store and applies the existing account identity/revision guard to queued calculations. One new regression failed before the fix; a second queued-calculation characterization already passed and remains covered.",
+    "AtomicEmissionWorkbench is a standalone exported component with its own tests, not currently wired into the main workspace. Its code cell remains unexecuted export text, results are recomputed on document reload, and unsupported providers return gaps. Its tests remount per profile; no automatic mounted-profile reset is claimed."
+  ],
+  "limits": [
+    "Private unfrozen source proposal. Source checks do not establish installed two-profile delivery, a live finalized sticker, game action, public publication or mathematical/physical certification.",
+    "The broader workstation adapter suite has one open theory-context reflection failure: exact_badge_ids returns source_residual and wall_t00_source_residual where the test requires source_residual and qei.sampling_window. This also fails with the unchanged public adapter using current canonical dependencies. Do not call the full suite green or infer that the published release had the same failure.",
+    "Glyph tests use local stores, jsdom and mocked HTTP/native board access. They do not run a real iframe JS engine, browser security boundary, external chat provider, cross-tab login or native receipt path.",
+    "Shared physics/operator contracts and math are not changed by this client admission fix. Existing educational/model labels do not certify a scene; no Casimir verification certificate is asserted by these tests.",
+    "General adapter branches beyond the small glyph registration remain the public baseline. Full application build, API integration and installed signed acceptance remain separate work. Selected-entry compilation externalizes omitted dependencies.",
+    "Atomic standalone workbench availability and profile remounting must be qualified if it is later mounted. No UI availability claim is made from its isolated tests.",
+    "Five intentional support-contact matches inherited from prior candidates remain in the final owner publication review."
+  ]
+}

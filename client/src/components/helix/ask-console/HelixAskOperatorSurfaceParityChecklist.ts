@@ -1,3 +1,5 @@
+import type { HelixAskConsoleOperatorSurfaceParityItem } from "./HelixAskConsoleState";
+
 export type HelixAskOperatorSurfaceParityStatus = "proven" | "open";
 
 export type HelixAskOperatorSurfaceParityValidationKind =
@@ -6,7 +8,7 @@ export type HelixAskOperatorSurfaceParityValidationKind =
   | "behavior_sensitive_browser";
 
 export type HelixAskOperatorSurfaceParityChecklistItem = {
-  key: string;
+  key: HelixAskConsoleOperatorSurfaceParityItem;
   label: string;
   status: HelixAskOperatorSurfaceParityStatus;
   bridgeReference: "HelixAskPill.tsx";

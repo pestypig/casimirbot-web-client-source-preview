@@ -56,7 +56,7 @@ const workbench = (overrides: Record<string, unknown> = {}) => ({
 describe("research-paper-to-proposal workflow demo", () => {
   it("makes the demo panel available to developers, users, and unsigned sessions", () => {
     expect(HELIX_DEVELOPER_ACCOUNT_POLICY.allowed_panels).toContain("*");
-    expect(HELIX_USER_ACCOUNT_POLICY.allowed_panels).toContain("workflow-demo-lab");
+    expect(HELIX_USER_ACCOUNT_POLICY.allowed_panels).toContain("*");
     expect(HELIX_USER_ACCOUNT_POLICY.locked_panels).not.toContain("workflow-demo-lab");
     expect(resolveHelixAccountPanelAccess(HELIX_USER_ACCOUNT_POLICY, "workflow-demo-lab")).toEqual({
       state: "available",

@@ -156,7 +156,7 @@ export function HelixAskReasoningMeterSurface({
               <span
                 key={particle.id}
                 ref={(node) => {
-                  frontierParticleRefs.current[index] = node;
+                  if (frontierParticleRefs.current) frontierParticleRefs.current[index] = node;
                 }}
                 className="absolute left-0 top-0 block rounded-full"
                 style={{ opacity: 0, transform: "translate3d(0,0,0)" }}

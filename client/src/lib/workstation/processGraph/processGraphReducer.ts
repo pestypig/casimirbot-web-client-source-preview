@@ -247,6 +247,13 @@ function addTrace(state: WorkstationProcessGraphState, traceId: string | undefin
   state.activeTraceIds = [traceId, ...state.activeTraceIds.filter((id) => id !== traceId)].slice(0, 24);
 }
 
+function isEventFamily<Family extends "panel" | "tool" | "operation" | "job">(
+  event: WorkstationProcessGraphEvent,
+  family: Family,
+): event is Extract<WorkstationProcessGraphEvent, { type: `${Family}.${string}` }> {
+  return event.type.startsWith(`${family}.`);
+}
+
 export function applyWorkstationProcessGraphEvent(
   current: WorkstationProcessGraphState,
   event: WorkstationProcessGraphEvent,
@@ -265,7 +272,7 @@ export function applyWorkstationProcessGraphEvent(
     view: { ...current.view },
   };
 
-  if (event.type.startsWith("panel.")) {
+  if (isEventFamily(event, "panel")) {
     const status = statusFromEvent(event.type);
     const panelNodeId = nodeId("panel", event.panelId);
     upsertNode(state, ts, {
@@ -290,7 +297,7 @@ export function applyWorkstationProcessGraphEvent(
     addTimeline(state, { ts, label: `${event.type.replace(".", " ")}: ${event.label ?? event.panelId}`, nodeIds: [panelNodeId], traceId: event.traceId });
   }
 
-  if (event.type.startsWith("tool.")) {
+  if (isEventFamily(event, "tool")) {
     const status = statusFromEvent(event.type);
     const toolNodeId = nodeId("tool", event.tool);
     upsertNode(state, ts, {
@@ -331,7 +338,7 @@ export function applyWorkstationProcessGraphEvent(
     addTimeline(state, { ts, label: `${event.type.replace(".", " ")}: ${event.label ?? event.tool}`, nodeIds: [toolNodeId], traceId: event.traceId });
   }
 
-  if (event.type.startsWith("operation.")) {
+  if (isEventFamily(event, "operation")) {
     const status = statusFromEvent(event.type);
     const operationNodeId = nodeId("operation", event.operationId);
     upsertNode(state, ts, {
@@ -368,7 +375,7 @@ export function applyWorkstationProcessGraphEvent(
     addTimeline(state, { ts, label: `artifact attached: ${event.label}`, nodeIds: [artifactNodeId], traceId: event.traceId });
   }
 
-  if (event.type.startsWith("job.")) {
+  if (isEventFamily(event, "job")) {
     const status = event.type === "job.step" ? "running" : statusFromEvent(event.type);
     const jobNodeId = nodeId("job", event.jobId);
     upsertNode(state, ts, {

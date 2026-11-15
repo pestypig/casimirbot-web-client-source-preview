@@ -10,8 +10,16 @@ import type {
   HelixProfileStorageSnapshot,
   HelixProfileStorageWriteReceipt,
 } from "@shared/helix-profile-storage";
-import { AGI_CHAT_STORAGE_KEY, useAgiChatStore, type ChatSession } from "@/store/useAgiChatStore";
+import {
+  LEGACY_SHARED_AGI_CHAT_STORAGE_KEY,
+  agiChatStorageKeyForProfile,
+  getCurrentAgiChatStorageKey,
+  useAgiChatStore,
+  type ChatSession,
+} from "@/store/useAgiChatStore";
 import { useWorkspaceMemoryRegistryStore } from "@/store/useWorkspaceMemoryRegistryStore";
+import { clipboardStorageKeyForProfile } from "@/store/useWorkstationClipboardStore";
+import { notesStorageKeyForProfile } from "@/store/useWorkstationNotesStore";
 import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "./accountCapabilityPolicy";
 import { pairingRecoveryValueAllowed } from "../agent-access/pairingRecoveryStorage";
 
@@ -25,6 +33,11 @@ const LIVE_SOURCE_ENDPOINT_STORAGE_KEY = "helix.worldEventSourceEndpoint";
 const LIVE_SOURCE_LABEL_STORAGE_KEY = "helix.worldEventSourceLabel";
 const VISUAL_CAPTURE_ROUTE_STORAGE_KEY = "helix.liveAnswer.visualCaptureRoutes.v1";
 const FRUITION_CALCULATOR_STORAGE_KEY = "fruition-calculator:v1";
+const LEGACY_SHARED_NOTES_STORAGE_KEY = "workstation-notes:v1";
+const NOTES_ACCOUNT_STORAGE_PREFIX = "workstation-notes:v2:";
+const LEGACY_SHARED_CLIPBOARD_STORAGE_KEY = "workstation-clipboard-history:v1";
+const CLIPBOARD_ACCOUNT_STORAGE_PREFIX = "workstation-clipboard-history:v2:";
+const AGI_CHAT_ACCOUNT_STORAGE_PREFIX = "agi-chat-sessions:v2:";
 export const HELIX_PROFILE_STORAGE_ATTACH_CONSENT_EVENT =
   "helix-profile-storage-attach-consent";
 const PROFILE_ATTACH_CONSENT_KEY_PREFIX = "helix.profileStorage.attachConsent:";
@@ -236,7 +249,8 @@ export function grantProfileStorageAttachConsent(profileId: string | null | unde
 
 export function revokeProfileStorageAttachConsent(profileId: string | null | undefined): boolean {
   if (!profileId?.trim()) return false;
-  const revoked = safeLocalStorageRemove(profileStorageAttachConsentKey(profileId.trim()));
+  // Retain an explicit opt-out so remounting cannot auto-attach this browser.
+  const revoked = safeLocalStorageSet(profileStorageAttachConsentKey(profileId.trim()), "0");
   if (revoked) {
     window.dispatchEvent(new CustomEvent(HELIX_PROFILE_STORAGE_ATTACH_CONSENT_EVENT, {
       detail: { profileId: profileId.trim(), granted: false },
@@ -365,12 +379,14 @@ function hasRestorableAgiChatSessions(value: string): boolean {
 }
 
 function syntheticHelixAskChatArtifacts(profileId: string): HelixWorkspaceMemoryArtifact[] {
-  const value = safeLocalStorageGet(AGI_CHAT_STORAGE_KEY);
+  const storageKey = agiChatStorageKeyForProfile(profileId);
+  if (getCurrentAgiChatStorageKey() !== storageKey) return [];
+  const value = safeLocalStorageGet(storageKey);
   if (value == null || value.trim() === "") return [];
   if (!hasRestorableAgiChatSessions(value)) return [];
   return [{
     schema: "helix.workspace_memory_registry.v1",
-    artifact_id: "helix-chat-storage:agi-chat-sessions-v1",
+    artifact_id: `helix-chat-storage:${storageKey}`,
     artifact_type: "helix_chat_session",
     owner_scope: "profile",
     storage_backend: "localStorage",
@@ -378,8 +394,8 @@ function syntheticHelixAskChatArtifacts(profileId: string): HelixWorkspaceMemory
     profile_id: profileId,
     chat_session_id: null,
     title: "Helix Ask chats",
-    storage_key: AGI_CHAT_STORAGE_KEY,
-    path_ref: `storage://localStorage/${AGI_CHAT_STORAGE_KEY}`,
+    storage_key: storageKey,
+    path_ref: `storage://localStorage/${storageKey}`,
     size_bytes: byteLength(value),
     quota_bytes: null,
     updated_at: new Date().toISOString(),
@@ -392,14 +408,26 @@ function excludedProfileStorageKeys(
 ): Set<string> {
   // Entries upload entire storage values. One foreign owner blocks the whole
   // key, including synthetic or duplicate registrations of those same bytes.
-  return new Set(artifacts
+  const excluded = new Set(artifacts
     .filter((artifact) => artifact.storage_backend === "localStorage")
     .filter((artifact) =>
       (artifact.profile_id !== null && artifact.profile_id !== profileId) ||
       (artifact.owner_scope === "profile" && artifact.profile_id !== profileId) ||
-      artifact.owner_scope === "surface_session_only",
+      artifact.owner_scope === "surface_session_only" ||
+      (artifact.storage_key.startsWith(NOTES_ACCOUNT_STORAGE_PREFIX) &&
+        artifact.storage_key !== notesStorageKeyForProfile(profileId)) ||
+      (artifact.storage_key.startsWith(CLIPBOARD_ACCOUNT_STORAGE_PREFIX) &&
+        artifact.storage_key !== clipboardStorageKeyForProfile(profileId)) ||
+      (artifact.storage_key.startsWith(AGI_CHAT_ACCOUNT_STORAGE_PREFIX) &&
+        artifact.storage_key !== agiChatStorageKeyForProfile(profileId)),
     )
     .map((artifact) => artifact.storage_key));
+  // This legacy key is shared across sign-ins. Its registry owner can be
+  // relabeled by a later note edit, so no profile may claim its entire value.
+  excluded.add(LEGACY_SHARED_NOTES_STORAGE_KEY);
+  excluded.add(LEGACY_SHARED_CLIPBOARD_STORAGE_KEY);
+  excluded.add(LEGACY_SHARED_AGI_CHAT_STORAGE_KEY);
+  return excluded;
 }
 
 function profileEligibleArtifacts(
@@ -486,6 +514,9 @@ async function flushPendingProfileStorageSync(
 ): Promise<{ ok: boolean; comparable: string | null }> {
   const pending = readPendingSync(profileId);
   if (!pending) return { ok: true, comparable: null };
+  if (signal?.aborted || !isProfileStorageAttachConsentGranted(profileId)) {
+    return { ok: false, comparable: pending.comparable };
+  }
   const ownershipMatches = () => {
     const excluded = excludedProfileStorageKeys([
       ...useWorkspaceMemoryRegistryStore.getState().buildRegistrySnapshot().artifacts,
@@ -493,12 +524,18 @@ async function flushPendingProfileStorageSync(
     ], profileId);
     return pending.profileId === profileId &&
       pending.payload.entries.every((entry) => pairingRecoveryValueAllowed(profileId, entry.storage_key, entry.value)) &&
+      pending.payload.entries.every((entry) => !entry.storage_key.startsWith(NOTES_ACCOUNT_STORAGE_PREFIX) ||
+        entry.storage_key === notesStorageKeyForProfile(profileId)) &&
+      pending.payload.entries.every((entry) => !entry.storage_key.startsWith(AGI_CHAT_ACCOUNT_STORAGE_PREFIX) ||
+        entry.storage_key === agiChatStorageKeyForProfile(profileId)) &&
+      pending.payload.entries.every((entry) => !entry.storage_key.startsWith(CLIPBOARD_ACCOUNT_STORAGE_PREFIX) ||
+        entry.storage_key === clipboardStorageKeyForProfile(profileId)) &&
       !pending.payload.entries.some((entry) => excluded.has(entry.storage_key)) &&
       !pending.payload.artifacts.some((artifact) => excluded.has(artifact.storage_key));
   };
   const stillOwnsQueue = () => {
     const current = readPendingSync(profileId);
-    return !signal?.aborted && current?.profileId === profileId &&
+    return !signal?.aborted && isProfileStorageAttachConsentGranted(profileId) && current?.profileId === profileId &&
       current.comparable === pending.comparable &&
       JSON.stringify(current.payload) === JSON.stringify(pending.payload);
   };
@@ -549,17 +586,36 @@ function applyProfileStorageSnapshot(snapshot: HelixProfileStorageSnapshot): num
   const registry = useWorkspaceMemoryRegistryStore.getState();
   for (const entry of snapshot.entries) {
     if (entry.storage_backend !== "localStorage") continue;
+    if (entry.storage_key === LEGACY_SHARED_NOTES_STORAGE_KEY ||
+        entry.storage_key === LEGACY_SHARED_CLIPBOARD_STORAGE_KEY ||
+        entry.storage_key === LEGACY_SHARED_AGI_CHAT_STORAGE_KEY) continue;
+    if (entry.storage_key.startsWith(NOTES_ACCOUNT_STORAGE_PREFIX) &&
+        entry.storage_key !== notesStorageKeyForProfile(snapshot.profile_id)) continue;
+    if (entry.storage_key.startsWith(CLIPBOARD_ACCOUNT_STORAGE_PREFIX) &&
+        entry.storage_key !== clipboardStorageKeyForProfile(snapshot.profile_id)) continue;
+    if (entry.storage_key.startsWith(AGI_CHAT_ACCOUNT_STORAGE_PREFIX) &&
+        entry.storage_key !== agiChatStorageKeyForProfile(snapshot.profile_id)) continue;
     if (!snapshot.profile_id || !pairingRecoveryValueAllowed(snapshot.profile_id, entry.storage_key, entry.value)) continue;
     const existing = safeLocalStorageGet(entry.storage_key);
     if (existing === entry.value) continue;
     if (safeLocalStorageSet(entry.storage_key, entry.value)) {
       applied += 1;
     }
-    if (entry.storage_key === AGI_CHAT_STORAGE_KEY) {
+    if (entry.storage_key === agiChatStorageKeyForProfile(snapshot.profile_id) &&
+        getCurrentAgiChatStorageKey() === entry.storage_key) {
       applyRestoredAgiChatStorageValue(entry.value);
     }
   }
   for (const artifact of snapshot.artifacts) {
+    if (artifact.storage_key === LEGACY_SHARED_NOTES_STORAGE_KEY ||
+        artifact.storage_key === LEGACY_SHARED_CLIPBOARD_STORAGE_KEY ||
+        artifact.storage_key === LEGACY_SHARED_AGI_CHAT_STORAGE_KEY) continue;
+    if (artifact.storage_key.startsWith(NOTES_ACCOUNT_STORAGE_PREFIX) &&
+        artifact.storage_key !== notesStorageKeyForProfile(snapshot.profile_id)) continue;
+    if (artifact.storage_key.startsWith(CLIPBOARD_ACCOUNT_STORAGE_PREFIX) &&
+        artifact.storage_key !== clipboardStorageKeyForProfile(snapshot.profile_id)) continue;
+    if (artifact.storage_key.startsWith(AGI_CHAT_ACCOUNT_STORAGE_PREFIX) &&
+        artifact.storage_key !== agiChatStorageKeyForProfile(snapshot.profile_id)) continue;
     if (!snapshot.profile_id || !pairingRecoveryValueAllowed(snapshot.profile_id, artifact.storage_key,
       safeLocalStorageGet(artifact.storage_key) ?? "")) continue;
     registry.upsertArtifact({
@@ -678,6 +734,7 @@ export function useProfileStorageSync(): void {
   React.useEffect(() => {
     if (!profileId) return;
     if (isProfileStorageAttachConsentGranted(profileId)) return;
+    if (safeLocalStorageGet(profileStorageAttachConsentKey(profileId)) === "0") return;
     grantProfileStorageAttachConsent(profileId);
   }, [profileId]);
 
@@ -749,7 +806,7 @@ export function useProfileStorageSync(): void {
     ) {
       return;
     }
-    if (!isProfileStorageAttachConsentGranted(profileId) && !pending) return;
+    if (!isProfileStorageAttachConsentGranted(profileId)) return;
     const comparable = JSON.stringify({
       profileId,
       entries: payload.entries.map((entry) => ({
@@ -767,6 +824,7 @@ export function useProfileStorageSync(): void {
     if (pending?.comparable === comparable && comparable === lastPayloadRef.current) return;
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
+      if (controller.signal.aborted || !isProfileStorageAttachConsentGranted(profileId)) return;
       if (payload.entries.length > 0 || payload.artifacts.length > 0) {
         queuePendingSync({ profileId, payload, comparable });
       }
@@ -784,6 +842,7 @@ export function useProfileStorageSync(): void {
 
   React.useEffect(() => {
     if (!profileId) return;
+    if (!isProfileStorageAttachConsentGranted(profileId)) return;
     const controller = new AbortController();
     const retryPending = () => {
       if (!restoredProfilesRef.current.has(profileId)) return;
@@ -799,5 +858,5 @@ export function useProfileStorageSync(): void {
       controller.abort();
       window.clearInterval(timer);
     };
-  }, [profileId]);
+  }, [profileId, attachConsentTick]);
 }

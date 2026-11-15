@@ -1,0 +1,46 @@
+{
+  "observed_at": "2026-11-13T22:58:50.000214+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/HelixAskPill.tsx",
+      "canonical_sha256": "529b8aa247eea5742e351631cc0cc2ef786f37b43ea28f7cf0c2c72e6d4f8056",
+      "export_sha256": "cf57017b7ff34c91b02cd1c7bc923ec99a22b525cd9338272042ac8b745f9110",
+      "bytes": 1048796,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "aded218e55487a485ec0aa8602e13589ae374fc32c1715250d361629cbc037ea"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyConsoleInventory.ts",
+      "canonical_sha256": "7d10cc85d48208f75736fe735b8009490b1cd3f68a3bd8c20450edc8722c754a",
+      "export_sha256": "ad3f949447988e2fd3a91525507c500e30f0b7128619a262876ebfe01c5f8149",
+      "bytes": 83435,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "abef8021f069fb6600588c1bc98db8303035ae2d74a8ca005476bb79f88bb036"
+    },
+    {
+      "path": "client/src/components/helix/__tests__/pending-ask-recovery.spec.ts",
+      "canonical_sha256": "f8f633b0cbff9f4f2f9bb240a05610a6cf688e6082d4f0e6a8a8dd7b967318e9",
+      "export_sha256": "f8f633b0cbff9f4f2f9bb240a05610a6cf688e6082d4f0e6a8a8dd7b967318e9",
+      "bytes": 6443,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Reviewed the complete resumePendingAsk callback and exact change against its previously reviewed bytes. Timeout and failed-resume reporting referenced inferredMode/manualAttempt from a different callback, causing ReferenceError while handling the original failure.",
+    "Runtime fix 42 records these failures as observe-mode timeline events using the resumed trace ID. Pending jobs contain no local reasoning-attempt ID or mode, so recovery must not fabricate or update a new-turn attempt. Partial answers remain suppressed and no action path is entered.",
+    "Two deterministic regressions execute the real extracted callback and failed before the repair. Cancellation and missing-job cases also pass. Explicit mock dependencies do not inject the formerly undefined names.",
+    "Updated only the source-location inventory to match removed lines; the existing 128-test console suite passes alongside the four callback tests.",
+    "The new test uses the existing TypeScript compiler and Node VM to execute the authored callback. No provider, server, room, credential, game or native action was invoked."
+  ],
+  "limits": [
+    "Source-only fix, uninstalled and unpublished. Mocked callback execution is not a mounted-console or hosted recovery acceptance check.",
+    "The prior production client build and 445-error typecheck are immutable pre-fix evidence. A later typecheck must confirm the repaired diagnostics; remaining type errors are not waived.",
+    "The shader, worksheet and generated document metadata holds from the final-resources inventory remain in effect. No new action authority or inferred mode is introduced."
+  ]
+}

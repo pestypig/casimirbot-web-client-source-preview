@@ -36,9 +36,9 @@ export function SolarMagneticArchiveDirectory({onOpenGongMap,onCompareHmi,gongAc
     setRetainedMessage('Checking retained source receipts…');
     try{
       const accountResponse=await fetch('/api/account/session',{credentials:'include',signal:controller.signal});
-      if(!accountResponse.ok)throw new Error('Developer profile unavailable');
+      if(!accountResponse.ok)throw new Error('Account profile unavailable');
       const account=await accountResponse.json(),profileId=account.session?.profile?.profile_id;
-      if(!profileId||account.account_policy?.account_type!=='developer')throw new Error('Developer profile required');
+      if(!profileId)throw new Error('Signed-in profile required');
       const response=await fetch(`/api/star-watcher/magnetic-archive/acquisitions?${new URLSearchParams({expected_profile_id:profileId})}`,
         {credentials:'include',signal:controller.signal});
       if(!response.ok)throw new Error(`Retained source list unavailable (${response.status})`);
@@ -67,7 +67,7 @@ export function SolarMagneticArchiveDirectory({onOpenGongMap,onCompareHmi,gongAc
       const response = await fetch(`/api/star-watcher/magnetic-archive/search?${new URLSearchParams({ dateUtc })}`,
         { credentials: 'include', signal: controller.signal });
       if (!response.ok) throw new Error(response.status === 400 ? 'Choose a valid UTC date from 2010 through today.' :
-        response.status === 403 ? 'Developer session required for archive search.' : 'Archive search request failed.');
+        response.status === 403 ? 'Account session required for archive search.' : 'Archive search request failed.');
       const parsed = solarMagneticArchiveSearchSchema.parse(await response.json());
       if (!controller.signal.aborted) {
         setResult(parsed);

@@ -1,0 +1,39 @@
+{
+  "schema": "casimirbot.room_callback_detail_source_addendum.v1",
+  "status": "private_working_copy_not_published",
+  "canonical_base_commit": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "canonical_frozen_source_commit": null,
+  "packaged_in_r384": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeRoomConnectionPanel.tsx",
+      "previous_canonical_sha256": "49b26cae723115c652afd2648c638182aa6ba0eeaae07ae6ab37db632950b3f0",
+      "canonical_sha256": "77c356445def05d0ea90b19d569d7885085bd953c34fc52d580626061fa9c801",
+      "export_sha256": "77c356445def05d0ea90b19d569d7885085bd953c34fc52d580626061fa9c801",
+      "transformation": "identity",
+      "bytes": 50879
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeRoomConnectionPanel.spec.tsx",
+      "previous_canonical_sha256": "3373c1bd46bcc68c17d429188b9b209c543ed98c4c8a1757f2af7fd125cbf408",
+      "canonical_sha256": "d7a89e9ed55df2f7da2b436d730de7e153f53bc78253fb6519d62555008f1c06",
+      "export_sha256": "d7a89e9ed55df2f7da2b436d730de7e153f53bc78253fb6519d62555008f1c06",
+      "transformation": "identity",
+      "bytes": 51665
+    }
+  ],
+  "review": [
+    "Display existing typed room identity/tenant failures with specific recovery actions; no authorization condition changed.",
+    "Journal only fixed allowlisted failure categories; arbitrary callback material still maps to rejected_other."
+  ],
+  "validation": {
+    "room_panel_passed": 43,
+    "diagnostic_passed": 3,
+    "initial_runner_issue": "Journal mock requires Node; initial mixed jsdom run collected zero journal tests, followed by successful Node run."
+  },
+  "limits": [
+    "Source-only follow-up after R384; requires rebuild and installed acceptance.",
+    "Actual R384 callback cause is unconfirmed because its journal collapsed the returned error into rejected_other.",
+    "No new account approval, token read, source grant, public push or game action."
+  ]
+}

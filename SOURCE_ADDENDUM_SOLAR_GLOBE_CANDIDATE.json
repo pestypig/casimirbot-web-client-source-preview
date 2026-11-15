@@ -1,0 +1,103 @@
+{
+  "observed_at": "2026-11-13T20:07:00.062776+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/SolarMagneticGlobe.tsx",
+      "canonical_sha256": "77d67e50c48cf10dc99e5685394d92e508d0ec9bd5732b4ab3de8225bffcaf54",
+      "export_sha256": "e572fc4cf2d45d7b619506a482e96bb4e36facffa0a4fe749e50f7ae5ca46f60",
+      "bytes": 100537,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "a75695f65c3782b9e48e350b7d84bdf49b46800bda73eb56191c15f732e38568"
+    },
+    {
+      "path": "client/src/components/SolarMagneticGlobe.spec.tsx",
+      "canonical_sha256": "9d1d007448e0e93f0271ffa7a7a4a21bdc2e04a5a3e6efc8d0f1237a49a4bb06",
+      "export_sha256": "944d4e574db04922848b75d2a67cf65d2212e0a1ce1e10fee41c840c6de8e733",
+      "bytes": 20383,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "23c00116d7f87051cd2b7ad8d133e44ee371cfd8e85611baee963ecee0bc45a3"
+    },
+    {
+      "path": "client/src/components/SolarMagneticGlobe.presentation.spec.tsx",
+      "canonical_sha256": "1982aa4bf75f325dd96571ee40a93ea24e30af425187109372d6dff1eaacfb5d",
+      "export_sha256": "96bb9d89b5fa138c2f1767243531338dc84f8fa3ea81be1d6bf971b06db0836f",
+      "bytes": 11924,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "cd9c3b48b0d4bf4e221f8bb41527599750ca9639f00e96469c84296712404bea"
+    },
+    {
+      "path": "client/src/components/SolarRobPfssBrowser.tsx",
+      "canonical_sha256": "99fc6ee56e1b7c43d7457240d6c6937cedada60055dcef2581e2dd6d28855d44",
+      "export_sha256": "e9a286e092beff9fc4779c9b195aa3f58b0e9726c3b236e2b44a6b822ed5ccbb",
+      "bytes": 19142,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/SolarRobPfssBrowser.spec.tsx",
+      "canonical_sha256": "28d413a6f8346d3a525ff7a56158504e79d877ed7170da75bc425515bc30fb22",
+      "export_sha256": "3032ce06e77b2c72e4f59d39ab4eeb77e53d940238391602e939062d119b5c53",
+      "bytes": 5616,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/SolarMagneticBundleStorage.tsx",
+      "canonical_sha256": "68d7d1bacb662efa65688cfa8553de0c7ec389437a4b5ae7b28d1281b7b26bef",
+      "export_sha256": "68d7d1bacb662efa65688cfa8553de0c7ec389437a4b5ae7b28d1281b7b26bef",
+      "bytes": 4927,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/SolarObservationRaster.tsx",
+      "canonical_sha256": "373ae68b9a42ebed16cd1628e6abd239f979b836392219b58ea5a2683f6e486d",
+      "export_sha256": "373ae68b9a42ebed16cd1628e6abd239f979b836392219b58ea5a2683f6e486d",
+      "bytes": 1085,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/solar-earth-view-pose.ts",
+      "canonical_sha256": "a5714a660faf9165a7e44a741e8324b8cc32c096ce349e5a8fd476701b99d8e5",
+      "export_sha256": "a5714a660faf9165a7e44a741e8324b8cc32c096ce349e5a8fd476701b99d8e5",
+      "bytes": 1049,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/solar-aia193-display.ts",
+      "canonical_sha256": "146910f28fbb5045a7db0c4702b35cd8c91638ee98ba8ed7777df602cd0411f0",
+      "export_sha256": "146910f28fbb5045a7db0c4702b35cd8c91638ee98ba8ed7777df602cd0411f0",
+      "bytes": 1341,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed magnetic-globe changes, ROB browser source, renderer/presentation lifecycle, exact-ID replay/export controls and focused tests. Existing illustration, observation, catalog, modeled-field and approximate-registration labels remain distinct.",
+    "Earth-facing display textures validate dimensions, byte count and normalized samples before using image WCS and observer geometry. Playback texture cache keys include archive, frame and display identity; source callers must supply replay-verified archives. Same-name GONG candidate overlays are explicitly not proof of ROB solver input or calibrated field-line registration.",
+    "ROB source selection separates public index/model inspection, explicit owner retention and exact retained reopening. Reproduced five identity failures: another-owner list/receipt and changed source hash, catalog or model time. Reopen now checks the selected record and returned snapshot together.",
+    "Reproduced two recovery failures with an unresolved read: changing account/date left controls disabled. Context changes now retire the request reference immediately and restore controls. A later old finalizer cannot clear a newer request.",
+    "Reproduced a parent/child integration failure: a globe control change recreated the ROB snapshot callback and aborted the browser request. The stable callback keeps unrelated display changes separate from actual request cancellation.",
+    "The previously repaired presentation fixtures now model the import-pending endpoint and actual cached identity changes. They test exact retained bundle acknowledgement, renderer-unavailable rejection, human view changes and account changes, with a mocked renderer rather than actual pixels.",
+    "Globe source now allows signed-in owner-retained inspection instead of a developer-only client check, while retaining expected profile/exact source IDs, replay verification and no-scientific-admission flags. Native save receipts are bounded, and browser exports remain explicitly download requests."
+  ],
+  "limits": [
+    "Private unfrozen source proposal; no installation, public push, native export, live acquisition or scientific verification claim. R380 does not contain these new fixes.",
+    "Globe tests use unavailable WebGL or a mock canvas. They exercise local replay and presentation receipts, not GPU texture orientation, actual scene geometry, camera motion or a native installed screenshot.",
+    "Shared WCS/registration, PFSS, hash/replay and scene operators remain canonical dependencies, listed as omitted from this web segment. Their mathematical and physical validation is not established by these UI checks.",
+    "The real local GONG/PFSS/HMI bundle test replays existing retained bytes; that fixture is separately hashed and not exported. Residual labels are diagnostic, not a scientific admission.",
+    "ROB parent-map live acquisition/retention, native JSON save, actual source refresh/revocation and late local file-import account changes remain separate installed/provider qualification. No claim that the entire feature matrix is passed.",
+    "Five inherited intentional support-contact matches remain in final owner publication review."
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "status": "unpublished_source_proposal_pending_coordinated_release",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_source_base_commit": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "canonical_source_state": "Material uncommitted changes on shared main; exact selected bytes below. No private history exported.",
+  "files": [
+    {
+      "path": "client/src/store/useNavPoseStore.ts",
+      "canonical_sha256": "5541cdbcfee76c5246ce696eefe38c15709dd37f9712ba9199bf4afe96e90417",
+      "export_sha256": "efa0fcdc796fae0b2d0bbb9e4816c4d9558d66794ac77b8f59443942a001fca0",
+      "bytes": 10555,
+      "transformation": "CRLF to LF only",
+      "previous_proposal_sha256": "6b665fda2cadf0a3d50ec1a247975aaee7e40fcad1c52b7e63f15281bdcb5df3"
+    },
+    {
+      "path": "client/src/store/useNavPoseStore.test.ts",
+      "canonical_sha256": "bcb38519340f98b11473c9a4213d5fb00b7c64bb5fd7a7dcb81c6a31be4fd50a",
+      "export_sha256": "bcb38519340f98b11473c9a4213d5fb00b7c64bb5fd7a7dcb81c6a31be4fd50a",
+      "bytes": 4514,
+      "transformation": "CRLF to LF only",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "scope": "Post-R382 navigation upload retention and explicitly uncertified navigation/demonstration-plan traces; benchmark trace identity repair.",
+  "rights": "Selected authored first-party source, tests and documentation under the existing owner-confirmed MIT policy. Imported packages and external material are not bundled.",
+  "qualification": {
+    "focused_canonical_tests": 40,
+    "test_files": 7,
+    "changed_root_typecheck": "8 roots and transitive dependencies pass",
+    "math_stage_validation": "323 entries pass; no maturity promotion",
+    "release_gate": "FAIL: whole-current-candidate build and broad schema/type qualification remain unknown; not a standalone preview result"
+  },
+  "source_review": [
+    "The earlier route exclusions were direct-authority-boundary classifications, not discovered embedded credentials. The complete selected route sources and their registration/tenant boundary were reviewed for this source-only proposal.",
+    "The route registration conditionally requires AGI JWT authorization; training trace resolves tenant claims/headers and filters scoped retrieval. Demonstration capture currently does not propagate a tenant identity. Source publication does not qualify live authorization or multi-tenant deployment.",
+    "No sign-in material, current profile identifiers, user messages, game data, audit logs, private local paths, signed capabilities or generated binaries are exported.",
+    "Test credentials/certificates and trace IDs are explicit synthetic fixtures; test-owned temporary directories are bounded before cleanup.",
+    "Diagnostic records reject gate-pass and certificate claims; certificate-backed robotics movement requirements are unchanged."
+  ],
+  "omitted_dependencies": "Other first-party client/server/shared modules and runtime registration, configuration, auth, persistence environment and external packages remain separately supplied. This selection is not a runnable platform.",
+  "remaining": [
+    "Complete full source freeze, build, installed/deployed checks and coordinated publication approval."
+  ],
+  "in_running_R382": false,
+  "published": false,
+  "selected_export_validation": {
+    "source_parity": "pass; CRLF to LF only",
+    "typescript_syntax": "pass",
+    "new_file_content_flags": 0,
+    "scan": "Complete proposed tree and reachable public blobs screened; no novel matches against the prior adjudicated scans.",
+    "publication": "pending full coordinated release review"
+  }
+}

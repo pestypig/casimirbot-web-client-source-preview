@@ -5,16 +5,18 @@ import type { SavedCodexActivity } from "./useSavedCodexActivity";
 export type LocalCodexStreamGrant = Readonly<{ sourceRef: string; threadId: string;
   title: string; helixConversationId: string | null; grantedAt: string }>;
 
-/** Read only the exact owner-granted local Codex chats while the Float is open.
+/** Read only the exact owner-granted local Codex chats while the Float is open
+ * or an approved stream needs activity after the Float is hidden.
  * The native host rechecks account, device and grant on both sides of each read. */
 export function useGrantedCodexStreamActivity(grants: readonly LocalCodexStreamGrant[], enabled: boolean) {
   const key = JSON.stringify(grants.map(grant => ({ sourceRef: grant.sourceRef,
-    title: grant.title })));
-  const sources = useMemo(() => JSON.parse(key) as Array<Pick<LocalCodexStreamGrant,
-    "sourceRef" | "title">>, [key]);
-  const [pages, setPages] = useState<Record<string, SavedCodexActivity>>({});
+    threadId: grant.threadId, title: grant.title,
+    helixConversationId: grant.helixConversationId, grantedAt: grant.grantedAt })));
+  const sources = useMemo(() => JSON.parse(key) as LocalCodexStreamGrant[], [key]);
+  const [snapshot, setSnapshot] = useState<{ key: string;
+    pages: Record<string, SavedCodexActivity> }>({ key, pages: {} });
   useEffect(() => {
-    setPages({});
+    setSnapshot({ key, pages: {} });
     if (!enabled || !window.casimirDesktop?.codexStreamGrants || !sources.length) return;
     let stopped = false;
     let timer: ReturnType<typeof setTimeout> | null = null;
@@ -27,16 +29,19 @@ export function useGrantedCodexStreamActivity(grants: readonly LocalCodexStreamG
             sourceRef: source.sourceRef }) as { status?: unknown; frame?: unknown } | undefined;
           const frame = helixCodexConsoleFrameSchema.safeParse(result?.frame);
           if (result?.status === "ready" && frame.success &&
+              source.sourceRef === `codex-thread:${source.threadId}` &&
+              frame.data.taskId === source.threadId &&
               frame.data.helixConversationId === source.sourceRef)
             next[source.sourceRef] = { chatId: source.sourceRef,
               bindingId: `stream-grant:${source.sourceRef}`, frame: frame.data,
               status: "live", verifiedAt: Date.now() };
         } catch { /* Unavailable sources are omitted, never replayed from cache. */ }
       }
-      if (!stopped) { setPages(next); timer = setTimeout(() => void poll(), 10_000); }
+      if (!stopped) { setSnapshot({ key, pages: next }); timer = setTimeout(() => void poll(), 10_000); }
     };
     void poll();
     return () => { stopped = true; if (timer) clearTimeout(timer); };
-  }, [enabled, sources]);
-  return enabled ? pages : {};
+  }, [enabled, key, sources]);
+  // Do not expose the retired grant's page during the render before effect cleanup.
+  return enabled && snapshot.key === key ? snapshot.pages : {};
 }

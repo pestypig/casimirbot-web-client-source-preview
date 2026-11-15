@@ -1,0 +1,69 @@
+{
+  "status": "unpublished consolidated candidate disclosure",
+  "scope": "Omitted direct dependencies; selected source only, not a standalone application or test suite.",
+  "files": [
+    {
+      "path": "server/db/client.ts",
+      "category": "database_runtime",
+      "reason": "Database runtime and these unselected migrations are omitted. No database rows, migration runner or complete schema/deployment is supplied.",
+      "referenced_by": [
+        "client/e2e/onboarding-isolated/profile-recovery-exports.ts"
+      ]
+    },
+    {
+      "path": "server/services/helix-account/profile-storage-store.ts",
+      "category": "account_and_credential_runtime",
+      "reason": "Integrated account, credential, budget or profile-storage implementation is outside the existing selected preview boundary. No live configuration, credentials, account data or funded entitlement is supplied.",
+      "referenced_by": [
+        "client/e2e/onboarding-isolated/profile-recovery-exports.ts"
+      ]
+    },
+    {
+      "path": "server/services/local-supervisor/reasoning-task-binding-store.ts",
+      "category": "supervisor_and_friend_runtime",
+      "reason": "Task pairing/setup or encrypted Friends state implementation is outside the selected inventory. Public call sites/tests do not supply a standalone supervisor or establish delivery into an active paired chat.",
+      "referenced_by": [
+        "client/e2e/onboarding-isolated/real-handler-exports.ts"
+      ]
+    },
+    {
+      "path": "shared/physics-glyphs/ask-context.ts",
+      "category": "shared_contracts_and_helpers",
+      "reason": "These newly referenced contracts/helpers are not in the existing selected source inventories. Their exact dependency is disclosed; the selected previews remain non-standalone. No source rights or physics/runtime acceptance is claimed for the omitted bytes.",
+      "referenced_by": [
+        "client/src/lib/workstation/physicsGlyphAskContext.ts"
+      ]
+    },
+    {
+      "path": "shared/physics-glyphs/scenario-example.ts",
+      "category": "shared_contracts_and_helpers",
+      "reason": "These newly referenced contracts/helpers are not in the existing selected source inventories. Their exact dependency is disclosed; the selected previews remain non-standalone. No source rights or physics/runtime acceptance is claimed for the omitted bytes.",
+      "referenced_by": [
+        "client/src/components/physics-glyphs/PhysicsScenarioComposer.tsx",
+        "client/src/components/workstation/friends-parties/__tests__/FriendArtifactContext.spec.tsx",
+        "client/src/components/workstation/friends-parties/__tests__/FriendArtifactWorkspace.spec.tsx",
+        "client/src/components/workstation/friends-parties/__tests__/FriendChatBoard.spec.tsx"
+      ]
+    },
+    {
+      "path": "shared/physics-glyphs/workspace.ts",
+      "category": "shared_contracts_and_helpers",
+      "reason": "These newly referenced contracts/helpers are not in the existing selected source inventories. Their exact dependency is disclosed; the selected previews remain non-standalone. No source rights or physics/runtime acceptance is claimed for the omitted bytes.",
+      "referenced_by": [
+        "client/src/components/physics-glyphs/PhysicsGlyphSandbox.tsx",
+        "client/src/components/physics-glyphs/__tests__/calculation-bridge.spec.tsx",
+        "client/src/components/physics-glyphs/__tests__/received-workspace-rendering.spec.tsx",
+        "client/src/components/physics-glyphs/__tests__/unified-answer.spec.tsx",
+        "client/src/components/physics-glyphs/__tests__/workspace-panel.spec.tsx",
+        "client/src/components/workstation/PhysicsGlyphWorkspacePanel.tsx",
+        "client/src/components/workstation/friends-parties/__tests__/FriendArtifactWorkspace.spec.tsx",
+        "client/src/store/usePhysicsGlyphWorkspaceStore.ts"
+      ]
+    }
+  ],
+  "limits": [
+    "No transitive dependency completeness or standalone-build claim.",
+    "Source publication, final source freeze, installed acceptance and existing native/research evidence holds remain open.",
+    "No additional omitted code has been silently copied into a public source proposal."
+  ]
+}

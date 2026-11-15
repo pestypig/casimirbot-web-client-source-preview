@@ -139,7 +139,7 @@ export function HelixOperatorActivityPanel() {
             Governed lifecycle facts, not private reasoning or an assistant answer.
           </div>
         </div>
-        <button
+        <button data-helix-control-id="helix.ask.helix-operator-activity-panel.void-refresh" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
           type="button"
           className="rounded-lg border border-slate-600 px-2 py-1 text-xs text-slate-200 hover:border-cyan-400/60"
           onClick={() => void refresh()}
@@ -152,7 +152,7 @@ export function HelixOperatorActivityPanel() {
       {streams.length > 0 ? (
         <label className="mt-3 block text-[11px] text-slate-400">
           Activity source
-          <select
+          <select data-helix-control-id="helix.ask.helix-operator-activity-panel.select" data-helix-interaction-kind="configure" data-helix-authority-state="client_local"
             className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs text-slate-100"
             value={selectedStreamRef ?? ""}
             onChange={(event) => selectStream(event.currentTarget.value)}
@@ -168,7 +168,7 @@ export function HelixOperatorActivityPanel() {
 
       <div className="mt-3 flex gap-1" role="tablist" aria-label="Activity detail">
         {(["summary", "activity", "technical"] as const).map((level) => (
-          <button
+          <button data-helix-control-id="helix.ask.helix-operator-activity-panel.set-detail-level-level" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
             key={level}
             type="button"
             role="tab"
@@ -240,7 +240,7 @@ export function HelixOperatorActivityPanel() {
       </div>
 
       {nextCursor && selectedStream ? (
-        <button
+        <button data-helix-control-id="helix.ask.helix-operator-activity-panel.void-load-stream-selected-stream-next-cursor" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
           type="button"
           className="mt-3 rounded-lg border border-slate-700 px-2.5 py-1 text-xs text-slate-200 hover:border-cyan-400/60"
           onClick={() => void loadStream(selectedStream, nextCursor)}

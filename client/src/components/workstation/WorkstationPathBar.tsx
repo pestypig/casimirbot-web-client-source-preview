@@ -1,3 +1,4 @@
+import { isExperimentalLaunchPanelVisible, useExperimentalLaunchPanels } from "@/lib/workstation/experimentalLaunchPanels";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { Check, Copy, Monitor, Send, X } from "lucide-react";
 import { useHelixStartSettings } from "@/hooks/useHelixStartSettings";
@@ -13,7 +14,7 @@ import { useInterfaceText, type InterfaceTextResolver } from "@/lib/i18n/interfa
 import { getInterfacePanelTitle } from "@/lib/i18n/panelTitles";
 import { panelRegistry } from "@/lib/desktop/panelRegistry";
 import { isSolarSpecialistLaunchPanel } from "@/lib/workstation/solarSpecialistPanels";
-import { isUserLaunchPanel } from "@/lib/workstation/launchPanelPolicy";
+import { isAccountLaunchPanel, isAccountPanelAccessible } from "@/lib/workstation/launchPanelPolicy";
 import {
   HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
   fetchAccountCapabilityPolicy,
@@ -79,6 +80,17 @@ export function WorkstationPathBar({
           activeEquationContext?.uri === value.trim()
             ? activeEquationContext
             : null;
+        const focusPanel = viewState.focusPanel ?? (viewState.activeDocPath ? "docs-viewer" : undefined);
+        const targetPanels = [
+          ...viewState.panels,
+          ...(matchedEquationContext?.openedPanels ?? []),
+          ...(viewState.activeDocPath ? ["docs-viewer"] : []),
+          ...(focusPanel ? [focusPanel] : []),
+        ];
+        const policy = readCachedAccountCapabilityPolicy();
+        // Validate the whole route before changing panels, documents or focus.
+        // Launch visibility does not restrict an otherwise admitted direct path.
+        if (targetPanels.some((panelId) => !isAccountPanelAccessible(panelId, policy))) return false;
         for (const panelId of viewState.panels) {
           openPanelInGroup(groupId, panelId);
         }
@@ -91,7 +103,6 @@ export function WorkstationPathBar({
             matchedEquationContext?.equationId ?? viewState.selectedObjectId ?? viewState.anchor,
           );
         }
-        const focusPanel = viewState.focusPanel ?? (viewState.activeDocPath ? "docs-viewer" : undefined);
         if (focusPanel) {
           openPanelInGroup(groupId, focusPanel);
           setActivePanel(groupId, focusPanel);
@@ -119,6 +130,7 @@ function WorkstationPathBreadcrumb({
   const [accountPolicy, setAccountPolicy] = useState<HelixAccountCapabilityPolicy | null>(() =>
     readCachedAccountCapabilityPolicy(),
   );
+  const experimentalLaunchPanels = useExperimentalLaunchPanels();
   const { userSettings } = useHelixStartSettings();
   const interfaceLanguage = getInterfaceLanguageOption(userSettings.interfaceLanguage);
   const { t } = useInterfaceText(interfaceLanguage.code);
@@ -131,8 +143,8 @@ function WorkstationPathBreadcrumb({
     if (panelQuery === null) return [];
     return panelRegistry
       .filter((panel) =>
-        !panel.startHidden && !isSolarSpecialistLaunchPanel(String(panel.id)) &&
-        (accountPolicy?.account_type === "developer" || isUserLaunchPanel(String(panel.id))),
+        !panel.startHidden && isExperimentalLaunchPanelVisible(String(panel.id), experimentalLaunchPanels) && !isSolarSpecialistLaunchPanel(String(panel.id)) &&
+        isAccountLaunchPanel(String(panel.id), accountPolicy),
       )
       .map((panel) => ({
         id: String(panel.id),
@@ -140,7 +152,7 @@ function WorkstationPathBreadcrumb({
       }))
       .filter((panel) => !panelQuery || `${panel.id} ${panel.title}`.toLocaleLowerCase().includes(panelQuery))
       .sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: "base" }));
-  }, [accountPolicy?.account_type, panelQuery, t]);
+  }, [experimentalLaunchPanels, accountPolicy, panelQuery, t]);
 
   useEffect(() => {
     setInputValue(pathRef.virtualUri);

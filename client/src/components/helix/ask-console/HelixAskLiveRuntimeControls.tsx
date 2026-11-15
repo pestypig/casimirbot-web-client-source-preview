@@ -48,6 +48,7 @@ import { labelForPersonalVoiceDestination, PERSONAL_VOICE_ROUTE_CHANGED_EVENT,
   personalVoiceBlockReason, readPersonalVoiceDestination, writePersonalVoiceDestination,
   type PersonalVoiceDestination } from "@/lib/helix/personal-voice-route";
 import { HelixAskSharedLiveRoomControls } from "./shared-live-room";
+import { SharedLiveRoomsAccessControl } from "./shared-live-room/SharedLiveRoomsAccessControl";
 import type { LocalRoomTextOwnerSnapshot } from "./shared-live-room/LocalRoomTextOwnerBridge";
 import type { HostedRoomTextOwnerSnapshot } from "./shared-live-room/NativeHostedRoomTextOwnerBridge";
 
@@ -146,9 +147,10 @@ export function buildHelixAskLiveRuntimeControlsModel(args: {
     accountPolicy.locked_features?.includes("runtime_agent_controls") !== true;
   const visible = runtimeControlsUnlocked;
   const mode = resolveHelixLiveRuntimeMode(args.mode);
-  const authoritySelectorVisible = accountPolicy?.account_type === "developer";
-  const authority = authoritySelectorVisible
-    ? resolveHelixLiveRuntimeAuthority(args.authority)
+  const authoritySelectorVisible = runtimeControlsUnlocked;
+  const requestedAuthority = resolveHelixLiveRuntimeAuthority(args.authority);
+  const authority = authoritySelectorVisible && requestedAuthority === "suggest_actions"
+    ? "suggest_actions"
     : "observe_only";
   const lifecycleState = args.lifecycleState ?? "off";
   const transportControllerState = args.transportControllerState ?? "idle";
@@ -157,7 +159,8 @@ export function buildHelixAskLiveRuntimeControlsModel(args: {
     locked: !runtimeControlsUnlocked,
     lockReason: runtimeControlsUnlocked ? null : "runtime_agent_controls_required",
     visualInputAllowed:
-      accountPolicy?.locked_features?.includes("live_answer_visual_capture_controls") !== true,
+      accountPolicy !== null &&
+      !accountPolicy.locked_features.includes("live_answer_visual_capture_controls"),
     sharedRealtimeRoomsAllowed:
       accountPolicy?.feature_flags?.includes("shared_realtime_rooms") === true &&
       accountPolicy.locked_features?.includes("shared_realtime_rooms") !== true,
@@ -331,7 +334,7 @@ function HelixAskVisibleLiveRuntimeControls({
     if (renewed) {
       if (pending) await pending.acknowledge().catch(() => false);
       setRenewalDialogOpen(false);
-      setRenewalMessage("New GPT Live session is active. Reconnect Discord audio in the room control; the current invitation and consents will be checked again.");
+      setRenewalMessage("New GPT Live session is active. Reconnect Discord audio in the room control; the current invitation and remembered consents will be checked again.");
     } else {
       setRenewalMessage("Renewal failed. Check the Live Voice error; a provider rate limit cannot be extended here.");
     }
@@ -350,13 +353,13 @@ function HelixAskVisibleLiveRuntimeControls({
   useEffect(() => {
     const onRouteChange = () => {
       // A route selected by another control cannot redirect an in-flight call.
-      if (runtime.active) void runtime.stop();
+      if (runtime.active || runtime.lifecycleState === "requesting") void runtime.stop();
     };
     const onAccountChange = () => {
       const nextProfileId = readCachedAccountProfileIdentity().profileId;
       if (nextProfileId === voiceProfileId.current) return;
       voiceProfileId.current = nextProfileId;
-      if (runtime.active) void runtime.stop();
+      if (runtime.active || runtime.lifecycleState === "requesting") void runtime.stop();
     };
     window.addEventListener(PERSONAL_VOICE_ROUTE_CHANGED_EVENT, onRouteChange);
     window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, onAccountChange);
@@ -364,7 +367,7 @@ function HelixAskVisibleLiveRuntimeControls({
       window.removeEventListener(PERSONAL_VOICE_ROUTE_CHANGED_EVENT, onRouteChange);
       window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, onAccountChange);
     };
-  }, [runtime.active, runtime.stop]);
+  }, [runtime.active, runtime.lifecycleState, runtime.stop]);
   const modeOptions: HelixLiveRuntimeAgentMode[] = [
     "live_voice",
     "live_voice_mini",
@@ -454,7 +457,7 @@ function HelixAskVisibleLiveRuntimeControls({
         <span>{labelForHelixAskLiveRuntimeLifecycleState(runtime.lifecycleState)}</span>
         <span className="text-[11px] opacity-75">→ {labelForPersonalVoiceDestination(voiceDestination)}</span>
       </button>
-      {renewalWindowOpen ? <button type="button" data-helix-ask-action-item="true"
+      {renewalWindowOpen ? <button data-helix-control-id="helix.ask.helix-ask-live-runtime-controls.renew-gpt-live-s" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" data-helix-ask-action-item="true"
         className="inline-flex h-10 shrink-0 items-center rounded-full border border-amber-300/60 bg-amber-400/15 px-3 text-xs font-semibold text-amber-100"
         onClick={() => setRenewalDialogOpen(true)}>
         Renew GPT Live · {Math.max(1, Math.ceil((remainingMs ?? 0) / 1_000))}s
@@ -472,18 +475,18 @@ function HelixAskVisibleLiveRuntimeControls({
           {discordRenewalRequest && discordRenewalRequest.expiresAtMs > clockMs ?
             <p className="text-sm text-amber-100">The linked Discord commander approved renewal for this invitation.</p> : null}
           <div className="flex gap-2">
-            <button type="button" disabled={renewalBusy} onClick={() => void approveRenewal()}
+            <button data-helix-control-id="helix.ask.helix-ask-live-runtime-controls.void-approve-renewal" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" disabled={renewalBusy} onClick={() => void approveRenewal()}
               className="rounded-md bg-amber-300 px-3 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">
               {renewalBusy ? "Starting…" : "Approve one more session"}
             </button>
-            <button type="button" onClick={() => setRenewalDialogOpen(false)}
+            <button data-helix-control-id="helix.ask.helix-ask-live-runtime-controls.not-now" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" onClick={() => setRenewalDialogOpen(false)}
               className="rounded-md border border-white/20 px-3 py-2 text-sm">Not now</button>
           </div>
         </DialogContent>
       </Dialog>
       <Popover>
-        <PopoverTrigger asChild><button type="button" data-helix-ask-action-item="true"
-          aria-label="Voice settings" title="Choose where personal Live Voice sends finalized speech"
+        <PopoverTrigger asChild><button data-helix-control-id="helix.ask.helix-ask-live-runtime-controls.voice-settings" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" data-helix-ask-action-item="true"
+          aria-label="Voice settings" title="Choose Live Voice destination and local playback"
           className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-violet-300/35 text-violet-100 hover:bg-violet-400/15">
           <Settings2 className="h-4 w-4" />
         </button></PopoverTrigger>
@@ -495,7 +498,7 @@ function HelixAskVisibleLiveRuntimeControls({
             {(["cloud_agent_dm", "message_codex", "ask_helix"] as const)
               .filter(destination => destination !== "message_codex" || exactTaskReady).map(destination =>
               <label key={destination} className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-white/5">
-                <input type="radio" name="personal-voice-destination" value={destination}
+                <input data-helix-control-id="helix.ask.helix-ask-live-runtime-controls.personal-voice-destination" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" type="radio" name="personal-voice-destination" value={destination}
                   checked={voiceDestination === destination}
                   disabled={destination === "ask_helix" && !experimentalAskEnabled}
                   onChange={() => selectVoiceDestination(destination)} />
@@ -537,8 +540,13 @@ function HelixAskVisibleLiveRuntimeControls({
             </div>
             <p className="mt-2 text-xs text-slate-400">Authority: {labelForAuthority(authority)}. Program actions still require their own grants.</p>
             <p className="mt-1 text-xs text-slate-400">Microphone: {runtime.microphoneEnabled ? "on" : "off"} · visual sharing: {runtime.visualInputEnabled ? "on" : "off"}</p>
+            <label className="mt-3 flex items-start gap-2 rounded-md border border-white/10 px-2 py-2 text-xs text-slate-200">
+              <input data-helix-control-id="helix.ask.helix-ask-live-runtime-controls.input" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" type="checkbox" checked={runtime.localPlaybackMuted}
+                onChange={(event) => runtime.setLocalPlaybackMuted(event.target.checked)} />
+              <span>Mute GPT Live on this computer while keeping the Discord call output available.</span>
+            </label>
             {typeof window.casimirDesktop !== "undefined" && notificationPermission !== "granted" &&
-              notificationPermission !== "unsupported" ? <button type="button"
+              notificationPermission !== "unsupported" ? <button data-helix-control-id="helix.ask.helix-ask-live-runtime-controls.enable-windows-renewal-reminders" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button"
                 className="mt-2 rounded-md border border-amber-300/40 px-2 py-1 text-xs text-amber-100"
                 onClick={() => void Notification.requestPermission().then(setNotificationPermission)}>
                 Enable Windows renewal reminders
@@ -559,6 +567,7 @@ function HelixAskVisibleLiveRuntimeControls({
           <span>{runtimeFailure.label}</span>
         </span>
       ) : null}
+      <SharedLiveRoomsAccessControl />
       {model.sharedRealtimeRoomsAllowed ? (
         <HelixAskSharedLiveRoomControls
           realtimeSessionId={runtime.realtimeSessionId}
@@ -570,6 +579,7 @@ function HelixAskVisibleLiveRuntimeControls({
           onSelectRoomMission={onSelectRoomMission}
           onHostedRoomTextOwnerChange={onHostedRoomTextOwnerChange}
           onDiscordVoiceRenewalRequest={setDiscordRenewalRequest}
+          onMuteLocalGptLive={() => runtime.setLocalPlaybackMuted(true)}
           onSelectHostedRoomChannel={onSelectHostedRoomChannel}
           onSelectHostedRoomMission={onSelectHostedRoomMission}
           onVisualSourceCaptureRequested={onVisualInputEnableRequested}

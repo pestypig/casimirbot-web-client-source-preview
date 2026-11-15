@@ -1,0 +1,32 @@
+.helix-console-conversations { container-type: inline-size; }
+.helix-console-conversations__layout { display: grid; gap: .75rem; min-height: 0; }
+.helix-console-conversations__channels { display: flex; gap: .375rem; overflow-x: auto; }
+.helix-console-conversations__wide-only { display: none; }
+.helix-console-conversations__pane { display: flex; flex-direction: column; min-height: 0; max-height: 52vh; overflow: hidden; }
+.helix-console-conversations__header { flex: none; }
+.helix-console-conversations__body { flex: 1; min-height: 0; min-width: 0; }
+.helix-console-conversations__body--ask { display: flex; flex-direction: column; overflow: hidden; }
+.helix-console-conversations__body--ask [data-testid="helix-ask-turn-list-scroll"] { flex: 1; min-height: 0; overflow-y: scroll; }
+.helix-console-conversations__body--scroll { overflow-y: scroll; }
+.helix-console-conversations__body--scroll [role="log"] { max-height: none; overflow: visible; }
+.helix-console-conversations__body--scroll,
+.helix-console-conversations__body--ask [data-testid="helix-ask-turn-list-scroll"],
+.helix-console-conversations__channels { scrollbar-color: rgba(103, 232, 249, .65) rgba(15, 23, 42, .7); scrollbar-width: thin; }
+.helix-console-conversations__body--scroll::-webkit-scrollbar,
+.helix-console-conversations__body--ask [data-testid="helix-ask-turn-list-scroll"]::-webkit-scrollbar,
+.helix-console-conversations__channels::-webkit-scrollbar { width: 9px; height: 9px; }
+.helix-console-conversations__body--scroll::-webkit-scrollbar-thumb,
+.helix-console-conversations__body--ask [data-testid="helix-ask-turn-list-scroll"]::-webkit-scrollbar-thumb,
+.helix-console-conversations__channels::-webkit-scrollbar-thumb { background: rgba(103, 232, 249, .55); border-radius: 999px; }
+.helix-console-conversations__body--scroll::-webkit-scrollbar-track,
+.helix-console-conversations__body--ask [data-testid="helix-ask-turn-list-scroll"]::-webkit-scrollbar-track,
+.helix-console-conversations__channels::-webkit-scrollbar-track { background: rgba(15, 23, 42, .7); }
+.helix-console-conversations[data-layout-variant="dock"] { display: flex; flex: 1 1 0; min-height: 0; overflow: hidden; }
+.helix-console-conversations[data-layout-variant="dock"] .helix-console-conversations__layout { flex: 1; min-height: 0; grid-template-rows: auto minmax(0, 1fr); }
+.helix-console-conversations[data-layout-variant="dock"] .helix-console-conversations__pane { max-height: none; }
+@container (min-width: 42rem) {
+  .helix-console-conversations__layout { grid-template-columns: minmax(10rem, 12rem) minmax(0, 1fr); }
+  .helix-console-conversations__channels { flex-direction: column; overflow-x: hidden; overflow-y: auto; min-height: 0; }
+  .helix-console-conversations__wide-only { display: block; }
+  .helix-console-conversations[data-layout-variant="dock"] .helix-console-conversations__layout { grid-template-rows: minmax(0, 1fr); }
+}

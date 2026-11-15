@@ -11,9 +11,7 @@ import {
 import { hawMessages } from "@/lib/i18n/messages/haw";
 import { INTERFACE_MESSAGE_IDS } from "@/lib/i18n/messages/types";
 import {
-  buildHelixSharedRealtimeRoomsExperimentPolicy,
   HELIX_DEVELOPER_ACCOUNT_POLICY,
-  HELIX_USER_ACCOUNT_POLICY,
 } from "@shared/helix-account-session";
 
 vi.mock("@/components/auth/GoogleSignInButton", () => ({
@@ -97,58 +95,6 @@ const statusBodyWithMappedStates = {
 const developerStatusBody = {
   ...statusBody,
   account_policy: HELIX_DEVELOPER_ACCOUNT_POLICY,
-};
-
-const publicRoomsStatusBody = {
-  ...statusBody,
-  ok: true,
-  account_policy: HELIX_USER_ACCOUNT_POLICY,
-  experimental_features: {
-    shared_realtime_rooms: {
-      available: true,
-      enabled: false,
-      guest_session: false,
-      guest_hosting_allowed: true,
-      session_expires_at: null,
-    },
-  },
-};
-
-const guestRoomsStatusBody = {
-  ...publicRoomsStatusBody,
-  session: {
-    schema: "helix.account_session.v1",
-    session_id: "account_session:guest-test",
-    profile: {
-      profile_id: "guest:00000000-0000-4000-8000-000000000001",
-      display_name: "BriskBadger47",
-      email: null,
-      email_verified_at: null,
-      auth_mode: "guest",
-      account_type: "user",
-      provider: "guest",
-      provider_subject: "00000000-0000-4000-8000-000000000001",
-      picture_url: null,
-      created_at: "2026-07-23T12:00:00.000Z",
-      updated_at: "2026-07-23T12:00:00.000Z",
-    },
-    account_policy: buildHelixSharedRealtimeRoomsExperimentPolicy("user"),
-    status: "active",
-    memory_scope: "session_only",
-    created_at: "2026-07-23T12:00:00.000Z",
-    updated_at: "2026-07-23T12:00:00.000Z",
-    expires_at: "2026-07-24T12:00:00.000Z",
-  },
-  account_policy: buildHelixSharedRealtimeRoomsExperimentPolicy("user"),
-  experimental_features: {
-    shared_realtime_rooms: {
-      available: true,
-      enabled: true,
-      guest_session: true,
-      guest_hosting_allowed: true,
-      session_expires_at: "2026-07-24T12:00:00.000Z",
-    },
-  },
 };
 
 const archiveRows = [
@@ -236,6 +182,22 @@ describe("AccountSessionPanel interface language", () => {
     document.documentElement.dir = "";
   });
 
+  it("saves the default-off unfinished panel preference across remounts", async () => {
+    vi.stubGlobal("fetch", mockFetch());
+    const first = render(<AccountSessionPanel />);
+    await screen.findByRole("combobox");
+    fireEvent.click(screen.getByText("Experimental features"));
+    const toggle = screen.getByRole("checkbox", { name: "Show unfinished launch panels" });
+    expect(toggle).not.toBeChecked();
+    fireEvent.click(toggle);
+    expect(toggle).toBeChecked();
+    first.unmount();
+    render(<AccountSessionPanel />);
+    await screen.findByRole("combobox");
+    fireEvent.click(screen.getByText("Experimental features"));
+    expect(screen.getByRole("checkbox", { name: "Show unfinished launch panels" })).toBeChecked();
+  });
+
   it("renders reviewed Hawaiian catalog entries when the account setting selects Hawaiian", async () => {
     localStorage.setItem("helix-start-settings", JSON.stringify({ interfaceLanguage: "haw" }));
     vi.stubGlobal("fetch", mockFetch(developerStatusBody));
@@ -272,42 +234,34 @@ describe("AccountSessionPanel interface language", () => {
     expect(screen.getByRole("option", { name: /Wolof/ })).toBeInTheDocument();
   });
 
-  it("enables Shared Live Rooms immediately and shows the generated guest identity", async () => {
-    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-      const url = String(input);
-      if (url === "/api/account/session/experimental-rooms") {
-        return new Response(JSON.stringify({
-          ok: true,
-          error: null,
-          status: guestRoomsStatusBody,
-          session_cookie_action: "set",
-        }), { status: 200, headers: { "Content-Type": "application/json" } });
-      }
-      return mockFetch(publicRoomsStatusBody)(input);
-    });
-    vi.stubGlobal("fetch", fetchMock);
-
+  it("presents the shared Auth0 identity before the separate password profile form", async () => {
+    vi.stubGlobal("fetch", mockFetch());
     render(<AccountSessionPanel />);
 
-    await waitFor(() => {
-      expect(screen.getByText("Experimental features")).toBeInTheDocument();
-    });
-    fireEvent.click(screen.getByText("Experimental features"));
-    const roomsSwitch = screen.getByRole("switch", { name: "Shared Live Rooms" });
-    expect(roomsSwitch).toHaveAttribute("aria-checked", "false");
-    fireEvent.click(roomsSwitch);
+    const authButton = await screen.findByRole("link", { name: /Sign in with Auth0/ });
+    const passwordInput = screen.getByLabelText("Password");
+    expect(authButton.compareDocumentPosition(passwordInput) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByText(/email\/password option below creates a separate profile/)).toBeInTheDocument();
+  });
 
-    await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledWith(
-        "/api/account/session/experimental-rooms",
-        expect.objectContaining({
-          method: "POST",
-          body: JSON.stringify({ enabled: true }),
-        }),
-      );
-      expect(screen.getAllByText("BriskBadger47").length).toBeGreaterThanOrEqual(2);
-      expect(roomsSwitch).toHaveAttribute("aria-checked", "true");
-    });
+  it("shows provider email verification without offering local password verification for Auth0", async () => {
+    const auth0Status = {
+      ...statusBodyWithMappedStates,
+      session: {
+        ...statusBodyWithMappedStates.session,
+        profile: {
+          ...statusBodyWithMappedStates.session.profile,
+          auth_mode: "web_auth",
+          provider: "external_oauth",
+          email_verified_at: "2026-10-14T15:34:35.000Z",
+        },
+      },
+    };
+    vi.stubGlobal("fetch", mockFetch(auth0Status));
+    render(<AccountSessionPanel />);
+
+    expect(await screen.findByText("Email verified")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Request verification token" })).not.toBeInTheDocument();
   });
 
   it("renders known backend states through localized display labels instead of raw enum values", async () => {
@@ -357,6 +311,7 @@ describe("AccountSessionPanel interface language", () => {
   });
 
   it("keeps refresh loading state from disabling account actions or changing button text", async () => {
+    let statusReads = 0;
     let releaseStatus = () => {};
     const pendingStatus = new Promise<void>((resolve) => {
       releaseStatus = resolve;
@@ -364,7 +319,7 @@ describe("AccountSessionPanel interface language", () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.startsWith("/api/account/session")) {
-        await pendingStatus;
+        if (++statusReads > 1) await pendingStatus;
         return new Response(JSON.stringify(statusBody), { status: 200, headers: { "Content-Type": "application/json" } });
       }
       if (url.startsWith("/api/discord/sessions")) {
@@ -382,6 +337,7 @@ describe("AccountSessionPanel interface language", () => {
 
     render(<AccountSessionPanel />);
 
+    fireEvent.click(await screen.findByRole("button", { name: "Refresh" }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Loading..." })).toHaveTextContent("Refresh");
     });

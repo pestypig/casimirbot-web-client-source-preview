@@ -59,6 +59,16 @@ function makeCapabilities(
 }
 
 export const WORKSTATION_V1_PANEL_CAPABILITIES: Record<string, WorkstationPanelCapabilities> = {
+  "physics-glyphs": makeCapabilities({
+    can_read_state: true,
+    can_run_action: true,
+    v1_job_ready: false,
+    actions: [
+      { id: "open", title: "Open physics glyph workspace", description: "Open the shared particle/state/model workspace.", risk: "low" },
+      { id: "inspect", title: "Inspect physics glyph workspace", description: "Read current scene revision and current evaluated results. Outdated values are omitted.", risk: "low", returns_artifact: true },
+      { id: "command", title: "Configure physics glyph workspace", description: "Apply one typed load_preset, set_parameters or evaluate command; expectedRevision is required for changes. This does not execute prompt text or code.", risk: "low", required_args: ["command"], returns_artifact: true },
+    ],
+  }),
   "visual-evidence": makeCapabilities({
     can_read_state: true,
     can_run_action: true,

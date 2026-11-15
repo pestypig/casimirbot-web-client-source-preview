@@ -3,12 +3,15 @@ import React from "react";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import LocalPersonalConnectionSetup from "../LocalPersonalConnectionSetup";
+import { HELIX_DEVELOPER_ACCOUNT_POLICY, HELIX_USER_ACCOUNT_POLICY } from "@shared/helix-account-session";
+import { cacheAccountCapabilityPolicy } from "@/lib/workstation/accountCapabilityPolicy";
 import { AGENT_CONNECTION_INVALIDATED_EVENT } from "@/lib/agent-access/connectionObservation";
 import { connectionFixture, tunnelFixture, installationFixture, permissionFixture } from "../../../../../tests/fixtures/local-personal-connection";
 const mocks=vi.hoisted(()=>({open:vi.fn()}));
 vi.mock("@/store/useWorkstationLayoutStore",()=>({useWorkstationLayoutStore:(selector:any)=>selector({openPanelInActiveGroup:mocks.open})}));
 beforeEach(()=>{
   mocks.open.mockReset();
+  cacheAccountCapabilityPolicy(HELIX_DEVELOPER_ACCOUNT_POLICY);
   vi.stubGlobal("crypto",{subtle:{digest:vi.fn(async()=>new Uint8Array(32).buffer)}});
   window.casimirDesktop={getRuntimeSnapshot:vi.fn(),getMcpTunnelState:vi.fn(async()=>tunnelFixture()),
     getPrivateEnvironmentState:vi.fn(async()=>installationFixture()),getPrivateClockMcpPermission:vi.fn(async()=>permissionFixture()),
@@ -16,9 +19,19 @@ beforeEach(()=>{
     startMcpTunnel:vi.fn(),grantPrivateClockMcpPermission:vi.fn(),observePrivateClock:vi.fn()};
   vi.stubGlobal("fetch",vi.fn(async()=>({ok:true,json:async()=>connectionFixture()})));
 });
-afterEach(()=>{cleanup();vi.unstubAllGlobals();vi.useRealTimers();delete window.casimirDesktop;});
+afterEach(()=>{cleanup();cacheAccountCapabilityPolicy(null);vi.unstubAllGlobals();vi.useRealTimers();delete window.casimirDesktop;});
 const inspect=()=>fireEvent.click(screen.getByRole("button",{name:"Inspect / resume connection"}));
 describe("local Connect Codex",()=>{
+  it("keeps the private installed clock qualification out of an ordinary account",()=>{
+    cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY);
+    render(<LocalPersonalConnectionSetup/>);
+    expect(screen.queryByRole("region",{name:"Connect Codex locally"})).toBeNull();
+    expect(fetch).not.toHaveBeenCalled();
+    act(()=>cacheAccountCapabilityPolicy(HELIX_DEVELOPER_ACCOUNT_POLICY));
+    expect(screen.getByRole("region",{name:"Connect Codex locally"})).toBeTruthy();
+    act(()=>cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY));
+    expect(screen.queryByRole("region",{name:"Connect Codex locally"})).toBeNull();
+  });
   it("retains an inspection across identical native tunnel notifications",async()=>{
     let notify!:(value:unknown)=>void;
     Object.defineProperty(window.casimirDesktop,"onMcpTunnelState",{value:vi.fn((listener:(value:unknown)=>void)=>{notify=listener;return()=>{};})});
@@ -38,7 +51,7 @@ describe("local Connect Codex",()=>{
     await act(async()=>inspect());
     expect(crypto.subtle.digest).toHaveBeenCalled();
     await act(async()=>vi.advanceTimersByTime(10000));
-    expect(screen.getByRole("button",{name:"Inspect / resume connection"})).not.toBeDisabled();
+    expect((screen.getByRole("button",{name:"Inspect / resume connection"}) as HTMLButtonElement).disabled).toBe(false);
     expect(screen.getByText(/Inspection unavailable/)).toBeTruthy();
     await act(async()=>finish(new Uint8Array(32).buffer));
     expect(screen.queryByText("Current installation grant")).toBeNull();
@@ -52,7 +65,7 @@ describe("local Connect Codex",()=>{
     render(<LocalPersonalConnectionSetup/>);
     await act(async()=>inspect());
     await act(async()=>vi.advanceTimersByTime(10000));
-    expect(screen.getByRole("button",{name:"Inspect / resume connection"})).not.toBeDisabled();
+    expect((screen.getByRole("button",{name:"Inspect / resume connection"}) as HTMLButtonElement).disabled).toBe(false);
     await act(async()=>inspect());
     expect(screen.queryByText("Current installation grant")).not.toBeNull();
     await act(async()=>finish({...tunnelFixture(),ready:false,healthy:false,status:"degraded"}));
@@ -68,7 +81,7 @@ describe("local Connect Codex",()=>{
     await screen.findByText("Current installation grant");
     act(()=>notify({ready:true}));
     expect(screen.queryByText("Current installation grant")).toBeNull();
-    expect(screen.getByRole("button",{name:"Inspect / resume connection"})).not.toBeDisabled();
+    expect((screen.getByRole("button",{name:"Inspect / resume connection"}) as HTMLButtonElement).disabled).toBe(false);
     view.unmount();
     expect(remove).toHaveBeenCalledTimes(1);
     render(<LocalPersonalConnectionSetup/>);

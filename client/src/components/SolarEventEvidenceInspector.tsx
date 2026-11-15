@@ -1,10 +1,10 @@
 import React from 'react';
 import { buildSolarEventImageContext } from '../../../shared/solar-event-image-context';
 import { solarHekEventRecordUrl } from '../../../shared/solar-hek-event-link';
-import { solarHekReferenceUrls } from '../../../shared/solar-hek-reference-links';
+import { solarHekReferences } from '../../../shared/solar-hek-reference-links';
 
 export function SolarEventEvidenceInspector({ event, frame, observation, archivedSelection = false }: {
-  event: (Parameters<typeof buildSolarEventImageContext>[0] & { reference_urls?: unknown }) | null;
+  event: (Parameters<typeof buildSolarEventImageContext>[0] & { references?: unknown; reference_urls?: unknown }) | null;
   frame: Parameters<typeof buildSolarEventImageContext>[1];
   observation: Parameters<typeof buildSolarEventImageContext>[2];
   archivedSelection?: boolean;
@@ -12,18 +12,18 @@ export function SolarEventEvidenceInspector({ event, frame, observation, archive
   if (!event) return <p className="text-xs text-slate-400">Select a HEK event to inspect its image context and provenance gaps.</p>;
   const context = buildSolarEventImageContext(event, frame, observation);
   const recordUrl = solarHekEventRecordUrl(context.eventId);
-  const referenceUrls = solarHekReferenceUrls(event.reference_urls);
+  const references = solarHekReferences(event.references ?? event.reference_urls);
   const offset = context.imageOffsetFromEventStartSeconds;
   return <section aria-label="Selected event image context" className="rounded border border-cyan-700/50 bg-slate-950/60 p-3 text-xs space-y-1">
     <p className="font-semibold text-cyan-100">Selected event · image context only</p>
     <p className="break-all font-mono">{context.eventId ?? 'No stable source event ID'} · {context.eventType}</p>
     {recordUrl && <p><a href={recordUrl} target="_blank" rel="noopener noreferrer" className="text-cyan-200 underline">
       Look up declared IVORN in the HEK event registry</a> · registry content and revision not checked by this panel.</p>}
-    {referenceUrls.length > 0 && <div>
+    {references.length > 0 && <div>
       <p>HEK-declared references · destinations, content and revisions not verified here:</p>
-      <ul className="list-disc pl-5">{referenceUrls.map((url, index) =>
-        <li key={url}><a href={url} target="_blank" rel="noopener noreferrer" className="break-all text-cyan-200 underline">
-          Reference {index + 1}: {new URL(url).hostname}</a></li>)}</ul>
+      <ul className="list-disc pl-5">{references.map((reference, index) =>
+        <li key={reference.url}><a href={reference.url} target="_blank" rel="noopener noreferrer" className="break-all text-cyan-200 underline">
+          {reference.name ?? `Reference ${index + 1}`} ({reference.type}): {new URL(reference.url).hostname}</a></li>)}</ul>
     </div>}
     <p>Reported event: {context.eventStartUtc ?? 'unknown'} to {context.eventEndUtc ?? 'unknown'}</p>
     <p>{archivedSelection ? 'Saved selection image' : 'Selected image'}: {context.imageTimeUtc ?? 'none'} · {context.instrument ?? 'unknown instrument'} {context.wavelengthAngstrom ?? 'unknown'} Å</p>

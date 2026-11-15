@@ -22,10 +22,10 @@ export const HELIX_ASK_LEGACY_CONSOLE_ACTIVE_PATH = [
 
 export const HELIX_ASK_LEGACY_CONSOLE_SOURCE_SNAPSHOT = {
   file: "client/src/components/helix/HelixAskPill.tsx",
-  lineCountAtInventory: 23809,
-  exportedComponentStartsAtLine: 6391,
-  liveRenderSliceStartsAtLine: 23584,
-  liveLegacyConsoleViewStartsAtLine: 23584,
+  lineCountAtInventory: 24255,
+  exportedComponentStartsAtLine: 6410,
+  liveRenderSliceStartsAtLine: 23986,
+  liveLegacyConsoleViewStartsAtLine: 23986,
   inventoryReason:
     "The normal Ask path remains on the legacy-looking bridge until the recrowned minimal runtime shell reaches live visual parity. Extracted ask-console display owners should continue to grow in the recrowned directory, not inside HelixAskPill.",
 } as const;
@@ -1213,6 +1213,6 @@ export const HELIX_ASK_LEGACY_CONSOLE_SLICE_PROGRESS = {
     (slice) => slice.classification === "behavior_sensitive_quarantined",
   ).length,
   unknownTrapDoorSliceCount: HELIX_ASK_LEGACY_CONSOLE_SLICES.filter(
-    (slice) => slice.classification === "unknown_trap_door_quarantined",
+    (slice: HelixAskLegacyConsoleSlice) => slice.classification === "unknown_trap_door_quarantined",
   ).length,
 } as const;

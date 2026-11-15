@@ -1,5 +1,7 @@
 import type { HelixAskRouteMetadata } from "@/lib/helix/ask-prompt-launch";
 import type { HelixRealtimeWorkerAdmissionV2 } from "@shared/contracts/helix-realtime-worker-dispatch.v2";
+import { HELIX_MINECRAFT_COMMAND_CAPABILITY } from
+  "@shared/helix-environment-command";
 import {
   isHelixAgentRuntimeId,
   type HelixAgentRuntimeId,
@@ -49,6 +51,7 @@ const DISPATCH_KINDS = new Set([
   "ask_runtime",
   "goal_wake",
   "ask_runtime_read_only",
+  "ask_runtime_governed_world_command",
 ]);
 
 const INTERACTION_MODES = new Set([
@@ -66,6 +69,10 @@ export const parseHelixRealtimeWorkerAdmissionV2 = (input: {
   const dispatch = readRecord(admission?.dispatch);
   const dispatchKind = readString(dispatch?.kind);
   const interactionMode = readString(admission?.interaction_mode);
+  const governedWorldCommand =
+    dispatchKind === "ask_runtime_governed_world_command";
+  const actionCandidates = Array.isArray(admission?.action_candidate_capability_ids)
+    ? admission.action_candidate_capability_ids : [];
   if (
     admission?.schema !== "helix.realtime_worker_admission.v2" ||
     admission.handoff_id !== input.handoffId ||
@@ -74,7 +81,7 @@ export const parseHelixRealtimeWorkerAdmissionV2 = (input: {
     !interactionMode ||
     !INTERACTION_MODES.has(interactionMode) ||
     admission.worker_turn_dispatched !== false ||
-    admission.workstation_action_execution_allowed !== false ||
+    admission.workstation_action_execution_allowed !== governedWorldCommand ||
     admission.realtime_provider_tool_execution_allowed !== false ||
     admission.answer_authority !== false ||
     admission.assistant_answer !== false ||
@@ -83,8 +90,8 @@ export const parseHelixRealtimeWorkerAdmissionV2 = (input: {
     dispatch?.schema !== "helix.realtime_worker_dispatch.v2" ||
     !dispatchKind ||
     !DISPATCH_KINDS.has(dispatchKind) ||
-    dispatch.read_only !== true ||
-    dispatch.workstation_action_execution_allowed !== false ||
+    dispatch.read_only !== !governedWorldCommand ||
+    dispatch.workstation_action_execution_allowed !== governedWorldCommand ||
     dispatch.realtime_provider_tool_execution_allowed !== false ||
     dispatch.answer_authority !== false ||
     dispatch.assistant_answer !== false ||
@@ -93,6 +100,14 @@ export const parseHelixRealtimeWorkerAdmissionV2 = (input: {
   ) {
     return null;
   }
+  if (governedWorldCommand && (
+    admission.outcome !== "action_candidate" ||
+    interactionMode !== "worker_required" ||
+    actionCandidates.length !== 1 ||
+    actionCandidates[0] !== HELIX_MINECRAFT_COMMAND_CAPABILITY ||
+    dispatch.goal_id !== null ||
+    dispatch.runtime_goal_session_ref !== null
+  )) return null;
   const targetRuntimeAgentProvider = dispatch?.target_runtime_agent_provider;
   const selectedRuntimeAgentProvider = admission?.selected_runtime_agent_provider;
   if (

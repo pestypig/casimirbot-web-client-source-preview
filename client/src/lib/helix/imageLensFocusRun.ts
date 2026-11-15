@@ -104,7 +104,7 @@ export async function runImageLensFocusRun(input: RunImageLensFocusRunInput): Pr
   let pageNumber = documentState.source?.pageNumber ?? null;
   let naturalSize = documentState.naturalSize;
   let image: HTMLImageElement | null = null;
-  let threadId = HELIX_ASK_CONTEXT_ID.desktop;
+  let threadId: string = HELIX_ASK_CONTEXT_ID.desktop;
   let roomId: string | null = null;
   let environmentId: string | null = null;
   let pipelineId: string | null = null;

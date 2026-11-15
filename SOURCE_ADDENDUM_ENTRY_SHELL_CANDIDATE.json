@@ -1,0 +1,134 @@
+{
+  "observed_at": "2026-11-13T18:51:47.425582+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/App.tsx",
+      "canonical_sha256": "b68b798c837ecc5c4310b8edbc9368a20b2efacb0af000b55f9e6d513eb8f86f",
+      "export_sha256": "136b447bc5019bf6af7a4a60cbc70d5e3e50c5ca1471f21062d1bd724f78707e",
+      "bytes": 10336,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "4c2ad69fb78d038c917fda778073b2d57afdb2d1dd0f5552138fbfa0e6f1003c"
+    },
+    {
+      "path": "client/src/pages/desktop.tsx",
+      "canonical_sha256": "483bd007289e13f417ec90e2e631ef144c27f160870c900aed00fd87fed2ba6c",
+      "export_sha256": "43aed0eec254cb1f5e4ffb8da958fa01b486f8ee824f8ed8711a74be8324a48d",
+      "bytes": 45640,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "ab45268fcde2c923563247f561f63223f6e479889cfff157d9e1f6f042a793ec"
+    },
+    {
+      "path": "client/src/pages/mobile-start.tsx",
+      "canonical_sha256": "c6f10f0df24e6b3d0d4db53d8bf23dfd1ac2a5f4a5badad81827c5cd8064d3b5",
+      "export_sha256": "be6a5432850126ee91886788df8ad08fcf3d4119307a47d5a5218a9d9e014463",
+      "bytes": 47015,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "7b3e67536dca88593d461bb654f6385c5d7d59ef491d8ea271aa75f8f492b7a2"
+    },
+    {
+      "path": "client/src/pages/__tests__/desktop.account-policy-source.spec.ts",
+      "canonical_sha256": "8013c1460532abe8fa0797770ebe0d64b94cab910231109d37e5959bedd28d5b",
+      "export_sha256": "c5214270fa42ff5429bc3190324f7caf90c58c1471306416193ebca4d84ccecf",
+      "bytes": 1529,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "f843d746d9d1847b86c1cae2d2aaf3037729b36935bffecdf502e480f1b28d1f"
+    },
+    {
+      "path": "client/src/pages/__tests__/mobile-start.account-policy.spec.tsx",
+      "canonical_sha256": "3aeb80dcb4f889249d9501063138dc19ebdb5d72df04a214125bbeadb2ee26b3",
+      "export_sha256": "8676c60c27258d314adb285044ac3b24692899707b89dee0787c0e8efea70cb4",
+      "bytes": 8947,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/desktop/DesktopTaskbar.tsx",
+      "canonical_sha256": "deea4e48bed87b8af68d8a13084f823694c506a7e0f43352a98748a1256ded8c",
+      "export_sha256": "ac18bf99e3e7bb5f30328617ae2ce5ad996e5a9f2c3484ba828fdd5b6909af45",
+      "bytes": 12030,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "3b28d4754f0836453043c69e03d411535efe8de8395c79ba4e9b0309a1aa85ed"
+    },
+    {
+      "path": "client/src/components/workstation/EnvironmentHomePanel.tsx",
+      "canonical_sha256": "323c3f2acab333a1797ff66e65f01aa4d8d7e27195fdcdbac83effc4b179e97d",
+      "export_sha256": "e9b236ba7ac31e9924d9c5097b2547c4d03a644bc8e9463fd0a61fe7193a03a9",
+      "bytes": 28720,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "19315e027456947a02bee7a12a8b0c10d1451560fde52bf0492861375cac024c"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/EnvironmentHomePanel.spec.tsx",
+      "canonical_sha256": "170a09ca12ebde2ced05ad37e49b34838ab08ec3cda85c908c63fdbc5535af8b",
+      "export_sha256": "a725eb6d6171d1bb0947ecfc75460d1fc2fce8d0d546ec6942548fd136ba4849",
+      "bytes": 31237,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "541ce3113ed277b04ba4c2885f6b3030a35448f291a17e05b93fc78ca64b3c3c"
+    },
+    {
+      "path": "client/src/hooks/usePersonalMcpSavedResume.ts",
+      "canonical_sha256": "e48f8457e04b2cf35fad0de051766a0f0d2134a22efbaedd4a903fd16e220b8d",
+      "export_sha256": "e48f8457e04b2cf35fad0de051766a0f0d2134a22efbaedd4a903fd16e220b8d",
+      "bytes": 4084,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/hooks/__tests__/usePersonalMcpSavedResume.spec.tsx",
+      "canonical_sha256": "81007b45c8cdfe2b9b2905e74fe4e9491207fa0be301337de545b359ab82233c",
+      "export_sha256": "81007b45c8cdfe2b9b2905e74fe4e9491207fa0be301337de545b359ab82233c",
+      "bytes": 7233,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/desktop/__tests__/DesktopTaskbar.guide.spec.tsx",
+      "canonical_sha256": "f77bda89d2815a3017aebea42ccd5d3c158b3e151e676112b41514e3e60efb6f",
+      "export_sha256": "f77bda89d2815a3017aebea42ccd5d3c158b3e151e676112b41514e3e60efb6f",
+      "bytes": 3941,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/launchPanelPolicy.ts",
+      "canonical_sha256": "eef8c5979bc8022339ead1858ca6a85d4f02d9dbc21805973c253c54816920e2",
+      "export_sha256": "31a133985d639b7610eb2f782846ccbfe97f87c69c7f27beadcbc55336f64db0",
+      "bytes": 2013,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/experimentalLaunchPanels.ts",
+      "canonical_sha256": "7535f86bbb9b869fd83321c76393e7d57409db4fb8e4f5c7cace137f203e8c10",
+      "export_sha256": "1e5ceb2c7ae8c58a30bc8ca164cb35d5c65ba7a5fd6df7686b780da600a08444",
+      "bytes": 2202,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed changed entry routes and desktop/mobile shell integration against the public preview, the saved personal resume hook, Home connector composition and taskbar visibility. App adds the getting-started route to the existing application route tree.",
+    "Desktop startup uses the finite signed-out policy, loads account policy before restored links, passes panel admission to workstation jobs and publishes their settled result rather than an optimistic delegation success. Connection health and saved personal resume mount with the desktop shell.",
+    "Mobile launch lists and visible running panels honor explicit account locks and experimental visibility. Open/focus and panel-action requests reject unavailable panels. Jobs receive a current-policy callback; receipts are emitted after the executor resolves. The tests mock the executor, so they prove shell receipt handling rather than real job completion.",
+    "Saved personal resume is limited to an identified ordinary account and the native inspect/resume path. It does not call start or open new approval. Profile epochs reject stale inspection results; transient unavailable/busy outcomes have a three-attempt bound. Unknown resume outcomes are not repeated. Native retained-grant and owner Stop enforcement remain native acceptance requirements.",
+    "Home adds connector guidance, local package inspection and explicit reviewed import without requiring the private clock catalog. Minecraft setup remains an inspection tile with no launch or player action. The guide taskbar retains its existing entry points; experimental filtering changes its menu visibility only."
+  ],
+  "limits": [
+    "Private unfrozen source proposal, not a signed installed release or public website publication.",
+    "Fifty-eight focused checks include two desktop source assertions; these do not mount or qualify the whole desktop shell. App route availability is compile-reviewed only. Mobile, Home and saved-resume tests use mocked HTTP/native services and job execution.",
+    "The changed job executor, other action adapters, full Guide runtime, panel manifest and full application dependencies remain separate source/qualification work. Selected-entry bundling externalizes omitted local inputs and is not a full application build or type check.",
+    "No real native resume, import, pairing approval, provider call, room admission or game operation occurred. Personal resume cannot itself establish that a retained grant is accepted by the running native service.",
+    "Taskbar testing covers Guide controls, not installed menu/account transitions. Mobile tests cover current panel-policy and job-receipt projection, not live source attribution or model terminal authority.",
+    "Five intentional support-contact matches inherited from earlier candidates remain in the final owner publication review."
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "observed_at": "2026-11-13T18:30:24.701604+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/workstation/InstalledServicesPanel.tsx",
+      "canonical_sha256": "fabd62ceddb5ad00680ba5915f92ae0bb3ac70cc0db3dbd1134e7dcb8eeba5c0",
+      "export_sha256": "fabd62ceddb5ad00680ba5915f92ae0bb3ac70cc0db3dbd1134e7dcb8eeba5c0",
+      "bytes": 42397,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "f3adfdccb5381c7bf0ac1b98a268208695871b6c8a053651143b0f4bbf644356"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/InstalledServicesPanel.spec.tsx",
+      "canonical_sha256": "9dc9a9314e4a041addc9b9721fea88d828240afb86ed6c7bc7884d15bc0125f4",
+      "export_sha256": "9dc9a9314e4a041addc9b9721fea88d828240afb86ed6c7bc7884d15bc0125f4",
+      "bytes": 30619,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "8425b2724a20a884e7bf40945d62f644ac39e9f141a2e323d07056bda5b72830"
+    },
+    {
+      "path": "client/src/components/workstation/AgentAccessPanel.tsx",
+      "canonical_sha256": "d759405ebdfd461c23101ff340e09709c2c88b1e555a8cc0be9e572995117108",
+      "export_sha256": "935518795c565853f9a2ac52292d4e4df480112f55301120c56c08a236396e60",
+      "bytes": 1094,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "0817c7f7baef8c59935d74121a4bf6c96d9b28a215d31f65e9d6e126aae96b02"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Reviewed InstalledServicesPanel changed hunks, read/mutation lifecycle and rendering, its complete suite, and the complete small AgentAccessPanel composition. Read the SPB-3 authority contract; this cohort does not change native/server MFA or receipt semantics.",
+    "Installed services distinguish personal OpenAI/Gemini keys from provider-broker enrollment, sandbox billing, registered device status, exact Codex grants and program authority. The overview now uses the current security observation for registration. Opening key settings remains an explicit action; account notifications close the dialog.",
+    "Reproduced five failures: stale installed account projections across profile replacement, late step-up responses opening the native browser after replacement/unmount, and late native failures cancelling requests in a newer context. A profile-revision keyed inner panel resets observations and drafts. Operation epochs suppress stale browser opens, cancellation follow-ups, UI completions and security reloads after replacement/unmount.",
+    "A sixth regression preserves the selected tab when an account notification does not change identity. Existing native approval, cancellation, payment-change and routing tests continue to pass with mocks.",
+    "Agent Access places the existing setup inbox and connection-health panel before personal/local setup and keeps manual guidance in a disclosure. It is compiled but this cohort does not mount its full integration."
+  ],
+  "limits": [
+    "Private unfrozen source proposal; no public publication or native account/MFA/payment action.",
+    "Twenty-one mocked installed-service tests exercise UI. They do not establish live Auth0 enrollment, token custody, server cross-account enforcement, funded billing, installed or signed-update acceptance.",
+    "The new guards do not cancel an already-issued server intent or native operation. Server expiry and owner-bound native validation remain authoritative. Same-profile session replacement and native completion-event identity attribution remain separate qualification.",
+    "LiveConnectionSettings, GeminiConnectionSettings, ConnectionHealthPanel, AgentAccessGuide and account-policy/shared dependencies remain separate source review. Tests use canonical versions of omitted dependencies; no full application build.",
+    "Five intentional support-contact matches inherited from the previous candidate remain in the final owner publication review."
+  ]
+}

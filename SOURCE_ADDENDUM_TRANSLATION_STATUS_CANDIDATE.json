@@ -1,0 +1,103 @@
+{
+  "observed_at": "2026-11-14T01:09:56.181776+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/lib/docs/liveTranslationInlineProjection.ts",
+      "canonical_sha256": "1f35fe2dd35f283f71e9f1270ebdeff4c69dde43e8f5ed579e00a089e0df1848",
+      "export_sha256": "1f35fe2dd35f283f71e9f1270ebdeff4c69dde43e8f5ed579e00a089e0df1848",
+      "bytes": 59996,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "147f3f6a96ed4babe447ceef54e168313483445b91079ae8f75630da0977fb12"
+    },
+    {
+      "path": "client/src/lib/docs/visibleTranslationContext.ts",
+      "canonical_sha256": "cf369480ac7b4757d359e0b109dbbd23e01563447d87b5256ba489e91c66dd25",
+      "export_sha256": "cf369480ac7b4757d359e0b109dbbd23e01563447d87b5256ba489e91c66dd25",
+      "bytes": 24865,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "a58e8d6464a6c22193ee131fc82b4c8f30cf03691ca404af590cef1b39601299"
+    },
+    {
+      "path": "client/src/lib/docs/liveTranslationStatus.ts",
+      "canonical_sha256": "7c017a6be79d3c36a02f1d5dd075bbd9d6ac9c2bae74216fa5486746713f7023",
+      "export_sha256": "7c017a6be79d3c36a02f1d5dd075bbd9d6ac9c2bae74216fa5486746713f7023",
+      "bytes": 1290,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/documentTranslationStatusBoundary.spec.ts",
+      "canonical_sha256": "c1a9bbcf3de630d2cb89b8f7217445990de42de48d2874057ff8f8833a2cb960",
+      "export_sha256": "c1a9bbcf3de630d2cb89b8f7217445990de42de48d2874057ff8f8833a2cb960",
+      "bytes": 3633,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/docs/__tests__/liveTranslationProjectionRegistry.spec.ts",
+      "canonical_sha256": "bb1ae04a34151e07b3c932fe3489403b019467f992dcde8c843509be0b8c83a2",
+      "export_sha256": "6bf80df280871a3f583fef06005d101928c7fc2a0703b9113de90c751822aa06",
+      "bytes": 167260,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/liveTranslationProjectionEventIngestion.spec.ts",
+      "canonical_sha256": "15a0279bc23980c6489c980e66035de0a17b966fb47c933db2dba472a9155891",
+      "export_sha256": "15a0279bc23980c6489c980e66035de0a17b966fb47c933db2dba472a9155891",
+      "bytes": 67523,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/liveTranslationInlineProjection.spec.ts",
+      "canonical_sha256": "6142392df69edc22db8848837b9d7bf2f22f81e0fddf05e9488ea554d77f53e4",
+      "export_sha256": "e72d7235ab533c146df1a161dfcadda0f2ed6849054f473358dbdd35b90ed49c",
+      "bytes": 98279,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/visibleTranslationContext.spec.ts",
+      "canonical_sha256": "df34d481cbb07779bf238d9f2e52ab4ce93d453545e5e84997709fdb4ed736bc",
+      "export_sha256": "df34d481cbb07779bf238d9f2e52ab4ce93d453545e5e84997709fdb4ed736bc",
+      "bytes": 23427,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/live-translation-projection.spec.ts",
+      "canonical_sha256": "441fc298eacc0a5c98d3b5104a4bb02572c3fa611ae059bb40b46ec93813b4f1",
+      "export_sha256": "2dabbac139196740dd2107ef8fb4b20c6ba2bbb8252770143294e5613702dfc5",
+      "bytes": 70369,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Document translation status boundary",
+    "capability": "Document rendering and passive visible-context metadata",
+    "lifecycle_stage": "Receipt presentation and context collection",
+    "reaction_timescale": "Incoming translation receipt or visible view update",
+    "authority_owner": "Existing translation/source checks; no execution or terminal authority",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with normalized status boundaries",
+    "required_evidence": "Before/after status cases through rendering and all four visible-region paths; existing translation integration suites and compiler",
+    "explicit_non_goals": "No real translation provider, game action, server contract change or installed acceptance",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "Runtime fix 49 normalizes document projection and freshness status strings at the rendering and visible-context boundaries. Known values retain their contract spelling after trim/lowercase; unknown/null render statuses become undefined and unknown visible statuses become null.",
+    "The local selection status missing remains meaningful inside document rendering, but is not an existing projection receipt status and becomes null in visible context. Receipt/observation references and non-answer authority flags are retained.",
+    "Selection, hover, document chunk and UI text regions now normalize output. The UI region input accepts raw status strings and validates them before returning the existing narrow HelixVisibleTranslationTarget contract; no server/output union is widened.",
+    "The visible-context normalizers match the existing read-only collector semantics in server/services/helix-ask/capability-lanes/workstation-tool-reference.ts. That server file is unchanged and is not newly exported by this slice.",
+    "Six of nine pipeline regressions fail on the original source, including a direct missing-to-visible case. Existing canonical lower-case projected/cancelled values and omitted statuses pass. The same tests verify all four region paths and preservation of non-authoritative evidence.",
+    "Five existing translation suites are selected unchanged. No provider, room mutation, or live document source was used."
+  ],
+  "limits": [
+    "Unfrozen, unpublished and uninstalled. Synthetic receipt/context tests do not establish actual translation quality, rendered website behavior, or GPT Live game continuity.",
+    "Other document manifest/filter errors and unrelated compiler diagnostics remain separate."
+  ]
+}

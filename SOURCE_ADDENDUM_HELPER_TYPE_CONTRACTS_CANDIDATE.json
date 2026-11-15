@@ -1,0 +1,50 @@
+{
+  "observed_at": "2026-11-14T05:57:26.960537+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/lib/helix/ask-workstation-command-text.ts",
+      "canonical_sha256": "1f416cde9294c14adbb0f042077c99ce1f169dbd82883137dfb486ed0f20f205",
+      "export_sha256": "1f416cde9294c14adbb0f042077c99ce1f169dbd82883137dfb486ed0f20f205",
+      "previous_public_sha256": "89e352d7a7d32b211928b4910d3db1115d6ffa63bf2e6e160a0d28a740e41307",
+      "bytes": 8278,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/lib/scientific-calculator/solver.ts",
+      "canonical_sha256": "606fbe77a0b62398aae9418dfb2ffce479d52b9b590460e8e67c688df8f620f4",
+      "export_sha256": "606fbe77a0b62398aae9418dfb2ffce479d52b9b590460e8e67c688df8f620f4",
+      "previous_public_sha256": "5b1e08f2791ccb6959df49e099750c0776a2be13ce30fa09d77420b57fed1cdc",
+      "bytes": 25458,
+      "transformation": "identity"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/lib/helix/__tests__/ask-workstation-command-text.spec.ts",
+      "canonical_sha256": "e03ae706802a0ae50d0a34676a3c5cb23bb81b10c7ff298e3212f9c06fecb9f7"
+    },
+    {
+      "path": "client/src/lib/scientific-calculator/__tests__/solver.step-schema.spec.ts",
+      "canonical_sha256": "3c4ed2bed99547058a4dbdde961d1d78bc7e5740c1a11cfd7e7ed0923c2c374b"
+    }
+  ],
+  "classification": "evidence normalization",
+  "source_frozen": false,
+  "published": false,
+  "review": [
+    "Expose the actual possible built-in alias IDs in the resolver return and hasPanel input types; remove the unsound cast of all built-in aliases into arbitrary generic PanelId. Custom alias order, admission predicate, lookup and commands remain unchanged.",
+    "Annotate the symbolic variable callback as string, matching the installed Nerdamer variables(): string[] declaration.",
+    "All edits are erased TypeScript contracts; no source/tool admission, command parsing, computation, physics formula or authority behavior changes."
+  ],
+  "limits": [
+    "Existing helper fixtures and erased-output comparisons do not establish live tool admission, certified physics or installed acceptance."
+  ],
+  "dependency_evidence": {
+    "path": "node_modules/nerdamer/index.d.ts",
+    "sha256": "25f70978e4ef2b19496fb7472880dbf54a9bb07a2833c7c875c71af2df8d3a35",
+    "contract": "variables(): string[]"
+  },
+  "web_candidate_count": 499
+}

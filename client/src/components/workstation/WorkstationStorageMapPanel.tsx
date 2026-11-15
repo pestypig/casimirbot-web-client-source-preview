@@ -13,6 +13,9 @@ import {
   type HelixWorkspaceStorageStatus,
 } from "@shared/helix-workspace-storage-status";
 
+import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, readCachedAccountProfileIdentity } from "@/lib/workstation/accountCapabilityPolicy";
+import { captureAccountOperationScope } from "@/lib/workstation/accountOperationScope";
+
 const POLL_INTERVAL_MS = 10000;
 
 type Rect = {
@@ -68,6 +71,7 @@ const statusMessages = {
 
 const displayMappedValue = (t: Translate, value: string | null | undefined, messages: DisplayMessageMap): string => {
   if (!value) return t("workstation.common.unknown");
+  if (value === "desktop_local") return "Desktop local data";
   const messageId = messages[value];
   return messageId ? t(messageId) : value;
 };
@@ -82,6 +86,8 @@ const backendClass = (backend: string): string => {
       return "border-amber-200/40 bg-amber-500/25 text-amber-50";
     case "profile_server":
       return "border-emerald-200/40 bg-emerald-500/25 text-emerald-50";
+    case "desktop_local":
+      return "border-indigo-200/40 bg-indigo-500/25 text-indigo-50";
     case "replit_app_storage":
       return "border-fuchsia-200/40 bg-fuchsia-500/25 text-fuchsia-50";
     default:
@@ -207,6 +213,7 @@ export default function WorkstationStorageMapPanel() {
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const refreshControllerRef = React.useRef<AbortController | null>(null);
 
   const rebuildBrowserStatus = React.useCallback((server: HelixWorkspaceStorageStatus | null = serverStatus) => {
     const next = buildBrowserWorkspaceStorageStatus({
@@ -218,38 +225,54 @@ export default function WorkstationStorageMapPanel() {
     setSelectedId((current) => current ?? next.summary.largest_artifact_id);
   }, [registrySnapshot, serverStatus]);
 
-  const refreshServerStatus = React.useCallback(async (signal?: AbortSignal) => {
+  const refreshServerStatus = React.useCallback(async () => {
+    refreshControllerRef.current?.abort();
+    const controller = new AbortController();
+    refreshControllerRef.current = controller;
+    const isCurrentAccount = captureAccountOperationScope();
+    const isCurrent = () => !controller.signal.aborted &&
+      refreshControllerRef.current === controller && isCurrentAccount();
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/workspace-os/storage/status?thread_id=helix-ask%3Adesktop", { signal });
+      const response = await fetch("/api/workspace-os/storage/status?thread_id=helix-ask%3Adesktop", { signal: controller.signal });
       if (!response.ok) throw new Error(`storage-status ${response.status}`);
       const body = await response.json() as HelixWorkspaceStorageStatus;
+      if (!isCurrent()) return;
       setServerStatus(body);
-      rebuildBrowserStatus(body);
     } catch (err) {
-      if ((err as Error).name !== "AbortError") {
+      if (isCurrent() && (err as Error).name !== "AbortError") {
         setError(err instanceof Error ? err.message : "Failed to load storage status.");
-        rebuildBrowserStatus(null);
+        setServerStatus(null);
       }
     } finally {
-      setLoading(false);
+      if (isCurrent()) setLoading(false);
     }
-  }, [rebuildBrowserStatus]);
+  }, []);
 
   React.useEffect(() => {
     rebuildBrowserStatus();
   }, [rebuildBrowserStatus]);
 
   React.useEffect(() => {
-    const controller = new AbortController();
-    void refreshServerStatus(controller.signal);
+    let identity = readCachedAccountProfileIdentity();
+    const handleAccountChange = () => {
+      const next = readCachedAccountProfileIdentity();
+      if (next.profileId === identity.profileId && next.revision === identity.revision) return;
+      identity = next;
+      setServerStatus(null);
+      setSelectedId(null);
+      void refreshServerStatus();
+    };
+    void refreshServerStatus();
     const timer = window.setInterval(() => {
       void refreshServerStatus();
     }, POLL_INTERVAL_MS);
+    window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, handleAccountChange);
     return () => {
-      controller.abort();
+      refreshControllerRef.current?.abort();
       window.clearInterval(timer);
+      window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, handleAccountChange);
     };
   }, [refreshServerStatus]);
 
@@ -416,6 +439,17 @@ export default function WorkstationStorageMapPanel() {
                   {displayMappedValue(t, selected.status, statusMessages)}
                 </span>
               </div>
+              {selected.path_ref.startsWith("casimirbot://solar-observations/") ? (
+                <div className="mt-3 space-y-1 text-[11px] text-slate-300">
+                  <div>Shared solar-data quota: {formatBytes(readDiagnosticNumber(selected.diagnostics, "shared_solar_quota_bytes"), t)}</div>
+                  {selected.artifact_id === "star_watcher.solar_download_requests" ? (
+                    <div>Temporary download folders: {readDiagnosticNumber(selected.diagnostics, "request_count") ?? 0}</div>
+                  ) : selected.artifact_id === "star_watcher.solar_retained_sources" ? (
+                    <div>Device-wide byte count. Exact owner-scoped timeline receipts are available through the solar playback MCP list/get tools.</div>
+                  ) : null}
+                  <div>Storage inventory counts bytes; it does not recheck FITS source hashes.</div>
+                </div>
+              ) : null}
             </div>
           ) : null}
 

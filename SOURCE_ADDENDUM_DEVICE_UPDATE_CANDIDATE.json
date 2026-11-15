@@ -1,0 +1,98 @@
+{
+  "observed_at": "2026-11-13T17:31:36.473863+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/DesktopUpdatePanel.tsx",
+      "canonical_sha256": "6533e2d58141520a66e77d6307c1008ecb03003e8e2e5af68c91a2cee5d3da48",
+      "export_sha256": "476e0b99ddc076ac2e5c1d95c4a50c2d67ef5b96830230e2d3206183d2d6370b",
+      "bytes": 13912,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "f30e8e5bcbe4573ec5da9cd06c2f1a35e5f0512fdadc145a3ba65aa5ff665532"
+    },
+    {
+      "path": "client/src/components/DeviceCheckPanel.tsx",
+      "canonical_sha256": "89482ef7cf4e90596b97fda6ff6b467217788758342f263feb07cbaa1fa01df1",
+      "export_sha256": "19fca4f1b497af7a00a95511ff8cafcfc15f0a8cd1efa1b6200dcd2059a31117",
+      "bytes": 51660,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "0e5fa3358b92b13bdcd50668795ea4b3e2708d7b6bad59a1456a62cd70ef31f1"
+    },
+    {
+      "path": "client/src/lib/runtime/RuntimeSurfaceProvider.tsx",
+      "canonical_sha256": "af0fa67114a5af70d70dde386d2ed595606a9418065721b3fa3e8a3859d5c199",
+      "export_sha256": "2109a5461b7d77b1a284943bc0e24b4ac2860f06635b5c4c0a214973f8f83530",
+      "bytes": 10649,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "97d26d175cd682ad7bc10edb247a889175ecd33f8b920940075d693b2b57d88b"
+    },
+    {
+      "path": "client/src/lib/workstation/personalMcpP1Availability.ts",
+      "canonical_sha256": "4698d09950c1b15907156ee42b13dc9e288e878dfaf43d990797835d69c33dee",
+      "export_sha256": "4698d09950c1b15907156ee42b13dc9e288e878dfaf43d990797835d69c33dee",
+      "bytes": 536,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/__tests__/DesktopUpdatePanel.spec.tsx",
+      "canonical_sha256": "044d29e6f372706589970fd644ee832622b5d41de5a0b67fd6bd49f5ad09e539",
+      "export_sha256": "3703236d07e066110d5ccbb1d9ca2ff05345e5f2ef16a76c4b20945ba7b4e511",
+      "bytes": 5213,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "a092edc0bbcb91758ae40fc9b506ee22cd07aea7302b36f07612e5b2692c7ab4"
+    },
+    {
+      "path": "client/src/components/__tests__/DeviceCheckPanel.spec.tsx",
+      "canonical_sha256": "18ea56306bb4b0c68e707a74b24d2c3bbd43b7432c63cfa8d375f3e5f7a1cd7e",
+      "export_sha256": "8f53b1bb2d91a44afe3414d51a647e897fbd7ab2fd523a3ba0fddb6030d325d6",
+      "bytes": 31222,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "a9f2d14ed53cd2382a15c5409b2bca40cc0a6cee7a026a5ad467c80d1d607cc4"
+    },
+    {
+      "path": "client/src/components/__tests__/DeviceCheckPanel.account-profile.spec.tsx",
+      "canonical_sha256": "6d3e0b03658d5d335e6338cfe5b55129326203447b1719cbb9baca0c62187f1d",
+      "export_sha256": "6d3e0b03658d5d335e6338cfe5b55129326203447b1719cbb9baca0c62187f1d",
+      "bytes": 5361,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/runtime/__tests__/RuntimeSurfaceProvider.spec.tsx",
+      "canonical_sha256": "650f5ca80284fcb9d3d252b5a13187c120cf3ab3df6fd007d03345081247b84d",
+      "export_sha256": "2a0fdc00995b2fa868c9d9f88bb11a7a3e04d3f3e519e77c9bb4eb7686c2a234",
+      "bytes": 2635,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Read complete Desktop Updates and Device Check components, native runtime provider, personal availability helper, three panel suites and unchanged runtime suite. Reviewed the previously exported account-policy dependency and exact profile-revision mechanism. First-party UI and synthetic bridge/HTTP fixtures only.",
+    "Device Check distinguishes ordinary personal Full Harness setup from saved read-only private tunnels. Developer tunnel configuration and full-scope controls remain separate. Local status explicitly does not prove remote exact-task MCP availability.",
+    "Integrated-world selection uses the native folder picker and typed state parser. The renderer grants no game action, starts no Minecraft process, and ordinary users do not receive developer dedicated-server controls.",
+    "The new profile-revision wrapper clears prior-account observations, drafts, busy state and pending UI callbacks by remounting the internal panel. Native operation authorization is not replaced and an already-started native operation is not canceled by this UI reset.",
+    "Private update guidance now describes recovery under an existing owner-approved setup contract after account, developer grant, trust and package checks. Neither updating nor this guidance renews a game grant. Public download/install buttons remain explicit native bridge actions.",
+    "Runtime provider changes are optional TypeScript bridge declarations for existing personal setup, integrated-world selection, isolated speech, budgets, storage and publishing APIs. Declaring a method is not evidence of installed availability or authority. Origin-bound handshake implementation is unchanged.",
+    "Existing Device Check fixture C:/Users/owner/AppData/Roaming/.minecraft is a literal mock return, not a filesystem read. New account-isolation tests use C:/Games/FixtureMinecraft and synthetic profile IDs. No real account payload or local file contents are exported.",
+    "The new regression fixture now supplies the required getRuntimeSnapshot bridge member; this is a type-shape correction after the historical 17-test receipt, with no production behavior change."
+  ],
+  "limits": [
+    "Private unfrozen source candidate only; no publication or native restart.",
+    "Mocked UI tests do not verify signed installation/updating, persisted native world selection, host-account isolation or live MCP enrollment.",
+    "The profile-isolation production fix and its new tests are newer than running R380.",
+    "Native server/preload admission, shared contracts and other client helpers remain separate dependencies; the preview is not a standalone app.",
+    "Three-person voice, GPT Live game context, Agent API funding and the coordinated signed public release remain separately open."
+  ]
+}

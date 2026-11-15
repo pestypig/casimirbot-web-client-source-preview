@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { HelixSharedRealtimeRoom } from "@shared/helix-shared-realtime-room";
+import { roomServiceReturnPath } from "@shared/helix-room-service-navigation";
+import { MinecraftPlayerSharingQueue } from "./MinecraftPlayerSharingQueue";
 
 type RoomResponse = {
   schema?: string;
@@ -150,9 +152,9 @@ export function AccountRoomPilot() {
 
   return (
     <div className="mt-5 border-t border-cyan-200/20 pt-5">
-      <h3 className="text-sm font-semibold text-white">Domain room for Discord pilot</h3>
+      <h3 className="text-sm font-semibold text-white">Hosted rooms</h3>
       <p className="mt-2 text-sm text-slate-300">
-        Create or open a room here and leave this page open while using Discord.
+        Create a room or open one to invite a friend or keep your presence current while using Discord.
         This keeps your owner presence current on the domain. No microphone or AI is started.
       </p>
       {error ? <p role="alert" className="mt-3 text-sm text-amber-200">{error}</p> : null}
@@ -176,17 +178,23 @@ export function AccountRoomPilot() {
           <p className="mt-1 break-all font-mono text-xs text-slate-300">{room.room_id}</p>
           <p className="mt-1 text-xs text-cyan-100">{activeRoomId === room.room_id && ownerIsPresent(room)
             ? "Owner present on domain" : "Open this room to renew owner presence"}</p>
-          <div className="mt-3 flex gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             <button type="button" disabled={busy || activeRoomId === room.room_id}
               onClick={() => void openRoom(room.room_id)}
               className="rounded-full border border-cyan-200/40 px-3 py-1 text-cyan-100 disabled:opacity-50">
               Open room
             </button>
+            <a href={roomServiceReturnPath(room.room_id)}
+              className="rounded-full border border-cyan-200/40 px-3 py-1 text-cyan-100">
+              Invite a friend
+            </a>
             <button type="button" disabled={busy} onClick={() => void closeRoom(room.room_id)}
               className="rounded-full border border-white/25 px-3 py-1 text-slate-200 disabled:opacity-50">
               Close room
             </button>
           </div>
+          {activeRoomId === room.room_id && ownerIsPresent(room) ?
+            <MinecraftPlayerSharingQueue roomId={room.room_id} /> : null}
         </li>)}
       </ul> : <p className="mt-4 text-sm text-slate-400">No domain rooms are listed for this account.</p>}
     </div>

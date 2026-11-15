@@ -1,0 +1,39 @@
+{
+  "observed_at": "2026-11-13T16:46:07.217152+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomInterpreterStatus.tsx",
+      "canonical_sha256": "a25eaf81f0dd5a11a2c6b771143cf1db0dc592cbb2e5080d800e0acb9bda790a",
+      "export_sha256": "a25eaf81f0dd5a11a2c6b771143cf1db0dc592cbb2e5080d800e0acb9bda790a",
+      "bytes": 9511,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "1910ce267472eefc20cfe10d99764716ee28fe423eb4727e08d8a745453c7f16"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeHostedRoomInterpreterStatus.spec.tsx",
+      "canonical_sha256": "096d55c7b3961aa1a28c5f5f74d29f711c666cf14ba28c583a79170802160df7",
+      "export_sha256": "096d55c7b3961aa1a28c5f5f74d29f711c666cf14ba28c583a79170802160df7",
+      "bytes": 10674,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Read the complete hosted interpreter status panel and its six tests. The only public-preview delta adds three_person_voice to the accepted capacityProfile type; runtime evaluation remains restricted to three_human_text.",
+    "First-party React/TypeScript with synthetic UUID rooms, example.test authority and mocked native/HTTP boundaries. No keys, private profiles, transcripts, third-party implementation or game assets exported.",
+    "Status refresh checks the exact room and session room, discards stale request epochs and aborts on room/account changes. Native key selection and interpreter preparation require explicit owner controls. A configured key is explicitly distinguished from active shared AI or successful provider access.",
+    "The two-turn evaluation control checks owner, exact configured session/generation, initial one-turn ceiling and text-only profile. It sends an explicit reviewed operation; this panel does not dispatch a model turn.",
+    "Existing tests cover wrong-room rejection, late account response, guest read-only UI, owner preparation/key selection, configured-state language and exact evaluation generation. Shared schemas and server/native enforcement remain separate dependencies."
+  ],
+  "limits": [
+    "Unpublished unfrozen source proposal; type-only delta already included in private R380, not a new implementation.",
+    "Six existing mocked tests do not establish three-person voice operation, paid provider access, installed room consent or game/GPT Live continuity.",
+    "Owner mutations use revision checks for visible results but cannot cancel an already admitted native/server operation. Busy-state completion across account/room switches has no regression coverage in this existing suite; do not claim complete mutation-lifecycle qualification.",
+    "No backend admission, funding or runtime authority changed by this export."
+  ]
+}

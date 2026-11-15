@@ -1,0 +1,82 @@
+{
+  "observed_at": "2026-11-13T23:56:03.560254+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/civilization/CivilizationGoogleBasemap.tsx",
+      "canonical_sha256": "5ecfe0005d17fbb04f0fe1b91c9af53ead8392d2216078727676c0c410569636",
+      "export_sha256": "4313121b3b958bdc82364475a7f8a394f89692a82d5b8f99099e044d7bd7bc52",
+      "bytes": 380038,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "bdd7418a54fac3586fe7388305efd4629ea368ad1488fdb614917f69ed5c1729"
+    },
+    {
+      "path": "client/src/components/auth/GoogleSignInButton.tsx",
+      "canonical_sha256": "e98b90c626aa8260cb42476c8aa30bb52f57002bdfb719c6646b9a306cedc3f3",
+      "export_sha256": "e98b90c626aa8260cb42476c8aa30bb52f57002bdfb719c6646b9a306cedc3f3",
+      "bytes": 5571,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "c85599adacc3fb56589bcd8bbcb4311483db9a6795c76b2197a6d9abd224382d"
+    },
+    {
+      "path": "client/src/components/auth/GoogleSignInButton.test.tsx",
+      "canonical_sha256": "eb1adf65eeb78793953a1c491f77772c1091cdd66c8aa59c9a0189b06543e84c",
+      "export_sha256": "eb1adf65eeb78793953a1c491f77772c1091cdd66c8aa59c9a0189b06543e84c",
+      "bytes": 4140,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "c573300dd891bcbfbc9b53cf116d941cbcda4ab6c04fa0728848a1bc2a7ac865"
+    },
+    {
+      "path": "client/src/components/civilization/CivilizationGoogleBasemap.spec.tsx",
+      "canonical_sha256": "047c4ce651d2f1b9428fd5690eb88b4ad514f094be5f63f880c9bc2e1f555784",
+      "export_sha256": "047c4ce651d2f1b9428fd5690eb88b4ad514f094be5f63f880c9bc2e1f555784",
+      "bytes": 1753,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/civilization/civilizationGeospatialAccountLifecycle.spec.tsx",
+      "canonical_sha256": "adeca95fa6d627c8437f1da5f565868d5cbd3901f2114fabd850202851491e3c",
+      "export_sha256": "adeca95fa6d627c8437f1da5f565868d5cbd3901f2114fabd850202851491e3c",
+      "bytes": 8338,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/civilization/CivilizationGeospatialSettings.spec.tsx",
+      "canonical_sha256": "89d7d7bb57907d880bd4e927e6d5027a71fc0122585707757d6e6c0ee9987fc0",
+      "export_sha256": "89d7d7bb57907d880bd4e927e6d5027a71fc0122585707757d6e6c0ee9987fc0",
+      "bytes": 2028,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/civilization/civilizationGeospatialClientConfig.spec.ts",
+      "canonical_sha256": "72c6b28dbe91361b5fa6794daf5808433630ec72dd06fe8faf647758074f94d8",
+      "export_sha256": "72c6b28dbe91361b5fa6794daf5808433630ec72dd06fe8faf647758074f94d8",
+      "bytes": 2011,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/civilization/civilizationGeospatialWebAccountKey.spec.ts",
+      "canonical_sha256": "a71a289c622140e1844dbfe643206c9ea9fbe09b9e3a829eac40f5241d6d9bd7",
+      "export_sha256": "a71a289c622140e1844dbfe643206c9ea9fbe09b9e3a829eac40f5241d6d9bd7",
+      "bytes": 2799,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed the original Google namespace declarations, Maps loader, twenty-three overlay API reads, sign-in loader and exact diffs against saved hashes.",
+    "Google Identity Services and Maps can independently populate window.google. Both declarations now augment one named interface with optional accounts and maps properties; no SDK is assumed loaded by the other.",
+    "Runtime fix 45 guards the Maps namespace in twenty-three Marker/Polyline/Data/SymbolPath reads. Two mounted regressions reproduced a TypeError with identity-only or empty Google globals before the fix. The absent-global case already passed.",
+    "The map regression uses no saved key, mocks the country index and diplomacy overlay, and confirms it neither inserts a Maps script nor calls Identity initialization, rendering or prompting. It does not verify a live rendered map.",
+    "The existing sign-in no-auto-prompt test now includes a Maps namespace and verifies it stays intact and unused. Its mocked credential submission test and the existing geospatial account/key lifecycle tests remain separate from real sign-in or provider access."
+  ],
+  "limits": [
+    "Unfrozen and unpublished source. No real Google credentials, API key, sign-in, Maps request or billed provider call was used.",
+    "Installed/web-provider acceptance and remaining type errors remain open; existing source export holds are unchanged."
+  ]
+}

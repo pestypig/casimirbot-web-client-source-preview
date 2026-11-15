@@ -22,6 +22,7 @@ const StartPortal = lazy(() => import("@/pages/start"));
 const MarketLandingPage = lazy(() => import("@/pages/market-landing"));
 const AccountPortalPage = lazy(() => import("@/pages/account-portal"));
 const DownloadPage = lazy(() => import("@/pages/download"));
+const GettingStartedPage = lazy(() => import("@/pages/getting-started"));
 const StationPage = lazy(() => import("@/pages/station"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const LumaPage = lazy(() => import("@/pages/luma"));
@@ -236,6 +237,7 @@ function Router() {
         <Route path="/open" component={AdaptiveWorkstationRoute} />
         <Route path="/start" component={StartRoute} />
         <Route path="/download" component={DownloadPage} />
+        <Route path="/getting-started" component={GettingStartedPage} />
         <Route path="/account" component={AccountPortalPage} />
         <Route path="/mobile" component={MobileRoute} />
         <Route path="/bridge" component={BridgeLegacyRoute} />

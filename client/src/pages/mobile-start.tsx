@@ -1,9 +1,10 @@
+import { captureAccountOperationScope } from "@/lib/workstation/accountOperationScope";
+import { isExperimentalLaunchPanelVisible, useExperimentalLaunchPanels } from "@/lib/workstation/experimentalLaunchPanels";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Clock3,
   Home,
   LayoutGrid,
-  Lock,
   MessageCircle,
   PanelsTopLeft,
   Pin,
@@ -12,7 +13,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useLocation } from "wouter";
-import { getPanelDef, panelRegistry } from "@/lib/desktop/panelRegistry";
+import { panelRegistry } from "@/lib/desktop/panelRegistry";
 import { useMobileAppStore } from "@/store/useMobileAppStore";
 import { MobilePanelHost } from "@/components/mobile/MobilePanelHost";
 import { recordPanelActivity } from "@/lib/essence/activityReporter";
@@ -43,9 +44,8 @@ import {
   emitWorkstationActionLiveEvent,
 } from "@/lib/workstation/workstationActionLiveEvents";
 import { maybePostSituationRoomSetupExecutionReceipt } from "@/lib/workstation/setupExecutionReceiptPost";
-import { isUserLaunchPanel } from "@/lib/workstation/launchPanelPolicy";
+import { isAccountLaunchPanel, isAccountPanelAccessible } from "@/lib/workstation/launchPanelPolicy";
 import { isSolarSpecialistLaunchPanel } from "@/lib/workstation/solarSpecialistPanels";
-import { resolveHelixAccountPanelAccess } from "@shared/helix-account-session";
 import type { HelixAccountCapabilityPolicy } from "@shared/helix-account-session";
 import {
   HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
@@ -63,6 +63,7 @@ export default function MobileStartPage() {
   const [, setLocation] = useLocation();
   const { stack, activeId, open, activate, close, closeAll, goHome } = useMobileAppStore();
   const toggleMobileDrawer = useWorkstationLayoutStore((state) => state.toggleMobileDrawer);
+  const experimentalLaunchPanels = useExperimentalLaunchPanels();
   const { userSettings, updateSettings } = useHelixStartSettings();
   const interfaceLanguage = getInterfaceLanguageOption(userSettings.interfaceLanguage);
   const { t } = useInterfaceText(interfaceLanguage.code);
@@ -82,12 +83,18 @@ export default function MobileStartPage() {
   const [accountPolicy, setAccountPolicy] = useState<HelixAccountCapabilityPolicy | null>(() =>
     readCachedAccountCapabilityPolicy(),
   );
+  const accountPolicyRef = useRef(accountPolicy);
+  accountPolicyRef.current = accountPolicy;
   const pressTimer = useRef<ReturnType<typeof setTimeout>>();
   const pressTriggered = useRef(false);
 
+  const visibleStack = useMemo(
+    () => stack.filter((entry) => isAccountPanelAccessible(entry.panelId, accountPolicy)),
+    [stack, accountPolicy],
+  );
   const activeEntry = useMemo(
-    () => stack.find((entry) => entry.panelId === activeId),
-    [stack, activeId]
+    () => visibleStack.find((entry) => entry.panelId === activeId),
+    [visibleStack, activeId]
   );
   const getPanelTitle = useCallback(
     (panelId: string, fallbackTitle: string) => getInterfacePanelTitle(t, panelId, fallbackTitle),
@@ -101,8 +108,8 @@ export default function MobileStartPage() {
   const pinnedPanels = useMemo(() => {
     const pinned = panelRegistry.filter(
       (panel) =>
-        (panel.pinned || panel.id === "helix-noise-gens") && !panel.startHidden && !isSolarSpecialistLaunchPanel(String(panel.id)) &&
-        (accountPolicy?.account_type === "developer" || isUserLaunchPanel(String(panel.id)))
+        (panel.pinned || panel.id === "helix-noise-gens") && !panel.startHidden && isExperimentalLaunchPanelVisible(String(panel.id), experimentalLaunchPanels) && !isSolarSpecialistLaunchPanel(String(panel.id)) &&
+        isAccountLaunchPanel(String(panel.id), accountPolicy)
     );
     const unique = new Map<string, (typeof panelRegistry)[number]>();
     pinned.forEach((panel) => unique.set(panel.id, panel));
@@ -111,7 +118,7 @@ export default function MobileStartPage() {
       if (b.id === "helix-noise-gens") return 1;
       return (panelOrder.get(a.id) ?? 0) - (panelOrder.get(b.id) ?? 0);
     });
-  }, [accountPolicy?.account_type, panelOrder]);
+  }, [accountPolicy, panelOrder, experimentalLaunchPanels]);
   const pinnedIds = useMemo(
     () => new Set(pinnedPanels.map((panel) => panel.id)),
     [pinnedPanels]
@@ -119,18 +126,17 @@ export default function MobileStartPage() {
   const gridPanels = useMemo(
     () =>
       panelRegistry.filter((panel) => {
-        if (pinnedIds.has(panel.id) || panel.startHidden || isSolarSpecialistLaunchPanel(String(panel.id))) return false;
-        if (accountPolicy?.account_type === "developer") return true;
-        return isUserLaunchPanel(String(panel.id));
+        if (pinnedIds.has(panel.id) || panel.startHidden || !isExperimentalLaunchPanelVisible(String(panel.id), experimentalLaunchPanels) || isSolarSpecialistLaunchPanel(String(panel.id))) return false;
+        return isAccountLaunchPanel(String(panel.id), accountPolicy);
       }),
-    [accountPolicy?.account_type, pinnedIds]
+    [accountPolicy, pinnedIds, experimentalLaunchPanels]
   );
   const launcherPanels = useMemo(
     () =>
       panelRegistry
         .filter((panel) =>
-          !panel.startHidden && !isSolarSpecialistLaunchPanel(String(panel.id)) &&
-          (accountPolicy?.account_type === "developer" || isUserLaunchPanel(String(panel.id)))
+          !panel.startHidden && isExperimentalLaunchPanelVisible(String(panel.id), experimentalLaunchPanels) && !isSolarSpecialistLaunchPanel(String(panel.id)) &&
+          isAccountLaunchPanel(String(panel.id), accountPolicy)
         )
         .sort((a, b) => {
           const aReady = a.workstationCapabilities?.v1_job_ready ? 1 : 0;
@@ -140,12 +146,12 @@ export default function MobileStartPage() {
           const bTitle = getPanelTitle(String(b.id), b.title);
           return aTitle.localeCompare(bTitle, undefined, { sensitivity: "base" });
         }),
-    [accountPolicy?.account_type, getPanelTitle],
+    [accountPolicy, getPanelTitle, experimentalLaunchPanels],
   );
 
   const recents = useMemo(
-    () => [...stack].sort((a, b) => b.openedAt - a.openedAt),
-    [stack]
+    () => [...visibleStack].sort((a, b) => b.openedAt - a.openedAt),
+    [visibleStack]
   );
   const { mood } = useLumaMoodTheme({ randomize: true, listenToBus: true });
 
@@ -223,18 +229,18 @@ export default function MobileStartPage() {
 
   const openPanelUniversal = useCallback(
     (panelId: string) => {
-      if (!panelId) return;
-      if (!getPanelDef(panelId)) return;
+      if (!isAccountPanelAccessible(panelId, accountPolicyRef.current)) return false;
       open(panelId);
       setAppViewerOpen(true);
       setShowSwitcher(false);
+      return true;
     },
     [open],
   );
 
   const handleTilePress = (panelId: string) => {
     const panel = panelRegistry.find((p) => p.id === panelId);
-    if (!panel) return;
+    if (!panel || !isAccountLaunchPanel(panelId, accountPolicy)) return;
     const panelTitle = getPanelTitle(String(panel.id), panel.title);
     if (panel.heavy && typeof window !== "undefined") {
       const proceed = window.confirm(
@@ -242,7 +248,7 @@ export default function MobileStartPage() {
       );
       if (!proceed) return;
     }
-    if (typeof window !== "undefined" && window.innerWidth <= 520 && stack.length >= MAX_WARN_STACK) {
+    if (typeof window !== "undefined" && window.innerWidth <= 520 && visibleStack.length >= MAX_WARN_STACK) {
       window.alert(t("mobileStart.alert.closingOlderPanels"));
     }
     recordPanelActivity(panel.id, "openMobile");
@@ -273,17 +279,26 @@ export default function MobileStartPage() {
     const handlePolicyChange = (event: Event) => {
       const policy = (event as CustomEvent<{ account_policy?: HelixAccountCapabilityPolicy | null }>).detail
         ?.account_policy;
-      setAccountPolicy(policy ?? readCachedAccountCapabilityPolicy());
+      const next = policy ?? readCachedAccountCapabilityPolicy();
+      accountPolicyRef.current = next;
+      setAccountPolicy(next);
     };
     if (typeof window !== "undefined") {
       window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, handlePolicyChange as EventListener);
     }
     fetchAccountCapabilityPolicy()
       .then((policy) => {
-        if (active) setAccountPolicy(policy);
+        if (active) {
+          accountPolicyRef.current = policy;
+          setAccountPolicy(policy);
+        }
       })
       .catch(() => {
-        if (active) setAccountPolicy(readCachedAccountCapabilityPolicy());
+        if (active) {
+          const next = readCachedAccountCapabilityPolicy();
+          accountPolicyRef.current = next;
+          setAccountPolicy(next);
+        }
       });
     return () => {
       active = false;
@@ -304,7 +319,7 @@ export default function MobileStartPage() {
     if (typeof window === "undefined") return;
     try {
       const pending = window.localStorage.getItem(PENDING_PANEL_KEY);
-      if (pending) {
+      if (pending && accountPolicy) {
         openPanelUniversal(pending);
         window.localStorage.removeItem(PENDING_PANEL_KEY);
       }
@@ -345,21 +360,12 @@ export default function MobileStartPage() {
         };
         switch (action.action) {
           case "open_panel":
-            if (!getPanelDef(action.panel_id)) {
-              publish({ ok: false, message: `Unknown panel: ${action.panel_id}` });
-              return;
-            }
-            openPanelUniversal(action.panel_id);
-            publish({ ok: true });
+          case "focus_panel": {
+            const opened = openPanelUniversal(action.panel_id);
+            publish({ ok: opened,
+              message: opened ? undefined : `Panel unavailable: ${action.panel_id}` });
             return;
-          case "focus_panel":
-            if (!getPanelDef(action.panel_id)) {
-              publish({ ok: false, message: `Unknown panel: ${action.panel_id}` });
-              return;
-            }
-            openPanelUniversal(action.panel_id);
-            publish({ ok: true });
-            return;
+          }
           case "close_panel":
             close(action.panel_id);
             publish({ ok: true });
@@ -377,7 +383,9 @@ export default function MobileStartPage() {
           case "focus_next_panel":
           case "focus_previous_panel": {
             const mobileState = useMobileAppStore.getState();
-            const panelIds = mobileState.stack.map((entry) => entry.panelId);
+            const panelIds = mobileState.stack
+              .filter((entry) => isAccountPanelAccessible(entry.panelId, accountPolicyRef.current))
+              .map((entry) => entry.panelId);
             if (panelIds.length === 0) {
               publish({ ok: false, message: "No open panels to focus." });
               return;
@@ -410,6 +418,10 @@ export default function MobileStartPage() {
             publish({ ok: true });
             return;
           case "run_panel_action": {
+            if (!isAccountPanelAccessible(action.panel_id, accountPolicyRef.current)) {
+              publish({ ok: false, message: `Panel unavailable: ${action.panel_id}` });
+              return;
+            }
             const execution = await executeWorkstationActionWithLedger({
               request: {
                 panel_id: action.panel_id,
@@ -421,8 +433,7 @@ export default function MobileStartPage() {
               context: {
                 openPanel: (panelId) => openPanelUniversal(panelId),
                 focusPanel: (panelId) => {
-                  openPanelUniversal(panelId);
-                  activate(panelId);
+                  if (openPanelUniversal(panelId)) activate(panelId);
                 },
                 closePanel: (panelId) => close(panelId),
                 openSettings: (tab) => openSettings(tab ?? "preferences"),
@@ -447,22 +458,34 @@ export default function MobileStartPage() {
             });
             return;
           }
-          case "run_job":
-            publish({ ok: true, message: "Delegated to workstation job executor." });
-            void runWorkstationJob({
-              contextId: HELIX_ASK_CONTEXT_ID.mobile,
-              payload: action.payload,
-              executionContext: {
-                openPanel: (panelId) => openPanelUniversal(panelId),
-                focusPanel: (panelId) => {
-                  openPanelUniversal(panelId);
-                  activate(panelId);
+          case "run_job": {
+            const isJobAccountCurrent = captureAccountOperationScope();
+            try {
+              const result = await runWorkstationJob({
+                contextId: HELIX_ASK_CONTEXT_ID.mobile,
+                payload: action.payload,
+                canUsePanel: (panelId) => isAccountPanelAccessible(panelId, accountPolicyRef.current),
+                executionContext: {
+                  openPanel: (panelId) => openPanelUniversal(panelId),
+                  focusPanel: (panelId) => {
+                    if (openPanelUniversal(panelId)) activate(panelId);
+                  },
+                  closePanel: (panelId) => close(panelId),
+                  openSettings: (tab) => openSettings(tab ?? "preferences"),
                 },
-                closePanel: (panelId) => close(panelId),
-                openSettings: (tab) => openSettings(tab ?? "preferences"),
-              },
-            });
+              });
+              if (!isJobAccountCurrent()) return;
+              publish({
+                ok: result.ok,
+                message: `Job ${result.job_id} ${result.ok ? "steps completed" : "steps failed or partially completed"}.`,
+                artifact: { job_id: result.job_id, step_receipts: result.step_receipts },
+              });
+            } catch (error) {
+              if (!isJobAccountCurrent()) return;
+              publish({ ok: false, message: error instanceof Error ? error.message : "Job failed." });
+            }
             return;
+          }
           case "set_chat_dock":
           case "reopen_last_closed_panel":
             publish({ ok: false, message: `${action.action} is not supported on mobile.` });
@@ -686,7 +709,7 @@ export default function MobileStartPage() {
                 </div>
               </section>
 
-              {!stack.length && (
+              {!visibleStack.length && (
                 <section className={sectionCardClass}>
                   <p className="text-sm text-muted-foreground/90">
                     {mobileWorkstationEnabled
@@ -696,7 +719,7 @@ export default function MobileStartPage() {
                 </section>
               )}
 
-              {stack.length > 0 && (
+              {visibleStack.length > 0 && (
                 <section className={sectionCardClass}>
                   <div className="flex items-center gap-2">
                     <Clock3 className="h-4 w-4 text-primary" />
@@ -818,10 +841,7 @@ export default function MobileStartPage() {
                     <Settings className="h-3.5 w-3.5" />
                   </button>
                   <div className="max-h-40 space-y-1 overflow-y-auto">
-                    {launcherPanels.map((panel) => {
-                      const panelAccess = resolveHelixAccountPanelAccess(accountPolicy, String(panel.id));
-                      const locked = panelAccess.state === "locked" && !isUserLaunchPanel(String(panel.id));
-                      return (
+                    {launcherPanels.map((panel) => (
                         <button data-helix-interaction-kind="act" data-helix-authority-state="client_local" data-helix-control-id="workstation.mobile_launcher.mobile-start.handle-tile-press-panel-id-set-show-switcher-false"
                           key={`launch-${panel.id}`}
                           className="flex w-full min-h-[38px] items-center justify-between rounded-lg border border-primary/25 bg-card/68 px-3 py-2 text-left text-xs text-foreground transition hover:border-primary/60 hover:bg-card/86 hover:text-primary"
@@ -831,7 +851,6 @@ export default function MobileStartPage() {
                           }}
                         >
                           <span className="inline-flex items-center gap-2">
-                            {locked ? <Lock className="h-3.5 w-3.5 text-amber-200" aria-hidden="true" /> : null}
                             <span className="line-clamp-1">{getPanelTitle(String(panel.id), panel.title)}</span>
                             {panel.workstationCapabilities?.v1_job_ready ? (
                               <span className="rounded border border-emerald-300/40 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-emerald-200">
@@ -840,22 +859,21 @@ export default function MobileStartPage() {
                             ) : null}
                           </span>
                           <span className="ml-2 text-[10px] uppercase tracking-wide text-muted-foreground/80">
-                            {locked ? t("mobileStart.switcher.locked") : t("mobileStart.switcher.open")}
+                            {t("mobileStart.switcher.open")}
                           </span>
                         </button>
-                      );
-                    })}
+                    ))}
                   </div>
                 </div>
               ) : null}
 
-              {stack.length === 0 && (
+              {visibleStack.length === 0 && (
                 <div className="rounded-xl border border-primary/25 bg-card/74 px-4 py-3 text-sm text-muted-foreground/85 shadow-[inset_0_0_24px_hsl(var(--primary)/0.08)]">
                   {t("mobileStart.switcher.noPanels")}
                 </div>
               )}
 
-              {stack.map((entry) => {
+              {visibleStack.map((entry) => {
                 const isActive = entry.panelId === activeId;
                 const panelDef = panelRegistry.find((panel) => panel.id === entry.panelId);
                 const Icon = panelDef?.icon ?? PanelsTopLeft;
@@ -904,7 +922,7 @@ export default function MobileStartPage() {
               })}
             </div>
 
-            {stack.length > 0 && (
+            {visibleStack.length > 0 && (
               <div className="mt-5 flex items-center justify-between gap-3">
                 <button data-helix-interaction-kind="act" data-helix-authority-state="client_local" data-helix-control-id="workstation.mobile_launcher.mobile-start.record-panel-activity-mobile-shell-close-all-close-all-go-home-set-show"
                   className="min-h-[44px] rounded-lg border border-primary/35 bg-card/74 px-4 py-2 text-sm font-semibold text-foreground transition hover:border-primary/55 hover:bg-card/86 hover:text-primary active:scale-[0.99] active:border-primary/65 active:bg-primary/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"

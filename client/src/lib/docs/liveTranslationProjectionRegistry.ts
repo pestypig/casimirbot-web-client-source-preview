@@ -460,7 +460,7 @@ let registryVersion = 0;
 const snapshots = new Map<string, DocumentLiveTranslationProjectionSnapshot>();
 const listeners = new Set<() => void>();
 
-const normalizeText = (value: string | null | undefined): string =>
+const normalizeText = (value: unknown): string =>
   typeof value === "string" ? value.trim() : "";
 
 const normalizeSourceKind = (value: unknown): string | null =>
@@ -1325,6 +1325,7 @@ export function ingestDocumentLiveTranslationProjectionFromAskLiveEvent(
   input: IngestDocumentLiveTranslationProjectionLiveEventInput,
 ): DocumentLiveTranslationProjectionSnapshot {
   const meta = readRecord(input.eventPayload.entry.meta);
+  if (!meta) return readDocumentLiveTranslationProjectionSnapshot(input);
   const sourceEventType = readString(meta?.sourceEventType ?? meta?.source_event_type);
   const lane = readString(meta?.lane);
   const sourceId = readString(meta?.sourceId ?? meta?.source_id);

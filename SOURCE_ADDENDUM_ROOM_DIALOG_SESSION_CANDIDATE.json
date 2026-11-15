@@ -1,0 +1,58 @@
+{
+  "observed_at": "2026-11-14T00:16:39.127074+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomDialog.tsx",
+      "canonical_sha256": "4656a72f2d0c78d25ade8b73a98ac0887b048485b99128ae1cbbbf1fe94182c5",
+      "export_sha256": "4656a72f2d0c78d25ade8b73a98ac0887b048485b99128ae1cbbbf1fe94182c5",
+      "bytes": 11276,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "75190cdaf155dfce54a085154334f014a2b828f08a2c19210ef1f2e1e1fdb81b"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomDialog.spec.tsx",
+      "canonical_sha256": "c411e488231b9a9db34ad2f693b6715fc99a169efedde24c1acace666ae806fc",
+      "export_sha256": "c411e488231b9a9db34ad2f693b6715fc99a169efedde24c1acace666ae806fc",
+      "bytes": 20371,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "cb00a726dde1c22b29f063c9a5ad8fdac10a5546bb4a34a2f4a0ca3ff98fe4de"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeRoomConnectionPanel.spec.tsx",
+      "canonical_sha256": "3373c1bd46bcc68c17d429188b9b209c543ed98c4c8a1757f2af7fd125cbf408",
+      "export_sha256": "3373c1bd46bcc68c17d429188b9b209c543ed98c4c8a1757f2af7fd125cbf408",
+      "bytes": 51436,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "ff0b690489e2ed581c3841400b65d35614569a54f0ef3763c488a0c7ea8c1278"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "work_scope": {
+    "program_gate": "G8, independent Friends and existing room qualification",
+    "workstream": "Existing Rooms dialog session presentation",
+    "capability": "Native room panel GPT Live session-state handoff",
+    "lifecycle_stage": "presentation",
+    "reaction_timescale": "React session-state update",
+    "authority_owner": "Existing account, room, participant consent and native bridge checks",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented, local regression evidence only",
+    "required_evidence": "Before/after mounted dialog test; current session changes, inactive/missing session blocks and no automatic bridge/context/consent action; exact export parity",
+    "explicit_non_goals": "No room admission, automatic bridge start, model call, game action or attended acceptance",
+    "downstream_gate_unlocked": "None; installed qualification remains open"
+  },
+  "review": [
+    "Runtime fix 46 forwards the existing controller realtimeSessionId and runtimeActive into the standalone native room panel. The persistent portalled panel already receives these values and is unchanged.",
+    "The new mounted dialog regression reaches the real native panel with synthetic room/status HTTP responses. It reproduced the disabled connect button for an active session. It checks active, inactive, changed and missing session state; no bridge ticket, source selection/read, runtime connection or consent mutation is requested.",
+    "Native panel fixtures that omit the now-required session inputs explicitly declare an inactive/null session. The fixture helper admits typed participant and recovery status variations already present in its tests. No runtime contracts or existing assertions are weakened.",
+    "Exact changes reviewed against pre-edit snapshots. Existing authorization, participant consent, exact room/session and bridge request checks remain in the native panel. No real room, provider or game service was contacted.",
+    "The native test helper explicitly models the existing optional source-scope status field. The dialog controller fixture now declares the existing required provider attachment mode, matching the idle bridge baseline. Production media and permission contracts are unchanged."
+  ],
+  "limits": [
+    "Unfrozen, unpublished source. Installed Friends/Discord/GPT Live/Minecraft handoff remains unqualified.",
+    "The test uses the standalone dialog path and mocked HTTP. The existing persistent portal path and audio transport have separate tests and installed acceptance."
+  ]
+}

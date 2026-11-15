@@ -168,17 +168,17 @@ export function SharedRoomTextReleaseControls({ room, messages, admitted }: {
         <p className="whitespace-pre-wrap text-slate-200">{message.text}</p>
         <p className="mt-1 text-slate-500">{receipt?.state === "released" ? "Future-use approval recorded" :
           receipt?.state === "revoked" ? "Future use revoked" : "Room members only"}</p>
-        {receipt?.state === "released" ? <button type="button" disabled={busy} onClick={() => void change(message, "revoke")}
+        {receipt?.state === "released" ? <button data-helix-control-id="helix.ask.shared_live_room.shared-room-text-release-controls.revoke-future-ai-use" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} onClick={() => void change(message, "revoke")}
           className="mt-1 rounded border border-amber-300/30 px-2 py-1 text-amber-100 disabled:opacity-40">Revoke future AI use</button>
-          : !receipt ? <button type="button" disabled={busy} onClick={() => setSelected(message.message_id)}
+          : !receipt ? <button data-helix-control-id="helix.ask.shared_live_room.shared-room-text-release-controls.review-ai-release" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} onClick={() => setSelected(message.message_id)}
             className="mt-1 rounded border border-fuchsia-300/30 px-2 py-1 text-fuchsia-100 disabled:opacity-40">Review AI release</button> : null}
         {selected === message.message_id && !receipt ? <div className="mt-2 rounded border border-fuchsia-300/30 p-2">
           <p className="text-slate-300">Release only this exact message to room {room.title || room.room_id} ({room.room_id}), generation {preparation.generation}. This records future-use permission; it does not send text to AI now. {preparation.state === "configured" ?
             "The host's OpenAI project would pay for an admitted later turn; no turn is enabled yet." :
             "Any later funded configuration needs fresh approval."}</p>
-          <button type="button" disabled={busy} onClick={() => void change(message, "release")}
+          <button data-helix-control-id="helix.ask.shared_live_room.shared-room-text-release-controls.approve-this-message-for-evaluation" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} onClick={() => void change(message, "release")}
             className="mt-2 rounded border border-fuchsia-300/30 px-2 py-1 text-fuchsia-100 disabled:opacity-40">Approve this message for evaluation</button>
-          <button type="button" disabled={busy} onClick={() => setSelected(null)} className="ml-2 text-slate-300">Cancel</button>
+          <button data-helix-control-id="helix.ask.shared_live_room.shared-room-text-release-controls.cancel" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} onClick={() => setSelected(null)} className="ml-2 text-slate-300">Cancel</button>
         </div> : null}
       </li>;
     })}</ul>

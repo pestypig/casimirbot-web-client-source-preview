@@ -2247,7 +2247,7 @@ export function LiveAnswerEnvironmentPanel({ threadId = "helix-ask:desktop" }: {
       setProcedureEpochClosures(Array.isArray(procedureClosureBody.closures) ? procedureClosureBody.closures : []);
       setProcedureLedgerItems(Array.isArray(procedureLedgerBody.ledger_items) ? procedureLedgerBody.ledger_items : []);
       const sourceBindingLedgerBody = await fetch(`/api/agi/situation/source-binding-status-ledger?thread_id=${encodeURIComponent(threadId)}&limit=80`).then((response) => response.json()).catch(() => ({}));
-      const goalContextBody = await fetch(`/api/helix/stage-play/goal-context?threadId=${encodeURIComponent(threadId)}&limit=24`).then((response) => response.ok ? response.json() : {}).catch(() => ({}));
+      const goalContextBody: Record<string, unknown> = readRecord(await fetch(`/api/helix/stage-play/goal-context?threadId=${encodeURIComponent(threadId)}&limit=24`).then((response) => response.ok ? response.json() : {}).catch(() => ({}))) ?? {};
       setSourceBindingTransitions(Array.isArray(sourceBindingLedgerBody.transitions) ? sourceBindingLedgerBody.transitions : []);
       setGoalContextUpdates(Array.isArray(goalContextBody.goalContextUpdates) ? goalContextBody.goalContextUpdates : []);
       setAgentGoalSessions(Array.isArray(goalContextBody.agentGoalSessions) ? goalContextBody.agentGoalSessions : []);

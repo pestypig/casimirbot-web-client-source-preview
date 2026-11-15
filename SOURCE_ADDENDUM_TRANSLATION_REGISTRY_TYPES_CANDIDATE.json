@@ -1,0 +1,90 @@
+{
+  "observed_at": "2026-11-14T00:56:59.715326+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/lib/docs/liveTranslationProjectionRegistry.ts",
+      "canonical_sha256": "374fd9a8000e70fa1e08566cbb200ec5d3285c80bf3778ea91205019a9294428",
+      "export_sha256": "374fd9a8000e70fa1e08566cbb200ec5d3285c80bf3778ea91205019a9294428",
+      "bytes": 107753,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "e733bc484609ad527a09750e25be1fbdf0c3b720c8d1c52a18625e11c91c158f"
+    },
+    {
+      "path": "client/src/lib/helix/live-translation-projection.ts",
+      "canonical_sha256": "afee629e88a92af977ba750ecc2297104c9d2b2c8e21449a673798d6b89990c5",
+      "export_sha256": "afee629e88a92af977ba750ecc2297104c9d2b2c8e21449a673798d6b89990c5",
+      "bytes": 76421,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "1592d547768a19b8f9fe39aec2b1a95d8c8339a88af938c4a2548996bd0725a6"
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/liveTranslationProjectionRegistry.spec.ts",
+      "canonical_sha256": "bb1ae04a34151e07b3c932fe3489403b019467f992dcde8c843509be0b8c83a2",
+      "export_sha256": "6bf80df280871a3f583fef06005d101928c7fc2a0703b9113de90c751822aa06",
+      "bytes": 167260,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "10ed49e7071e1148362b27c8153fcccec953984b021b0ebaeae5ac9369f6d008"
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/liveTranslationInlineProjection.spec.ts",
+      "canonical_sha256": "6142392df69edc22db8848837b9d7bf2f22f81e0fddf05e9488ea554d77f53e4",
+      "export_sha256": "e72d7235ab533c146df1a161dfcadda0f2ed6849054f473358dbdd35b90ed49c",
+      "bytes": 98279,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "720c0646f0e6bb0bf6526910a325acbf587b42eb6b4881e6958be76bf50ed88a"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/docs/__tests__/liveTranslationProjectionEventIngestion.spec.ts",
+      "canonical_sha256": "15a0279bc23980c6489c980e66035de0a17b966fb47c933db2dba472a9155891",
+      "export_sha256": "15a0279bc23980c6489c980e66035de0a17b966fb47c933db2dba472a9155891",
+      "bytes": 67523,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/docs/__tests__/visibleTranslationContext.spec.ts",
+      "canonical_sha256": "df34d481cbb07779bf238d9f2e52ab4ce93d453545e5e84997709fdb4ed736bc",
+      "export_sha256": "df34d481cbb07779bf238d9f2e52ab4ce93d453545e5e84997709fdb4ed736bc",
+      "bytes": 23427,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/live-translation-projection.spec.ts",
+      "canonical_sha256": "441fc298eacc0a5c98d3b5104a4bb02572c3fa611ae059bb40b46ec93813b4f1",
+      "export_sha256": "2dabbac139196740dd2107ef8fb4b20c6ba2bbb8252770143294e5613702dfc5",
+      "bytes": 70369,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Document translation projection type integration",
+    "capability": "Read-only document translation metadata and rendering",
+    "lifecycle_stage": "Projection ingestion",
+    "reaction_timescale": "Incoming UI event",
+    "authority_owner": "Existing source identity and projection selection; no mutation or terminal authority",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with accurate metadata types and invalid-event checks",
+    "required_evidence": "Projection registry, event integration, inline selection and visible context tests; scoped typecheck",
+    "explicit_non_goals": "No model calls, translation execution, grant changes or installed acceptance",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "normalizeText already rejects every non-string at runtime; its parameter now accurately accepts unknown event metadata. Missing record metadata returns the existing snapshot immediately; previously it reached that same return through empty event/lane identifiers.",
+    "HelixLiveTranslationInlineUnitState now declares optional sessionControlKey, already emitted by both ready and error result paths. The emitted JavaScript of that module must remain byte-identical.",
+    "Five malformed or missing metadata cases preserve the current snapshot and do not notify subscribers before and after the change. The initial suite exposed an obsolete locale expectation, not a new runtime regression.",
+    "The older locale test treated an explicit docs_chunk projection as forbidden across account languages. Commit 09a37acb8 and the existing event-ingestion test explicitly support a requested document translation language differing from account locale. Updated the negative fixture to docs_hover; selected the positive cross-language document integration test unchanged. No language-selection code was changed.",
+    "Tests use synthetic translation receipts and local event targets. Projection, source identity and non-answer metadata remain distinct from task execution or terminal authority.",
+    "Expanded scoped compilation exposed 40 existing errors in selected fixtures. Metadata literals retain their union types; two unused role fixtures use the supported packet_composer role; four session fixtures include their required absent fields; eleven duplicate expected properties already supplied by the later spread are removed. No production contract was widened.",
+    "The two document translation entry fixtures also now provide required tool-evidence and false authority flags. They remain synthetic non-answer observations; production flags already followed this contract."
+  ],
+  "limits": [
+    "Unfrozen, unpublished and uninstalled. Tests do not execute translations, invoke a provider, or establish rendered installed tutorial behavior.",
+    "Remaining inline/visible-context status type mismatches are separate; this slice only corrects the registry metadata boundary and existing session key declaration."
+  ]
+}

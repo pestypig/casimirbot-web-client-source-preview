@@ -7,7 +7,11 @@ import {
 } from "../HelixAskBackendEntrypointPolicy";
 import { buildHelixAskMinimalRuntimeSubmitPlan } from "../HelixAskMinimalRuntimeSubmitPlan";
 import { buildHelixAskMinimalRuntimeTurnPayload } from "../HelixAskMinimalRuntimeTransport";
-import { buildHelixAskSubmitBackendEntrypointRoutePlan } from "../HelixAskSubmitBackendEntrypointOptions";
+import { buildHelixAskConsoleBackendTurnPayloadCore } from "../HelixAskRequestEnvelope";
+import {
+  buildHelixAskSubmitBackendEntrypointRoutePlan,
+  resolveHelixAskSubmitRuntime,
+} from "../HelixAskSubmitBackendEntrypointOptions";
 
 describe("Helix Ask backend entrypoint policy", () => {
   it("routes affirmative note creation through backend Ask with the note-create capability", () => {
@@ -474,9 +478,52 @@ describe("Helix Ask backend entrypoint policy", () => {
     expect(payload?.force_reasoning_dispatch).toBeUndefined();
     expect(payload?.routeMetadata).toBeUndefined();
     expect(payload?.route_metadata).toBeUndefined();
-    expect(payload?.ask_entrypoint_required).toBeUndefined();
+    expect(payload).not.toHaveProperty("ask_entrypoint_required");
     expect(payload?.hard_backend_entrypoint_required).toBeUndefined();
     expect(payload?.backend_ask_call_attempted).toBeUndefined();
     expect(payload?.mandatory_next_tool_name).toBeUndefined();
+  });
+
+  it("preserves an admitted room voice handoff when a Minecraft prompt also matches hard-tool routing", () => {
+    const routeMetadata = {
+      schema: "helix.ask.route_metadata.v1",
+      source: "realtime_stage_play",
+      invocationKind: "stage_play_realtime_transcript_handoff",
+      handoff_id: "handoff:room-build",
+      source_target_intent: {
+        admitted_readonly_handoff: false,
+        admitted_governed_world_command_handoff: true,
+      },
+    } as const;
+    const plan = buildHelixAskSubmitBackendEntrypointRoutePlan({
+      question: "Build a wall in Minecraft.",
+      baseRunOptions: {
+        requiresBackendAskEntrypoint: true,
+        forceReasoningDispatch: true,
+        routeMetadata,
+      },
+      turnId: "ask:room-build",
+      threadId: "personal:composer-thread",
+      manualCanaryEnabled: false,
+    });
+    expect(plan.hardBackendEntrypointRequired).toBe(true);
+    expect(plan.routeMetadata).toBe(routeMetadata);
+    expect(plan.useBackendAskTurnEntrypoint).toBe(true);
+  });
+
+  it("submits a room voice turn to its admitted provider even when the visible picker differs", () => {
+    const runtime = resolveHelixAskSubmitRuntime({
+      selectedRuntime: "helix",
+      serverAdmittedRuntimeAgentProvider: "codex",
+    });
+    const payload = buildHelixAskConsoleBackendTurnPayloadCore({
+      agentRuntime: runtime,
+      traceId: "trace:voice-build",
+      turnId: "turn:voice-build",
+      maxTokens: 256,
+      question: "Build a wall in Minecraft.",
+    });
+    expect(payload).toMatchObject({ agentRuntime: "codex", agent_runtime: "codex" });
+    expect(resolveHelixAskSubmitRuntime({ selectedRuntime: "helix" })).toBe("helix");
   });
 });

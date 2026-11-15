@@ -1,0 +1,81 @@
+{
+  "observed_at": "2026-11-14T01:28:37.271277+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyTurnControls.ts",
+      "canonical_sha256": "5593daf6f4bed1fdacd41304161a08d66e33b4b03d4fbbc63b889d86907dabac",
+      "export_sha256": "5593daf6f4bed1fdacd41304161a08d66e33b4b03d4fbbc63b889d86907dabac",
+      "bytes": 34351,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "6e173b88b89b509f9bfc3d6758c2e913eadd568d4dbba3f21fd202a1ae99fc14"
+    },
+    {
+      "path": "client/src/lib/helix/ask-envelope-copy.ts",
+      "canonical_sha256": "6787687d966e2310b0c8aa81533e389dc3a7eb9b0745e90f94bc6f4827d592cb",
+      "export_sha256": "6787687d966e2310b0c8aa81533e389dc3a7eb9b0745e90f94bc6f4827d592cb",
+      "bytes": 1350,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "8aba9e554c745449f5d0e71238cda85877a073de20af841d351a6b5713d215f0"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskRenderedDebugMissingTurn.spec.tsx",
+      "canonical_sha256": "e6d97a289498d8c7b57a14b56e7a7ff814d6c24c5fb2dd87d61708e5f0842700",
+      "export_sha256": "e6d97a289498d8c7b57a14b56e7a7ff814d6c24c5fb2dd87d61708e5f0842700",
+      "bytes": 3109,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskRenderedReplyDebugExport.ts",
+      "canonical_sha256": "248616e98b82ff41b87b0fa9024fa4ad4ec889e0de8417d457d9b290969044a3",
+      "export_sha256": "248616e98b82ff41b87b0fa9024fa4ad4ec889e0de8417d457d9b290969044a3",
+      "bytes": 10140,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-envelope-copy.spec.ts",
+      "canonical_sha256": "b8667aca6e787aa215e325141f9c6363f7c2d5ba791de0fcc5692b47581d42f3",
+      "export_sha256": "3bda1b90d438d579bdf6676d191b2780b6bc1ba637d0695109bc186f06bb42f7",
+      "bytes": 1779,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-recrown.spec.ts",
+      "canonical_sha256": "c7a598b6497b5ad235f982dfb82b854b2cb18c668a5c2230595988bb9f1789f5",
+      "export_sha256": "da7b63264e3632b523f21b2c10dae32da428ba186502092b335a1e109201e4d5",
+      "bytes": 524824,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Rendered reply debug and copy boundaries",
+    "capability": "Reply-scoped copy and diagnostics",
+    "lifecycle_stage": "Explicit rendered-reply export",
+    "reaction_timescale": "Owner copy action",
+    "authority_owner": "Existing rendered reply and backend turn checks",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with missing turn handling",
+    "required_evidence": "Before/after missing-ID pipeline tests; existing console and copy suites; scoped compiler",
+    "explicit_non_goals": "No provider, room, game, backend fetch or installed acceptance changes",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "Runtime fix 51 treats a null or omitted backend turn ID as ineligible instead of calling trim on it. Reply-local identity and backend identity remain separate; no backend identity or fetch is invented.",
+    "Six regression/guard tests use real DOM buttons and the actual rendered-reply export pipeline. Two missing-ID cases fail on the original source. Empty IDs, a backend ID absent from button scope, a button ID without matching diagnostics, and detached ancestor traversal remain covered.",
+    "The first test run also found an incorrect empty-ID expectation in the new test. Corrected it before editing production; both original and corrected before receipts are retained. The existing empty-backend behavior remains null with a separate local client ID.",
+    "The copy formatter already coerces unknown titles/bodies and filters citation strings. Its input type now describes that tolerant existing behavior, without changing emitted JavaScript or the shared response envelope contract.",
+    "Legacy reply ID accepts the null already produced by rendered replies. Ancestor traversal uses optional parent access to make its existing terminating null state explicit. Existing console and envelope-copy tests are unchanged.",
+    "All three existing production files selected here previously matched the public preview after newline normalization. No private runtime bytes beyond the reviewed patch and test are newly copied."
+  ],
+  "limits": [
+    "Unfrozen, unpublished and uninstalled. Mocked envelope serialization and DOM tests do not establish native clipboard, actual backend fetch, or UI acceptance.",
+    "Full client typecheck still contains unrelated errors; existing shader/dataset/metadata holds remain."
+  ]
+}

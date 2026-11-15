@@ -11,8 +11,12 @@ import {
   SCIENTIFIC_CALCULATOR_RECEIPT_CLAIM_BOUNDARY,
   type ScientificCalculatorReceiptV1,
 } from "@shared/contracts/scientific-calculator-receipt.v1";
+import {
+  HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
+  readCachedAccountProfileIdentity,
+} from "@/lib/workstation/accountCapabilityPolicy";
 
-const SCIENTIFIC_CALCULATOR_STORAGE_KEY = "scientific-calculator:v1";
+const SCIENTIFIC_CALCULATOR_STORAGE_PREFIX = "scientific-calculator:v2:";
 
 export type ScientificCalculatorWorkbenchTarget = "scalar" | "runtime" | "theory";
 
@@ -123,6 +127,61 @@ type ScientificCalculatorState = {
   clear: (meta?: { source?: ScientificCalculatorDebugEvent["source"] }) => void;
 };
 
+type PersistedCalculatorState = Pick<ScientificCalculatorState,
+  "currentLatex" | "history" | "lastSolve" | "lastArtifactV1" | "lastTheoryLoadout" |
+  "activeTheoryLoadoutItemIndex" | "lastSetup" | "calculatorReceipts" |
+  "calculatorReceiptIdsByContextKey" | "lastCalculatorReceipt" | "steps" | "debugEvents">;
+
+const emptyCalculatorState = (): PersistedCalculatorState => ({
+  currentLatex: "",
+  history: [],
+  lastSolve: null,
+  lastArtifactV1: null,
+  lastTheoryLoadout: null,
+  activeTheoryLoadoutItemIndex: null,
+  lastSetup: null,
+  calculatorReceipts: [],
+  calculatorReceiptIdsByContextKey: {},
+  lastCalculatorReceipt: null,
+  steps: [],
+  debugEvents: [],
+});
+
+const calculatorStorageKey = (profileId: string | null | undefined): string =>
+  `${SCIENTIFIC_CALCULATOR_STORAGE_PREFIX}${profileId === undefined
+    ? "unresolved" : profileId === null ? "guest" : `profile:${encodeURIComponent(profileId)}`}`;
+
+function readStoredCalculator(key: string): PersistedCalculatorState {
+  try {
+    const raw = typeof window === "undefined" ? null : window.localStorage.getItem(key);
+    const state = (JSON.parse(raw ?? "null") as { state?: Partial<PersistedCalculatorState> } | null)?.state;
+    if (!state || typeof state !== "object") return emptyCalculatorState();
+    return {
+      currentLatex: typeof state.currentLatex === "string" ? state.currentLatex : "",
+      history: Array.isArray(state.history) ? state.history : [],
+      lastSolve: state.lastSolve ?? null,
+      lastArtifactV1: state.lastArtifactV1 ?? null,
+      lastTheoryLoadout: state.lastTheoryLoadout ?? null,
+      activeTheoryLoadoutItemIndex: typeof state.activeTheoryLoadoutItemIndex === "number"
+        ? state.activeTheoryLoadoutItemIndex : null,
+      lastSetup: state.lastSetup ?? null,
+      calculatorReceipts: Array.isArray(state.calculatorReceipts) ? state.calculatorReceipts : [],
+      calculatorReceiptIdsByContextKey: state.calculatorReceiptIdsByContextKey &&
+        typeof state.calculatorReceiptIdsByContextKey === "object" &&
+        !Array.isArray(state.calculatorReceiptIdsByContextKey)
+        ? state.calculatorReceiptIdsByContextKey : {},
+      lastCalculatorReceipt: state.lastCalculatorReceipt ?? null,
+      steps: Array.isArray(state.steps) ? state.steps : [],
+      debugEvents: Array.isArray(state.debugEvents) ? state.debugEvents : [],
+    };
+  } catch {
+    return emptyCalculatorState();
+  }
+}
+
+let currentCalculatorStorageKey = calculatorStorageKey(readCachedAccountProfileIdentity().profileId);
+const initialCalculatorState = readStoredCalculator(currentCalculatorStorageKey);
+
 const MAX_HISTORY = 80;
 const MAX_DEBUG_EVENTS = 160;
 const MAX_CALCULATOR_RECEIPTS = 80;
@@ -208,18 +267,7 @@ const buildReceiptFromSolve = (
 export const useScientificCalculatorStore = create<ScientificCalculatorState>()(
   persist(
     (set) => ({
-      currentLatex: "",
-      history: [],
-      lastSolve: null,
-      lastArtifactV1: null,
-      lastTheoryLoadout: null,
-      activeTheoryLoadoutItemIndex: null,
-      lastSetup: null,
-      calculatorReceipts: [],
-      calculatorReceiptIdsByContextKey: {},
-      lastCalculatorReceipt: null,
-      steps: [],
-      debugEvents: [],
+      ...initialCalculatorState,
       ingestLatex: (latex, meta) => {
         const trimmed = latex.trim();
         const entry: ScientificCalculatorHistoryEntry = {
@@ -441,7 +489,8 @@ export const useScientificCalculatorStore = create<ScientificCalculatorState>()(
         })),
     }),
     {
-      name: SCIENTIFIC_CALCULATOR_STORAGE_KEY,
+      name: currentCalculatorStorageKey,
+      skipHydration: true,
       partialize: (state) => ({
         currentLatex: state.currentLatex,
         history: state.history,
@@ -459,3 +508,16 @@ export const useScientificCalculatorStore = create<ScientificCalculatorState>()(
     },
   ),
 );
+
+if (typeof window !== "undefined") {
+  window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, () => {
+    const profileId = readCachedAccountProfileIdentity().profileId;
+    const nextKey = calculatorStorageKey(profileId);
+    if (nextKey !== currentCalculatorStorageKey) {
+      const nextState = readStoredCalculator(nextKey);
+      currentCalculatorStorageKey = nextKey;
+      useScientificCalculatorStore.persist.setOptions({ name: nextKey });
+      useScientificCalculatorStore.setState(nextState);
+    }
+  });
+}

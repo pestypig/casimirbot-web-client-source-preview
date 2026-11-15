@@ -1,0 +1,96 @@
+{
+  "observed_at": "2026-11-13T17:25:25.086075+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomApi.ts",
+      "canonical_sha256": "6b78c4208287a0ccc7f55d0bad3b18f2158d0933aa3fca925ebddf9de96cef78",
+      "export_sha256": "6b78c4208287a0ccc7f55d0bad3b18f2158d0933aa3fca925ebddf9de96cef78",
+      "bytes": 10226,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "291f60564e6cfaccc77cdc424fe6197d7131950ab8a27d1d0f04b5343f1a1ae7"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomViewModel.ts",
+      "canonical_sha256": "d247c94f6265a5c988683c8ba4ad8b7df9156dc06a5af2bcb55d801952decad2",
+      "export_sha256": "d247c94f6265a5c988683c8ba4ad8b7df9156dc06a5af2bcb55d801952decad2",
+      "bytes": 4562,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "e8937385ff5bcb1e06ebae74de8344485ebee3cc1e7e19c53858cd404077285b"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/HelixAskSharedLiveRoomControls.tsx",
+      "canonical_sha256": "8478b824be30ca4e47d465a3e87a8065813850078832eca4406584fc8f940869",
+      "export_sha256": "8478b824be30ca4e47d465a3e87a8065813850078832eca4406584fc8f940869",
+      "bytes": 13199,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "247394d902b68da4480bb67357199f9a7d7980c8ddf3b8fdd5c050e87f58a492"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/useHelixSharedLiveRoom.ts",
+      "canonical_sha256": "8530034704dad345be77ef760490a4497d2c5f3de1461c6d1d55021079e44ade",
+      "export_sha256": "8530034704dad345be77ef760490a4497d2c5f3de1461c6d1d55021079e44ade",
+      "bytes": 14176,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "f38af7fc8a53b3ec121e061d8b841116cc59223a42a220bd7d2599478f695c32"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/HelixAskSharedLiveRoomControls.spec.tsx",
+      "canonical_sha256": "e161364c843c2257d588555fc07eeaf8e4fdfb31afea9c45f5296c7c3b12a887",
+      "export_sha256": "e161364c843c2257d588555fc07eeaf8e4fdfb31afea9c45f5296c7c3b12a887",
+      "bytes": 11830,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "35287d900ae8fc3cd70c29c6ffa7796844f6591af3b806657053f83769fa246f"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomViewModel.trigger.spec.ts",
+      "canonical_sha256": "5e50fbbe41eca147ce5a5483ef8e48a604b6386c8819e424d5621415d6cbf618",
+      "export_sha256": "5e50fbbe41eca147ce5a5483ef8e48a604b6386c8819e424d5621415d6cbf618",
+      "bytes": 1824,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "0bda0a627305ebf4b26c738716f14f01b70ae230f4b437a002dee721a2a2ed27"
+    },
+    {
+      "path": "client/src/lib/workstation/exactRoomReviewNavigation.ts",
+      "canonical_sha256": "68a884d48dabe628224d6c36778172a25b71f8a5282e0ab7b61bd978ca161a78",
+      "export_sha256": "68a884d48dabe628224d6c36778172a25b71f8a5282e0ab7b61bd978ca161a78",
+      "bytes": 1717,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/exactRoomReviewNavigation.spec.ts",
+      "canonical_sha256": "fc8e544ad193b86102f4d39297b92e7afe0611558eb17a79f4b02ef58b464548",
+      "export_sha256": "fc8e544ad193b86102f4d39297b92e7afe0611558eb17a79f4b02ef58b464548",
+      "bytes": 1956,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomApi.spec.ts",
+      "canonical_sha256": "891fb70a5e33214d642a7b7c3ba6ecdcea15f17b4fb80f7f515a51e5ba19377b",
+      "export_sha256": "52584e09b316160e6659219e5311204dd8e96156a7190732640d69a1f8c741b8",
+      "bytes": 2609,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Read full API, controller hook, room controls, view model, exact-room navigation helper and four test files. First-party React/browser orchestration and synthetic tests; no credentials, audio, personal profile payloads or third-party implementation exported.",
+    "The selected capacity profile is sent explicitly; default create does not silently select group voice. UI labels three-person voice as pending and distinguish consent readiness from installed group-media availability.",
+    "Room controls consume a bounded one-shot navigation hint after mounting, abort exact-room reads when superseded or account scope changes, and clear queued hints on account change. The hint is a navigation request, not room membership or action approval.",
+    "The new source dependency validates the supported room-ID shape and bounded environment reference, expires a pending hint after twelve seconds, and stores it only in module memory. The room controller must still perform the authenticated read.",
+    "The API uses same-origin credentialed no-store requests and encoded room paths; all server-side admission, consent and runtime funding remain authoritative. The hook type now accepts the existing three-person voice profile without adding media implementation.",
+    "The native panel receives the explicit mute-local-GPT callback. Existing controls retain separate host-transport invalidation, consent checks, room text owner state and owner-action callbacks."
+  ],
+  "limits": [
+    "Unfrozen private source proposal; no canonical edits during this cohort, commit, deployment or publication.",
+    "Tests use synthetic room projections and mocked hooks/fetch. They do not qualify actual account transitions, hosted authorization, microphone consent, three-person audio, GPT Live or Minecraft continuity.",
+    "Controller-hook runtime operations and provider/mute callback effects are read and syntax-checked but not directly executed by these focused tests.",
+    "Shared contracts and other client/runtime modules are separate dependencies. Source preview is not a standalone application."
+  ]
+}

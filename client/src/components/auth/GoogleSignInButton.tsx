@@ -16,12 +16,13 @@ type GoogleAccountsId = {
 };
 
 declare global {
-  interface Window {
-    google?: {
-      accounts?: {
-        id?: GoogleAccountsId;
-      };
+  interface CasimirGoogleBrowserNamespace {
+    accounts?: {
+      id?: GoogleAccountsId;
     };
+  }
+  interface Window {
+    google?: CasimirGoogleBrowserNamespace;
   }
 }
 

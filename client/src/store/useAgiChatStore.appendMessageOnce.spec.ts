@@ -2,7 +2,7 @@
 
 import { beforeEach, describe, expect, it } from "vitest";
 import type { ChatMessage } from "@shared/agi-chat";
-import { AGI_CHAT_STORAGE_KEY, useAgiChatStore } from "@/store/useAgiChatStore";
+import { getCurrentAgiChatStorageKey, useAgiChatStore } from "@/store/useAgiChatStore";
 import { useWorkspaceMemoryRegistryStore } from "@/store/useWorkspaceMemoryRegistryStore";
 
 const terminalMessage: ChatMessage = {
@@ -99,7 +99,7 @@ describe("useAgiChatStore.appendMessageOnce", () => {
       .getState()
       .appendMessageOnce(sessionId, longTerminalMessage);
 
-    const persistedEnvelope = window.localStorage.getItem(AGI_CHAT_STORAGE_KEY);
+    const persistedEnvelope = window.localStorage.getItem(getCurrentAgiChatStorageKey());
     expect(persistedEnvelope).toBeTruthy();
     const persistedContent = JSON.parse(persistedEnvelope ?? "{}")?.state
       ?.sessions?.[sessionId]?.messages?.[0]?.content;
@@ -111,7 +111,7 @@ describe("useAgiChatStore.appendMessageOnce", () => {
       activeId: undefined,
       hydrated: false,
     });
-    window.localStorage.setItem(AGI_CHAT_STORAGE_KEY, persistedEnvelope ?? "");
+    window.localStorage.setItem(getCurrentAgiChatStorageKey(), persistedEnvelope ?? "");
     await useAgiChatStore.persist.rehydrate();
     expect(
       useAgiChatStore.getState().sessions[sessionId]?.messages[0]?.content,
@@ -150,14 +150,14 @@ describe("useAgiChatStore.appendMessageOnce", () => {
       .getState()
       .appendMessageOnce(sessionId, longTerminalMessage);
     const persistedEnvelope =
-      window.localStorage.getItem(AGI_CHAT_STORAGE_KEY) ?? "";
+      window.localStorage.getItem(getCurrentAgiChatStorageKey()) ?? "";
 
     useAgiChatStore.setState({
       sessions: {},
       activeId: undefined,
       hydrated: false,
     });
-    window.localStorage.setItem(AGI_CHAT_STORAGE_KEY, persistedEnvelope);
+    window.localStorage.setItem(getCurrentAgiChatStorageKey(), persistedEnvelope);
     await useAgiChatStore.persist.rehydrate();
     const persistedMessage =
       useAgiChatStore.getState().sessions[sessionId]?.messages[0];

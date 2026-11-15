@@ -41,11 +41,9 @@ export type HelixAskVoiceCaptureDiagnosticsCheckpointInput = {
 
 export type HelixAskVoiceCaptureDiagnosticsSegmentInput = VoiceCaptureSegmentSnapshot;
 
-export type HelixAskVoiceCaptureDiagnosticsPendingConfirmationInput = NonNullable<
+export type HelixAskVoiceCaptureDiagnosticsPendingConfirmationInput = Partial<NonNullable<
   VoiceCaptureDiagnosticsSnapshot["pendingConfirmation"]
-> & {
-  confirmBlockReason?: string | null;
-};
+>>;
 
 export type HelixAskVoiceCaptureDiagnosticsBaseStateOptions = {
   micArmState: VoiceCaptureDiagnosticsSnapshot["micArmState"];

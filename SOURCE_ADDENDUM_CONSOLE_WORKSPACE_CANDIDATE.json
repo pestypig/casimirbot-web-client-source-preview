@@ -1,0 +1,74 @@
+{
+  "observed_at": "2026-11-13T22:11:53.473232+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyConsoleView.tsx",
+      "canonical_sha256": "e6b69dce354c4fc86d7f59dc3af93e6c1631ebddd29a7f50f1b61878fcb2078c",
+      "export_sha256": "e6b69dce354c4fc86d7f59dc3af93e6c1631ebddd29a7f50f1b61878fcb2078c",
+      "bytes": 5515,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "d7c49de1cc5da5f7375ba83cb2331680519c2f47031f8fb3e77d53b2761a2a29"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixConsoleConversationWorkspace.tsx",
+      "canonical_sha256": "67b8e164a536cf7e42e5f10f773bb444b3d9a4f2745ebcf785ad0977c702b4f3",
+      "export_sha256": "b77fea6b55ea5ecfec81f51e3ed8d8194768c95ca741e743aa27adb2069d085e",
+      "bytes": 86974,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "2c8c7ad377b99a014fd50c414ee2ae3b89171a888b3194bf62c53bc229df82ca"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixConsoleSelectedComposer.tsx",
+      "canonical_sha256": "69bfbf87c1095a8fdc7309cad95680d4049b6326e78cf9c2f2c2a807b8d677bd",
+      "export_sha256": "69bfbf87c1095a8fdc7309cad95680d4049b6326e78cf9c2f2c2a807b8d677bd",
+      "bytes": 7282,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "6a3c14b0ba6e1692139ae7f535527a9db0f1716ee46a8f7239f1b3fb7533e925"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/ManagedAiTextConsole.tsx",
+      "canonical_sha256": "d4fa79719d93dc86b89a7fbdc5a85689638f32a76fcda2e43d1dc956ea62f117",
+      "export_sha256": "d4fa79719d93dc86b89a7fbdc5a85689638f32a76fcda2e43d1dc956ea62f117",
+      "bytes": 9866,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixConsoleConversationWorkspace.spec.tsx",
+      "canonical_sha256": "9d4d3f9d03da98d28b2a65f02fa929251e2214c7997c9b193229b06160b3eb9f",
+      "export_sha256": "41ba040d04bc5bffaa6304750618a57192a9440c9ab737be7ce64bcbd6d2c541",
+      "bytes": 63701,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "101aaf28df2d5c538e4ce1cd330b65b0e2101fbd5066819c43b3ac07c0d9cf5e"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/ManagedAiTextConsole.spec.tsx",
+      "canonical_sha256": "58e261f6b3e524070f368f5512a50ce32f9b41638dabef2f9dd024b983a90c27",
+      "export_sha256": "58e261f6b3e524070f368f5512a50ce32f9b41638dabef2f9dd024b983a90c27",
+      "bytes": 9683,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Reviewed selected existing runtime deltas, the new ManagedAiTextConsole module and suite, workspace stream discovery/grant/selection/publish/resume and native-cloud continuation paths, channel rendering and composer routing. Existing large-workspace coverage is not a claim of fresh qualification of every retained interaction.",
+    "Managed text has a distinct native funded route and session-only transcript; each explicit question is independent and bounded to 4096 UTF-8 bytes. Linked installation consent, reported minimum reservation and allowance gates precede submission. Unconfirmed outcomes block the same question without automatic retry; native/server funding and authorization remain authoritative.",
+    "Managed text hides the original visible composer while retaining its mounted room controller. Party Chat remains member text; the developer Room Agent shortcut posts a message for separate review rather than running work. Adapter activity remains read-only.",
+    "Personal Discord destinations are discovered from the native bridge independently of a Hosted Room. Hosted-owner destination takes precedence. Exact local read grants remain separate from finite source-set sharing approval. Current activity is baselined before selection; periodic heartbeat, revision and receipt checks constrain delivery. Closing the Float does not itself stop an approved background share.",
+    "Runtime fix 37 keys the workspace to the monotonic account revision and guards native/domain stream continuations before and after asynchronous calls. A delayed discovery cannot select a prior account destination, and a delayed local read-grant receipt cannot be forwarded under a successor account. Same-profile refresh retains drafts; an account round trip or unmount retires the old operation.",
+    "Two regressions failed before the fix. The resulting suite includes switch, round-trip and unmount cases; all native/provider endpoints are mocked. Account scope is a client attribution guard and does not add or renew any authorization."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal; runtime fix 37 and previous post-R380 fixes are not installed.",
+    "No real model request, key operation, account approval, stream send or game action occurred in these tests.",
+    "A request already accepted by native/server authority is not undone by client retirement. Cross-account cleanup must not be sent under the successor account; lease expiry and native account custody require installed verification.",
+    "Native funding validity, actual allowance expiry, live stream delivery/deduplication/revocation, protected resume, Windows Float custody and attended Minecraft/GPT Live handoff remain separate acceptance work.",
+    "Export tests load selected production modules with canonical unselected dependencies. Compilation externalizes npm and separately scoped dependencies; it is not full application typechecking or a rendered CSS check.",
+    "Five intentional support-contact matches elsewhere remain for exact public-candidate owner review."
+  ]
+}

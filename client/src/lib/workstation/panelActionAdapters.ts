@@ -1,4 +1,5 @@
 import { openDocPanel } from "@/lib/docs/openDocPanel";
+import { executePhysicsGlyphPanelAction } from "@/lib/workstation/physicsGlyphActionAdapter";
 import { DOC_MANIFEST, findDocEntry } from "@/lib/docs/docManifest";
 import { getPanelDef } from "@/lib/desktop/panelRegistry";
 import type { SettingsTab } from "@/hooks/useHelixStartSettings";
@@ -2263,6 +2264,10 @@ export function executeHelixPanelAction(
       action_id: actionId,
       artifact: buildWorkspaceActionReceipt(panelId, actionId),
     };
+  }
+
+  if (panelId === "physics-glyphs") {
+    return executePhysicsGlyphPanelAction(actionId, request.args);
   }
 
   if (panelId === "narrator") {
@@ -5833,7 +5838,7 @@ export function executeHelixPanelAction(
         threadId: asNonEmptyString(args.thread_id ?? args.threadId) ?? "helix-ask:desktop",
         buildExplanationPlan: true,
         buildFrontierSearch: true,
-        frontierSearchSeed: asNonEmptyString(args.frontier_search_seed ?? args.frontierSearchSeed),
+        frontierSearchSeed: asNonEmptyString(args.frontier_search_seed ?? args.frontierSearchSeed) ?? undefined,
         syncPanel: asBoolean(args.overlay) ?? true,
         overlayMode: "discussion_zone",
         openPanel: asBoolean(args.open_panel ?? args.openPanel) ?? true,

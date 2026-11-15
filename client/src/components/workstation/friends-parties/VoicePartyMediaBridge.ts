@@ -88,6 +88,7 @@ export const createVoicePartyMediaBridge = (input: {
   let playback: ReturnType<typeof createSharedLiveRoomAudioPlayback> | null = null;
   let iceRestartInFlight = false;
   let closed = false;
+  let starting = false;
   let projection: VoicePartyMediaProjection = {
     ...INITIAL_VOICE_PARTY_MEDIA_PROJECTION,
     muted: input.self.muted,
@@ -145,105 +146,121 @@ export const createVoicePartyMediaBridge = (input: {
 
   return {
     async start() {
-      if (closed || connection) return;
-      peer = findPeer(party, input.self.participant_id);
-      if (!peer || party.state === "ended") {
-        update({ state: "waiting_for_peer" });
-        return;
-      }
-      update({ state: "waiting_for_peer", failure: null });
-      await reportMedia("connecting");
-      let peerConfiguration: RTCConfiguration;
+      if (closed || connection || starting) return;
+      starting = true;
       try {
-        if (input.iceServers) {
-          peerConfiguration = {
-            iceServers: input.iceServers,
-            iceTransportPolicy: input.transportPolicy ?? "all",
-          };
-        } else {
-          const admitted = await input.api.getIceConfiguration(
-            party.party_id,
-            input.transportPolicy ?? "all",
-          );
-          peerConfiguration = {
-            iceServers: admitted.ice_servers,
-            iceTransportPolicy: admitted.ice_transport_policy,
-          };
+        peer = findPeer(party, input.self.participant_id);
+        if (!peer || party.state === "ended") {
+          update({ state: "waiting_for_peer" });
+          return;
         }
-      } catch {
-        update({ state: "error", failure: "ice_configuration_unavailable" });
-        await reportMedia("failed").catch(() => undefined);
-        return;
-      }
-      try {
-        microphone = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            echoCancellation: { ideal: true },
-            noiseSuppression: { ideal: true },
-            autoGainControl: { ideal: true },
-            channelCount: { ideal: 1 },
-          },
-        });
-      } catch {
-        update({ state: "error", failure: "microphone_unavailable" });
-        await reportMedia("failed").catch(() => undefined);
-        return;
-      }
-      const localTrack = microphone.getAudioTracks()[0];
-      localTrack.enabled = !projection.muted;
-      connection = new RTCPeerConnection(peerConfiguration);
-      playback = createSharedLiveRoomAudioPlayback({
-        onBlocked: () => update({
-          state: "degraded",
-          remote_audio_playback_ready: false,
-          failure: "remote_audio_playback_blocked",
-        }),
-        onPlaying: () => update({ remote_audio_playback_ready: true }),
-      });
-      playback.setMuted(projection.deafened);
-      connection.addTrack(localTrack, microphone);
-      connection.ontrack = (event) => playback?.attach(event.track);
-      connection.onicecandidate = (event) => {
-        if (event.candidate) void signaling.publishCandidate(event.candidate.toJSON())
-          .catch(() => update({ state: "degraded", failure: "signaling_failed" }));
-      };
-      connection.onconnectionstatechange = () => {
-        if (!connection) return;
-        if (connection.connectionState === "connected") {
-          recovery.observe("connected");
-          update({ state: "active", peer_audio_connected: true, failure: null });
-          void reportMedia("connected").then(async () => {
-            if (!connection) return;
-            const transport = await detectTransport(connection);
-            update({ transport });
-            if (transport !== "unknown") await reportMedia(transport);
-          }).catch(() => undefined);
-        } else if (
-          connection.connectionState === "disconnected" ||
-          connection.connectionState === "failed"
-        ) {
-          recovery.observe("disconnected");
-          update({ state: "degraded", peer_audio_connected: false });
-          void reportMedia("degraded").catch(() => undefined);
-          if (
-            role === "owner" && !iceRestartInFlight && connection.restartIce
-          ) {
-            iceRestartInFlight = true;
-            try {
-              connection.restartIce();
-              void signaling.sendOffer()
-                .catch(() => update({ state: "degraded", failure: "signaling_failed" }))
-                .finally(() => { iceRestartInFlight = false; });
-            } catch {
-              iceRestartInFlight = false;
-            }
+        update({ state: "waiting_for_peer", failure: null });
+        await reportMedia("connecting");
+        if (closed) return;
+        let peerConfiguration: RTCConfiguration;
+        try {
+          if (input.iceServers) {
+            peerConfiguration = {
+              iceServers: input.iceServers,
+              iceTransportPolicy: input.transportPolicy ?? "all",
+            };
+          } else {
+            const admitted = await input.api.getIceConfiguration(
+              party.party_id,
+              input.transportPolicy ?? "all",
+            );
+            peerConfiguration = {
+              iceServers: admitted.ice_servers,
+              iceTransportPolicy: admitted.ice_transport_policy,
+            };
           }
-        } else {
-          recovery.observe(connection.connectionState);
+        } catch {
+          if (closed) return;
+          update({ state: "error", failure: "ice_configuration_unavailable" });
+          await reportMedia("failed").catch(() => undefined);
+          return;
         }
-      };
-      signaling.start();
-      if (role === "owner") await signaling.sendOffer();
+        if (closed) return;
+        try {
+          const acquired = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              echoCancellation: { ideal: true },
+              noiseSuppression: { ideal: true },
+              autoGainControl: { ideal: true },
+              channelCount: { ideal: 1 },
+            },
+          });
+          if (closed) {
+            acquired.getTracks().forEach((track) => track.stop());
+            return;
+          }
+          microphone = acquired;
+        } catch {
+          if (closed) return;
+          update({ state: "error", failure: "microphone_unavailable" });
+          await reportMedia("failed").catch(() => undefined);
+          return;
+        }
+        const localTrack = microphone.getAudioTracks()[0];
+        localTrack.enabled = !projection.muted;
+        connection = new RTCPeerConnection(peerConfiguration);
+        playback = createSharedLiveRoomAudioPlayback({
+          onBlocked: () => update({
+            state: "degraded",
+            remote_audio_playback_ready: false,
+            failure: "remote_audio_playback_blocked",
+          }),
+          onPlaying: () => update({ remote_audio_playback_ready: true }),
+        });
+        playback.setMuted(projection.deafened);
+        connection.addTrack(localTrack, microphone);
+        connection.ontrack = (event) => playback?.attach(event.track);
+        connection.onicecandidate = (event) => {
+          if (event.candidate) void signaling.publishCandidate(event.candidate.toJSON())
+            .catch(() => update({ state: "degraded", failure: "signaling_failed" }));
+        };
+        connection.onconnectionstatechange = () => {
+          if (!connection) return;
+          if (connection.connectionState === "connected") {
+            recovery.observe("connected");
+            update({ state: "active", peer_audio_connected: true, failure: null });
+            void reportMedia("connected").then(async () => {
+              if (!connection) return;
+              const observed = connection;
+              const transport = await detectTransport(observed);
+              if (closed || connection !== observed) return;
+              update({ transport });
+              if (transport !== "unknown") await reportMedia(transport);
+            }).catch(() => undefined);
+          } else if (
+            connection.connectionState === "disconnected" ||
+            connection.connectionState === "failed"
+          ) {
+            recovery.observe("disconnected");
+            update({ state: "degraded", peer_audio_connected: false });
+            void reportMedia("degraded").catch(() => undefined);
+            if (
+              role === "owner" && !iceRestartInFlight && connection.restartIce
+            ) {
+              iceRestartInFlight = true;
+              try {
+                connection.restartIce();
+                void signaling.sendOffer()
+                  .catch(() => update({ state: "degraded", failure: "signaling_failed" }))
+                  .finally(() => { iceRestartInFlight = false; });
+              } catch {
+                iceRestartInFlight = false;
+              }
+            }
+          } else {
+            recovery.observe(connection.connectionState);
+          }
+        };
+        signaling.start();
+        if (role === "owner") await signaling.sendOffer();
+      } finally {
+        starting = false;
+      }
     },
     syncParty(nextParty) {
       party = nextParty;

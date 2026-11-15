@@ -29,6 +29,7 @@ import {
   type HelixAskRealtimeProviderEventProjection,
 } from "./HelixAskRealtimeProviderEventHandler";
 import { getAudioFocusSnapshot } from "@/lib/audio-focus";
+import { captureAccountOperationScope } from "@/lib/workstation/accountOperationScope";
 import { HELIX_MANAGED_VOICE_REPLY_COMPLETED_EVENT,
   type HelixManagedVoiceReplyCompletedDetail } from "@/lib/helix/managed-voice-reply";
 import {
@@ -164,6 +165,13 @@ export const useHelixAskLiveRuntimeSession = (input: {
     transportState: input.initialTransportState ?? INITIAL_STATE.transportState,
   }));
   const [visualTransportRevision, setVisualTransportRevision] = useState(0);
+  const [localPlaybackMuted, setLocalPlaybackMutedState] = useState(false);
+  const localPlaybackMutedRef = useRef(false);
+  const lifecycleGeneration = useRef(0);
+  const startInFlight = useRef(false);
+  const mounted = useRef(true);
+  const enabledRef = useRef(input.enabled);
+  enabledRef.current = input.enabled;
   const controllerRef = useRef<HelixAskLiveRuntimeBrowserTransportController | null>(null);
   const providerEventHandlerRef = useRef<HelixAskRealtimeProviderEventHandler | null>(null);
   const sessionIdRef = useRef<string | null>(null);
@@ -205,6 +213,8 @@ export const useHelixAskLiveRuntimeSession = (input: {
   }, []);
 
   const stop = useCallback(async () => {
+    const revision = ++lifecycleGeneration.current;
+    startInFlight.current = false;
     // Consent revocation must take effect before React can commit the next render.
     visualInputEnabledRef.current = false;
     visualFrameAcknowledgementTrackerRef.current.reset();
@@ -224,20 +234,21 @@ export const useHelixAskLiveRuntimeSession = (input: {
     providerEventHandlerRef.current?.dispose();
     providerEventHandlerRef.current = null;
     unregisterHelixAskLiveMediaBoundary({ realtimeSessionId: sessionId, controller });
-    await controller?.stopTransport({ realtimeSessionId: sessionId }).catch(() => null);
     controllerRef.current = null;
     sessionIdRef.current = null;
-    runtimeContextRef.current = {
-      transportReceiptRef: null,
-      vadState: null,
-      interruptionCount: 0,
-    };
+    await controller?.stopTransport({ realtimeSessionId: sessionId }).catch(() => null);
     if (sessionId) {
       await postJson(`/api/agi/realtime/session/${encodeURIComponent(sessionId)}/stop`, {
         receipt_kind: "stop_requested",
         observed_at_ms: Date.now(),
       }).catch(() => null);
     }
+    if (revision !== lifecycleGeneration.current || !mounted.current) return;
+    runtimeContextRef.current = {
+      transportReceiptRef: null,
+      vadState: null,
+      interruptionCount: 0,
+    };
     setState({
       lifecycleState: "stopped",
       transportState: "stopped",
@@ -264,8 +275,31 @@ export const useHelixAskLiveRuntimeSession = (input: {
   }, [state.realtimeSessionId]);
 
   const start = useCallback(async (renewal = false) => {
-    if (!input.enabled || (!renewal && state.active) || state.lifecycleState === "requesting") return false;
+    if (!mounted.current || !input.enabled || startInFlight.current || (!renewal && state.active) || state.lifecycleState === "requesting") return false;
     if (renewal) await stop();
+    if (!mounted.current || !enabledRef.current || startInFlight.current) return false;
+    const revision = ++lifecycleGeneration.current;
+    const sameAccount = captureAccountOperationScope();
+    const current = () => mounted.current && enabledRef.current &&
+      lifecycleGeneration.current === revision && sameAccount();
+    startInFlight.current = true;
+    let admittedSessionId: string | null = null;
+    let attemptController: HelixAskLiveRuntimeBrowserTransportController | null = null;
+    let attemptHandler: HelixAskRealtimeProviderEventHandler | null = null;
+    const retireAttempt = async () => {
+      attemptHandler?.dispose();
+      unregisterHelixAskLiveMediaBoundary({ realtimeSessionId: admittedSessionId, controller: attemptController });
+      if (attemptController && controllerRef.current === attemptController) {
+        controllerRef.current = null;
+        sessionIdRef.current = null;
+      }
+      if (attemptHandler && providerEventHandlerRef.current === attemptHandler)
+        providerEventHandlerRef.current = null;
+      await attemptController?.stopTransport({ realtimeSessionId: admittedSessionId }).catch(() => null);
+      if (admittedSessionId) await postJson(`/api/agi/realtime/session/${encodeURIComponent(admittedSessionId)}/stop`, {
+        receipt_kind: "start_cancelled_cleanup", observed_at_ms: Date.now(),
+      }).catch(() => null);
+    };
     visualInputEnabledRef.current = false;
     visualFrameAcknowledgementTrackerRef.current.reset();
     const mode = input.mode === "off" ? "live_voice" : input.mode;
@@ -322,6 +356,8 @@ export const useHelixAskLiveRuntimeSession = (input: {
         source_binding: readLiveRuntimeSourceBinding(),
         visible_user_consent_receipt: consentReceipt.client_receipt_ref,
       });
+      admittedSessionId = response.realtime_session_id ?? null;
+      if (!current()) { await retireAttempt(); return false; }
       if (!response.ok || !response.realtime_session_id) {
         throw new Error(response.blocked_reason || response.error || "realtime_session_admission_failed");
       }
@@ -347,6 +383,7 @@ export const useHelixAskLiveRuntimeSession = (input: {
           selectedRuntimeAgentProvider: selectedRuntimeAgentProviderRef.current,
         }),
         onProjection: (projection: HelixAskRealtimeProviderEventProjection) => {
+          if (!current()) return;
           if (projection.completed_output_transcript) {
             recordHelixAskLiveRuntimeCompletedOutputTranscript(
               projection.completed_output_transcript,
@@ -383,11 +420,13 @@ export const useHelixAskLiveRuntimeSession = (input: {
           }
         },
       });
+      attemptHandler = eventHandler;
       providerEventHandlerRef.current?.dispose();
       providerEventHandlerRef.current = eventHandler;
       let remoteAudioPlaybackFailure: string | null = null;
       const controller = createHelixAskLiveRuntimeBrowserTransportController({
         onProviderEvent: (event) => {
+          if (!current()) return;
           const providerEvent = event && typeof event === "object" && !Array.isArray(event)
             ? event as Record<string, unknown>
             : null;
@@ -487,6 +526,7 @@ export const useHelixAskLiveRuntimeSession = (input: {
           void eventHandler.handle(event);
         },
         onMicrophoneState: (outcome) => {
+          if (!current()) return;
           recordHelixAskLiveRuntimeClientDebugEvent({
             eventKind: "microphone_tracks_observed",
             realtimeSessionId: response.realtime_session_id,
@@ -499,6 +539,7 @@ export const useHelixAskLiveRuntimeSession = (input: {
           });
         },
         onDataChannelState: (outcome) => {
+          if (!current()) return;
           recordHelixAskLiveRuntimeClientDebugEvent({
             eventKind: outcome.initialAudioProbe === "requested"
               ? "initial_audio_probe_requested"
@@ -517,6 +558,7 @@ export const useHelixAskLiveRuntimeSession = (input: {
           }
         },
         onAudioState: (audioState) => {
+          if (!current()) return;
           const projectedAudioState = audioState === "listening" && !microphoneEnabledRef.current
             ? "active"
             : audioState;
@@ -533,6 +575,7 @@ export const useHelixAskLiveRuntimeSession = (input: {
             : current);
         },
         onRemoteAudioTrack: (outcome) => {
+          if (!current()) return;
           recordHelixAskLiveRuntimeClientDebugEvent({
             eventKind: "remote_audio_track_attached",
             realtimeSessionId: response.realtime_session_id,
@@ -542,6 +585,7 @@ export const useHelixAskLiveRuntimeSession = (input: {
           });
         },
         onRemoteAudioPlayback: (outcome) => {
+          if (!current()) return;
           remoteAudioPlaybackFailure = outcome.errorCode;
           recordHelixAskLiveRuntimeClientDebugEvent({
             eventKind: outcome.status === "failed"
@@ -590,6 +634,8 @@ export const useHelixAskLiveRuntimeSession = (input: {
           }).catch(() => null);
         },
       });
+      attemptController = controller;
+      controller.setLocalPlaybackMuted(localPlaybackMutedRef.current);
       controllerRef.current = controller;
       sessionIdRef.current = response.realtime_session_id;
       const handoffPlan = buildHelixAskLiveRuntimeTransportHandoffPlan({
@@ -602,6 +648,7 @@ export const useHelixAskLiveRuntimeSession = (input: {
         realtimeSessionId: response.realtime_session_id,
       }));
       const result = await controller.startTransport({ handoffPlan, serverResponse: response });
+      if (!current()) { await retireAttempt(); return false; }
       runtimeContextRef.current.transportReceiptRef = result.receipt.client_receipt_ref;
       await postJson(
         `/api/agi/realtime/session/${encodeURIComponent(response.realtime_session_id)}/client-receipt`,
@@ -617,6 +664,7 @@ export const useHelixAskLiveRuntimeSession = (input: {
           failure_reason: result.ok ? null : result.blocked_reason,
         },
       ).catch(() => null);
+      if (!current()) { await retireAttempt(); return false; }
       if (!result.ok) throw new Error(result.blocked_reason);
       registerHelixAskLiveMediaBoundary({
         realtimeSessionId: response.realtime_session_id,
@@ -648,6 +696,7 @@ export const useHelixAskLiveRuntimeSession = (input: {
       });
       return !remoteAudioPlaybackFailure;
     } catch (error) {
+      if (!current()) { await retireAttempt(); return false; }
       visualInputEnabledRef.current = false;
       const failureCode = error instanceof Error ? error.message : "realtime_session_start_failed";
       recordHelixAskLiveRuntimeClientDebugEvent({
@@ -671,6 +720,7 @@ export const useHelixAskLiveRuntimeSession = (input: {
           observed_at_ms: Date.now(),
         }).catch(() => null);
       }
+      if (!current()) return false;
       controllerRef.current = null;
       providerEventHandlerRef.current?.dispose();
       providerEventHandlerRef.current = null;
@@ -698,6 +748,8 @@ export const useHelixAskLiveRuntimeSession = (input: {
       });
       microphoneEnabledRef.current = false;
       return false;
+    } finally {
+      if (lifecycleGeneration.current === revision) startInFlight.current = false;
     }
   }, [input.authority, input.enabled, input.mode, state.active, state.lifecycleState, state.realtimeSessionId, stop]);
 
@@ -723,6 +775,12 @@ export const useHelixAskLiveRuntimeSession = (input: {
       lifecycleState: enabled ? "listening" : "active",
     }));
     return true;
+  }, []);
+
+  const setLocalPlaybackMuted = useCallback((muted: boolean): void => {
+    localPlaybackMutedRef.current = muted;
+    controllerRef.current?.setLocalPlaybackMuted(muted);
+    setLocalPlaybackMutedState(muted);
   }, []);
 
   const setVisualInputEnabled = useCallback((enabled: boolean): boolean => {
@@ -914,29 +972,35 @@ export const useHelixAskLiveRuntimeSession = (input: {
     };
   }, [state.active, state.realtimeSessionId]);
 
-  useEffect(() => () => {
-    visualInputEnabledRef.current = false;
-    visualFrameAcknowledgementTrackerRef.current.reset();
-    const controller = controllerRef.current;
-    const sessionId = sessionIdRef.current;
-    providerEventHandlerRef.current?.dispose();
-    providerEventHandlerRef.current = null;
-    controllerRef.current = null;
-    sessionIdRef.current = null;
-    unregisterHelixAskLiveMediaBoundary({ realtimeSessionId: sessionId, controller });
-    microphoneEnabledRef.current = false;
-    runtimeContextRef.current = {
-      transportReceiptRef: null,
-      vadState: null,
-      interruptionCount: 0,
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      ++lifecycleGeneration.current;
+      startInFlight.current = false;
+      visualInputEnabledRef.current = false;
+      visualFrameAcknowledgementTrackerRef.current.reset();
+      const controller = controllerRef.current;
+      const sessionId = sessionIdRef.current;
+      providerEventHandlerRef.current?.dispose();
+      providerEventHandlerRef.current = null;
+      controllerRef.current = null;
+      sessionIdRef.current = null;
+      unregisterHelixAskLiveMediaBoundary({ realtimeSessionId: sessionId, controller });
+      microphoneEnabledRef.current = false;
+      runtimeContextRef.current = {
+        transportReceiptRef: null,
+        vadState: null,
+        interruptionCount: 0,
+      };
+      void controller?.stopTransport({ realtimeSessionId: sessionId });
+      if (sessionId) {
+        void postJson(`/api/agi/realtime/session/${encodeURIComponent(sessionId)}/stop`, {
+          receipt_kind: "component_unmounted",
+          observed_at_ms: Date.now(),
+        }).catch(() => null);
+      }
     };
-    void controller?.stopTransport({ realtimeSessionId: sessionId });
-    if (sessionId) {
-      void postJson(`/api/agi/realtime/session/${encodeURIComponent(sessionId)}/stop`, {
-        receipt_kind: "component_unmounted",
-        observed_at_ms: Date.now(),
-      }).catch(() => null);
-    }
   }, []);
 
   return {
@@ -945,6 +1009,8 @@ export const useHelixAskLiveRuntimeSession = (input: {
     renew,
     stop,
     setMicrophoneEnabled,
+    localPlaybackMuted,
+    setLocalPlaybackMuted,
     setVisualInputEnabled,
   };
 };

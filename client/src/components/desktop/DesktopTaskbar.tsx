@@ -1,3 +1,4 @@
+import { isExperimentalLaunchPanelVisible, useExperimentalLaunchPanels } from "@/lib/workstation/experimentalLaunchPanels";
 import React from "react";
 import { AppWindow, ChevronUp, CircleDot } from "lucide-react";
 import { TaskbarShelf } from "@/components/desktop/TaskbarPanel";
@@ -137,6 +138,7 @@ export function DesktopTaskbar({
 }
 
 function HelixStartLauncher({ onOpenPanel }: { onOpenPanel?: (panelId: string) => void }) {
+  const experimentalLaunchPanels = useExperimentalLaunchPanels();
   const [menuOpen, setMenuOpen] = React.useState(false);
   const { windows, open, focus, restore } = useDesktopStore();
   const { userSettings } = useHelixStartSettings();
@@ -146,13 +148,13 @@ function HelixStartLauncher({ onOpenPanel }: { onOpenPanel?: (panelId: string) =
   const helixPanels = React.useMemo(
     () =>
       [...HELIX_PANELS]
-        .filter((panel) => !panel.startHidden && !isSolarSpecialistLaunchPanel(panel.id))
+        .filter((panel) => !panel.startHidden && isExperimentalLaunchPanelVisible(String(panel.id), experimentalLaunchPanels) && !isSolarSpecialistLaunchPanel(panel.id))
         .sort((a, b) => {
           const aTitle = getInterfacePanelTitle(t, a.id, a.title);
           const bTitle = getInterfacePanelTitle(t, b.id, b.title);
           return aTitle.localeCompare(bTitle, undefined, { sensitivity: "base" });
         }),
-    [t]
+    [t, experimentalLaunchPanels]
   );
 
   const keywordFilter = React.useCallback((value: string, search: string) => {

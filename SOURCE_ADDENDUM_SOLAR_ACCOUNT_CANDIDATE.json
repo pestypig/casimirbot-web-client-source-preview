@@ -1,0 +1,121 @@
+{
+  "observed_at": "2026-11-13T19:39:47.937399+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/SolarEventEvidenceInspector.tsx",
+      "canonical_sha256": "56928b79f1ef494402a4ace9f4e82f852c433dbc844053725171c6dc59d8a3b1",
+      "export_sha256": "56928b79f1ef494402a4ace9f4e82f852c433dbc844053725171c6dc59d8a3b1",
+      "bytes": 3400,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "cb6e4ffdf3bad58bb6b37520e7ea420996c57025fc5e02ef1db32ca86a30a5d8"
+    },
+    {
+      "path": "client/src/components/SolarMagneticArchiveDirectory.tsx",
+      "canonical_sha256": "fcaa7b0113571e78602e09f85586a87cd101581bc4f683596bffddb07ceb3232",
+      "export_sha256": "fcaa7b0113571e78602e09f85586a87cd101581bc4f683596bffddb07ceb3232",
+      "bytes": 16429,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "ec9acac8578b6a32da896c42483e5840238f00dbc64554ba65ab87e74f114e89"
+    },
+    {
+      "path": "client/src/components/SolarMagneticBundleStorage.tsx",
+      "canonical_sha256": "68d7d1bacb662efa65688cfa8553de0c7ec389437a4b5ae7b28d1281b7b26bef",
+      "export_sha256": "68d7d1bacb662efa65688cfa8553de0c7ec389437a4b5ae7b28d1281b7b26bef",
+      "bytes": 4927,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "24131dd99e64f7d43787b491dba337a82bec8548b88f446f7a412c7f3c645038"
+    },
+    {
+      "path": "client/src/components/SolarMagneticBundleStorage.test.tsx",
+      "canonical_sha256": "f5812921cedaec2dc47695294e81192f5db77e22a84d4c1649cdaa0505d8fe7a",
+      "export_sha256": "f5812921cedaec2dc47695294e81192f5db77e22a84d4c1649cdaa0505d8fe7a",
+      "bytes": 2787,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "7c4bb64defd286ea0317f7c9971de48fb578d0d91e53cf5c4ec0afe109c9a073"
+    },
+    {
+      "path": "client/src/components/SolarResearchComparisonRecord.tsx",
+      "canonical_sha256": "34e54afbd680055dd565236f1eaf09803a8f65c8bafdf0fab1f69bc9cdac80a8",
+      "export_sha256": "34e54afbd680055dd565236f1eaf09803a8f65c8bafdf0fab1f69bc9cdac80a8",
+      "bytes": 21937,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "ecd22f43271309e89b5545a902083e3e814623ebb5fcaeae89b6957b56933cf3"
+    },
+    {
+      "path": "client/src/components/SolarResearchPackageStorage.tsx",
+      "canonical_sha256": "caf5a8cfb7b3ed81206df701f27d8eb205bc396ef1375bf5ded177ed9c16de8b",
+      "export_sha256": "caf5a8cfb7b3ed81206df701f27d8eb205bc396ef1375bf5ded177ed9c16de8b",
+      "bytes": 7932,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "cee8025f1c0069d3f6aca03fc4b0a3fe5ade0e59ec4d79acc362cffc79e22ec6"
+    },
+    {
+      "path": "client/src/components/SolarResearchWorkbenchCatalog.tsx",
+      "canonical_sha256": "ff89524d449b67415f3b2786867f382b863756139843a170c69e8b04a053af82",
+      "export_sha256": "06bc1de5c4f6881c3455bf51d6efddd27bc409698c7e2eabf36073fcfade295d",
+      "bytes": 16050,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "8a0958c5950b5b5632bcf98d25cce327430b0a0ab6c29510ed04968233e5f68f"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-event-evidence-inspector.spec.tsx",
+      "canonical_sha256": "f06b9613c8fe2e1f0598b667e3d37d2110d8a5536f52fbff5fd5b78b5a18c1c2",
+      "export_sha256": "f06b9613c8fe2e1f0598b667e3d37d2110d8a5536f52fbff5fd5b78b5a18c1c2",
+      "bytes": 2796,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "f4a46ea3e044ff90a9dd230d947080c3f7b23f5a6ea05dd8bc81b4d8a0f55afd"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-research-comparison-record.spec.tsx",
+      "canonical_sha256": "18ab574ebf009057c39d753680777a274586ec300ee33d048f34277383911663",
+      "export_sha256": "18ab574ebf009057c39d753680777a274586ec300ee33d048f34277383911663",
+      "bytes": 20314,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "4ffec1a75136796ac56ac28245f3f050f297308d7982fac97d383efd4207e6dc"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-research-package-storage.spec.tsx",
+      "canonical_sha256": "bc1df376c2ad1e3d6297ccb92c5203e5c706923e4bcfb26479b05a49b06b5671",
+      "export_sha256": "bc1df376c2ad1e3d6297ccb92c5203e5c706923e4bcfb26479b05a49b06b5671",
+      "bytes": 8800,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "8381911acc09db426f080d1af655d539e6d3501da12468c51291f9f374322724"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-research-workbench-catalog.spec.tsx",
+      "canonical_sha256": "c5374b8ee7190eb4fdc7c9cf1155413ef3bdfa7ee44683fe869e3d788ee4eac1",
+      "export_sha256": "22030607c8b30cc92f8b2b64f3f6daaaf86164995635bae0673c77c6e9b6244d",
+      "bytes": 11945,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "920a3a7a8597cbfef906b86f66434e89e2e6b35ffd9bfb0ffd6e614c6bf1ef21"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed the selected account-retention and HEK navigation diffs, relevant request/response handlers and focused tests. Ordinary signed-in profiles can request their own magnetic bundles, research records and evidence packages; explicit retention remains distinct from selecting, preparing or reopening content.",
+    "Expected profile and exact record/package IDs, response claim-boundary flags and replay verification remain in the existing paths. Account events retire in-flight UI operations and clear retained selections. Server account/quota gates remain independent of client visibility.",
+    "Local repository inputs remain a separate developer feature. Reproduced an explicit-lock precedence defect: a developer account listing the feature still requested local products when locked_features also denied it. Added a negative lock check without restricting ordinary owner catalogs.",
+    "HEK references now retain bounded names and declared media types through the existing shared normalizer. HTTP(S) navigation links use noopener/noreferrer and remain labeled as unverified destinations/content/revisions. No external link or provider was fetched during this review.",
+    "Scientific data, observation/operator models, hash contracts and certificates are unchanged. Existing diagnostic, fixture, covariance, provenance and no-admission labels remain. Source UI tests are not evidence of a solver result or scientific admission."
+  ],
+  "limits": [
+    "Private unfrozen source proposal; no installed or public-release acceptance. R380 does not contain the new explicit-lock fix.",
+    "Tests use mocked HTTP, canonical shared replay/validation code and local observation/package fixtures. Those files are not being copied to this web proposal and their presence is not a scientific validation claim.",
+    "Magnetic archive directory copy/account check was reviewed and compiled; no live provider search, FITS download or installed acquisition was exercised by these suites.",
+    "Magnetic bundle tests mock bundle preparation/verification, so they test UI identity routing and sign-in rather than cryptographic correctness.",
+    "The larger globe, time-player, palette/registration changes and their new dependencies remain separate review. Full application compilation and matching server/native authorization are still required.",
+    "Five inherited intentional support-contact matches remain in the final owner publication review."
+  ]
+}

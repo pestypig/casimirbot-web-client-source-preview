@@ -280,7 +280,7 @@ export function MoralGraphBiomeMap({
           <div className="font-semibold text-zinc-50">{translateText(hoveredNode.label)}</div>
           <div className="mt-0.5 font-mono text-[10px] text-zinc-500">{hoveredNode.id}</div>
           <div className="mt-1 font-mono text-[11px] leading-snug text-cyan-100">
-            {translateText(hoveredNode.proceduralExpression)}
+            {translateText(hoveredNode.proceduralExpression ?? "No procedural expression mapped.")}
           </div>
           <div className="mt-1 grid grid-cols-2 gap-1 text-[10px] text-zinc-300">
             <span>{translateText(labelize(hoveredNode.biome))}</span>

@@ -10,7 +10,7 @@ import {
 export type HelixAskConsoleDiagnosticsReply = {
   id: string;
   canonicalKey: string;
-  createdAtMs: number;
+  createdAtMs: number | null;
 };
 
 export type HelixAskConsoleDiagnosticsActiveDom = Record<string, unknown> | null;
@@ -212,7 +212,7 @@ export type HelixAskConsoleAssemblyDebugSnapshot = {
   activeTurnId: string | null;
   activeTraceId: string | null;
   activeStartedAtMs: number | null;
-  activeQuestion: string;
+  activeQuestion: string | null;
   totalLiveEventCount: number;
   retainedLiveEventCount: number;
   activeLiveEventCount: number;
@@ -233,7 +233,7 @@ export type HelixAskConsoleAssemblyDebugSnapshot = {
         index: number;
         replyId: string;
         canonicalKey: string;
-        createdAtMs: number;
+        createdAtMs: number | null;
         isLatest: boolean;
       }
   >;
@@ -1333,7 +1333,7 @@ export function buildHelixAskConsoleAssemblyDebugSnapshot(input: {
   activeTurnId: string | null;
   activeTraceId: string | null;
   activeStartedAtMs: number | null;
-  activeQuestion: string;
+  activeQuestion: string | null;
   totalLiveEventCount: number;
   retainedLiveEventCount: number;
   activeLiveEventCount: number;

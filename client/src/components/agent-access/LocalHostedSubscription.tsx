@@ -29,10 +29,10 @@ export function LocalHostedSubscription() {
     <p>The $60 monthly P50 offer is a validation candidate awaiting review. This screen creates no production subscription.</p>
     {term && <p>{term.reason} · {term.profile ?? "No term"} · {term.successfulEffects} verified effects · {term.unresolvedEffects} pending reconciliation{term.endsAt ? ` · Ends ${term.endsAt}` : ""}</p>}
     <div className="flex flex-wrap gap-2">
-      <button disabled={busy || !!term?.termId} onClick={() => void act("trial", { acknowledgedLocalValidationLimits: true })}>Start local trial</button>
-      <button disabled={busy} onClick={() => void act("status")}>Refresh</button>
-      <button disabled={busy || !term?.eligible} onClick={() => void act("cancel", {})}>End local hosted eligibility</button>
-      <button disabled={busy} onClick={() => void act("sandbox-event", {
+      <button data-helix-control-id="workstation.panel.account-session.local-hosted-subscription.start-local-trial" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" disabled={busy || !!term?.termId} onClick={() => void act("trial", { acknowledgedLocalValidationLimits: true })}>Start local trial</button>
+      <button data-helix-control-id="workstation.panel.account-session.local-hosted-subscription.refresh" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" disabled={busy} onClick={() => void act("status")}>Refresh</button>
+      <button data-helix-control-id="workstation.panel.account-session.local-hosted-subscription.end-local-hosted-eligibility" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" disabled={busy || !term?.eligible} onClick={() => void act("cancel", {})}>End local hosted eligibility</button>
+      <button data-helix-control-id="workstation.panel.account-session.local-hosted-subscription.enroll-sandbox-p50-fixture" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" disabled={busy} onClick={() => void act("sandbox-event", {
         eventId: `evt_local_${crypto.randomUUID().replaceAll("-", "")}`, action: "activate", acknowledgedFixture: true,
       })}>Enroll sandbox P50 fixture</button>
     </div>

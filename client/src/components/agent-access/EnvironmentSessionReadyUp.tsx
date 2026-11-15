@@ -144,13 +144,13 @@ function EnvironmentSessionReadyUpContent({ binding }: { binding: BrowserReasoni
     }
   };
   return <div className="mt-3 border-t border-white/15 pt-3">
-    <button type="button" onClick={() => void prepare()} disabled={busy || !binding.run_id}
+    <button data-helix-control-id="workstation.panel.agent-access.environment-session-ready-up.void-prepare" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" onClick={() => void prepare()} disabled={busy || !binding.run_id}
       className="rounded border border-cyan-300/30 px-3 py-2 disabled:opacity-50">
       {busy ? "Preparing session…" : "Ready up"}
     </button>
     <p className="mt-1">Checks the bound environment session without replacing its binding or renewing permissions.</p>
     {!binding.run_id ? <p>Associate an environment run before preparing this session.</p> : null}
-    {roomId ? <button type="button" className="mt-2 rounded border border-white/20 px-3 py-2" onClick={() => {
+    {roomId ? <button data-helix-control-id="workstation.panel.agent-access.environment-session-ready-up.review-environment-settings" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="mt-2 rounded border border-white/20 px-3 py-2" onClick={() => {
       const event = new CustomEvent(HELIX_SHARED_LIVE_ROOM_OPEN_DIALOG_EVENT, {
         detail: { roomId, ...(environmentId ? { environmentBindingId: environmentId } : {}),
           onResult: (opened: boolean) => setMessage(opened

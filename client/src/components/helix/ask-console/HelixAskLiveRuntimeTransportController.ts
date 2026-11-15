@@ -179,9 +179,11 @@ export type HelixAskLiveRuntimeBrowserTransportController =
       track: HelixAskLiveRuntimeTrackLike,
       options?: { enableExternalAudio?: boolean },
     ): Promise<boolean>;
-    restoreProviderInputAudioTrack(): Promise<boolean>;
+    restoreProviderInputAudioTrack(expectedTrack?: HelixAskLiveRuntimeTrackLike): Promise<boolean>;
     setMicrophoneEnabled(enabled: boolean): boolean;
     getMicrophoneEnabled(): boolean;
+    setLocalPlaybackMuted(muted: boolean): void;
+    getLocalPlaybackMuted(): boolean;
     sendVisualFrame(
       input: HelixAskLiveRuntimeVisualFrameInput,
     ): HelixAskLiveRuntimeVisualFrameReceipt;
@@ -440,10 +442,17 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
   let providerAudioSender: HelixAskLiveRuntimeRtpSenderLike | null = null;
   let providerInputAudioTrack: HelixAskLiveRuntimeTrackLike | null = null;
   let originalProviderInputAudioTrack: HelixAskLiveRuntimeTrackLike | null = null;
+  let providerInputTarget: HelixAskLiveRuntimeTrackLike | null = null;
+  let providerInputChangeRevision = 0;
+  let providerInputQueue: Promise<void> = Promise.resolve();
   let providerOutputStream: HelixAskLiveRuntimeMediaStreamLike | null = null;
   let audioFocusId: string | null = null;
   let microphoneEnabled = false;
+  let localPlaybackMuted = false;
+  let audioFocusGranted = false;
   let transportActive = false;
+  let transportRevision = 0;
+  let startingTransport = false;
   let visualFrameSequence = 0;
   let managedVoiceReplySequence = 0;
   const retainedVisualFrameItemIds: string[] = [];
@@ -472,6 +481,9 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
     const tracks = providerInputAudioTrack
       ? [providerInputAudioTrack]
       : mediaStream?.getTracks() ?? [];
+    if (originalProviderInputAudioTrack && !tracks.includes(originalProviderInputAudioTrack)) {
+      tracks.push(originalProviderInputAudioTrack);
+    }
     if (tracks.length === 0) return false;
     microphoneEnabled = enabled;
     tracks.forEach((track) => {
@@ -479,6 +491,11 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
     });
     reportMicrophoneState();
     return true;
+  };
+
+  const setLocalPlaybackMuted = (muted: boolean): void => {
+    localPlaybackMuted = muted;
+    if (remoteAudio) remoteAudio.muted = muted || !audioFocusGranted;
   };
 
   const playRemoteAudio = () => {
@@ -499,6 +516,13 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
   };
 
   const closeResources = () => {
+    ++providerInputChangeRevision;
+    if (providerInputTarget && providerInputTarget !== originalProviderInputAudioTrack) {
+      providerInputTarget.enabled = false;
+    }
+    providerInputTarget = null;
+    // A new transport must not wait for a stopped sender's pending operation.
+    providerInputQueue = Promise.resolve();
     const tracks = mediaStream?.getTracks() ?? [];
     tracks.forEach((track) => track.stop());
     if (providerInputAudioTrack && !tracks.includes(providerInputAudioTrack)) {
@@ -523,10 +547,46 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
     originalProviderInputAudioTrack = null;
     providerOutputStream = null;
     audioFocusId = null;
+    audioFocusGranted = false;
     microphoneEnabled = false;
     transportActive = false;
     retainedVisualFrameItemIds.length = 0;
     return closed;
+  };
+
+  const changeProviderInputTrack = (
+    track: HelixAskLiveRuntimeTrackLike,
+    enableExternalAudio: boolean,
+    expectedTrack?: HelixAskLiveRuntimeTrackLike,
+    restoring = false,
+  ): Promise<boolean> => {
+    const sender = providerAudioSender;
+    if (!transportActive || (!restoring && track.kind !== "audio") || !sender?.replaceTrack ||
+        (expectedTrack && providerInputTarget !== expectedTrack)) return Promise.resolve(false);
+    const revision = transportRevision;
+    const changeRevision = ++providerInputChangeRevision;
+    const replaceTrack = sender.replaceTrack.bind(sender);
+    providerInputTarget = track;
+    if (!restoring) track.enabled = false;
+    const current = () => transportActive && transportRevision === revision &&
+      providerAudioSender === sender && providerInputChangeRevision === changeRevision;
+    const operation = providerInputQueue.then(async () => {
+      if (!current()) return false;
+      if (restoring) track.enabled = microphoneEnabled;
+      try {
+        await replaceTrack(track);
+      } catch (error) {
+        if (!current()) return false;
+        throw error;
+      }
+      if (!current()) return false;
+      providerInputAudioTrack = track;
+      track.enabled = enableExternalAudio || microphoneEnabled;
+      return true;
+    });
+    // Preserve sender order even after failure; callers still receive the failure.
+    providerInputQueue = operation.then(() => undefined, () => undefined);
+    return operation;
   };
 
   const buildVisualFrameReceipt = (args: {
@@ -775,37 +835,18 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
   return {
     getResources: () => ({ mediaStream, peerConnection, dataChannel, remoteAudio }),
     readProviderOutputStream: () => providerOutputStream,
-    replaceProviderInputAudioTrack: async (track, options) => {
-      if (
-        !transportActive ||
-        track.kind !== "audio" ||
-        !providerAudioSender?.replaceTrack
-      ) {
-        return false;
-      }
-      await providerAudioSender.replaceTrack(track);
-      providerInputAudioTrack = track;
-      // A consented external input can feed GPT Live while the owner's device
-      // microphone remains muted. The original microphone is restored below
-      // using its independent owner control state.
-      track.enabled = options?.enableExternalAudio === true || microphoneEnabled;
-      return true;
-    },
-    restoreProviderInputAudioTrack: async () => {
-      if (
-        !transportActive ||
-        !originalProviderInputAudioTrack ||
-        !providerAudioSender?.replaceTrack
-      ) {
-        return false;
-      }
-      await providerAudioSender.replaceTrack(originalProviderInputAudioTrack);
-      providerInputAudioTrack = originalProviderInputAudioTrack;
-      originalProviderInputAudioTrack.enabled = microphoneEnabled;
-      return true;
+    replaceProviderInputAudioTrack: (track, options) =>
+      changeProviderInputTrack(track, options?.enableExternalAudio === true),
+    restoreProviderInputAudioTrack: (expectedTrack) => {
+      const original = originalProviderInputAudioTrack;
+      return original
+        ? changeProviderInputTrack(original, false, expectedTrack, true)
+        : Promise.resolve(false);
     },
     setMicrophoneEnabled,
     getMicrophoneEnabled: () => microphoneEnabled,
+    setLocalPlaybackMuted,
+    getLocalPlaybackMuted: () => localPlaybackMuted,
     sendVisualFrame,
     speakManagedVoiceReply,
     prepareTransport: async ({ handoffPlan, observedAtMs }) =>
@@ -823,6 +864,11 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
         controllerState: canStartBrowserTransport(handoffPlan) ? "ready" : "ready_blocked",
       }),
     startTransport: async ({ handoffPlan, serverResponse, observedAtMs }) => {
+      if (transportActive || startingTransport) return buildResult({
+        ok: false, method: "startTransport", receiptKind: "transport_start_blocked",
+        handoffPlan, observedAtMs: observedAtMs ?? nowMs(),
+        blockedReason: "transport_already_started", controllerState: "starting_blocked",
+      });
       if (!canStartBrowserTransport(handoffPlan) || !hasServerReturnedRealtimeSessionContract(serverResponse)) {
         return buildResult({
           ok: false,
@@ -837,8 +883,18 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
 
       let openAiNetworkCallAttempted = false;
       let transportStage = "microphone_request";
+      const revision = ++transportRevision;
+      startingTransport = true;
+      const assertCurrent = () => {
+        if (revision !== transportRevision) throw new Error("realtime_transport_start_cancelled");
+      };
       try {
-        mediaStream = await requestMicrophone();
+        const acquired = await requestMicrophone();
+        if (revision !== transportRevision) {
+          acquired.getTracks().forEach(track => track.stop());
+          assertCurrent();
+        }
+        mediaStream = acquired;
         transportStage = "microphone_configure";
         setMicrophoneEnabled(false);
         transportStage = "peer_connection_create";
@@ -855,6 +911,7 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
         remoteAudio = createRemoteAudio();
         audioFocusId = `helix-realtime:${serverResponse.realtime_session_id}`;
         peerConnection.ontrack = (event) => {
+          if (revision !== transportRevision) return;
           const streamFromEvent = event.streams?.[0] ?? null;
           const stream = streamFromEvent ?? createRemoteMediaStream(event.track);
           if (!remoteAudio || !stream || !audioFocusId) return;
@@ -866,17 +923,22 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
             priority: 20,
             resumeWhenAvailable: true,
             stop: () => {
+              if (revision !== transportRevision) return;
+              audioFocusGranted = false;
               if (remoteAudio) remoteAudio.muted = true;
               deps.onAudioState?.("muted");
             },
             resume: () => {
+              if (revision !== transportRevision) return;
               if (!remoteAudio) return;
-              remoteAudio.muted = false;
+              audioFocusGranted = true;
+              remoteAudio.muted = localPlaybackMuted;
               deps.onAudioState?.("speaking");
               playRemoteAudio();
             },
           });
-          remoteAudio.muted = !focusGranted;
+          audioFocusGranted = focusGranted;
+          remoteAudio.muted = !focusGranted || localPlaybackMuted;
           deps.onRemoteAudioTrack?.({
             source: streamFromEvent ? "stream" : "track_fallback",
             muted: remoteAudio.muted,
@@ -897,12 +959,14 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
             providerAudioSender = sender as HelixAskLiveRuntimeRtpSenderLike;
             providerInputAudioTrack = track;
             originalProviderInputAudioTrack = track;
+            providerInputTarget = track;
           }
         }
         transportStage = "data_channel_create";
         dataChannel = peerConnection.createDataChannel?.("oai-events") ?? null;
         if (dataChannel) {
           dataChannel.onopen = () => {
+            if (revision !== transportRevision) return;
             deps.onDataChannelState?.({
               state: "open",
               initialAudioProbe: "not_attempted",
@@ -925,6 +989,7 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
             }
           };
           dataChannel.onclose = () => {
+            if (revision !== transportRevision) return;
             transportActive = false;
             retainedVisualFrameItemIds.length = 0;
             deps.onDataChannelState?.({
@@ -934,6 +999,7 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
             });
           };
           dataChannel.onerror = () => {
+            if (revision !== transportRevision) return;
             transportActive = false;
             retainedVisualFrameItemIds.length = 0;
             deps.onDataChannelState?.({
@@ -943,6 +1009,7 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
             });
           };
           dataChannel.onmessage = (event) => {
+            if (revision !== transportRevision) return;
             try {
               deps.onProviderEvent?.(
                 typeof event.data === "string" ? JSON.parse(event.data) : event.data,
@@ -954,9 +1021,11 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
         }
         transportStage = "offer_create";
         const offer = await peerConnection.createOffer();
+        assertCurrent();
         if (!offer.sdp) throw new Error("webrtc_offer_sdp_missing");
         transportStage = "local_description_set";
         await peerConnection.setLocalDescription(offer);
+        assertCurrent();
         openAiNetworkCallAttempted = true;
         transportStage = "sdp_exchange";
         const exchange = await exchangeSdp({
@@ -964,8 +1033,10 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
           offerSdp: offer.sdp,
           visibleUserConsentReceipt: handoffPlan.visible_user_consent_receipt as string,
         });
+        assertCurrent();
         transportStage = "remote_description_set";
         await peerConnection.setRemoteDescription({ type: "answer", sdp: exchange.answerSdp });
+        assertCurrent();
         transportActive = true;
         return buildResult({
           ok: true,
@@ -985,6 +1056,14 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
           dataChannelsCreated: Boolean(dataChannel),
         });
       } catch (error) {
+        // Stop already closed this attempt's resources. A retired completion
+        // must not inspect or close resources belonging to a later start.
+        if (revision !== transportRevision) return buildResult({
+          ok: false, method: "startTransport", receiptKind: "transport_error",
+          handoffPlan, realtimeSessionId: serverResponse.realtime_session_id,
+          observedAtMs: observedAtMs ?? nowMs(), blockedReason: "transport_start_cancelled",
+          controllerState: "stopped", openAiNetworkCallAttempted,
+        });
         const normalizedFailure = normalizeBrowserTransportFailure(error);
         const failureCode = normalizedFailure === "realtime_browser_transport_failed"
           ? `${normalizedFailure}:${transportStage}`
@@ -1011,9 +1090,13 @@ export const createHelixAskLiveRuntimeBrowserTransportController = (
           openAiNetworkCallAttempted,
           browserMediaApiReferenced: true,
         });
+      } finally {
+        if (revision === transportRevision) startingTransport = false;
       }
     },
     stopTransport: async ({ realtimeSessionId, observedAtMs }) => {
+      ++transportRevision;
+      startingTransport = false;
       const closed = closeResources();
       return buildResult({
         ok: false,

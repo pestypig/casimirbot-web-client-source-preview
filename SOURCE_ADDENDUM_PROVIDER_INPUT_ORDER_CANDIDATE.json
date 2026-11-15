@@ -1,0 +1,136 @@
+{
+  "observed_at": "2026-11-14T00:38:25.666164+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLiveRuntimeTransportController.ts",
+      "canonical_sha256": "ccb653be9b4cd4b4854d04b4e18b16a57df88f889021386122bf6df7d5746f5f",
+      "export_sha256": "ccb653be9b4cd4b4854d04b4e18b16a57df88f889021386122bf6df7d5746f5f",
+      "bytes": 42499,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "5af3e563f64b27d3b1135fff75c69ef3a0a8b51eee65b546852c019a7e29989f"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/HelixAskLiveMediaBoundary.ts",
+      "canonical_sha256": "2e73df5a90920c72b3b595019dd3f08945548245419adad99844c16332b9b695",
+      "export_sha256": "2e73df5a90920c72b3b595019dd3f08945548245419adad99844c16332b9b695",
+      "bytes": 2532,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "047e15083b7b56665665c1119adab685416217ecebd07aa389b30557c571a92e"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/RoomMediaBridge.ts",
+      "canonical_sha256": "39643e2a5352d6be41d2002e74026e7814c4fb66560a9ba32c1d3537346b04b3",
+      "export_sha256": "39643e2a5352d6be41d2002e74026e7814c4fb66560a9ba32c1d3537346b04b3",
+      "bytes": 17288,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "9e649279fb88caac149c2cfebd83005c260485adae794153725279081deaf28e"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/DiscordVoiceGptLiveBridge.ts",
+      "canonical_sha256": "8e53a0d3a498dea8acc995eb875bc14dbd9335d20ef6ca04ac7eb8456b43f750",
+      "export_sha256": "8e53a0d3a498dea8acc995eb875bc14dbd9335d20ef6ca04ac7eb8456b43f750",
+      "bytes": 15307,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "2e5ee0a4796ab9d599f42f74deb654d439991da5ccd7bf6c160a8f7aa57c743e"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/__tests__/RoomMediaBridge.lifecycle.spec.ts",
+      "canonical_sha256": "bc4b9c6ba29acee88b78384bb166cb578d05f80222006a707751990d4cc29e34",
+      "export_sha256": "bc4b9c6ba29acee88b78384bb166cb578d05f80222006a707751990d4cc29e34",
+      "bytes": 10229,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "5d711d098a4006ee8645b87c333d7830e6ad55fbc4413a0b42dda794e9aaa248"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/DiscordVoiceGptLiveBridge.lifecycle.spec.ts",
+      "canonical_sha256": "78e86cb4721c160c31cf910fa95478073f7f86bf42b3c4c0b273add69c9b68f9",
+      "export_sha256": "78e86cb4721c160c31cf910fa95478073f7f86bf42b3c4c0b273add69c9b68f9",
+      "bytes": 6658,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "d811df33f44d8f33103369372dd186aa0f7ba2ffde8348cc1f767a658a90b3f7"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.input-order.spec.ts",
+      "canonical_sha256": "f5044ab865b55c54a22f50aa0c363787a2e9707fa9ddf33ed258a181084a192f",
+      "export_sha256": "f5044ab865b55c54a22f50aa0c363787a2e9707fa9ddf33ed258a181084a192f",
+      "bytes": 8720,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.visual-frame.spec.ts",
+      "canonical_sha256": "d351c7c6db3973df3e289c47f2af8285f8fc980db108eac4e51b77fe567416c7",
+      "export_sha256": "d351c7c6db3973df3e289c47f2af8285f8fc980db108eac4e51b77fe567416c7",
+      "bytes": 9993,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "ad8c3a1d2d5ed4567c9c586a8be0c24d09d6ad752014fe682e6ec7877321c47b"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.media-restore.spec.ts",
+      "canonical_sha256": "20afe8bcf2dfb559c96392b525a223a4556e93de0bc9fb8fc02f11ed31297179",
+      "export_sha256": "20afe8bcf2dfb559c96392b525a223a4556e93de0bc9fb8fc02f11ed31297179",
+      "bytes": 3086,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.cancellation.spec.ts",
+      "canonical_sha256": "22fefefb0603ec479852abaa7cf587dd1508a2b4d9ba46fbc6dc5bc5623e23d2",
+      "export_sha256": "22fefefb0603ec479852abaa7cf587dd1508a2b4d9ba46fbc6dc5bc5623e23d2",
+      "bytes": 4801,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.local-playback.spec.ts",
+      "canonical_sha256": "0411985db5781da4022d520acc3f926d52775de4e690e46b826e898616aca2d6",
+      "export_sha256": "0411985db5781da4022d520acc3f926d52775de4e690e46b826e898616aca2d6",
+      "bytes": 3353,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.failure-stage.spec.ts",
+      "canonical_sha256": "aed4be046d9995af7fb94c4037dce2ae75da2a7b2e3172d0cbac48c10e5daf6d",
+      "export_sha256": "aed4be046d9995af7fb94c4037dce2ae75da2a7b2e3172d0cbac48c10e5daf6d",
+      "bytes": 2555,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/DiscordVoiceGptLiveBridge.spec.ts",
+      "canonical_sha256": "4ad5fc16431521030433cc52636b7a85e3c6a890dd2d577acab7d04fbe4af926",
+      "export_sha256": "4ad5fc16431521030433cc52636b7a85e3c6a890dd2d577acab7d04fbe4af926",
+      "bytes": 1745,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "work_scope": {
+    "program_gate": "G8, existing room qualification",
+    "workstream": "Provider audio input ownership and shutdown",
+    "capability": "GPT Live browser transport, room and Discord bridges",
+    "lifecycle_stage": "media resource lifecycle",
+    "reaction_timescale": "Asynchronous sender replacement and restoration",
+    "authority_owner": "Existing account, room, participant consent and GPT Live transport checks",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with deterministic ordering and ownership regressions",
+    "required_evidence": "Replacement/restore order, stale owner rejection, stop/restart isolation, immediate bridge-owned audio release and muted restoration",
+    "explicit_non_goals": "No real microphone, provider call, room admission, game action or installed acceptance",
+    "downstream_gate_unlocked": "None; attended and release acceptance remain open"
+  },
+  "review": [
+    "Runtime fix 48 serializes provider input changes within one transport generation. A newer accepted target retires older queued/results; stopped senders cannot write into a restarted transport. A failed current operation still rejects to its caller without poisoning the queue.",
+    "Restoration optionally requires the exact input track owned by the caller. The browser media boundary forwards this identity. Both room and Discord bridges supply their own track, preventing an older closing bridge from overwriting a newer input.",
+    "Room and Discord shutdown stop their owned output before awaiting restoration. The Discord bridge records its replacement track before awaiting the browser, so close also covers an in-flight replacement. Borrowed owner microphone tracks remain separately controlled.",
+    "The original microphone follows owner mute state even while an external input is selected and during restoration. External audio enablement remains an explicitly selected option, independent of the remembered owner microphone setting.",
+    "Five correctly configured controller/boundary regressions failed before the repair; the original first fixture mistakenly switched microphone identity on lookup and is retained only as diagnostic evidence. Additional tests exercise both bridge cleanup paths and the original admitted recovery, cancellation, playback, failure-stage and visual-frame paths.",
+    "Seven changed files and six unchanged test selections reviewed for exact export parity. Tests use synthetic tracks, browser peers, worklets, sockets and service receipts; no provider, game or live room service was invoked.",
+    "Final cleanup stops peer connections, cloned room tracks, playback and Discord audio contexts before awaiting provider restoration. Deferred restoration tests assert that cleanup and closed-state projection happen immediately. New test sender mocks use Promise<void>, and the existing visual-frame sender fixture now has its actual callable string signature; production contracts are unchanged by these fixture corrections."
+  ],
+  "limits": [
+    "Unfrozen, unpublished and uninstalled. Deterministic sender mocks do not prove actual heard audio or browser/device scheduling.",
+    "Other late signaling callbacks and installed participant-consent/session revocation acceptance remain separate. This slice does not advance the public release or environment maturity gate."
+  ]
+}

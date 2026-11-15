@@ -1,0 +1,68 @@
+{
+  "observed_at": "2026-11-14T00:05:09.824485+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/HelixAskPill.tsx",
+      "canonical_sha256": "8a182a4604c6591a24f89fc895d6e55d2740348685b145ad01042e831c4283d9",
+      "export_sha256": "8a182a4604c6591a24f89fc895d6e55d2740348685b145ad01042e831c4283d9",
+      "bytes": 1047708,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "46793e87555d60dd9c11df10deb64e364a91eee2f5bec4108d5e4cc76a0114ef"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleDiagnostics.ts",
+      "canonical_sha256": "2ec53bff7fb5de770c7cbccb61cb1f23f366010545f539eab387da066b90392f",
+      "export_sha256": "2ec53bff7fb5de770c7cbccb61cb1f23f366010545f539eab387da066b90392f",
+      "bytes": 63882,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "2f84658aee0f0c54069d1de65a22a486d428717422321cd97c2fc740ee4f1313"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyConsoleInventory.ts",
+      "canonical_sha256": "e72f7d7599f4348e62f14294efc0ef3a9a7237eec99ebd1add68074835a9c927",
+      "export_sha256": "e72f7d7599f4348e62f14294efc0ef3a9a7237eec99ebd1add68074835a9c927",
+      "bytes": 83435,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "441bab01cd13b7cca43c181af00bd9bb8bbbb31272177384b7a4b21933478f98"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-diagnostics.spec.ts",
+      "canonical_sha256": "9763f7fd8e9dc42172fe8dcb7708d9752207877191295bdb5badc88a3cb60c3a",
+      "export_sha256": "9763f7fd8e9dc42172fe8dcb7708d9752207877191295bdb5badc88a3cb60c3a",
+      "bytes": 69362,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "547a9e5ad3f602326ce4c98e1cdc0da32991df44abfdb5cabca93ae81b9aa633"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-recrown.spec.ts",
+      "canonical_sha256": "c7a598b6497b5ad235f982dfb82b854b2cb18c668a5c2230595988bb9f1789f5",
+      "export_sha256": "da7b63264e3632b523f21b2c10dae32da428ba186502092b335a1e109201e4d5",
+      "bytes": 524824,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-active-turn-stream.spec.ts",
+      "canonical_sha256": "4a1cd18db9e23cf084b1496d13d6307eb792f920dff2f1299c28dc47f1df9059",
+      "export_sha256": "4a1cd18db9e23cf084b1496d13d6307eb792f920dff2f1299c28dc47f1df9059",
+      "bytes": 9291,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Presentation type declarations only. The console now imports the existing stream ingress type used by its initializer, retaining the already initialized heartbeat counter.",
+    "Diagnostic question and reply timestamp declarations now admit the null values already produced by idle console state and the reply timestamp resolver. They are copied into the same output fields without coercion, invented timestamps, or runtime branching.",
+    "Legacy inventory source positions were recomputed after removal of the duplicate type. No execution, admission, pairing, streaming, saved-chat recovery or terminal behavior changed.",
+    "The exact three-file diff is reviewed against saved pre-edit hashes. Existing diagnostic, stream and console inventory suites are unchanged source selections. Two runtime modules are checked for byte-identical emitted JavaScript; inventory position metadata is separately updated.",
+    "Including the existing diagnostics test in the compiler roots exposed one invalid fixture tone: error is not a stream tone. The terminal rejection fixture now uses the supported warning tone; rejection status, authority assertions and runtime contracts remain unchanged."
+  ],
+  "limits": [
+    "Unfrozen, unpublished source; remaining type errors and installed qualification are open.",
+    "No new runtime fix is claimed. This does not qualify live stream delivery or saved-chat recovery."
+  ]
+}

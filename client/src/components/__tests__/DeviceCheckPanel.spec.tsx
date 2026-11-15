@@ -5,14 +5,20 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-libra
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HELIX_PANELS } from "@/pages/helix-core.panels";
 import { RuntimeSurfaceProvider } from "@/lib/runtime/RuntimeSurfaceProvider";
+import { useWorkstationLayoutStore } from "@/store/useWorkstationLayoutStore";
 import { DESKTOP_RUNTIME_SNAPSHOT_SCHEMA_VERSION } from "@shared/runtime-surface";
 import { DESKTOP_CODEX_PLUGIN_STATE_SCHEMA_VERSION } from "@shared/codex-plugin";
-import { DESKTOP_MCP_TUNNEL_STATE_SCHEMA_VERSION } from "@shared/desktop-mcp-tunnel";
+import { DESKTOP_MINECRAFT_INTEGRATED_WORLD_SCHEMA } from "@shared/desktop-minecraft-integrated-world";
+import {
+  DESKTOP_MCP_TUNNEL_STATE_SCHEMA_VERSION,
+  type DesktopMcpTunnelState,
+} from "@shared/desktop-mcp-tunnel";
 import {
   HELIX_DEVELOPER_ACCOUNT_POLICY,
   HELIX_USER_ACCOUNT_POLICY,
 } from "@shared/helix-account-session";
 import {
+  HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
   cacheAccountCapabilityPolicy,
   clearCachedAccountCapabilityPolicy,
 } from "@/lib/workstation/accountCapabilityPolicy";
@@ -114,8 +120,10 @@ describe("Device Check panel", () => {
     );
   });
 
-  it("shows ordinary users tunnel status without developer controls or local Minecraft paths", async () => {
+  it("lets an ordinary owner select an integrated world and manage a read-only tunnel without developer controls", async () => {
     cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY);
+    const openPanel = vi.spyOn(useWorkstationLayoutStore.getState(),
+      "openPanelInActiveGroup").mockImplementation(() => undefined);
     vi.stubGlobal("fetch", vi.fn(async () => ({
       ok: true,
       status: 200,
@@ -132,7 +140,51 @@ describe("Device Check panel", () => {
       }),
     })) as unknown as typeof fetch);
     const getMinecraftRunProfile = vi.fn();
-    const startMcpTunnel = vi.fn();
+    const getMinecraftIntegratedWorld = vi.fn(async () => ({
+      schema: DESKTOP_MINECRAFT_INTEGRATED_WORLD_SCHEMA,
+      configured: false,
+      worldFolder: null,
+      gameDirectory: null,
+    }));
+    const selectMinecraftIntegratedWorld = vi.fn(async () => ({
+      schema: DESKTOP_MINECRAFT_INTEGRATED_WORLD_SCHEMA,
+      configured: true,
+      worldFolder: "reee hamtar",
+      gameDirectory: "C:\\Users\\owner\\AppData\\Roaming\\.minecraft",
+    }));
+    const getMcpTunnelState = vi.fn(async (): Promise<DesktopMcpTunnelState> => ({
+      schemaVersion: DESKTOP_MCP_TUNNEL_STATE_SCHEMA_VERSION,
+      transport: "openai_secure_mcp_tunnel" as const,
+      access: "developer_private" as const,
+      scope: "local_supervisor_coordination_and_device_check" as const,
+      status: "stopped" as const,
+      configured: true,
+      vaultAvailable: true,
+      binaryVersion: "0.0.13",
+      processRunning: false,
+      healthy: false,
+      ready: false,
+      adminUiAvailable: false,
+      failureCode: null,
+      recovery: {
+        phase: "idle" as const,
+        attemptCount: 0,
+        maxAttempts: 3,
+        nextAttemptAt: null,
+        lastReason: null,
+        automaticScope: "local_supervisor_coordination_and_device_check" as const,
+        manualInterventionRequired: false,
+      },
+    }));
+    const startMcpTunnel = vi.fn(async () => ({
+      ...await getMcpTunnelState(), status: "ready" as const,
+      processRunning: true, healthy: true, ready: true,
+    }));
+    const stopMcpTunnel = vi.fn(async () => getMcpTunnelState());
+    const clearMcpTunnel = vi.fn(async () => ({
+      ...await getMcpTunnelState(), status: "unconfigured" as const,
+      configured: false,
+    }));
     window.casimirDesktop = Object.freeze({
       getRuntimeSnapshot: vi.fn(async () => ({
         schemaVersion: DESKTOP_RUNTIME_SNAPSHOT_SCHEMA_VERSION,
@@ -147,32 +199,14 @@ describe("Device Check panel", () => {
           deviceAgentControl: false,
         },
       })),
-      getMcpTunnelState: vi.fn(async () => ({
-        schemaVersion: DESKTOP_MCP_TUNNEL_STATE_SCHEMA_VERSION,
-        transport: "openai_secure_mcp_tunnel",
-        access: "developer_private",
-        scope: "local_supervisor_coordination_and_device_check",
-        status: "stopped",
-        configured: true,
-        vaultAvailable: true,
-        binaryVersion: "0.0.13",
-        processRunning: false,
-        healthy: false,
-        ready: false,
-        adminUiAvailable: false,
-        failureCode: null,
-        recovery: {
-          phase: "idle",
-          attemptCount: 0,
-          maxAttempts: 3,
-          nextAttemptAt: null,
-          lastReason: null,
-          automaticScope: "local_supervisor_coordination_and_device_check",
-          manualInterventionRequired: false,
-        },
-      })),
+      getMcpTunnelState,
+      personalMcpP1Connection: vi.fn(async () => ({ available: true, phase: "ready" })),
       getMinecraftRunProfile,
+      getMinecraftIntegratedWorld,
+      selectMinecraftIntegratedWorld,
       startMcpTunnel,
+      stopMcpTunnel,
+      clearMcpTunnel,
     });
 
     const panel = HELIX_PANELS.find((entry) => entry.id === "device-check")!;
@@ -180,13 +214,111 @@ describe("Device Check panel", () => {
     render(<RuntimeSurfaceProvider><loaded.default /></RuntimeSurfaceProvider>);
 
     await waitFor(() => expect(screen.getByTestId("device-check-tunnel-status")).toHaveTextContent("Stopped"));
-    expect(screen.getByText(/sign in or activate local developer access/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Open Account & Sessions" })).toBeInTheDocument();
+    expect(await screen.findByText(/Local Codex setup is available/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Set up Full Harness" }));
+    expect(openPanel).toHaveBeenCalledWith("account-session");
+    expect(screen.getByText(/This saved read-only tunnel is separate/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Start full developer MCP" })).toBeNull();
-    expect(screen.queryByRole("button", { name: "Start read-only tunnel" })).toBeNull();
-    expect(screen.queryByTestId("device-check-minecraft-run-profile")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Tunnel console" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Start read-only tunnel" })).toBeInTheDocument();
+    const unconfigured = {
+      ...await getMcpTunnelState(), status: "unconfigured" as const,
+      configured: false,
+    };
+    let finishTunnelRead: ((state: DesktopMcpTunnelState) => void) | undefined;
+    getMcpTunnelState.mockImplementationOnce(() => new Promise((resolve) => {
+      finishTunnelRead = resolve;
+    }));
+    act(() => window.dispatchEvent(new CustomEvent(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, {
+      detail: { account_policy: HELIX_USER_ACCOUNT_POLICY },
+    })));
+    expect(screen.getByTestId("device-check-tunnel-status")).toHaveTextContent("Stopped");
+    await act(async () => { finishTunnelRead?.(unconfigured); });
+    await waitFor(() => expect(screen.queryByRole("button", { name: "Start read-only tunnel" })).toBeNull());
+    expect(screen.getByTestId("device-check-tunnel-status")).toHaveTextContent("Unconfigured");
+    act(() => window.dispatchEvent(new CustomEvent(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, {
+      detail: { account_policy: HELIX_USER_ACCOUNT_POLICY },
+    })));
+    expect(await screen.findByRole("button", { name: "Start read-only tunnel" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Start read-only tunnel" }));
+    await waitFor(() => expect(startMcpTunnel).toHaveBeenCalledWith({
+      scope: "local_supervisor_coordination_and_device_check",
+    }));
+    expect(await screen.findByRole("button", { name: "Stop tunnel" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Enable full harness for this session" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Stop tunnel" }));
+    await waitFor(() => expect(stopMcpTunnel).toHaveBeenCalledOnce());
+    fireEvent.click(await screen.findByRole("button", { name: "Forget credentials" }));
+    await waitFor(() => expect(clearMcpTunnel).toHaveBeenCalledOnce());
+    expect(screen.getByTestId("device-check-minecraft-run-profile")).toBeInTheDocument();
+    expect(getMinecraftIntegratedWorld).toHaveBeenCalledOnce();
+    fireEvent.click(screen.getByRole("button", { name: "Select integrated world" }));
+    expect(await screen.findByText(/Integrated world: reee hamtar/)).toBeInTheDocument();
+    expect(selectMinecraftIntegratedWorld).toHaveBeenCalledOnce();
+    expect(screen.queryByRole("button", { name: "Select server folder" })).toBeNull();
     expect(getMinecraftRunProfile).not.toHaveBeenCalled();
-    expect(startMcpTunnel).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["build_unavailable", "This desktop build does not include approved personal Codex setup."],
+    ["website_unavailable", "CasimirBot website approval is not ready or does not match this build."],
+    ["codex_unavailable", "Codex Desktop was not found on this computer."],
+  ])("loads ordinary policy and reports %s without opening setup", async (phase, message) => {
+    cacheAccountCapabilityPolicy(null);
+    const inspectPersonalP1 = vi.fn()
+      .mockResolvedValueOnce({ available: false, phase })
+      .mockResolvedValue({ available: true, phase: "ready" });
+    const fetchMock = vi.fn(async (url: string) => ({
+      ok: true,
+      status: 200,
+      json: async () => url === "/api/account/session"
+        ? {
+            account_policy: HELIX_USER_ACCOUNT_POLICY,
+            session: { profile: { profile_id: "ordinary-test-profile" } },
+          }
+        : {
+            schema: "helix.environment_connector.device_check_list.v1",
+            generated_at: "2026-10-15T18:00:00.000Z",
+            devices: [],
+            content_role: "device_health_observations_not_assistant_answer",
+            credential_included: false,
+            answer_authority: false,
+            assistant_answer: false,
+            terminal_eligible: false,
+            raw_content_included: false,
+          },
+    })) as unknown as typeof fetch;
+    vi.stubGlobal("fetch", fetchMock);
+    window.casimirDesktop = Object.freeze({
+      getRuntimeSnapshot: vi.fn(async () => ({
+        schemaVersion: DESKTOP_RUNTIME_SNAPSHOT_SCHEMA_VERSION,
+        surface: "desktop_native",
+        serviceOrigin: window.location.origin,
+        capabilities: {
+          nativeBinaryUpdate: false,
+          localServiceControl: true,
+          localWorkspaceAccess: false,
+          codexMcpRegistration: false,
+          secureCredentialVault: true,
+          deviceAgentControl: false,
+        },
+      })),
+      personalMcpP1Connection: inspectPersonalP1,
+    });
+
+    const panel = HELIX_PANELS.find((entry) => entry.id === "device-check")!;
+    const loaded = await panel.loader();
+    render(<RuntimeSurfaceProvider><loaded.default /></RuntimeSurfaceProvider>);
+
+    expect(await screen.findByTestId("device-check-personal-harness")).toHaveTextContent(
+      message,
+    );
+    expect(fetchMock).toHaveBeenCalledWith("/api/account/session", expect.anything());
+    expect(screen.queryByRole("button", { name: "Start full developer MCP" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Set up Full Harness" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Refresh" }));
+    expect(await screen.findByRole("button", { name: "Set up Full Harness" })).toBeInTheDocument();
+    expect(inspectPersonalP1).toHaveBeenCalledTimes(2);
   });
 
   it("shows the native Codex boundary but keeps install locked until OAuth is verified", async () => {
@@ -381,6 +513,7 @@ describe("Device Check panel", () => {
     const button = await screen.findByRole("button", {
       name: "Start full developer MCP",
     });
+    expect(screen.queryByTestId("device-check-personal-harness")).toBeNull();
     expect(startMcpTunnel).not.toHaveBeenCalled();
     fireEvent.click(button);
     await waitFor(() =>

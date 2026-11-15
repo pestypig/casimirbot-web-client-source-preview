@@ -1093,7 +1093,7 @@ describe("Helix Ask console diagnostics", () => {
           text: "Terminal authority rejected direct lane output.",
           meta: "source capability_lane_call_results | terminal_rejected | terminal_authority_missing",
           status: "rejected",
-          tone: "error",
+          tone: "warning",
           evidenceRefs: ["ask:lane:translation:obs"],
         },
       ],

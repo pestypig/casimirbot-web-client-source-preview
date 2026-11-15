@@ -351,12 +351,12 @@ export function HelixAskMinimalRuntimeShell({
     if (runtimeState.askBusy) {
       workflowQteBridge.clearPending();
       pendingExternalPromptRef.current = pendingPrompt
-        ? { ...pendingPrompt, question: draftText, workflowQte }
+        ? { ...pendingPrompt, question: draftText, workflowQte: workflowQte ?? undefined }
         : {
             promptId: `queued:${Date.now()}`,
             question: draftText,
             autoSubmit: true,
-            workflowQte,
+            workflowQte: workflowQte ?? undefined,
             createdAt: Date.now(),
           };
       return true;
@@ -622,7 +622,7 @@ export function HelixAskMinimalRuntimeShell({
       currentReasoningBinding,
       readReasoningBinding(candidateSessionId),
       candidateSessionId ? persistedReasoningBindings[candidateSessionId] ?? null : null,
-    ].filter((candidate) =>
+    ].filter((candidate): candidate is BrowserReasoningBinding =>
       candidate != null && candidate.helix_conversation_id === candidateSessionId,
     );
     // Resolve the selected chat through the authenticated server before using
@@ -743,7 +743,7 @@ export function HelixAskMinimalRuntimeShell({
         publishBoundAgentSteeringProgress(clientEventRef, "acknowledged", progressTarget);
         return true;
       }
-      if (event?.delivery_state && event.delivery_state !== "pending") {
+      if (event?.delivery_state && event.delivery_state !== "pending" && event.delivery_state !== "picked_up") {
         setBoundAgentState("unavailable");
         setRuntimeState((state) => ({ ...state,
           askStatus: `Exact pickup ended with ${event.delivery_state}; no provider answer is claimed.`,
@@ -779,7 +779,7 @@ export function HelixAskMinimalRuntimeShell({
                 publishBoundAgentSteeringProgress(clientEventRef, "acknowledged", progressTarget);
                 return;
               }
-              if (current.delivery_state !== "pending") {
+              if (current.delivery_state !== "pending" && current.delivery_state !== "picked_up") {
                 setBoundAgentState("unavailable");
                 setRuntimeState((state) => ({
                   ...state,

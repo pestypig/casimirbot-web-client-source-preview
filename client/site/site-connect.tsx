@@ -7,6 +7,8 @@ type Link = {
   expires_at: string; state: "pending" | "approved" | "claimed" | "expired";
   text_authorization_available?: boolean;
   managed_text_authorized?: boolean;
+  voice_authorization_available?: boolean;
+  managed_voice_authorized?: boolean;
 };
 const requestPattern = /^link_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u;
 
@@ -18,6 +20,7 @@ export function SiteConnectPage() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [allowManagedText, setAllowManagedText] = useState(false);
+  const [allowManagedVoice, setAllowManagedVoice] = useState(false);
   const authResult = new URLSearchParams(window.location.search).get("auth0_account");
 
   const refresh = useCallback(async () => {
@@ -54,7 +57,9 @@ export function SiteConnectPage() {
         method: "POST", credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ managed_text_authorized:
-          link?.text_authorization_available === true && allowManagedText }),
+          link?.text_authorization_available === true && allowManagedText,
+          managed_voice_authorized:
+          link?.voice_authorization_available === true && allowManagedVoice }),
       });
       if (!response.ok) throw new Error("approval failed");
       await refresh();
@@ -86,6 +91,7 @@ export function SiteConnectPage() {
                 {link.state === "expired" ? <p role="alert" className="text-amber-200">This request expired. Start a new connection in the app.</p> : null}
                 {link.state === "approved" || link.state === "claimed" ? <p role="status" className="text-emerald-200">Approved. Return to the app to finish.</p> : null}
                 {link.managed_text_authorized ? <p className="text-sm text-amber-100">This installation was also approved for managed text requests. Each request still requires an active AI plan and server allowance.</p> : null}
+                {link.managed_voice_authorized ? <p className="text-sm text-amber-100">This installation was also approved for managed voice requests. Each session still needs a paid allowance, current room and participant consent, and a bounded session approval.</p> : null}
               </div>
             ) : !loading ? <p role="alert" className="text-amber-200">Connection request unavailable.</p> : null}
             {link?.state === "pending" && !verified ? (
@@ -107,6 +113,12 @@ export function SiteConnectPage() {
                     onChange={event => setAllowManagedText(event.target.checked)}
                     className="mt-1" />
                   <span>Allow this installation to use my included AI allowance for bounded text answers when I select CasimirBot-managed AI. Calls will consume plan capacity. This does not grant room or program actions.</span>
+                </label> : null}
+                {link.voice_authorization_available ? <label className="mt-4 flex gap-3 rounded-xl border border-amber-200/25 bg-amber-200/5 p-4 text-sm text-slate-200">
+                  <input type="checkbox" checked={allowManagedVoice}
+                    onChange={event => setAllowManagedVoice(event.target.checked)}
+                    className="mt-1" />
+                  <span>Allow this installation to request bounded CasimirBot-managed GPT Live voice sessions when I select managed AI. Voice uses my plan capacity. This device choice does not open a microphone, join a call, or replace room and participant consent.</span>
                 </label> : null}
                 <button type="button" disabled={!canApprove} onClick={() => void approve()}
                   className="mt-5 rounded-full bg-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 hover:bg-cyan-200 disabled:opacity-50">Approve this installation</button>

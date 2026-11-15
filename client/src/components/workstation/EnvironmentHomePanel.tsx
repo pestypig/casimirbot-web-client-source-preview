@@ -11,6 +11,9 @@ import PrivatePackageRemoval, { type PrivateRemovalBridge } from "./PrivatePacka
 import {startEnvironmentHomeController} from "./environmentHomeController";
 import LocalPersonalConnectionSetup from "../agent-access/LocalPersonalConnectionSetup";
 import MinecraftHomeReadinessPreview from "./MinecraftHomeReadinessPreview";
+import DeveloperConnectorGuide from "./DeveloperConnectorGuide";
+import LocalConnectorPackageInspection from "./LocalConnectorPackageInspection";
+import ReviewedConnectorImport, { type ReviewedConnectorImportBridge } from "./ReviewedConnectorImport";
 
 const DIRECTORY = "/api/agi/environment-connectors/private/directory/packages";
 const MINECRAFT_MENU = "built-in:minecraft";
@@ -20,6 +23,14 @@ const title = (record: EnvironmentHomePackage) => record.package_id.replace(/^co
 const button = "rounded-lg border border-white/20 px-3 py-2 text-sm hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300 disabled:cursor-not-allowed disabled:opacity-45";
 
 export default function EnvironmentHomePanel() {
+  const reviewedImportBridge = useMemo<ReviewedConnectorImportBridge | null>(() => {
+    const native = window.casimirDesktop;
+    return native?.getReviewedConnectorImportState && native.importReviewedConnectorPackage &&
+      native.removeReviewedConnectorPackage && native.invalidateReviewedConnectorImport ? {
+        inspect: native.getReviewedConnectorImportState, import: native.importReviewedConnectorPackage,
+        remove: native.removeReviewedConnectorPackage, invalidate: native.invalidateReviewedConnectorImport,
+      } : null;
+  }, []);
   const openPanel = useWorkstationLayoutStore(state => state.openPanelInActiveGroup);
   const [directory, setDirectory] = useState<Directory | null>(null);
   const [installed, setInstalled] = useState<PrivateEnvironmentState | null>(null);
@@ -174,6 +185,9 @@ export default function EnvironmentHomePanel() {
         <button className={button} onClick={() => void load()} disabled={busy || removalBusy} aria-label="Refresh environment catalog"><RefreshCw className="h-4 w-4" /></button></div>
     </header>
     {store && <p role="status" aria-live="polite" className="mb-4 text-sm text-slate-300">{busy ? "Checking your local packages…" : message}</p>}
+    {store && <DeveloperConnectorGuide native={Boolean(window.casimirDesktop)} />}
+    {store && <LocalConnectorPackageInspection />}
+    {store && <ReviewedConnectorImport bridge={reviewedImportBridge} />}
     {!store && <section aria-label="Choose how to start" className="mb-6 grid gap-3 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.04] p-4 md:grid-cols-2 xl:grid-cols-4">
       <div><p className="text-sm font-semibold text-cyan-100">Free personal tools</p>
         <p className="mt-1 text-xs leading-5 text-slate-300">Explore local tools below. Each program asks for its own permission when needed.</p></div>
@@ -242,7 +256,8 @@ export default function EnvironmentHomePanel() {
           <button role="menuitem" tabIndex={-1} className="block p-2 text-sm hover:bg-white/10 focus-visible:outline focus-visible:outline-cyan-300"
             onClick={() => { setMenu(null); openPanel("agent-access"); }}>Configure connection</button>
         </div>}
-        <button data-home-tile-primary type="button" className="mt-5 text-left focus-visible:outline focus-visible:outline-cyan-300"
+        <button data-home-tile-primary data-helix-guidance-target="environment-home-minecraft-adapter"
+          type="button" className="mt-5 text-left focus-visible:outline focus-visible:outline-cyan-300"
           onClick={event => { minecraftTrigger.current = event.currentTarget; setMinecraftPreview(true); setSelected(null); setMenu(null); }}>
           <span className="block text-lg font-medium">Minecraft Adapter</span>
           <span className="mt-1 block text-sm text-slate-400">Inspect saved local setup · no launch</span>

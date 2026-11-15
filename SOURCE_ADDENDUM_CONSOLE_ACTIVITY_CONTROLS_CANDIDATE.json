@@ -1,0 +1,128 @@
+{
+  "observed_at": "2026-11-13T21:25:59.566192+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/AdapterAiActivityPanel.tsx",
+      "canonical_sha256": "7b456ae82cdaff7f9ee6cbda7fa22a841dcf6e70f68ffe71b44769d04fb3e3cc",
+      "export_sha256": "7b456ae82cdaff7f9ee6cbda7fa22a841dcf6e70f68ffe71b44769d04fb3e3cc",
+      "bytes": 7215,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "4799144dea58c628f155f06e965a614a2d3003bcf47ded14abf6f32c9128195d"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/BoundTaskConsoleHistory.tsx",
+      "canonical_sha256": "d907560c0eebe14dab044bd3a25a32bb07b9d37ff419a86da7b1e7feb7ecc41e",
+      "export_sha256": "db4191bba2412a8416baa85322145d519ecbe013212d31c23ab45f94bf878c61",
+      "bytes": 11281,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "cffad6d1c1bcee4e9930d3e0a5b311b9e2bd91418e73d577dfc0fe1e6ec2f892"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/PrivateAskConnectionMenu.tsx",
+      "canonical_sha256": "a00df053eb59f2b7de0f11858b1938ab1e5d6c12de5fa805d1f64684ae9e110e",
+      "export_sha256": "a00df053eb59f2b7de0f11858b1938ab1e5d6c12de5fa805d1f64684ae9e110e",
+      "bytes": 8715,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "b1b4e8e9f56930407f6d42c7742accef40fd14f7b57d2e681a0689c0da5b13bc"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskComposerActionToolbarState.ts",
+      "canonical_sha256": "f9e4a9f1ddf268ee619c134ebd38194e28d761bb99efbc0722276ca794c6b8b8",
+      "export_sha256": "f9e4a9f1ddf268ee619c134ebd38194e28d761bb99efbc0722276ca794c6b8b8",
+      "bytes": 3152,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "cef1737d39bdb5a85dc676caaa1d2fa339235428bb6d0d0c7f230a105f9cf57a"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskComposerActionToolbarSurface.tsx",
+      "canonical_sha256": "f55d188fc65fe719b1252f46d81168dd06a4ef313515c2a2b60ff53111561e2c",
+      "export_sha256": "f55d188fc65fe719b1252f46d81168dd06a4ef313515c2a2b60ff53111561e2c",
+      "bytes": 9642,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "419e5db29541a1db5c0cc789b5afe50b90c9900f374e41fe74f18a6c5f715eb1"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskActionToolbar.tsx",
+      "canonical_sha256": "5b53e209133452b3554fabda00547bffa364bbf7562a6da1a1d575f76de44cad",
+      "export_sha256": "5b53e209133452b3554fabda00547bffa364bbf7562a6da1a1d575f76de44cad",
+      "bytes": 15538,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "09cbfdad596d3366366bc344e38067bf505c2557ae7d476ee006552d354f3df7"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/AdapterAiActivityPanel.spec.tsx",
+      "canonical_sha256": "667c9b6cb37f3574154cd7cfeb28882b629287554f7ba017ebcfd459ed393b86",
+      "export_sha256": "667c9b6cb37f3574154cd7cfeb28882b629287554f7ba017ebcfd459ed393b86",
+      "bytes": 4642,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "a3895a6f4c5e553d5b642ab89f655e825bd3dfdf291c2940a1b5a9673ad40c42"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/BoundTaskConsoleHistory.spec.tsx",
+      "canonical_sha256": "cc82e78afc5b3bbf14dcea0d63020b2809e5623813376e7825961ffff6ad7468",
+      "export_sha256": "b951920c0f6107e55e3b6a0539e7f59af179c9405834a8bcc3598192531e7f49",
+      "bytes": 9675,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "013acecec00e56367f3dc7dd9ec96d92472071b4c45daec6ae1cca966792c781"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/PrivateAskConnectionMenu.spec.tsx",
+      "canonical_sha256": "e586fc8f4e1b2fc9f1eed0e4688678b6bd8996c06629f6596344852d1057d36e",
+      "export_sha256": "e586fc8f4e1b2fc9f1eed0e4688678b6bd8996c06629f6596344852d1057d36e",
+      "bytes": 15134,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "67a3c06907fc8012a520e36b331bdc9dcb0a53c2cfb2609b1065867e2a96df96"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskComposerActionToolbarState.private-connection.spec.ts",
+      "canonical_sha256": "fce12a176b51769a2bd62275f5ff253c2e9faed25818bce8c4bc0d542ef57de7",
+      "export_sha256": "fce12a176b51769a2bd62275f5ff253c2e9faed25818bce8c4bc0d542ef57de7",
+      "bytes": 2154,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "c2c4c0eb102d43c58cd0d526ed686b62259f3a98599d953e431db7c10391321c"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskActionToolbar.visual-source.spec.tsx",
+      "canonical_sha256": "138bf2dcd971ab5becbf83bd18467746095ef3515c656248b64acfc524bc09a5",
+      "export_sha256": "138bf2dcd971ab5becbf83bd18467746095ef3515c656248b64acfc524bc09a5",
+      "bytes": 5823,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "adc1e53042c808d81b353daff33a85d4950b462c7215a0ad4285c254868f5a82"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/messageCloudProjection.ts",
+      "canonical_sha256": "392661e6f4a54d106ff54f258f5b723d6beb3f0728329e70e562aa09358cfc40",
+      "export_sha256": "1bcf1b2f769e1c141abf3f9a65ffdbbb8c73215adeb109952c0b5428a47706ee",
+      "bytes": 1842,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/useConversationPairing.ts",
+      "canonical_sha256": "6ef2e5ade51b538888189638de0f59085c817978e9ecde9988177c68bed4bf1d",
+      "export_sha256": "c6c211e0bca945f816598a8883711fe2dcf8c54e985b44f40ad1ede5c0bb4779",
+      "bytes": 5332,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Adapter activity adds Responses observation-monitor summaries alongside decision checkpoints and separately attributed native result receipts. Matching run/chat/binding/epoch and sanitized profile-visible event requirements remain. The new label says observation interpretation and preserves the no-inferred-action distinction.",
+    "Bound task history no longer stops polling after one minute. It polls at two seconds initially and ten seconds thereafter while mounted, with sequential awaited reads and unmount abort. Exact binding/event/epoch/source-turn checks and task-report-only labels are unchanged. Its parent uses a conversation-keyed component, so chat navigation remounts the report state.",
+    "Personal connection menu admission derives from the profile_connections feature flag and lock. The separate private-inspector flag derives from developer account type. Ordinary personal-key setup does not query the developer directory or show its inspector. Native provider-key operations remain separately account-bound.",
+    "Private menu resets drafts and closes on account, scope or admission changes, aborts pending directory reads, checks parsed directory expiry and restores focus. Opening a connection menu does not submit the surrounding composer. Managed chat is explicit and uses its own prompt; the inspected tests assert no room/task context is forwarded.",
+    "The action toolbar distinguishes speech transcription from Live Voice and tab/system screen audio with labels and existing Lucide icons. Existing callbacks, capture cancellation, source selection locks and microphone ownership wiring are unchanged.",
+    "Read the complete two activity panels, private menu, toolbar-state builder and selected suites, the normalized surface/toolbar deltas and surrounding handlers. Unchanged cloud projection and exact-pairing hooks were read as dependencies. All selected files are existing first-party source with synthetic test data; no native profiles, real transcripts, credentials or third-party implementation was copied."
+  ],
+  "limits": [
+    "Unfrozen unpublished source-only proposal. No canonical runtime edits were made during this cohort. Existing candidate changes are not claimed to be in the signed installed release.",
+    "Five selected suites use mocked native/HTTP reads and local event normalization. They do not establish actual provider billing, microphone/screen capture, native approval, observer interpretation quality, game effects or two-profile streaming delivery.",
+    "Client visibility is not authorization. Current server/native account, grant, room, consent, funding and exact task checks remain authoritative; no such boundary changed here.",
+    "The toolbar surface is compiled, but its complete Live runtime integration is a later cohort. These tests qualify labels/callbacks and selected menu behavior, not the full Console or app.",
+    "The activity reader, server event normalizer, shared contracts, managed-conversation runtime and private inspector are canonical dependencies outside this selected cohort. Remaining full-source and installed acceptance and five intentional support-contact publication-review matches remain open."
+  ]
+}

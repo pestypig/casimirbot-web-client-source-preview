@@ -1,0 +1,80 @@
+{
+  "observed_at": "2026-11-14T01:43:33.659685+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/HelixAskPill.tsx",
+      "canonical_sha256": "9d7aa4a22cec9f552789898110677d40987794238763fcac2dea8ae7af6b73b5",
+      "export_sha256": "9d7aa4a22cec9f552789898110677d40987794238763fcac2dea8ae7af6b73b5",
+      "bytes": 1047944,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "9cf55427f29b0f8475191a1ade1e036b2c2f346db8ea58b2ad0f94716ba5a622"
+    },
+    {
+      "path": "client/src/components/helix/__tests__/pending-response-classification.spec.ts",
+      "canonical_sha256": "eb6b90cb44669ec7bb12f96eaddf1216a03d267af232fd235567bab2523edf27",
+      "export_sha256": "eb6b90cb44669ec7bb12f96eaddf1216a03d267af232fd235567bab2523edf27",
+      "bytes": 3772,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/helix/ask-pending-input-readers.ts",
+      "canonical_sha256": "11247c8f41098245e819ccc987d92915a7fa8e77b3ef8e2fd6198002efbd9d43",
+      "export_sha256": "11247c8f41098245e819ccc987d92915a7fa8e77b3ef8e2fd6198002efbd9d43",
+      "bytes": 5131,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-pending-input-readers.spec.ts",
+      "canonical_sha256": "dafd40d4c78e03c2665b2b933715fb36f5d0c2a53b3f4ad4af3ea540e2b4f4d2",
+      "export_sha256": "dafd40d4c78e03c2665b2b933715fb36f5d0c2a53b3f4ad4af3ea540e2b4f4d2",
+      "bytes": 4023,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/helix/ask-value-normalization.ts",
+      "canonical_sha256": "7f0a6a5d00b26d5353371aa362e9f44bd1a78df1d07d8c75294cc759a69b9f0e",
+      "export_sha256": "c78ed126942fbf16ee1b1f8d6b688be365e832d848bf699b7ce68bd13dc5cda5",
+      "bytes": 1682,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-recrown.spec.ts",
+      "canonical_sha256": "c7a598b6497b5ad235f982dfb82b854b2cb18c668a5c2230595988bb9f1789f5",
+      "export_sha256": "da7b63264e3632b523f21b2c10dae32da428ba186502092b335a1e109201e4d5",
+      "bytes": 524824,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Pending response presentation",
+    "capability": "Manual chat response timeline classification",
+    "lifecycle_stage": "Response projection",
+    "reaction_timescale": "A response is received",
+    "authority_owner": "Existing server response and pending cancellation readers",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with correct pending metadata sources",
+    "required_evidence": "Actual classifier before/after tests; existing pending readers and console tests; scoped compiler",
+    "explicit_non_goals": "No dispatch, request resumption, provider, room, game or installed acceptance",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "Runtime fix 53 reads the top-level response route before the legacy envelope route and uses the existing pending-input reader across response, envelope and debug sources. The server already emits pending_server_request at top level, including stream carryover requests in server/routes/agi.plan.ts; that server file is unchanged and is not exported here.",
+    "The timeline classifier no longer treats every truthy pending object as an active request. Existing record validation rejects empty, array and resolved shapes; cancellation takes precedence over a stale clarification route.",
+    "Twelve cases execute the actual three classifier declarations extracted from the console AST with actual normalization and pending-reader functions. Eight fail before the patch; four existing ordinary/legacy cases pass.",
+    "A separate unreachable reply-debug read is removed after the function has already returned for every present reply. The remaining extra sources are unchanged and the existing reader ignores the removed absent arguments.",
+    "No source lines were added or removed from the console; inventory positions remain unchanged. Existing pending-reader and console suites are selected unchanged. No mutation, resumption, final-answer authority or admission check is added."
+  ],
+  "limits": [
+    "Unfrozen, unpublished and uninstalled. Classifier AST tests and synthetic records do not establish rendered UI, real server clarification or installed chat behavior.",
+    "Export tests exercise the preview classifier and pending readers; the broad console suite runs on canonical dependencies.",
+    "Other compiler diagnostics and existing source holds remain."
+  ]
+}

@@ -126,10 +126,10 @@ export function BoundTaskConsoleHistory({ messages, status, helixConversationId,
         });
       } catch { /* Display reads cannot grant task or answer authority. */ }
       finally {
-        // The binding may be accepted just after this view mounts. Keep the
-        // bounded display poll alive through an inactive or partial read.
-        if (!controller.signal.aborted && ++attempts < 30)
-          timer = window.setTimeout(() => void refresh(), 2_000);
+        // The task can report after the initial minute. Reconcile at a lower
+        // rate while this owner view is open; unmount still aborts the read.
+        if (!controller.signal.aborted)
+          timer = window.setTimeout(() => void refresh(), ++attempts < 30 ? 2_000 : 10_000);
       }
     };
     void refresh();

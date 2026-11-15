@@ -15,7 +15,7 @@ it('saves explicitly, reopens by exact ID, and checks account/claim identity',as
   const onReopen=vi.fn();
   const fetchMock=vi.fn(async(input:string,init?:RequestInit)=>{
     if(input==='/api/account/session')return new Response(JSON.stringify({session:{profile:{profile_id:'researcher'}},
-      account_policy:{account_type:'developer'}}),{status:200});
+      account_policy:{account_type:'user'}}),{status:200});
     if(input==='/api/account/solar-research/magnetic-bundles'&&init?.method==='POST')
       return new Response(JSON.stringify({ok:true,saved:true,profileId:'researcher',bundleId,
         scientificAdmission:false,scienceRunAllowed:false}),{status:201});
@@ -32,11 +32,11 @@ it('saves explicitly, reopens by exact ID, and checks account/claim identity',as
   expect(fetchMock.mock.calls.some((call:any)=>String(call[0]).includes(`bundleId=solar-magnetic-bundle%3A${'a'.repeat(64)}`))).toBe(true);
 });
 
-it('requires a signed-in developer before profile storage is touched',async()=>{
+it('requires a signed-in account before profile storage is touched',async()=>{
   const fetchMock=vi.fn(async()=>new Response(JSON.stringify({session:null,account_policy:{account_type:'user'}}),{status:200}));
   vi.stubGlobal('fetch',fetchMock);
   render(<SolarMagneticBundleStorage payload={{schemaVersion:'solar-magnetic-comparison-bundle/1'} as any} onReopen={vi.fn()}/>);
   fireEvent.click(screen.getByText('Save comparison to profile'));
-  await waitFor(()=>expect(screen.getByRole('status').textContent).toContain('signed-in developer'));
+  await waitFor(()=>expect(screen.getByRole('status').textContent).toContain('signed-in account'));
   expect(fetchMock).toHaveBeenCalledTimes(1);
 });

@@ -515,7 +515,7 @@ export function HelixAskTurnStreamPanel({
         })}
       </div>
       {hasConversationRows && detailCount > 0 ? (
-        <button
+        <button data-helix-control-id="helix.ask.helix-ask-turn-stream-panel.turn" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
           type="button"
           className="mt-3 rounded-md border border-white/15 px-2 py-1 text-[11px] text-slate-300 hover:bg-white/5 hover:text-white"
           aria-expanded={showTurnDetails}

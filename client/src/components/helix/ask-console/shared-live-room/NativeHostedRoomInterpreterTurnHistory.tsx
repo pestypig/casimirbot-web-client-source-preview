@@ -167,10 +167,11 @@ export function NativeHostedRoomInterpreterTurnHistory({ roomId, authority, clos
     setPreview(null);
     setRunning(turn.request_id); setRunMessage("");
     try {
-      const result = await bridge({ action: evaluation
-        ? "room_hosted_interpreter_evaluation_run" : "room_hosted_interpreter_run", room_id: roomId,
-        interpreter_session_id: turn.interpreter_session_id, generation: turn.generation,
-        request_id: turn.request_id, ...(evaluation ? { turn_ordinal: turn.turn_ordinal } : {}) });
+      const request = { room_id: roomId, interpreter_session_id: turn.interpreter_session_id,
+        generation: turn.generation, request_id: turn.request_id };
+      const result = await bridge(evaluation
+        ? { ...request, action: "room_hosted_interpreter_evaluation_run", turn_ordinal: turn.turn_ordinal }
+        : { ...request, action: "room_hosted_interpreter_run" });
       if (current !== epoch.current) return;
       setRunMessage(stopRequested.current === turn.request_id
         ? "Stop requested. Refresh this turn: a provider outcome may still be uncertain."
@@ -285,7 +286,7 @@ export function NativeHostedRoomInterpreterTurnHistory({ roomId, authority, clos
       {isOwner && turn.state === "queued" && trigger && !("turn_ordinal" in turn) && !canaryEnabled ? <p className="mt-2 text-slate-400">
         Attended shared-AI evaluation is not enabled on this device. The request remains queued without model input.
       </p> : null}
-      {isOwner && turn.state === "queued" && trigger && !closed ? <button type="button"
+      {isOwner && turn.state === "queued" && trigger && !closed ? <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-turn-history.void-review-turn" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button"
         disabled={previewBusy || running !== null || stopping}
         onClick={() => void review(turn)} className="mt-2 rounded border border-fuchsia-300/30 px-2 py-1 disabled:opacity-40">
         {previewBusy ? "Checking released context…" : "Review released room context"}
@@ -303,19 +304,19 @@ export function NativeHostedRoomInterpreterTurnHistory({ roomId, authority, clos
       </div> : null}
       {isOwner && turn.state === "queued" && trigger && !("turn_ordinal" in turn) && canaryEnabled &&
         preview?.room.room_id === roomId && preview.turn.request_id === turn.request_id && !closed && window.casimirDesktop?.liveConnection ?
-        <button type="button" disabled={running !== null || stopping}
+        <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-turn-history.run-one-shared-ai-turn-with-my-open-ai-api-key-api-charges-may-apply" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={running !== null || stopping}
           onClick={() => void run(turn)} className="mt-2 rounded border border-fuchsia-300/30 px-2 py-1 disabled:opacity-40">
           Run one shared AI turn with my OpenAI API key (API charges may apply)
         </button> : null}
       {isOwner && turn.state === "queued" && trigger && "turn_ordinal" in turn && evaluationEnabled &&
         preview?.room.room_id === roomId && preview.turn.request_id === turn.request_id && !closed && window.casimirDesktop?.liveConnection ?
-        <button type="button" disabled={running !== null || stopping}
+        <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-turn-history.run-with-my-open-ai-api-key-api-charges-may-apply" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={running !== null || stopping}
           onClick={() => void run(turn)} className="mt-2 rounded border border-fuchsia-300/30 px-2 py-1 disabled:opacity-40">
           Run {turn.turn_ordinal === 1 ? "first reply" : "correction"} with my OpenAI API key (API charges may apply)
         </button> : null}
       {isOwner && (running === turn.request_id || turn.state === "claimed") &&
         window.casimirDesktop?.liveConnection ?
-        <button type="button" disabled={stopping}
+        <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-turn-history.void-stop-turn-request-id" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={stopping}
           onClick={() => void stop(turn.request_id)} className="ml-2 mt-2 rounded border border-amber-300/30 px-2 py-1 text-amber-100 disabled:opacity-40">
           {stopping ? "Requesting stop…" : running === turn.request_id
             ? "Stop this AI turn" : "Request stop on this device"}

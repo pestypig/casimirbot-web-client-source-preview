@@ -1,0 +1,88 @@
+{
+  "observed_at": "2026-11-14T03:27:49.992899+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/__tests__/solar-patrol-artifacts.spec.tsx",
+      "canonical_sha256": "d08aa585e8645cf7e517bafe4974026abb7f0806f1b286aca467f888df34648b",
+      "export_sha256": "d08aa585e8645cf7e517bafe4974026abb7f0806f1b286aca467f888df34648b",
+      "bytes": 4163,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "fffc75a9ec34b7081223a75126cbe40346969b92d4b8f6989885930b6850527a"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-reasoning-budget-lifecycle.spec.tsx",
+      "canonical_sha256": "9536a9ebd399689371696dfca1bfb6c8f200cdfb72f325d51913a2153e0e9819",
+      "export_sha256": "9536a9ebd399689371696dfca1bfb6c8f200cdfb72f325d51913a2153e0e9819",
+      "bytes": 12255,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "8ed159b9f109ebec00f256c311bece0787940d3654de6d85e82ed7058f578736"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/CompanionResidentControl.spec.tsx",
+      "canonical_sha256": "f10f456813365bc847da3f9156a340c0ca2ac682d7dec47e841efa7852226c50",
+      "export_sha256": "f10f456813365bc847da3f9156a340c0ca2ac682d7dec47e841efa7852226c50",
+      "bytes": 12795,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "f1b011a42e54aa28cef0969a479dd4fb63b81e4f8a3bf00722592ad7011f7681"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/sessionActivityProjection.spec.ts",
+      "canonical_sha256": "e7061da162ab8f5f9e3a2158455c9bbdd41466f832f5945e901e023e792928f5",
+      "export_sha256": "e7061da162ab8f5f9e3a2158455c9bbdd41466f832f5945e901e023e792928f5",
+      "bytes": 28470,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "fdee81a476d7e94632cf0bd736451813cd6bc8f2f7f33cd1905db819ba283395"
+    },
+    {
+      "path": "client/src/components/SolarMagneticGlobe.presentation.spec.tsx",
+      "canonical_sha256": "041734a29552bfe9d499227c495f3863fdf52e67bd553f9bf1401383961d1b2a",
+      "export_sha256": "041734a29552bfe9d499227c495f3863fdf52e67bd553f9bf1401383961d1b2a",
+      "bytes": 11943,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "96bb9d89b5fa138c2f1767243531338dc84f8fa3ea81be1d6bf971b06db0836f"
+    },
+    {
+      "path": "client/src/components/SolarTimePlayer.identity.spec.tsx",
+      "canonical_sha256": "03be97b33011273e44ad9b86af54b121cedd34123b768ab551edf95c1b9d960c",
+      "export_sha256": "03be97b33011273e44ad9b86af54b121cedd34123b768ab551edf95c1b9d960c",
+      "bytes": 10411,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "5fd76005e8b84a3fe0f43e36c1c787fc45f06b795ae98b022a520024c96b06f7"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/panelActionAdapters.spec.ts",
+      "canonical_sha256": "ce62bfbfebe646773ed60f4d16bf8e7dab231a54f6ead03547980d8364531130",
+      "export_sha256": "ce62bfbfebe646773ed60f4d16bf8e7dab231a54f6ead03547980d8364531130",
+      "bytes": 111338,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "1ac5265f8edb80be27f1748d101a5a5d3338e07e2967f5cd4c0b3dc07e56de1c"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [],
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Remaining reviewed UI test contracts",
+    "capability": "Solar display, Companion Stop, session activity and panel evidence tests",
+    "current_maturity": "implemented",
+    "target_maturity": "typed existing test fixtures",
+    "required_evidence": "Seven existing suites and scoped compiler",
+    "explicit_non_goals": "No production, physical model, certificate, provider, account, pairing or game action changes",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "Fetch mocks declare the request arguments inspected by their existing assertions; optional RequestInit is checked before reading its method.",
+    "The Companion Stop test spies on the DOM Window timer interface, preserving its captured poll callback, numeric timer handle and original fallback. This avoids the unrelated Node timer overload.",
+    "The Responses activity fixture supplies the source/world identities required by its existing normalizer. Its display-only monitor assertions and authority flags are unchanged.",
+    "The deliberate manifest-identity mismatch verifies that its selected slot is resolved before replacing its archive ID. The panel evidence test checks the candidate array shape before retaining its original first-candidate assertions.",
+    "Only seven already-reviewed tests change. All original behavior assertions are retained; no new runtime fix or physical qualification is claimed."
+  ],
+  "limits": [
+    "Mocked source tests, not installed two-profile, provider, model or game acceptance.",
+    "Exported test bodies run against canonical production dependencies. Existing production bundle remains separately identified; test fixtures are not runtime changes."
+  ]
+}

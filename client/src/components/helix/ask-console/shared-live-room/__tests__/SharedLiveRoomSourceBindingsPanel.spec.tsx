@@ -1,9 +1,11 @@
 /** @vitest-environment jsdom */
 
 import React from "react";
+import type { HelixRoomEnvironmentProjection } from "@shared/helix-environment-subject";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SharedLiveRoomSourceBindingsPanel } from "../SharedLiveRoomSourceBindingsPanel";
+import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/accountCapabilityPolicy";
 
 const environment = {
   schema: "helix.room_environment_projection.v1",
@@ -70,9 +72,9 @@ const environment = {
   assistant_answer: false,
   terminal_eligible: false,
   raw_content_included: false,
-} as const;
+} satisfies HelixRoomEnvironmentProjection;
 
-const environmentReceipt = (environments = [environment]) => ({
+const environmentReceipt = (environments: HelixRoomEnvironmentProjection[] = [environment]) => ({
   schema: "helix.room_environments.receipt.v1",
   ok: true,
   error: null,
@@ -99,6 +101,81 @@ afterEach(() => {
 });
 
 describe("Shared Live Room environment panel", () => {
+  it.each(["room", "account"] as const)("clears the old environment immediately when %s changes", async change => {
+    let loads = 0;
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      if (String(input).endsWith("/environments")) {
+        if (++loads === 1) return jsonResponse(environmentReceipt());
+        return new Promise<Response>(() => undefined);
+      }
+      return jsonResponse({ ok: true, authority: null, bindings: [], pairings: [] });
+    }));
+    const view = render(<SharedLiveRoomSourceBindingsPanel roomId={environment.room_id}
+      roomClosed={false} isOwner={false} selfParticipantId="participant:self" />);
+    await screen.findByText("Local Fabric 1.21.8");
+    if (change === "room") view.rerender(<SharedLiveRoomSourceBindingsPanel roomId="shared_realtime_room:other"
+      roomClosed={false} isOwner={false} selfParticipantId="participant:self" />);
+    else act(() => window.dispatchEvent(new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT)));
+    expect(screen.queryByText("Local Fabric 1.21.8")).toBeNull();
+    await waitFor(() => expect(loads).toBe(2));
+  });
+  it.each(["headers", "body"] as const)("does not claim credentials after an account change with delayed %s", async delayed => {
+    let finishCreate!: (value: Response) => void;
+    const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (String(input).endsWith("/environments")) return jsonResponse(environmentReceipt([]));
+      if (String(input).endsWith("/source-bindings") && init?.method === "POST") {
+        if (delayed === "headers") return new Promise<Response>(resolve => { finishCreate = resolve; });
+        const response = jsonResponse({});
+        Object.defineProperty(response, "json", { configurable: true, value: () =>
+          new Promise(resolve => { finishCreate = value => { void value.json().then(resolve); }; }) });
+        return response;
+      }
+      return jsonResponse({ ok: true, authority: null, bindings: [], pairings: [] });
+    });
+    vi.stubGlobal("fetch", fetcher);
+    render(<SharedLiveRoomSourceBindingsPanel roomId={environment.room_id}
+      roomClosed={false} isOwner selfParticipantId="participant:self" />);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Manual config" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Manual config" }));
+    await waitFor(() => expect(finishCreate).toBeTypeOf("function"));
+    act(() => window.dispatchEvent(new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT)));
+    await act(async () => finishCreate(jsonResponse({ ok: true, credential_delivery: {
+      claim_handle: "fixture-stale-claim", claim_url: "/unused", expires_at: "2099-01-01T00:00:00Z",
+      delivery_status: "pending_claim", bearer_included: false, plugin_config_included: false,
+    } })));
+    expect(fetcher.mock.calls.some(([input]) => String(input).endsWith("/claim"))).toBe(false);
+  });
+  it("shows an unclaimed Fabric source as waiting and keeps local pairing available", async () => {
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      if (String(input).endsWith("/environments")) {
+        return jsonResponse(environmentReceipt([]));
+      }
+      if (String(input).endsWith("/source-bindings")) {
+        return jsonResponse({ ok: true, bindings: [{
+          binding_id: "room_source_binding:waiting",
+          room_id: environment.room_id,
+          source_id: "source:room-ingress:waiting",
+          world_id: environment.world_id,
+          domain_adapter: "minecraft.fabric_mod.v1",
+          source_label: "Selected world sensor",
+          status: "pending_credential_claim",
+          token_prefix: null,
+          expires_at: null,
+          last_used_at: null,
+          public_ingress_base_url: "http://127.0.0.1:1522/api/room-ingress/v1/bindings/waiting",
+        }] });
+      }
+      return jsonResponse({ ok: true, authority: null, authorities: [],
+        bindings: [], pairings: [] });
+    }));
+    render(<SharedLiveRoomSourceBindingsPanel roomId={environment.room_id}
+      roomClosed={false} isOwner selfParticipantId="participant:self" />);
+    expect(await screen.findByText("Selected world sensor - waiting for sensor pairing"))
+      .toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Pair local sensing privately" }))
+      .toBeEnabled();
+  });
+
   it("retains the narrowed same-player draft through stale observation re-entry, without retaining consent", async () => {
     vi.useFakeTimers();
     let status = "active";
@@ -128,7 +205,7 @@ describe("Shared Live Room environment panel", () => {
     expect(screen.getByLabelText("Navigate", { exact: true })).not.toBeChecked();
     expect(screen.getByLabelText(/Player action lease duration/)).toHaveValue(String(8 * 3600000));
     expect(screen.getByLabelText(/Acknowledge Minecraft player control/)).not.toBeChecked();
-    expect(screen.getByRole("button", { name: "Save player authority", exact: true })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Save player authority" })).toBeDisabled();
     subjectRef = "environment_subject:bob";
     await act(async () => { await vi.advanceTimersByTimeAsync(10000); });
     expect(screen.getByLabelText("Navigate", { exact: true })).toBeChecked();
@@ -143,6 +220,7 @@ describe("Shared Live Room environment panel", () => {
     fireEvent.click(screen.getByLabelText("Navigate", { exact: true }));
     view.rerender(<SharedLiveRoomSourceBindingsPanel roomId={environment.room_id} roomClosed={false}
       isOwner selfParticipantId="participant:other" />);
+    await act(async () => { await vi.advanceTimersByTimeAsync(1); });
     expect(screen.getByLabelText("Navigate", { exact: true })).toBeChecked();
     expect(screen.getByLabelText(/Acknowledge Minecraft player control/)).not.toBeChecked();
     expect(fetchMock.mock.calls.every(call => !call[1]?.method || call[1].method === "GET")).toBe(true);
@@ -261,7 +339,7 @@ describe("Shared Live Room environment panel", () => {
           },
         ],
       },
-    } as const;
+    } satisfies HelixRoomEnvironmentProjection;
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
       jsonResponse(environmentReceipt([environment, paperEnvironment])),
     ));
@@ -291,7 +369,7 @@ describe("Shared Live Room environment panel", () => {
         ...environment.subject_directory,
         subjects: [],
       },
-    } as const;
+    } satisfies HelixRoomEnvironmentProjection;
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
       jsonResponse(environmentReceipt([emptyEnvironment])),
     ));
@@ -420,7 +498,7 @@ describe("Shared Live Room environment panel", () => {
         terminal_eligible: false,
         raw_content_included: false,
       },
-    } as const;
+    } satisfies HelixRoomEnvironmentProjection;
     const fetchMock = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
       if (init?.method === "PUT") {
         return jsonResponse({

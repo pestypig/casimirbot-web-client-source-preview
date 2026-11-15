@@ -107,6 +107,7 @@ export const createHelixAskRealtimeVisualFrameAcknowledgementTracker = (input?: 
     event: unknown,
   ): HelixAskRealtimeVisualFrameProviderAcknowledgement | null => {
     const providerEvent = readRecord(event);
+    if (!providerEvent) return null;
     const providerEventType = readString(providerEvent?.type);
     if (
       providerEventType !== "conversation.item.added" &&

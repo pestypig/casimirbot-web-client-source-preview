@@ -1,0 +1,73 @@
+{
+  "observed_at": "2026-11-14T02:18:33.943633+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/HelixAskPill.tsx",
+      "canonical_sha256": "a114fc4e485d721d1c4e67380cf11af4cb47f16d2e260a85ba4aa77e626320fa",
+      "export_sha256": "a114fc4e485d721d1c4e67380cf11af4cb47f16d2e260a85ba4aa77e626320fa",
+      "bytes": 1048074,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "10b26e4520ff0360ddb67f886ad6ce8153cc90c97a0151718d2a21ba0044b41f"
+    },
+    {
+      "path": "client/src/components/helix/__tests__/manual-mode-defaults.spec.ts",
+      "canonical_sha256": "2a4bb1d6dbaef38b305044698d048f6ba9f83498e73464bfc6e4f4c2fbec9e3c",
+      "export_sha256": "3a0b8f7f3d9e3456d30c1cfe582df820abb6a0292a55d71f21e24dff711463dc",
+      "bytes": 3746,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-recrown.spec.ts",
+      "canonical_sha256": "c7a598b6497b5ad235f982dfb82b854b2cb18c668a5c2230595988bb9f1789f5",
+      "export_sha256": "da7b63264e3632b523f21b2c10dae32da428ba186502092b335a1e109201e4d5",
+      "scope": "Unchanged public-parity validation test; not a new export."
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-voice-reasoning-dispatch-prompt.spec.ts",
+      "canonical_sha256": "7b528792526e2ef2f22095dbfff4dacf27ae13a0d76975678c5cf072e773e2a5",
+      "export_sha256": "7b528792526e2ef2f22095dbfff4dacf27ae13a0d76975678c5cf072e773e2a5",
+      "scope": "Unchanged public-parity validation test; not a new export."
+    }
+  ],
+  "validation_dependencies": [
+    {
+      "path": "client/src/lib/helix/ask-exploration-policy.ts",
+      "canonical_sha256": "60875807bfdcd7b3b9541a880d5ef663d8e82f1f9f77582726de9d7a8fd42021"
+    },
+    {
+      "path": "client/src/lib/helix/ask-voice-reasoning-dispatch-prompt.ts",
+      "canonical_sha256": "90eaa393866893b781e59f84487a061a2b9c6938103c30dbdde30dea735189c1"
+    }
+  ],
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Manual Ask absent-mode contract",
+    "capability": "Simple document question routing and observer display mode",
+    "lifecycle_stage": "Existing manual Ask turn",
+    "reaction_timescale": "Prompt routing and finalization display",
+    "authority_owner": "Existing backend entrypoint, forced reasoning, request and terminal gates",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with correct absent-mode handling",
+    "required_evidence": "Before/after actual-expression cases; existing console and dispatch tests; scoped compiler",
+    "explicit_non_goals": "No automatic action, source retrieval grant, pairing, server/provider call or physical proof change",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "inferAskMode returns undefined for prompts without observe, act or verify cues. The narrow simple-document branch now checks that actual absence instead of the impossible read value. Hard backend entrypoint, backend-owned recall, repository-evidence, forced reasoning and simple-document eligibility checks remain in place.",
+    "When both response and inferred modes are missing, manual finalization diagnostics use observe, matching the existing handling of response read mode. Explicit response modes and inferred observe/act/verify remain unchanged.",
+    "Eighteen cases execute the actual simpleDirectPromptLane and detailMode initializers extracted from the console, with canonical inference and prompt-policy functions. Three failed before: two eligible document prompts and the missing display default. The test is expression-level evidence, not a full mounted chat, server or paid model run.",
+    "Only two existing lines change, so legacy console inventory positions remain accurate. Existing console/dispatch suites are public-parity validation inputs. Export checks read the new test and actual Pill expressions from the preview; helper dependencies remain canonical."
+  ],
+  "limits": [
+    "Unfrozen, unpublished and uninstalled. No actual prompt was sent, game action started or server permission widened.",
+    "The expression checks do not establish complete routing, backend answer quality, native conversation behavior or installed acceptance."
+  ]
+}

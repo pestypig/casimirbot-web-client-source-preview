@@ -1,0 +1,65 @@
+{
+  "observed_at": "2026-11-13T17:09:15.031262+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/DiscordVoiceGptLiveBridge.ts",
+      "canonical_sha256": "2e5ee0a4796ab9d599f42f74deb654d439991da5ccd7bf6c160a8f7aa57c743e",
+      "export_sha256": "2e5ee0a4796ab9d599f42f74deb654d439991da5ccd7bf6c160a8f7aa57c743e",
+      "bytes": 15148,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "6ea0a03a9db82ccdab37a0ad0b59299a3ba6adf8e4be7b38440b038af7223089"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/DiscordIsolatedAudioRelay.ts",
+      "canonical_sha256": "7f296b6c5509149f0723f99bfe22a4bcc2a8881c1ef4963763176e382bc41bd8",
+      "export_sha256": "7f296b6c5509149f0723f99bfe22a4bcc2a8881c1ef4963763176e382bc41bd8",
+      "bytes": 7201,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/DiscordVoiceGptLiveBridge.spec.ts",
+      "canonical_sha256": "4ad5fc16431521030433cc52636b7a85e3c6a890dd2d577acab7d04fbe4af926",
+      "export_sha256": "4ad5fc16431521030433cc52636b7a85e3c6a890dd2d577acab7d04fbe4af926",
+      "bytes": 1745,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "b168cbe56e2e382a513ac6de7212717da014f48e4027581624c4d0d7cd20a9b2"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/DiscordVoiceGptLiveBridge.lifecycle.spec.ts",
+      "canonical_sha256": "d811df33f44d8f33103369372dd186aa0f7ba2ffde8348cc1f767a658a90b3f7",
+      "export_sha256": "d811df33f44d8f33103369372dd186aa0f7ba2ffde8348cc1f767a658a90b3f7",
+      "bytes": 4016,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/HelixAskLiveMediaBoundary.ts",
+      "canonical_sha256": "047e15083b7b56665665c1119adab685416217ecebd07aa389b30557c571a92e",
+      "export_sha256": "047e15083b7b56665665c1119adab685416217ecebd07aa389b30557c571a92e",
+      "bytes": 2462,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Read the complete bridge, isolated PCM relay, media boundary, existing four tests and new three-test startup cancellation suite. First-party browser transport and synthetic test fixtures; no third-party implementation, assets, live identity, credentials or audio exported.",
+    "Bridge requires an existing GPT Live media boundary and laptop mic off, parses a room-scoped ticket, verifies plausible expiry and exact isolated-session fields, and bounds WebSocket frames and queues. Start/stop uses explicit owner controls; it starts no model session itself.",
+    "Owner stop is checked before startup, after audio resume and ticket issuance and after approved-ticket callbacks. Late tickets cannot construct a socket. The new regression suite reproduced all three startup cancellation failures before the fix.",
+    "The isolated relay binds room, invitation, worker, Realtime session, provider call and speaker metadata into a segment hash; bounds PCM size/chunks/transfer time; checks offset, payload digest and segment digest before its callback; clears PCM on completion and invalidates in-flight digest callbacks on clear.",
+    "Isolated metadata and retained allowance IDs are observations, not authority. Native consumer/server admission still recheck current funding, consent, room and speaker permissions. No paid provider or Discord connection was exercised.",
+    "The unchanged media boundary is an ephemeral map over existing transport controllers. Its controller import is type-only. Source preview omits the full controller/runtime and shared-contract deployment."
+  ],
+  "limits": [
+    "Private unfrozen source proposal only; not committed or published.",
+    "The two authored cancellation files are newer than running R380. Existing helper changes predate this fix; no installed bridge acceptance claimed.",
+    "Seven focused mocked tests cover startup cancellation, safe close messages and isolated ticket scope; they do not cover complete audio relay integrity, live Discord consent/funding, transcript attribution or Minecraft/GPT Live continuity.",
+    "Cancelling locally does not revoke a ticket already issued server-side or undo an admitted provider operation.",
+    "Relay clear/reuse concurrency and the complete media restoration lifecycle have not been independently qualified by this cohort."
+  ]
+}

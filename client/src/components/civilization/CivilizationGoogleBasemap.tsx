@@ -23,6 +23,7 @@ import {
   CIVILIZATION_GEOSPATIAL_CONFIG_CHANGED_EVENT,
   loadCivilizationMapsBrowserKey,
 } from "./civilizationGeospatialClientConfig";
+import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/accountCapabilityPolicy";
 
 const GEO_URL = new URL("../../assets/world-countries.json", import.meta.url).href;
 const MAPPED_NETWORK_KINDS = ["pipeline", "road", "rail", "waterway", "power", "telecom"] as const;
@@ -797,8 +798,11 @@ type GoogleMapsNamespace = {
 };
 
 declare global {
+  interface CasimirGoogleBrowserNamespace {
+    maps?: GoogleMapsNamespace["maps"];
+  }
   interface Window {
-    google?: GoogleMapsNamespace;
+    google?: CasimirGoogleBrowserNamespace;
     gm_authFailure?: () => void;
   }
 }
@@ -1588,9 +1592,16 @@ export function CivilizationGoogleBasemap({
     };
     refreshKey();
     window.addEventListener(CIVILIZATION_GEOSPATIAL_CONFIG_CHANGED_EVENT, refreshKey);
+    const onAccountChange = (event: Event) => {
+      if ((event as CustomEvent<{ account_profile_changed?: boolean }>).detail?.account_profile_changed) {
+        window.location.reload();
+      }
+    };
+    window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, onAccountChange);
     return () => {
       keyLoadSequenceRef.current += 1;
       window.removeEventListener(CIVILIZATION_GEOSPATIAL_CONFIG_CHANGED_EVENT, refreshKey);
+      window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, onAccountChange);
     };
   }, []);
 
@@ -1601,7 +1612,7 @@ export function CivilizationGoogleBasemap({
     if (!browserKey) {
       setLoading(false);
       setError(keyLoadFailed
-        ? "The saved Maps key could not be read from this desktop profile. Check developer sign-in and protected storage."
+        ? "The saved Maps key could not be read from this desktop account. Check sign-in and protected storage."
         : "No Maps browser key is saved for this app window.");
       return;
     }
@@ -1926,14 +1937,14 @@ export function CivilizationGoogleBasemap({
 
   useEffect(() => {
     const map = mapInstance;
-    const Marker = window.google?.maps.Marker;
+    const Marker = window.google?.maps?.Marker;
     if (!map || !mapReady || !Marker || !nwsVisible || nwsNotices.length === 0 || !nwsQueryPoint) return;
     const marker = new Marker({
       map,
       position: { lat: nwsQueryPoint.lat, lng: nwsQueryPoint.lon },
       title: `${nwsNotices.length} NWS alert notices returned for this queried point; marker is not an alert footprint`,
       icon: {
-        path: window.google?.maps.SymbolPath?.CIRCLE,
+        path: window.google?.maps?.SymbolPath?.CIRCLE,
         fillColor: "#ef4444",
         fillOpacity: 0.88,
         strokeColor: "#fef2f2",
@@ -1947,7 +1958,7 @@ export function CivilizationGoogleBasemap({
 
   useEffect(() => {
     const map = mapInstance;
-    const Marker = window.google?.maps.Marker;
+    const Marker = window.google?.maps?.Marker;
     const station = noaaSource?.station;
     if (!map || !mapReady || !Marker || !noaaVisible || !station || station.lat == null || station.lon == null) return;
     const marker = new Marker({
@@ -1955,7 +1966,7 @@ export function CivilizationGoogleBasemap({
       position: { lat: station.lat, lng: station.lon },
       title: `NOAA CO-OPS station ${station.id}; water-level observations apply at this station, not along a route`,
       icon: {
-        path: window.google?.maps.SymbolPath?.CIRCLE,
+        path: window.google?.maps?.SymbolPath?.CIRCLE,
         fillColor: "#38bdf8", fillOpacity: 0.9,
         strokeColor: "#f0f9ff", strokeWeight: 2, scale: 10,
       },
@@ -2174,7 +2185,7 @@ export function CivilizationGoogleBasemap({
   };
 
   useEffect(() => {
-    const Polyline = window.google?.maps.Polyline;
+    const Polyline = window.google?.maps?.Polyline;
     if (!mapInstance || !Polyline || !googleRouteVisible || !googleRoute) return;
     const line = new Polyline({
       map: mapInstance,
@@ -2188,7 +2199,7 @@ export function CivilizationGoogleBasemap({
   }, [mapInstance, googleRoute, googleRouteVisible]);
 
   useEffect(() => {
-    const Polyline = window.google?.maps.Polyline;
+    const Polyline = window.google?.maps?.Polyline;
     if (!mapInstance || !Polyline || !proposedVisible || !routeOrigin || !routeDestination) return;
     const vertices = proposedScreen?.query.vertices ?? [routeOrigin, ...proposedWaypoints, routeDestination];
     const line = new Polyline({
@@ -2205,7 +2216,7 @@ export function CivilizationGoogleBasemap({
   }, [mapInstance, routeOrigin, routeDestination, proposedWaypoints, proposedScreen, proposedVisible]);
 
   useEffect(() => {
-    const Marker = window.google?.maps.Marker;
+    const Marker = window.google?.maps?.Marker;
     if (!mapInstance || !Marker || !proposedVisible) return;
     const markers = proposedWaypoints.map((point, index) => new Marker({
       map: mapInstance,
@@ -2213,7 +2224,7 @@ export function CivilizationGoogleBasemap({
       title: `Proposed sketch waypoint ${index + 1}; this is user supplied, not sourced infrastructure`,
       clickable: false,
       icon: {
-        path: window.google?.maps.SymbolPath?.CIRCLE,
+        path: window.google?.maps?.SymbolPath?.CIRCLE,
         fillColor: "#fbbf24",
         fillOpacity: 0.9,
         strokeColor: "#111827",
@@ -2487,7 +2498,7 @@ export function CivilizationGoogleBasemap({
 
   useEffect(() => {
     const map = mapInstance;
-    const Polyline = window.google?.maps.Polyline;
+    const Polyline = window.google?.maps?.Polyline;
     if (!map || !mapReady || !Polyline || !routeCandidate || !routeVisible) return;
     const overlay = new Polyline({
       map,
@@ -2503,7 +2514,7 @@ export function CivilizationGoogleBasemap({
 
   useEffect(() => {
     const map = mapInstance;
-    const Marker = window.google?.maps.Marker;
+    const Marker = window.google?.maps?.Marker;
     if (!map || !mapReady || !Marker || !routeVisible || !routeCandidate ||
         routeBoundaryLineReview?.status !== "available") return;
     const encounters = (routeBoundaryLineReview.encounters ?? [])
@@ -2513,7 +2524,7 @@ export function CivilizationGoogleBasemap({
       position: { lat: item.position.lat, lng: item.position.lon },
       title: `${item.recordCategory}: ${item.lineLabel} — editorial line contact only`,
       icon: {
-        path: window.google?.maps.SymbolPath?.CIRCLE,
+        path: window.google?.maps?.SymbolPath?.CIRCLE,
         scale: 5,
         fillColor: "#fb7185",
         fillOpacity: 1,
@@ -2527,7 +2538,7 @@ export function CivilizationGoogleBasemap({
 
   useEffect(() => {
     const map = mapInstance;
-    const Marker = window.google?.maps.Marker;
+    const Marker = window.google?.maps?.Marker;
     if (!map || !mapReady || !Marker || !packetContactsVisible || !reviewPacket) return;
     const contacts = reviewPacket.countries.flatMap((country) =>
       country.status === "available" && country.routeGeometryReview?.status === "available"
@@ -2538,7 +2549,7 @@ export function CivilizationGoogleBasemap({
       position: { lat: contact.position.lat, lng: contact.position.lon },
       title: `${countryIso3} administrative depiction contact, packet option ${reviewPacket.route.candidates?.find((candidate) => candidate.candidateId === contact.candidateId)?.optionIndex ?? "unknown"}; not a legal border crossing`,
       icon: {
-        path: window.google?.maps.SymbolPath?.CIRCLE,
+        path: window.google?.maps?.SymbolPath?.CIRCLE,
         scale: 7,
         fillColor: "#a78bfa",
         fillOpacity: 0.9,
@@ -2645,7 +2656,7 @@ export function CivilizationGoogleBasemap({
 
   useEffect(() => {
     const map = mapInstance;
-    const Polyline = window.google?.maps.Polyline;
+    const Polyline = window.google?.maps?.Polyline;
     if (!map || !mapReady || !Polyline || !boundaryLineVisible) return;
     const colors: Record<CivilizationBoundaryLineAssertionV1["recordCategory"], string> = {
       "Claim boundary": "#fb7185",
@@ -2680,7 +2691,7 @@ export function CivilizationGoogleBasemap({
 
   useEffect(() => {
     const map = mapInstance;
-    const Polyline = window.google?.maps.Polyline;
+    const Polyline = window.google?.maps?.Polyline;
     if (!map || !mapReady || !Polyline || !boundaryVisible) return;
     const overlays: GoogleOverlay[] = [];
     for (const [index, claim] of boundaryClaims.entries()) {
@@ -2750,7 +2761,7 @@ export function CivilizationGoogleBasemap({
 
   useEffect(() => {
     const map = mapInstance;
-    const Polyline = window.google?.maps.Polyline;
+    const Polyline = window.google?.maps?.Polyline;
     if (!map || !mapReady || !Polyline || !infrastructureVisible) return;
     const colors: Record<string, string> = {
       pipeline: "#f59e0b", road: "#a3e635", rail: "#f472b6",
@@ -2997,7 +3008,7 @@ export function CivilizationGoogleBasemap({
   }, [mapReady, viewportBbox, boundaryLineVisible, hydroVisible, lakesVisible, infrastructureVisible, portVisible, wpiVisible]);
 
   useEffect(() => {
-    const Marker = window.google?.maps.Marker;
+    const Marker = window.google?.maps?.Marker;
     if (!mapInstance || !mapReady || !Marker || !portVisible) return;
     const markers: GoogleOverlay[] = [];
     const listeners: Array<{ remove(): void }> = [];
@@ -3005,7 +3016,7 @@ export function CivilizationGoogleBasemap({
       const marker = new Marker({
         map: mapInstance, position: { lat: port.position.lat, lng: port.position.lon },
         title: `${port.label} · OSM mapped candidate; service and access unverified`,
-        icon: { path: window.google?.maps.SymbolPath?.CIRCLE, fillColor: "#f59e0b",
+        icon: { path: window.google?.maps?.SymbolPath?.CIRCLE, fillColor: "#f59e0b",
           fillOpacity: 0.88, strokeColor: "#111827", strokeWeight: 2, scale: 5 },
         zIndex: 34,
       });
@@ -3018,7 +3029,7 @@ export function CivilizationGoogleBasemap({
   }, [mapInstance, mapReady, portCandidates, portVisible]);
 
   useEffect(() => {
-    const Marker = window.google?.maps.Marker;
+    const Marker = window.google?.maps?.Marker;
     if (!mapInstance || !mapReady || !Marker || !wpiVisible) return;
     const markers: GoogleOverlay[] = [];
     const listeners: Array<{ remove(): void }> = [];
@@ -3026,7 +3037,7 @@ export function CivilizationGoogleBasemap({
       const marker = new Marker({
         map: mapInstance, position: { lat: port.position.lat, lng: port.position.lon },
         title: `${port.name} · NGA World Port Index ${port.wpiNumber}; current service unverified`,
-        icon: { path: window.google?.maps.SymbolPath?.CIRCLE, fillColor: "#38bdf8",
+        icon: { path: window.google?.maps?.SymbolPath?.CIRCLE, fillColor: "#38bdf8",
           fillOpacity: 0.92, strokeColor: "#0f172a", strokeWeight: 2, scale: 6 },
         zIndex: 35,
       });
@@ -3039,7 +3050,7 @@ export function CivilizationGoogleBasemap({
   }, [mapInstance, mapReady, wpiPorts, wpiVisible]);
 
   useEffect(() => {
-    const Data = window.google?.maps.Data;
+    const Data = window.google?.maps?.Data;
     if (!mapInstance || !mapReady || !ramsarViewportActive || !ramsarOverlay || !Data) return;
     const layer = new Data({ map: mapInstance });
     layer.addGeoJson(ramsarOverlay.geojson);
@@ -3058,7 +3069,7 @@ export function CivilizationGoogleBasemap({
   }, [mapInstance, mapReady, ramsarViewportActive, ramsarOverlay]);
 
   useEffect(() => {
-    const Data = window.google?.maps.Data;
+    const Data = window.google?.maps?.Data;
     if (!mapInstance || !mapReady || !lakesVisible || !Data || !lakeDepictions.length) return;
     const layer = new Data({ map: mapInstance });
     layer.addGeoJson({ type: "FeatureCollection", features: lakeDepictions.map((lake) => ({
@@ -3078,7 +3089,7 @@ export function CivilizationGoogleBasemap({
 
   useEffect(() => {
     const map = mapInstance;
-    const Polyline = window.google?.maps.Polyline;
+    const Polyline = window.google?.maps?.Polyline;
     if (!map || !mapReady || !Polyline || !hydroVisible) return;
     const overlays: GoogleOverlay[] = [];
     const listeners: Array<{ remove(): void }> = [];

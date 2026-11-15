@@ -1,0 +1,55 @@
+{
+  "observed_at": "2026-11-14T05:25:23.328241+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/components/panels/StagePlayBadgeGraphPanel.tsx",
+      "canonical_sha256": "b80902daf537033f9084cbb333ef00b4d7b4c3e2541181751e49d4ae192f02e1",
+      "export_sha256": "4a440e61fd7ee6c7584b9a6496578b48994530e9536cf38e059b2d574fa7110d",
+      "previous_public_sha256": "ebde0a19d74101b996cc925dd6ccd092d77d2b30041ec437127b991246a2b82b",
+      "bytes": 623285,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/__tests__/stage-play-badge-graph-panel.spec.tsx",
+      "canonical_sha256": "5f909b9f244550fdaf69c27bca39a81cd9636e9fd73937671866fee738834c11",
+      "export_sha256": "cb40d72e508882085850f9f56d86de26b2da14a884280bdd209d5cca608a9e67",
+      "previous_public_sha256": "601fcf6b5c6e7d98c3d0e264c59d6edb164a3772911efa2b0eeee493cad64d68",
+      "bytes": 217133,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/panels/stagePlayEvidenceDisplay.ts",
+      "canonical_sha256": "e5f13c3e4ea2c2869064fb12f829ed4b4a0477fcf1889eb4e028cba5ef828b57",
+      "export_sha256": "e5f13c3e4ea2c2869064fb12f829ed4b4a0477fcf1889eb4e028cba5ef828b57",
+      "previous_public_sha256": null,
+      "bytes": 1558,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/components/__tests__/stage-play-evidence-display.spec.ts",
+      "canonical_sha256": "8221d6fa32762f934783ba880708733a407ebf060222f3977b3c938538710bf1",
+      "export_sha256": "8221d6fa32762f934783ba880708733a407ebf060222f3977b3c938538710bf1",
+      "previous_public_sha256": null,
+      "bytes": 3047,
+      "transformation": "identity"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [],
+  "classification": "evidence normalization / presentation",
+  "source_frozen": false,
+  "published": false,
+  "review": [
+    "Current completed and voice_delivered lifecycle values are recognized in the copied checkpoint coverage, while pending voice remains incomplete. Checkpoint evidence is not assistant-answer authority.",
+    "Job trace ordering reads the required updatedAt field; capture cadence uses producer/source cadence and its existing default rather than nonexistent watch-policy wake fields.",
+    "Observer metadata is read only from a unique profile stamp on the mail evidence; conflicting or absent stamps remain unknown. Profile titles require a matching retained profile.",
+    "Goal relevance comes only from the latest exact packet context update for the current goal. No score is inferred from qualitative salience, and absent/mismatched relevance remains null.",
+    "Draft parameter templates cover only configured node kinds; other valid graph kinds get an empty local template rather than an undefined-map crash. No new builder choices or action grants are added.",
+    "Removed the now-unused local policy binding after the first passing canonical run."
+  ],
+  "limits": [
+    "Display projections and local draft parameters only; server wake scheduling, graph execution, context admission, participant consent and program authority are unchanged.",
+    "Synthetic tests do not establish installed voice, room or Minecraft/GPT Live acceptance."
+  ]
+}

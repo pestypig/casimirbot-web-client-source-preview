@@ -15,7 +15,7 @@ export type SetupExecutionReceiptPostResult =
   | { ok: false; error: string };
 
 export const postSituationRoomSetupExecutionReceipt = async (args: {
-  action: HelixWorkstationAction;
+  action: Extract<HelixWorkstationAction, { action: "run_panel_action" }>;
   receipt: Record<string, unknown>;
   traceId?: string | null;
 }): Promise<SetupExecutionReceiptPostResult> => {
@@ -59,7 +59,7 @@ export const postSituationRoomSetupExecutionReceipt = async (args: {
 };
 
 export const maybePostSituationRoomSetupExecutionReceipt = (args: {
-  action: HelixWorkstationAction;
+  action: Extract<HelixWorkstationAction, { action: "run_panel_action" }>;
   artifact?: Record<string, unknown> | null;
   traceId?: string | null;
 }): void => {

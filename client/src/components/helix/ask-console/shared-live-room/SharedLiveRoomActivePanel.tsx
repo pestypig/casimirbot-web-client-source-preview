@@ -51,12 +51,13 @@ export function SharedLiveRoomActivePanel({
 }) {
   const isOwner = controller.selfParticipant?.role === "owner";
   const textOnly = room.capacity_profile === "three_human_text";
+  const nativeVoiceAvailable = room.capacity_profile === "two_person_voice";
   const roleLabel = isOwner ? "Host" : controller.selfParticipant?.role === "participant" ? "Guest" : "Checking membership";
   const roomRuntimeSupportsAudio =
     room.runtime.state === "host_transport_active" ||
     room.runtime.state === "bridge_active";
   const canStartRoomAudio = Boolean(
-    room.readiness.ready &&
+    nativeVoiceAvailable && room.readiness.ready &&
     roomRuntimeSupportsAudio &&
     (!isOwner || controller.runtimeActive),
   );
@@ -96,34 +97,35 @@ export function SharedLiveRoomActivePanel({
         </div>
         <p className="mt-2 text-xs text-slate-300">{describeHelixSharedLiveRoomReadiness(room)}</p>
         <nav aria-label="Conversation destinations" className="mt-3 flex flex-wrap gap-2 text-[11px]">
-          <button type="button" onClick={() => roomTextConversation?.admitted && onOpenRoomConsole
+          <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-active-panel.write-to-room-members" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" onClick={() => roomTextConversation?.admitted && onOpenRoomConsole
             ? onOpenRoomConsole() : showArea("conversation")}
             className="rounded-lg border border-cyan-300/30 bg-cyan-400/[0.06] px-3 py-2 text-cyan-100">Write to room members</button>
-          <button type="button" onClick={onReturnToPrivateAsk}
+          <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-active-panel.open-ask-helix" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" onClick={onReturnToPrivateAsk}
             className="rounded-lg border border-white/20 px-3 py-2 text-slate-100">Open Ask Helix</button>
-          {onOpenPrivateApiChat ? <button type="button" onClick={onOpenPrivateApiChat}
+          {onOpenPrivateApiChat ? <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-active-panel.open-cloud-agent-dm" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" onClick={onOpenPrivateApiChat}
             className="rounded-lg border border-white/20 px-3 py-2 text-slate-100">Open Cloud Agent DM</button> : null}
-          <button type="button" onClick={() => onOpenMissionConsole ? onOpenMissionConsole() : showArea("mission")}
+          <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-active-panel.review-task-handoff" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" onClick={() => onOpenMissionConsole ? onOpenMissionConsole() : showArea("mission")}
             className="rounded-lg border border-emerald-300/30 px-3 py-2 text-emerald-100">Review task handoff</button>
-          <button type="button" onClick={() => showArea("people")}
+          <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-active-panel.people-amp-permissions" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" onClick={() => showArea("people")}
             className="rounded-lg border border-white/20 px-3 py-2 text-slate-100">People &amp; permissions</button>
         </nav>
         <p className="mt-2 text-[11px] text-slate-400">Room text goes to members{ textOnly ? " (up to three people)" : "" }; private chats stay private. Shared AI needs each author's exact release and a separate turn; this local room view cannot start one. {isOwner ? "You review each mission handoff." : "The host reviews mission handoffs."}</p>
-        {!textOnly ? <p className="mt-1 text-[11px] leading-5 text-amber-100/80">
+        {nativeVoiceAvailable ? <p className="mt-1 text-[11px] leading-5 text-amber-100/80">
           When GPT Live is connected, the owner's browser hosts that call. Screen frames stay labeled by
           participant; room audio uses a separate two-browser relay and never feeds GPT audio
           back into the model microphone mix.
         </p> : <p className="mt-1 text-[11px] leading-5 text-amber-100/80">
-          Three-person voice is unavailable in this profile. Interpreter preparation and text release
-          record permission only; this local room view cannot start an AI turn.
+          {textOnly ? "Three-person voice is unavailable in this profile." :
+            "Three-person consent can be reviewed here; its native group media bridge is pending."}
+          {" "}Interpreter preparation and text release record permission only; this local room view cannot start an AI turn.
         </p>}
       </section>
 
       <section id={`${idPrefix}-conversation`} aria-label="Party Chat conversation" className="space-y-3">
         <div>
           <h3 className="text-sm font-semibold text-cyan-100">Conversation</h3>
-          <p className="mt-1 text-[11px] text-slate-400">{textOnly
-            ? "Each message is attributed to its author. Three-person voice is unavailable."
+          <p className="mt-1 text-[11px] text-slate-400">{!nativeVoiceAvailable
+            ? "Each text message is attributed to its author. Native three-person voice is unavailable."
             : "Shared speech is attributed to its speaker. Recent lines stay in this live connection only and clear when room transcript consent or the connection ends."}</p>
         </div>
       <SharedLiveRoomTextConversation room={room} draftStore={draftStore}
@@ -131,7 +133,7 @@ export function SharedLiveRoomActivePanel({
       <SharedRoomInterpreterPreparationPanel key={`${room.room_id}:${room.self_participant_id}`}
         room={room} isOwner={isOwner} />
       <SharedRoomInterpreterTurnHistory room={room} />
-      {!textOnly ? <section className="rounded-xl border border-cyan-300/20 bg-cyan-400/[0.04] p-3">
+      {nativeVoiceAvailable ? <section className="rounded-xl border border-cyan-300/20 bg-cyan-400/[0.04] p-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-xs font-semibold text-cyan-100">Room audio bridge</p>

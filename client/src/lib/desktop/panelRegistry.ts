@@ -97,6 +97,14 @@ const load = <T extends Record<string, unknown>>(
 
 const BASE_PANELS: PanelDefinition[] = [
   {
+    id: "physics-glyphs",
+    title: "Physics Glyph Workspace",
+    loader: load(() => import("@/components/workstation/PhysicsGlyphWorkspacePanel")),
+    defaultSize: { w: 1160, h: 780 },
+    defaultPosition: { x: 240, y: 140 },
+    keywords: ["physics", "glyph", "particle", "phase", "spin", "atom", "casimir"],
+  },
+  {
     id: "mission-ethos",
     title: "Ideology & Moral",
     loader: load(() => import("@/components/IdeologyPanel"), "IdeologyPanel"),
@@ -113,7 +121,7 @@ const BASE_PANELS: PanelDefinition[] = [
   },
   {
     id: "helix-noise-gens",
-    title: "Helix Noise Gens",
+    title: "Noise Gen · Local music",
     loader: load(() => import("@/pages/helix-noise-gens")),
     defaultSize: { w: 1100, h: 720 },
     defaultPosition: { x: 180, y: 140 },

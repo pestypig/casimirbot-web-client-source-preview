@@ -60,6 +60,7 @@ export type HelixAskComposerActionToolbarSurfaceProps = {
   runtimePickerModel: HelixAskRuntimePickerModel;
   runtimeMenuOpen: boolean;
   privateConnectionInspectorEnabled?: boolean;
+  personalConnectionMenuEnabled?: boolean;
   onSelectPrivateApiChat?: () => void;
   onRuntimePrimaryClick: () => void;
   onRuntimeSelect: (value: HelixAgentRuntimeId) => void;
@@ -105,6 +106,7 @@ export function HelixAskComposerActionToolbarSurface({
   runtimePickerModel,
   runtimeMenuOpen,
   privateConnectionInspectorEnabled = false,
+  personalConnectionMenuEnabled = false,
   onSelectPrivateApiChat,
   onRuntimePrimaryClick,
   onRuntimeSelect,
@@ -238,7 +240,8 @@ export function HelixAskComposerActionToolbarSurface({
           menuOpen={runtimeMenuOpen}
           onPrimaryClick={onRuntimePrimaryClick}
           onSelect={onRuntimeSelect}
-        /><PrivateAskConnectionMenu enabled={privateConnectionInspectorEnabled}
+        /><PrivateAskConnectionMenu enabled={personalConnectionMenuEnabled}
+          privateInspectorEnabled={privateConnectionInspectorEnabled}
           scope={runtimePickerModel.selectedRuntime} onSelectPrivateApiChat={onSelectPrivateApiChat}/></>
       }
       submitButton={

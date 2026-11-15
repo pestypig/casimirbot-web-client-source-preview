@@ -31,12 +31,13 @@ const advisoryInstruction = (handoff: AgentHandoffTurn): string =>
   "A proposal does not authorize a program action or prove a result.";
 
 export function ManagedConversationConsoleHistory({ helixConversationId, messageCloudOpen = false,
-  overlayMode = "all", pairingSnapshot, savedCodexChats = [], adapterPages = EMPTY_ADAPTER_PAGES,
+  overlayMode = "all", streamActive = false, pairingSnapshot, savedCodexChats = [], adapterPages = EMPTY_ADAPTER_PAGES,
   streamReadGrants = [],
   onActivityFrame }: {
   helixConversationId?: string | null;
   messageCloudOpen?: boolean;
   overlayMode?: "all" | "conversation" | "reports";
+  streamActive?: boolean;
   /** Shared exact-chat status from the parent console; avoids a second owner
    * lookup racing the already verified Message Codex panel. */
   pairingSnapshot?: ConversationPairing;
@@ -68,7 +69,7 @@ export function ManagedConversationConsoleHistory({ helixConversationId, message
   const otherCodexActivity = useSavedCodexActivity(activityChats.map(chat => chat.id),
     helixConversationId, messageCloudOpen && overlayMode === "all");
   const grantedCodexActivity = useGrantedCodexStreamActivity(streamReadGrants,
-    messageCloudOpen && overlayMode === "all");
+    messageCloudOpen && overlayMode === "all" || streamActive);
   const messages = conversation?.view.messages ?? [];
   const pairedBindingId = pairingSnapshot?.status === "active" ? pairingSnapshot.bindingId : undefined;
   const pairedBindingIdRef = useRef(pairedBindingId);
@@ -197,8 +198,8 @@ export function ManagedConversationConsoleHistory({ helixConversationId, message
       window.removeEventListener(HELIX_REASONING_BINDING_UPDATED_EVENT, onBinding); };
   }, [messageCloudOpen, overlayMode, helixConversationId, terminalPairing]);
   useEffect(() => {
-    if (!messageCloudOpen || !helixConversationId || !window.casimirDesktop?.showMessageCloud) return;
-    if (overlayMode === "all") {
+    if ((!messageCloudOpen && !streamActive) || !helixConversationId || !window.casimirDesktop) return;
+    if (overlayMode === "all" || streamActive) {
       const frame = projectSessionActivity({ helixConversationId, messages, codexFrame,
         currentChatTitle: activityChats.find(chat => chat.id === helixConversationId)?.title ?? "This Helix chat",
         savedCodexChatCount: activityChats.length + streamReadGrants.length,
@@ -223,9 +224,10 @@ export function ManagedConversationConsoleHistory({ helixConversationId, message
               handoff.state === "unavailable" || handoff.state === "rejected" ? handoff.state : "submitting" } : null,
         taskReport: taskReport && handoff?.steeringEventRef
           ? { id: handoff.steeringEventRef, status: taskReport.status, text: taskReport.text } : null });
-      void window.casimirDesktop.showMessageCloud(frame).catch(() => {});
+      if (messageCloudOpen && overlayMode === "all" && window.casimirDesktop.showMessageCloud)
+        void window.casimirDesktop.showMessageCloud(frame).catch(() => {});
       onActivityFrame?.(frame);
-      return;
+      if (overlayMode === "all" || !messageCloudOpen) return;
     }
     const turns: HelixMessageCloudFrame["turns"] = (overlayMode === "reports" ? [] : messages.slice(-3)).map((item, index) => ({
       id: `${item.turnId ?? `message:${messages.length - 3 + index}`}:${item.role}`,
@@ -241,9 +243,10 @@ export function ManagedConversationConsoleHistory({ helixConversationId, message
       report: { status: taskReport.status, text: overlayMode === "conversation"
         ? taskReport.text : taskReport.text.slice(0, 1_200) },
     });
+    if (!window.casimirDesktop.showMessageCloud) return;
     void window.casimirDesktop.showMessageCloud({ schema: "helix.message_cloud_frame.v1",
       helixConversationId, source: "cloud_agent_dm", displayMode: overlayMode, pairing, turns: turns.slice(-3) }).catch(() => {});
-  }, [messageCloudOpen, helixConversationId, messages, pairing, taskReport, handoff?.steeringEventRef, overlayMode,
+  }, [messageCloudOpen, streamActive, helixConversationId, messages, pairing, taskReport, handoff?.steeringEventRef, overlayMode,
     codexFrame, nativeVerifiedBindingId, codexSourceStatus, codexSourceReason, handoff,
     adapterPages, activityBindingId, activityChats, otherCodexActivity,
     streamReadGrants, grantedCodexActivity, onActivityFrame]);

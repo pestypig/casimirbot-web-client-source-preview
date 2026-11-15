@@ -1,4 +1,5 @@
 import type { DocumentTranslationUnit } from "@shared/document-translation";
+import { normalizeDocumentFreshnessStatus, normalizeVisibleDocumentProjectionStatus } from "./liveTranslationStatus";
 import { hashDocumentSource } from "@shared/document-translation";
 import type { HelixVisibleTranslationTarget } from "@shared/helix-live-translation-lane";
 import {
@@ -293,8 +294,8 @@ export function buildActiveDocVisibleTranslationContext(input: {
     sourceKind?: "button_label" | "panel_text";
     existingObservationRef?: string | null;
     existingReceiptRef?: string | null;
-    existingProjectionStatus?: HelixVisibleTranslationTarget["existing_projection_status"];
-    existingFreshnessStatus?: HelixVisibleTranslationTarget["existing_freshness_status"];
+    existingProjectionStatus?: string | null;
+    existingFreshnessStatus?: string | null;
     existingTerminalAuthorityStatus?: HelixVisibleTranslationTarget["existing_terminal_authority_status"];
     existingSourceEventMs?: number | null;
     existingObservedAtMs?: number | null;
@@ -367,8 +368,8 @@ export function buildActiveDocVisibleTranslationContext(input: {
       projection_target: HELIX_LIVE_TRANSLATION_PROJECTION_TARGET_DOCS_SELECTION,
       existing_observation_ref: selectionExistingProjection?.observationRef ?? null,
       existing_receipt_ref: selectionExistingProjection?.receiptRef ?? null,
-      existing_projection_status: selectionExistingProjection?.projectionStatus ?? null,
-      existing_freshness_status: selectionExistingProjection?.freshnessStatus ?? null,
+      existing_projection_status: normalizeVisibleDocumentProjectionStatus(selectionExistingProjection?.projectionStatus),
+      existing_freshness_status: normalizeDocumentFreshnessStatus(selectionExistingProjection?.freshnessStatus) ?? null,
       existing_terminal_authority_status: selectionExistingProjection?.terminalAuthorityStatus ?? null,
       existing_source_event_ms: readFiniteNumber(selectionExistingProjection?.sourceEventMs),
       existing_observed_at_ms: readFiniteNumber(selectionExistingProjection?.observedAtMs),
@@ -410,8 +411,8 @@ export function buildActiveDocVisibleTranslationContext(input: {
       projection_target: HELIX_LIVE_TRANSLATION_PROJECTION_TARGET_DOCS_HOVER,
       existing_observation_ref: hoverExistingProjection?.observationRef ?? null,
       existing_receipt_ref: hoverExistingProjection?.receiptRef ?? null,
-      existing_projection_status: hoverExistingProjection?.projectionStatus ?? null,
-      existing_freshness_status: hoverExistingProjection?.freshnessStatus ?? null,
+      existing_projection_status: normalizeVisibleDocumentProjectionStatus(hoverExistingProjection?.projectionStatus),
+      existing_freshness_status: normalizeDocumentFreshnessStatus(hoverExistingProjection?.freshnessStatus) ?? null,
       existing_terminal_authority_status: hoverExistingProjection?.terminalAuthorityStatus ?? null,
       existing_source_event_ms: readFiniteNumber(hoverExistingProjection?.sourceEventMs),
       existing_observed_at_ms: readFiniteNumber(hoverExistingProjection?.observedAtMs),
@@ -485,8 +486,8 @@ export function buildActiveDocVisibleTranslationContext(input: {
       projection_target: HELIX_LIVE_TRANSLATION_PROJECTION_TARGET_DOCS_CHUNK,
       existing_observation_ref: existingObservationRef,
       existing_receipt_ref: existingReceiptRef,
-      existing_projection_status: existingProjectionStatus,
-      existing_freshness_status: existingFreshnessStatus,
+      existing_projection_status: normalizeVisibleDocumentProjectionStatus(existingProjectionStatus),
+      existing_freshness_status: normalizeDocumentFreshnessStatus(existingFreshnessStatus) ?? null,
       existing_terminal_authority_status: existingTerminalAuthorityStatus,
       existing_source_event_ms: existingSourceEventMs,
       existing_observed_at_ms: existingObservedAtMs,
@@ -536,8 +537,8 @@ export function buildActiveDocVisibleTranslationContext(input: {
       projection_target: HELIX_LIVE_TRANSLATION_PROJECTION_TARGET_ACCOUNT_LANGUAGE,
       existing_observation_ref: region.existingObservationRef ?? null,
       existing_receipt_ref: region.existingReceiptRef ?? null,
-      existing_projection_status: region.existingProjectionStatus ?? null,
-      existing_freshness_status: region.existingFreshnessStatus ?? null,
+      existing_projection_status: normalizeVisibleDocumentProjectionStatus(region.existingProjectionStatus),
+      existing_freshness_status: normalizeDocumentFreshnessStatus(region.existingFreshnessStatus) ?? null,
       existing_terminal_authority_status: region.existingTerminalAuthorityStatus ?? null,
       existing_source_event_ms: readFiniteNumber(region.existingSourceEventMs),
       existing_observed_at_ms: readFiniteNumber(region.existingObservedAtMs),

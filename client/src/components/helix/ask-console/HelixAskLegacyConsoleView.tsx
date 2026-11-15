@@ -96,11 +96,13 @@ export function HelixAskLegacyConsoleView({
   // The room controller lives below the original pill toolbar. Keep that
   // subtree mounted while another channel owns the visible pill; otherwise
   // selecting a room tears down its own admission and starts a request loop.
+  const managedTextSelected = selectedChannel === "managed_text";
   const resolvedSurface = conversationWorkspace && surfaceFrameState ? <>
-    <div className={surface ? "hidden" : "w-full"} aria-hidden={surface ? true : undefined}>
+    <div className={surface || managedTextSelected ? "hidden" : "w-full"}
+      aria-hidden={surface || managedTextSelected ? true : undefined}>
       {privateAskSurface}
     </div>
-    {surface}
+    {managedTextSelected ? null : surface}
   </> : surface ?? privateAskSurface;
   const resolvedGoalPill = goalPill ?? (goalPillState ? <HelixAskGoalPillSurface {...goalPillState} /> : null);
   const resolvedErrorLine = errorLine ?? <HelixAskConsoleErrorLineSurface {...(errorLineState ?? { message: errorMessage })} />;

@@ -2,6 +2,7 @@
 import React from 'react';
 import {afterEach,expect,it,vi} from 'vitest';
 import {cleanup,fireEvent,render,screen} from '@testing-library/react';
+import {HELIX_DEVELOPER_ACCOUNT_POLICY} from '@shared/helix-account-session';
 vi.mock('@/hooks/useHelixStartSettings',()=>({useHelixStartSettings:()=>({userSettings:{interfaceLanguage:'en'}})}));
 vi.mock('@/lib/i18n/interfaceText',()=>({useInterfaceText:()=>({t:(key:string)=>key})}));
 vi.mock('@/lib/i18n/panelTitles',()=>({getInterfacePanelTitle:(_t:unknown,_id:string,title:string)=>title}));
@@ -9,7 +10,7 @@ vi.mock('@/lib/desktop/panelRegistry',()=>{
   const panelRegistry=Array.from({length:20},(_,index)=>({id:`panel-${String(index).padStart(2,'0')}`,title:`Panel ${String(index).padStart(2,'0')}`}));
   return {panelRegistry,getPanelDef:(id:string)=>panelRegistry.find(panel=>panel.id===id)};
 });
-vi.mock('@/lib/workstation/accountCapabilityPolicy',()=>({HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT:'test-policy',readCachedAccountCapabilityPolicy:()=>({account_type:'developer'}),fetchAccountCapabilityPolicy:async()=>({account_type:'developer'})}));
+vi.mock('@/lib/workstation/accountCapabilityPolicy',()=>({HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT:'test-policy',readCachedAccountCapabilityPolicy:()=>HELIX_DEVELOPER_ACCOUNT_POLICY,fetchAccountCapabilityPolicy:async()=>HELIX_DEVELOPER_ACCOUNT_POLICY}));
 vi.mock('@/store/useDocViewerStore',()=>({useDocViewerStore:(select:any)=>select({mode:'doc',currentPath:null,anchor:null})}));
 vi.mock('@/store/useDocEquationContextStore',()=>({useDocEquationContextStore:(select:any)=>select({latestContext:null})}));
 vi.mock('@/store/useWorkstationLayoutStore',()=>({useWorkstationLayoutStore:(select:any)=>select({openPanelInGroup:vi.fn(),setActivePanel:vi.fn(),focusGroup:vi.fn()})}));

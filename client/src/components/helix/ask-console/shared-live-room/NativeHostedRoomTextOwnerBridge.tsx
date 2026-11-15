@@ -7,7 +7,7 @@ export type HostedRoomConsoleProjection = {
   room_id: string;
   title: string;
   status: string;
-  capacity_profile?: "two_person_voice" | "three_human_text";
+  capacity_profile?: "two_person_voice" | "three_person_voice" | "three_human_text";
   self_participant_id?: string;
   participants: Array<{ participant_id: string; display_name: string; role?: string }>;
 };

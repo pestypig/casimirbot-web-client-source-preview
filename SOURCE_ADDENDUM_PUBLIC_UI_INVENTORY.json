@@ -1,0 +1,486 @@
+{
+  "observed_at": "2026-11-15T05:38:12.268465+00:00",
+  "status": "reviewed unpublished source proposal",
+  "canonical_base_commit": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_identity": "Recorded dirty main source; not a clean build of the base commit. Exact source/export hashes below.",
+  "scope": "Current public UI control identity and descriptive metadata reconciliation; no new gateway, route, account or game permission.",
+  "transformation": "CRLF normalized to LF only.",
+  "rights_review": "First-party modifications to existing selected CasimirBot source. No new dependencies, assets, datasets, private history, user fixtures or third-party copied content in this delta. Existing omissions and notices remain.",
+  "checks": [
+    "88 focused canonical tests pass; 16 inventory tests rerun after test typing correction.",
+    "Tooling compiler passes; all 66 annotated component syntax/behavior-source checks pass.",
+    "Three existing route authority bindings unchanged."
+  ],
+  "maturity": "Source-only preview; no installed, signed, public deployment or scientific maturity claim.",
+  "files": [
+    {
+      "path": "client/src/components/account/DiscordTaskConnections.tsx",
+      "previous_export_sha256": "dbfadf545ad2cbff06b5fd268a0d754b38dd0cb035d2fd231cf084eaafbbd7f4",
+      "canonical_sha256": "def62a9592d07afcb68d660667540756520ec54a0169fbf3f9091df2a7a2f578",
+      "export_sha256": "def62a9592d07afcb68d660667540756520ec54a0169fbf3f9091df2a7a2f578",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/agent-access/AgentAccountBindingReadiness.tsx",
+      "previous_export_sha256": "a4af13254eaad3a5c8aae435a294e88bcdca859caae4d8f64ba2683e49735ea1",
+      "canonical_sha256": "2b4e50491841c3e8281a789db30e1454469a809f0576460b348888567d856830",
+      "export_sha256": "2b4e50491841c3e8281a789db30e1454469a809f0576460b348888567d856830",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/agent-access/AgentConnectionSetup.tsx",
+      "previous_export_sha256": "c001e644bdaa4c93e2ac592486dc66a4b3a872833ae2363fe3b6ff547a2d6923",
+      "canonical_sha256": "4940634c1b295ee90c1518468bb8ff2fd36a8a945f4d77a46921d8fc5066c544",
+      "export_sha256": "40dd49f7e8e54c9abf124e11a2536f994dcece8a2a59e56cc806a38176dfcaf8",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/agent-access/CaptainKeyesTaskAccess.tsx",
+      "previous_export_sha256": "101145ff7b8c3b116d42b5d4215477a6d7da2c4929275ffe970469a4ef9452f3",
+      "canonical_sha256": "7cd94c40a43ef178d7fb8221c66e529892d102e5a5f02e5c3641569b3332bd7f",
+      "export_sha256": "7cd94c40a43ef178d7fb8221c66e529892d102e5a5f02e5c3641569b3332bd7f",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/agent-access/CompanionResidentControl.tsx",
+      "previous_export_sha256": "695cd69268b840312fbba551858cfe6bf0c360e18264e9b1aa235c3c9c77aaa1",
+      "canonical_sha256": "1d8e82ba0b26638ad57c597d7f5f592556b7abe530d3bb89e5f866bfea8bbd5d",
+      "export_sha256": "1d8e82ba0b26638ad57c597d7f5f592556b7abe530d3bb89e5f866bfea8bbd5d",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/agent-access/ConnectionExpiryNotice.tsx",
+      "previous_export_sha256": "0f1ca5e67b451be9254fc46b6a8f9c28e2a8532ddf72ca9dc7f4d939e38904f7",
+      "canonical_sha256": "6b4e265d8e56558202d7f8d965510e443d4e48933e4806456c98750369f5e873",
+      "export_sha256": "6b4e265d8e56558202d7f8d965510e443d4e48933e4806456c98750369f5e873",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/agent-access/ConnectionHealthPanel.tsx",
+      "previous_export_sha256": "b20101316cebab97dfbb2279b858ffa7592f8945cd8b45416f6d808e492cca2a",
+      "canonical_sha256": "21d1f4765f3debe74a0d2992ec62b8703be6516d6b640174d4193250d25f7dcc",
+      "export_sha256": "21d1f4765f3debe74a0d2992ec62b8703be6516d6b640174d4193250d25f7dcc",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/agent-access/DurableTaskPairing.tsx",
+      "previous_export_sha256": "c54a64a9d438e307dc5ad6c7a033ad6c841eb6b35e44ea6c27e524f419b506cd",
+      "canonical_sha256": "5d6f99bd8d4bd63edfe71b93532b9600b36bd9072116dfa0e9832694126a95ff",
+      "export_sha256": "60c65c581b2e251c666267299088ec6a09b3007f681004323347079cc3b4a670",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/agent-access/EnvironmentSessionPreparationRequest.tsx",
+      "previous_export_sha256": "50a2dfdb199a688fa6262e0971a55dfd67d872d09000fd3179c3a1e0ba8983a3",
+      "canonical_sha256": "777c1ea88007e284ef9fb68ef08058f8aa79891605b512ea64eb89a19fd679f6",
+      "export_sha256": "777c1ea88007e284ef9fb68ef08058f8aa79891605b512ea64eb89a19fd679f6",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/agent-access/EnvironmentSessionReadyUp.tsx",
+      "previous_export_sha256": "5a0592f4dd09bbf2e7a4d7e5628301dba3235ecddcf3871b5a6905a7deaaf64a",
+      "canonical_sha256": "ca498fbf365d6153936c8c7e2e6273563a8c9b317a9e6124362c19fb499c7d2e",
+      "export_sha256": "ca498fbf365d6153936c8c7e2e6273563a8c9b317a9e6124362c19fb499c7d2e",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/agent-access/LocalHostedSubscription.tsx",
+      "previous_export_sha256": "9e444ffb1298fe55508008cc97d4fcd400d336f43e98f66e0dc7ebcc57821e6e",
+      "canonical_sha256": "77451c0c1ff6aa3017f68da3e3cf9100e9bbc9a51e7a91249bb2e4904db6baba",
+      "export_sha256": "a77663024ab0ef464a7528777869754ed6477e0166dc570f9637e25527f6d783",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/agent-access/LocalPersonalConnectionSetup.tsx",
+      "previous_export_sha256": "dc884c97dd949a51598e6120f748365266cd6ac2edf698c08af4332bf9c7fd33",
+      "canonical_sha256": "cf1188695a544d40d68a179338eaf7289a450ed70b0e9eec32a63b06630f0412",
+      "export_sha256": "5a55f75fff1a4b7ddf878f965f28e2d21f1748986d1aa8c389686f950de0dc6b",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/agent-access/ReasoningClaimHandle.tsx",
+      "previous_export_sha256": "c4132cc8a8736652e914073e8b428ce37ebded759b96870c2e5164ced24a63ed",
+      "canonical_sha256": "1c0db9e5047192c315abf07d937e3843b1be6b3eb77a60bbb405c9c4d71417a6",
+      "export_sha256": "1c0db9e5047192c315abf07d937e3843b1be6b3eb77a60bbb405c9c4d71417a6",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/agent-access/SetupContractDialog.tsx",
+      "previous_export_sha256": "988b2a1981b8839239c7bd4920a672e6913a9ffd6a6d2cd90adc75035054d9c9",
+      "canonical_sha256": "a5b101aec630764440b970bbd42010d11a75972a21241e7534f5ed2a6c5ee138",
+      "export_sha256": "e2ac28e39d91d1d02b36886ddf962a68370c83fc1efd1031eb43e227c496e929",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/agent-access/SetupContractInbox.tsx",
+      "previous_export_sha256": "5ce48534c7ec8bd3e8b419b3aa5f877d4008f128641820184746597af66f0014",
+      "canonical_sha256": "6d3ea7a349f4ab5971d9a5fb55c0e42b34f4411a895d756266a5ef5bb6569329",
+      "export_sha256": "6a89696be5645557475c9f65d94af1c6bd5effcbcd145e552e595d405b547b4a",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/AdapterAiActivityPanel.tsx",
+      "previous_export_sha256": "7b456ae82cdaff7f9ee6cbda7fa22a841dcf6e70f68ffe71b44769d04fb3e3cc",
+      "canonical_sha256": "fed894e6528f8b3e49e5b8e24dc9894e77af50a761033fa69fca5f83234c37ae",
+      "export_sha256": "fed894e6528f8b3e49e5b8e24dc9894e77af50a761033fa69fca5f83234c37ae",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskComposerDestinationStrip.tsx",
+      "previous_export_sha256": "f9ddfc86fb2b3482fafb693c78053bd53eee3e9ccfb6bac7d36d9f24a90848cb",
+      "canonical_sha256": "1989599cdc9d5a109d899b4a492caf58a2b4c3e4b457fa7a829d02952e9220ae",
+      "export_sha256": "1989599cdc9d5a109d899b4a492caf58a2b4c3e4b457fa7a829d02952e9220ae",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleRuntimeShell.tsx",
+      "previous_export_sha256": "348d1c9f4559c7fb9c91d02789cd1eef277250baf1f780d8fd84086acaa51f44",
+      "canonical_sha256": "ada67adf15e884a87333f2fd3b07c5063283c0b3eb901c7c3433bea7084dbbb5",
+      "export_sha256": "ada67adf15e884a87333f2fd3b07c5063283c0b3eb901c7c3433bea7084dbbb5",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLiveRuntimeControls.tsx",
+      "previous_export_sha256": "64cb1ab0c3ff290248cb8e975525253ce9eff480f8e46fd025d1aaed800444cd",
+      "canonical_sha256": "a0c625519888764cb5ae5dedbcf7e0f86d16d475af84675522c5f2abaace004b",
+      "export_sha256": "a3aa6880ee91dee537ef00d5199e15af41dbc97cf7875a5f4777b13fda3f0fc8",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskTurnStreamPanel.tsx",
+      "previous_export_sha256": "9abd40170283765afd7474e1d75431dca1e3233c8b3c157c11331e6bbeceddd3",
+      "canonical_sha256": "07aad3784ccfe28538ee347f9506150073372ea87cd32d25567cb643a732737a",
+      "export_sha256": "07aad3784ccfe28538ee347f9506150073372ea87cd32d25567cb643a732737a",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixConsoleConversationWorkspace.tsx",
+      "previous_export_sha256": "b77fea6b55ea5ecfec81f51e3ed8d8194768c95ca741e743aa27adb2069d085e",
+      "canonical_sha256": "ca4a8880c112c6c788e682f65401e54fc340a1a19537dae7750d181c04eeffdf",
+      "export_sha256": "c1bb5726546d32f30c6f6cd1dda3a9a1f0f1f03dcb64416c0763d28590265fc4",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixOperatorActivityPanel.tsx",
+      "previous_export_sha256": "41e4d7b33590e221b647ee4aeb83ced2fc31b3604865295c8532975a6c879488",
+      "canonical_sha256": "0d29de95d1c28fb235c2028b1daf3a0581af90d6d2e7bd57e48a19b3629c709f",
+      "export_sha256": "0d29de95d1c28fb235c2028b1daf3a0581af90d6d2e7bd57e48a19b3629c709f",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/ManagedAiTextConsole.tsx",
+      "previous_export_sha256": "d4fa79719d93dc86b89a7fbdc5a85689638f32a76fcda2e43d1dc956ea62f117",
+      "canonical_sha256": "cf45b5ce5d283eddff89813eda87aa1129296d5b851ba53d8f6e5498bce89820",
+      "export_sha256": "cf45b5ce5d283eddff89813eda87aa1129296d5b851ba53d8f6e5498bce89820",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/PrivateAskConnectionMenu.tsx",
+      "previous_export_sha256": "a00df053eb59f2b7de0f11858b1938ab1e5d6c12de5fa805d1f64684ae9e110e",
+      "canonical_sha256": "e25ca7c500b5e0f9a05be293df3c981ebf9d13e9790114353a5e4704a27e2d8d",
+      "export_sha256": "e25ca7c500b5e0f9a05be293df3c981ebf9d13e9790114353a5e4704a27e2d8d",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/DiscordRoomSpeakerLinkPanel.tsx",
+      "previous_export_sha256": "28ebab23c280845ce401dc0225cd9f0de1c34d6338dc119366d3129962a243f3",
+      "canonical_sha256": "2e52507235ab282563a42c915c9eba94e1397e2748c9c059a150c4b09aa0699e",
+      "export_sha256": "729fb952ce43b585db10c1656f4a35ccbbf82e34d9d5bf25a3bf8206a5104905",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/HostedRoomConsoleChannel.tsx",
+      "previous_export_sha256": "6a40f319d70657f9babc28ee87ec70c8c7385be8e4d3e20218bcb40c5b080deb",
+      "canonical_sha256": "166d2c2053cb064c66ec447b2fa0dc19485e2cd17e36ac54e30c9ae4d3a9b6d6",
+      "export_sha256": "166d2c2053cb064c66ec447b2fa0dc19485e2cd17e36ac54e30c9ae4d3a9b6d6",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/LocalRoomConsoleChannel.tsx",
+      "previous_export_sha256": "368ee13342120d782692dfa126a733a640a5b697b2929e8100addb5142b5f730",
+      "canonical_sha256": "3eeec30ee7aaf20e920bbf3c54916ae3cdb73fb680caa69e2ec958f1bdf0adae",
+      "export_sha256": "3eeec30ee7aaf20e920bbf3c54916ae3cdb73fb680caa69e2ec958f1bdf0adae",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeDiscordTaskTranscriptOfferPanel.tsx",
+      "previous_export_sha256": "eb9ed4dd0834e201f92c17cdd51f69fc1ae34f9b313dde7006f065c3dae73f73",
+      "canonical_sha256": "18d8b1ccd19c924ce46e09f97152d62505a49d514fe8f40aa00d05a412a92a29",
+      "export_sha256": "e76e38b21fb7b6da358af77224e094f3041c6545b989310469ad0a1c99b227f7",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedDiscordSpeakerReview.tsx",
+      "previous_export_sha256": "f98d4b7b814971627901ce4bf96ece02a6a48bb9bf0ce9919aab82e01109fea1",
+      "canonical_sha256": "047e93050b39941a1c6090245c66721cf0ab1ab489f5add5b19c15ab923fd6b5",
+      "export_sha256": "1b54ece2d1ad057f513cce0812f417af519fe200b9799ff6795968c6e82693a5",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomInterpreterProposalReview.tsx",
+      "previous_export_sha256": "7415436534995c9c6e4248056c53ca78c481a5b8ca49c1199b88b740231609d4",
+      "canonical_sha256": "13a87d4879e589e4e6f43649fd413a831be35aff7d3b21c043766a0b4ccbe5ef",
+      "export_sha256": "13a87d4879e589e4e6f43649fd413a831be35aff7d3b21c043766a0b4ccbe5ef",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomInterpreterResultsPanel.tsx",
+      "previous_export_sha256": "ca44cf27542eb0b335c399e6bfef218949634001578c33b56818de42caa656ad",
+      "canonical_sha256": "a4e6c2fc5ef4acf6629f5e7b2f622621869bec3ef7be4ef23bdab99dc2cf9bc6",
+      "export_sha256": "a4e6c2fc5ef4acf6629f5e7b2f622621869bec3ef7be4ef23bdab99dc2cf9bc6",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomInterpreterStatus.tsx",
+      "previous_export_sha256": "a25eaf81f0dd5a11a2c6b771143cf1db0dc592cbb2e5080d800e0acb9bda790a",
+      "canonical_sha256": "e97216e9ad65ed072c30a0a5645235474f3254320afc1c68ccf80b12dac3b338",
+      "export_sha256": "e97216e9ad65ed072c30a0a5645235474f3254320afc1c68ccf80b12dac3b338",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomInterpreterTurnHistory.tsx",
+      "previous_export_sha256": "c6bc077c5f80e0840b3f144a84b212fa0f5724944cb5a0bbe15f8ec0aba9e7bb",
+      "canonical_sha256": "181f3336f31ace18b0d4e49af574263ccdc0129bf465dbcb0d7e38326ab14c5d",
+      "export_sha256": "e075dec6926a4335b354e435476f44caa841bcb358b6f286e57247dade2d9c07",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomResultsPanel.tsx",
+      "previous_export_sha256": "644dafb8af7d942ce722527d72407a391524c0b3a0e75fea1a5f83107218ddde",
+      "canonical_sha256": "f182853c02a7250973c045cdc958586f319a0fcd115f05591d0232e7fb696552",
+      "export_sha256": "f182853c02a7250973c045cdc958586f319a0fcd115f05591d0232e7fb696552",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomTaskPanel.tsx",
+      "previous_export_sha256": "2bf1c40c8016fb753030dbe5173c2e639511910f64119fd1170971ba46df8cf2",
+      "canonical_sha256": "cca55d7005bb99a6eee593943cf62b3c0e78b68ff10572927b05b1734a90378e",
+      "export_sha256": "cca55d7005bb99a6eee593943cf62b3c0e78b68ff10572927b05b1734a90378e",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomTextConversation.tsx",
+      "previous_export_sha256": "165e0b895b3e98411a85d5d28ef0cd395d921a5017c2d2fab77cdb6ae4758799",
+      "canonical_sha256": "2fb08bfafb5c7bd87b73a5201f888cb7f52bf45bc5b00194eca4c1098dfbca4c",
+      "export_sha256": "2fb08bfafb5c7bd87b73a5201f888cb7f52bf45bc5b00194eca4c1098dfbca4c",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomTextReleaseControls.tsx",
+      "previous_export_sha256": "421b7974e1f2777ef92fc1133dd3b9d63f7f3f22a29218bfb42fdbc75492a6e2",
+      "canonical_sha256": "7cc87d51fd0f96690f9c24c843b244a3a77481368a058e921fefaca2b3fba9eb",
+      "export_sha256": "7cc87d51fd0f96690f9c24c843b244a3a77481368a058e921fefaca2b3fba9eb",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomVoiceChannel.tsx",
+      "previous_export_sha256": "5fc506b91901d253b8b030344c2c8c99ea13e01bfc0d3310846d569398aacc6e",
+      "canonical_sha256": "1fff68ba8c4b704743bd19c036af9376055a45f31e9f43ca26169213f1896064",
+      "export_sha256": "1fff68ba8c4b704743bd19c036af9376055a45f31e9f43ca26169213f1896064",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeMinecraftPlayerSharingQueue.tsx",
+      "previous_export_sha256": "cd6412b10b3e5e8e25d874edd3c470cf86a8c49209b52c0fca1bcc909f8e7e1e",
+      "canonical_sha256": "784d75306cdb632e4d3fa7df5c62c06088aa815ccbbdadeb797cc49f1d855976",
+      "export_sha256": "3810219eb97a8370dcb440d4fc9faffaa604c29e408c375670defdaae7c70856",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeRoomConnectionPanel.tsx",
+      "previous_export_sha256": "9062b2920997046c5d81a4b7e9a59690f816c86388dafc8cdca4a7edacc01af0",
+      "canonical_sha256": "49b26cae723115c652afd2648c638182aa6ba0eeaae07ae6ab37db632950b3f0",
+      "export_sha256": "49b26cae723115c652afd2648c638182aa6ba0eeaae07ae6ab37db632950b3f0",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeRoomInstructionsPanel.tsx",
+      "previous_export_sha256": "ce90f716ea3add4eb2deaa544f38b8b0d5cae4f75c79aa5d4c5adaf21fabaa38",
+      "canonical_sha256": "0faf1e93d1246c4c756ada2305d77f13115ea307aaa9708495aeb7902ed82d06",
+      "export_sha256": "0faf1e93d1246c4c756ada2305d77f13115ea307aaa9708495aeb7902ed82d06",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeSharedInterpreterReportsPanel.tsx",
+      "previous_export_sha256": "8f9b1a4fa022ea37725aa40dcb31c6e866d0b4d4c04dbe73ff551bc933475e89",
+      "canonical_sha256": "10007e8202fb152e6aba50f7b2eeebaaa9f060f45c1dcb383cabbf198dc85876",
+      "export_sha256": "10007e8202fb152e6aba50f7b2eeebaaa9f060f45c1dcb383cabbf198dc85876",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeSharedRoomReportsPanel.tsx",
+      "previous_export_sha256": "1e2fa0b83fe4cd9c3df67a7e3e2055cd90e91b53fb5a5dbc8e1955bba55637e5",
+      "canonical_sha256": "7e6c93924ab3ca1170abf79491fd9087d67650843b41a7755d172fb56c400b8d",
+      "export_sha256": "7e6c93924ab3ca1170abf79491fd9087d67650843b41a7755d172fb56c400b8d",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/PrivateManagedDiscordVoice.tsx",
+      "previous_export_sha256": "9f38c5dc5c756f392ddae19d1c5455d20b9088b27ee74bd71d0a465f6c5857c7",
+      "canonical_sha256": "6cee28fe93c644632438554cacac1cc4570b616965dd67b5c4534eb28fad315b",
+      "export_sha256": "6cee28fe93c644632438554cacac1cc4570b616965dd67b5c4534eb28fad315b",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/ReviewedRoomInstructionPanel.tsx",
+      "previous_export_sha256": "8410e9c6af4060e093668def08fd926247c172375f78ef110ffc8188e37f1c20",
+      "canonical_sha256": "7341f2786d4a3940d78dc904930ed04c038a796dcd59de58e99f0387bffb4242",
+      "export_sha256": "7341f2786d4a3940d78dc904930ed04c038a796dcd59de58e99f0387bffb4242",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/RoomMissionActivityPreview.tsx",
+      "previous_export_sha256": "3c80d2c85bbf7e733fc0b5e4f8de974861f9822b9ac862f0e5b516853342e411",
+      "canonical_sha256": "a21a5975b7515aaf4cad84ad0b09e2f7ad4c062d3c7867608a2d943711eb37e7",
+      "export_sha256": "a21a5975b7515aaf4cad84ad0b09e2f7ad4c062d3c7867608a2d943711eb37e7",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/RoomMissionTextOwnerReviewPanel.tsx",
+      "previous_export_sha256": "317db677b2154e203a348ca89f1a8e4de5e2997224df4e0d1675c3a781d466a8",
+      "canonical_sha256": "f472cb41cd3b460fe14192f298982dad83636b31b34f792fd146c974c074e919",
+      "export_sha256": "f472cb41cd3b460fe14192f298982dad83636b31b34f792fd146c974c074e919",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/RoomServiceEntry.tsx",
+      "previous_export_sha256": "6f509d902db350c8630c73ffb55044a1f9bd563be0ec9fe9f750989c6b63bd4d",
+      "canonical_sha256": "fef8754bb02bdd5975caa3b93d759c8cc9269bdb64b36e2efc074503ac3b1acf",
+      "export_sha256": "fef8754bb02bdd5975caa3b93d759c8cc9269bdb64b36e2efc074503ac3b1acf",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomActivePanel.tsx",
+      "previous_export_sha256": "016f99d956d25b4e0261164770269fb875966986bf0a72777df145a710480bda",
+      "canonical_sha256": "7ff5787a6ce51e2a2574c5920602a20f2dc912bcfd776c2bba86a0a64e2063ba",
+      "export_sha256": "7ff5787a6ce51e2a2574c5920602a20f2dc912bcfd776c2bba86a0a64e2063ba",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomMissionPanel.tsx",
+      "previous_export_sha256": "bb8f65ad5d53661165a0f1f8d3c8c57158af40254af37a5ba9670de244957047",
+      "canonical_sha256": "9ab8fa19563f48f7756d8c6df7aafc1c6a9cf1ace54fad9b932339129c093337",
+      "export_sha256": "9ab8fa19563f48f7756d8c6df7aafc1c6a9cf1ace54fad9b932339129c093337",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomOwnerResultsPanel.tsx",
+      "previous_export_sha256": "cf97f4bd8dab518051b562399ade9f7b1e3111354b2beff14112bf3d30a38936",
+      "canonical_sha256": "3b8ee41cb56ce6d781dff310d70392ecce95e64cd6455e58b8cf40fbe5519fb2",
+      "export_sha256": "3b8ee41cb56ce6d781dff310d70392ecce95e64cd6455e58b8cf40fbe5519fb2",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomPlayerEmbodimentPanel.tsx",
+      "previous_export_sha256": "c40e01dcc0f7c5ea3b8f37b81b65f577d4e7f1bd2cacf86f00327c7875517b61",
+      "canonical_sha256": "e97f32106ed6da010a688b999fe3ec42aac01fd39bcc196fbf84eadc4c7f5ab3",
+      "export_sha256": "4fbc5faf10acd84ba5e6763177233bdd419412d51992723d605afc15e880ca35",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomSetupPanel.tsx",
+      "previous_export_sha256": "c1cbc92d854533681ece778ad77c0ea2f9d4d0cf14f88addfd58eade548f3d80",
+      "canonical_sha256": "c38ac5a456236ca974d329eb2b63d02659223dcb16263c6c8f6ace30ff4c6fbb",
+      "export_sha256": "c38ac5a456236ca974d329eb2b63d02659223dcb16263c6c8f6ace30ff4c6fbb",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomTextConversation.tsx",
+      "previous_export_sha256": "29d385f631dda248dbdadd9272d8c987104b41f5a429f6d2a1d1d636e5db1cfc",
+      "canonical_sha256": "2cd766e5ce0183f9e607591fbb48516844e4d62de7a90e6c82e88abc9914b94a",
+      "export_sha256": "2cd766e5ce0183f9e607591fbb48516844e4d62de7a90e6c82e88abc9914b94a",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomsAccessControl.tsx",
+      "previous_export_sha256": "c78aa2e8e009bfc42bac979d2bb290e19906ca3c2ddfb9f1cbc732fa02057934",
+      "canonical_sha256": "5a18029b66719c6bea1860ea36a2e79733354486e8b57d2c34edf268eb2807fa",
+      "export_sha256": "5a18029b66719c6bea1860ea36a2e79733354486e8b57d2c34edf268eb2807fa",
+      "metadata_only_component": false
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedRoomInterpreterPreparationPanel.tsx",
+      "previous_export_sha256": "4206f6609e5f027b1b608c675c5971dada41953a3ef6010831fc355d5d6171a1",
+      "canonical_sha256": "8cf5ad147a16e61f403836552b3fb9448187e0218ab7faa01d8e06c33a79ee10",
+      "export_sha256": "8cf5ad147a16e61f403836552b3fb9448187e0218ab7faa01d8e06c33a79ee10",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedRoomMissionTextChoices.tsx",
+      "previous_export_sha256": "3144a878ba5d1482b889bf42f2ed8af67b59a8d378ea79502fa03edad9594354",
+      "canonical_sha256": "cbdbf5992cd3d92b24530cee7f1a038e6655661e50339e18bb68932467f9718a",
+      "export_sha256": "cbdbf5992cd3d92b24530cee7f1a038e6655661e50339e18bb68932467f9718a",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedRoomTextReleaseControls.tsx",
+      "previous_export_sha256": "c891d7362e69288765809088b862bb9c841ce7dd8544a712afa281fe497ce7df",
+      "canonical_sha256": "67183eddade4aa4b0b864171948539d122f18f5f34f05c2752fcad4b0766031b",
+      "export_sha256": "67183eddade4aa4b0b864171948539d122f18f5f34f05c2752fcad4b0766031b",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/UnavailableRoomPillSurface.tsx",
+      "previous_export_sha256": "2829e9801dc2f059e397a330272bd1f822a883cc34d4e11f37ed6df3d6961ba0",
+      "canonical_sha256": "27ad74f3e6f83f5cec709abeef800b5fd90bc51e32c1c2797518214faf5ce425",
+      "export_sha256": "27ad74f3e6f83f5cec709abeef800b5fd90bc51e32c1c2797518214faf5ce425",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/panels/TheoryBadgeGraphPanel.tsx",
+      "previous_export_sha256": "eecaf4a73215cfe0e37f261a9af214b9da5df4b3bf91cd025a5cb3d7444e7f98",
+      "canonical_sha256": "c1b16f09a964947991302cbce602b5cc6db34bc5a737aea29749ed14f64e81b4",
+      "export_sha256": "c1b16f09a964947991302cbce602b5cc6db34bc5a737aea29749ed14f64e81b4",
+      "metadata_only_component": false
+    },
+    {
+      "path": "client/src/components/panels/WarpGrNhm2Lens.tsx",
+      "previous_export_sha256": "e8694e2dbdf30ce3f026d444fed33e1a9061958493b68610bfb38f4acd0bd147",
+      "canonical_sha256": "e5bcf8b4358515367649c7d038b1bbfe295988b3df249961e4740dc07150675a",
+      "export_sha256": "e5bcf8b4358515367649c7d038b1bbfe295988b3df249961e4740dc07150675a",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/workstation/AccountSessionPanel.tsx",
+      "previous_export_sha256": "91372702d9671d5d73b280a9e8e658203ede7361c11422ac7eb5a3f31690685c",
+      "canonical_sha256": "b22e574cd7e454fc64a843867947bedb5ca6c8188f9bc7aa9ae7d22d04ebfccf",
+      "export_sha256": "16919f771f62510f43411ea19e7b491d24cecc6a524352ce9ce6642040e51fc8",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/workstation/LocalDeveloperAccess.tsx",
+      "previous_export_sha256": "127c09f0a138365e4db786c10b8c0d5ef64e7baf083833aa3784d531e38a3472",
+      "canonical_sha256": "9b864c90d86a518438cedb8cebb46f774ba64e416d4bee352af962fb0cd65dd6",
+      "export_sha256": "9b864c90d86a518438cedb8cebb46f774ba64e416d4bee352af962fb0cd65dd6",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/workstation/ManagedWebsiteConnection.tsx",
+      "previous_export_sha256": "d29217eaec02f42c56aff722c9cc1afbd8956991a94bdcb5fd4dc3d39ff05a98",
+      "canonical_sha256": "4b2565c84d5ddb115fe3de7f3c7219a6f897e0fc7706b56cae17e3eb09644e1a",
+      "export_sha256": "f8a9ad61ada0c4d42074402595a3f31107a4d1687527e2e7b707ca2a2e1550fb",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/workstation/PersonalMcpDeviceRegistration.tsx",
+      "previous_export_sha256": "dca41e253ac202c435809a402d896c100a7fe5fb09a884b1c3cfd786e2ccf7b5",
+      "canonical_sha256": "8d92923216249532bbcf20d96a07204fca363715ca1b7b82f63fbaec30ea2399",
+      "export_sha256": "8d92923216249532bbcf20d96a07204fca363715ca1b7b82f63fbaec30ea2399",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/workstation/RealtimeTexturePackControls.tsx",
+      "previous_export_sha256": "532cab93308820e91bd74ec42b6008c83727923d57d1c221cb53979135ef4500",
+      "canonical_sha256": "bd6ed56e6df4e511ccea30b69e35c37ed943201e8b2843487b3d2c1410c41e9f",
+      "export_sha256": "bd6ed56e6df4e511ccea30b69e35c37ed943201e8b2843487b3d2c1410c41e9f",
+      "metadata_only_component": true
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationPanelTabs.tsx",
+      "previous_export_sha256": "fd6cd8c0cb1329167b20aaf2f00424a24561ddecf5384ab2664d7cbd3738ce0b",
+      "canonical_sha256": "a1e93eadef5e20dbd22a38faee6f03fa4887c52c274b8f258b2fc85fffed0a78",
+      "export_sha256": "030058ab3528716d136bb5ddc711ba9da1350c50c083429393e4d73fbbafd2b0",
+      "metadata_only_component": true
+    }
+  ]
+}

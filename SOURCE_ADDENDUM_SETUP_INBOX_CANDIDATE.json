@@ -1,0 +1,71 @@
+{
+  "observed_at": "2026-11-13T17:49:20.103185+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/agent-access/SetupContractInbox.tsx",
+      "canonical_sha256": "d12058109e27ce07c69c58bbcb1283fe495c1a4781cc814d32a3e317fc1e28b5",
+      "export_sha256": "e51309e62062d8df9717fa556f00d5cea21c68d84881ab4ebebefe9f10a3b28b",
+      "bytes": 110757,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/SetupContractInbox.spec.tsx",
+      "canonical_sha256": "01bd7a6c4c87979a37de3889590b570ca4deca5ad059436b0a4fc91b873be1c8",
+      "export_sha256": "bb29deb62c8597189ac1172ff8cf1a15727b0f5875dad5c38738975ba1dbfc82",
+      "bytes": 97998,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/pages/agent-access.tsx",
+      "canonical_sha256": "e339d537e31c071c72291226c2a074d0ed7f127f315e726111b04819f2d123c2",
+      "export_sha256": "e339d537e31c071c72291226c2a074d0ed7f127f315e726111b04819f2d123c2",
+      "bytes": 2053,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "85aa12fc51a68aaabffd92c1f8159d57d5b92d3a5a49669999da43361364a96e"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/workstation/workstationGuidance.ts",
+      "canonical_sha256": "d040d3a838f180e0996dd7ef4d9c8f33b94f4eb01dbaa3ef0403b49b389774dd",
+      "export_sha256": "65fd70672d79dd0f3f4422af84cb718aef7870978ee924e34b8ebb64e44dec38",
+      "bytes": 2684,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomGuideProjection.ts",
+      "canonical_sha256": "ea21d7da9c48d2f3fbff413ba98bc583c4e85dc207754b05ce268039dc09ad1a",
+      "export_sha256": "cf375f459dc9a0612d58634261b5b44a5f5df6ac524d99c39dbd4e4f759f6e1f",
+      "bytes": 7492,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/agent-access/durablePairing.ts",
+      "canonical_sha256": "ca4ee4adad1bad3a602c256c65ec9f61e201ee480490e07d109c8f6183c0c714",
+      "export_sha256": "4c27c31784a832b70bc0950b9e5f3cca38d0a5b9bb7ef2f33e33eb6e541aa2f6",
+      "bytes": 8840,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Read full 1805-line setup inbox, 1659-line test suite, Agent Access page and unchanged navigation/room-guide helpers. Previously reviewed durable pairing/helper/control modules are hash-checked against the staged source index. First-party UI and explicit synthetic fixtures only.",
+    "Owner list reads parse a strict request shape and use a generation guard. Slow automatic owner reads finish before the next poll; unavailable/unauthorized reads hide the inbox, transient failures suspend approval. Request and review IDs key the dialog, and resident UI is keyed by request.",
+    "Pairing checks exact account, installation, client/task/chat identity, current contract revision, finite expiry and registered destination. It reconciles existing or uncertain invitation issuance before considering another. Client-declared task identity is disclosed and server validation remains separate.",
+    "Discord selection freshly rechecks the approved source snapshot before mutations. Resume hints are not authority; revoked/expired requests do not replay them. Selection setup does not itself publish transcript text. Responses budget activation remains a distinct approved scope and calls native enforcement without performing inference.",
+    "Room membership, room-service OAuth, native grants, source staging, current player/connector facts, voice consent, game authority and provider budget remain distinct UI states. Source/preparation/mission controls are explicit owner actions; tests use mocked endpoints and do not qualify native enforcement.",
+    "Agent Access now renders the setup inbox alongside its existing guide and connection controls. AgentConnectionSetup has separate unreviewed canonical changes and remains at the older public bytes; this source preview is intentionally incomplete and not a runnable app.",
+    "Normalized eight groups of older fixture identities/labels: named world, three room UUIDs and four Discord snowflakes now use explicit fixture values. All expectations refer to the same replacements; no production changes."
+  ],
+  "limits": [
+    "Private unfrozen source proposal only; no publication, account approval, native restart or actual pairing/Discord/game operation.",
+    "Mocked inbox tests verify selected UI and request orchestration, not a live ordinary-account deployment, signed continuation, native authority or model funding.",
+    "Shared setup contracts/projections and domain/native endpoints remain separate held dependencies. AgentConnectionSetup and account portal changes still require source review.",
+    "Per-service poll behavior under long native/network latency, cross-account outstanding continuations and full installed action/revocation behavior remain acceptance concerns; no broad live claim is made."
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "observed_at": "2026-11-13T16:40:53.126685+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomOwnerResultsPanel.tsx",
+      "canonical_sha256": "cf97f4bd8dab518051b562399ade9f7b1e3111354b2beff14112bf3d30a38936",
+      "export_sha256": "cf97f4bd8dab518051b562399ade9f7b1e3111354b2beff14112bf3d30a38936",
+      "bytes": 9882,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "b85ddcb7a511f9d87b103b9bbfdeae89e718df5b4dfb67f20e3052b2ff7c6bbf"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/RoomResultOwnerApi.ts",
+      "canonical_sha256": "1b6ffbd84c0e9d3a1e8f2b0a5d6ebda63c5bbf017d0f5d00fc770777f187e739",
+      "export_sha256": "cbbda7039ecec952f21b6ad10b39d73551c83436f63c36679e07b4e335ad85d0",
+      "bytes": 4031,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomOwnerResultsPanel.spec.tsx",
+      "canonical_sha256": "db1153ed48b3417a54ae4df2e006a7d2c30582b51d9ce54263ecdf1ab23a835d",
+      "export_sha256": "db1153ed48b3417a54ae4df2e006a7d2c30582b51d9ce54263ecdf1ab23a835d",
+      "bytes": 12079,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Read complete panel, API helper and tests plus exact public-preview diff. First-party React/TypeScript; synthetic room/result identities and mocked HTTP only. No credentials, private profiles, game assets or external source copied.",
+    "The sole delta treats room_result_account_policy_blocked like the existing developer-required rejection when hiding the owner results panel. No new account-mode gate is introduced; server admission remains authoritative.",
+    "Catalog reads expose metadata and verify exact room/mission/revision identities. Hosted catalogs use the shared strict schema. Selecting a report and consenting explicitly are required before an explanation request; question or location changes clear consent.",
+    "Explanation retries retain the same source request identity. A private HTTP answer is never rendered as the public answer; only the room projection matching its turn ID marks publication. Account change/unmount abort UI continuations and suppress late callback/results.",
+    "The unchanged helper sends an explicit report selection to the existing Ask route. This source proposal does not alter provider dispatch, funding, task delegation, server authority or idempotency enforcement."
+  ],
+  "limits": [
+    "Unpublished unfrozen source preview; no live model request or installed validation.",
+    "Mocks and UI guards do not establish backend account/room authorization or funding.",
+    "Aborting a request cannot undo an already admitted server operation.",
+    "The panel hidden-state recovery requires its existing account event or remount; no new product behavior was implemented in this export."
+  ]
+}

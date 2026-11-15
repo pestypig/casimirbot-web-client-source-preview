@@ -1,0 +1,102 @@
+{
+  "observed_at": "2026-11-13T18:40:15.731310+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/lib/workstation/launchPanelPolicy.ts",
+      "canonical_sha256": "eef8c5979bc8022339ead1858ca6a85d4f02d9dbc21805973c253c54816920e2",
+      "export_sha256": "31a133985d639b7610eb2f782846ccbfe97f87c69c7f27beadcbc55336f64db0",
+      "bytes": 2013,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "29d82b20bcc19ffd9881a421db56e53c585a7403fd6208be906776bdbfc960c2"
+    },
+    {
+      "path": "client/src/lib/workstation/experimentalLaunchPanels.ts",
+      "canonical_sha256": "7535f86bbb9b869fd83321c76393e7d57409db4fb8e4f5c7cace137f203e8c10",
+      "export_sha256": "1e5ceb2c7ae8c58a30bc8ca164cb35d5c65ba7a5fd6df7686b780da600a08444",
+      "bytes": 2202,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/launchPanelPolicy.spec.ts",
+      "canonical_sha256": "d75a3a39f26edca411723e0e80103152cfe8562a83de8c4a17f2dc378c59a4ba",
+      "export_sha256": "98783888e7f2e9ff105fdbb598cd0877aca67534536782ac6725c6f19a8baf8a",
+      "bytes": 9415,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "1c6fce79abf550f920c0ea94291732cae728f62b0eef336db9b4734af81e1144"
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationPanelTabs.tsx",
+      "canonical_sha256": "9b7bb2ad041c9b90d634dbc676f75ab1290413dc286d345e35591deb092803a2",
+      "export_sha256": "fd6cd8c0cb1329167b20aaf2f00424a24561ddecf5384ab2664d7cbd3738ce0b",
+      "bytes": 12207,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "4bd4bb0ccdb56f784c601f92b19976c4e6da63f0c4331d2765bfce133e299858"
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationPanelHost.tsx",
+      "canonical_sha256": "0e1f59c7898ad8f68e70ae91c854173b4dec18dca8cf93d6ce226df1c9b52a67",
+      "export_sha256": "0e1f59c7898ad8f68e70ae91c854173b4dec18dca8cf93d6ce226df1c9b52a67",
+      "bytes": 7127,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "2f63a015d163fcff54a750e3c096da41fd2738a6929087b20f43e9a6932d7175"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/WorkstationPanelHost.account-policy.spec.tsx",
+      "canonical_sha256": "a46e746e82a3da100bf09bfa6f9e0114af8b94aa64becb528b00ec96f0d341d5",
+      "export_sha256": "a46e746e82a3da100bf09bfa6f9e0114af8b94aa64becb528b00ec96f0d341d5",
+      "bytes": 7472,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "df9ebf665262e42704492334f9d51447c2140afffa86c704d4fb0d6aac0d160b"
+    },
+    {
+      "path": "client/src/lib/desktop/panelRegistry.ts",
+      "canonical_sha256": "786a4489913bf88e0ed2c5fd65c9b315945c4b2bb24d5fe459292acc926ddc2a",
+      "export_sha256": "d96cb12c7bb8dbb41cca2c512725ad5bd44c10c16c1d26426c25b2d292b382b1",
+      "bytes": 16377,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "9c15e4a1e0d7558667b1daaf16c329f9ec2d4ed66b9cc71b07f5a1a73f5298ce"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/accountCapabilityPolicy.spec.ts",
+      "canonical_sha256": "16de24c238b74c4c03f9ba7ce794e2fe2b8bcd83f0bc2b4a7563efe0661c9178",
+      "export_sha256": "16de24c238b74c4c03f9ba7ce794e2fe2b8bcd83f0bc2b4a7563efe0661c9178",
+      "bytes": 7970,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/agent-access/connectionObservation.ts",
+      "canonical_sha256": "35765cc62bc02324ce59a9a67cb3b28b0c91b479d5fd15f7e72d84b6bc0f3e13",
+      "export_sha256": "8e298d4691a220ca2b1192684902afb925566c172a06d85f39e05b5746e30eed",
+      "bytes": 249,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed launcher policy, experimental visibility preference, tab picker, panel host and registry differences plus complete launch/host tests. Reviewed the unchanged account policy cache, its tests and connection observation signal as dependencies.",
+    "Ordinary accounts default to the same product surface. Hidden launch entries are presentation choices; explicit locks and named operator-only panels remain enforced in the host. Legacy finite-policy fallback permits a known visible panel but never overrides an explicit lock. Server operations retain separate authority.",
+    "Experimental preference is browser-local and affects launch visibility only. Same-tab and storage events refresh subscribers; unavailable storage reads default to false. It does not change account type or operation permissions.",
+    "Account policy single-flight reads are invalidated by explicit profile observations and cross-tab events; stale responses cannot replace newer account state or clear a newer in-flight request. Profile revision signals clear dependent views without granting authority.",
+    "Panel host now remounts notes and calculator by profile identity. Registry adds the Physics Glyph workspace entry and renames Noise Gen for local music; registration alone does not certify an artifact or qualify a panel runtime."
+  ],
+  "limits": [
+    "Private unfrozen source proposal; not a public release or installed acceptance.",
+    "Focused tests use mocked session HTTP responses and canonical dependency modules. No real account, grant, model, Minecraft or native operation was performed.",
+    "The full panel registry dynamically loads other panels, many of which remain separately reviewed dependencies. Selected-entry compilation is not a full website build or type check.",
+    "Experimental preference storage-denied behavior and cross-tab UI interactions were inspected but not qualified in a real browser. Notes/calculator profile remounting needs their dedicated persistence tests and installed checks.",
+    "Five intentional support-contact matches inherited from prior candidates remain in the final owner publication review."
+  ]
+}

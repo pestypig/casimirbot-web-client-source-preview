@@ -4,6 +4,7 @@ import { normalizeResponsesActionActivity } from
   "../../../../../server/services/helix-ask/operator-activity-normalizer";
 import { projectSessionActivity, selectSessionActivityBinding } from "../sessionActivityProjection";
 import { projectDiscordFloatActivityEvent } from "@shared/discord-float-activity";
+import { discordStreamSourceForTurn } from "@shared/discord-stream-selection";
 
 describe("owner-private session activity projection", () => {
   const pairing = { status: "active" as const,
@@ -25,6 +26,8 @@ describe("owner-private session activity projection", () => {
     const first = await projectDiscordFloatActivityEvent(before, pilot(before));
     const shifted = await projectDiscordFloatActivityEvent(after, pilot(after));
     expect(shifted?.event_key).toBe(first?.event_key);
+    expect(discordStreamSourceForTurn(before, pilot(before), new Map()))
+      .toBe(`codex-thread:${pairing.taskId}`);
   });
 
   it("groups actual Cloud Agent DM and owner-granted Codex visible turns without inventing an adapter worker", () => {
@@ -143,9 +146,31 @@ describe("owner-private session activity projection", () => {
     expect(frame.turns.map(turn => turn.lane)).toEqual(["codex_task", "codex_task"]);
   });
 
+  it("shows a paired codex deep link with the native bare task ID", () => {
+    const frame = projectSessionActivity({ helixConversationId: "chat:owner",
+      pairing: { ...pairing, taskId: `codex://threads/${pairing.taskId}` },
+      nativeVerifiedBindingId: "binding:exact", codexSourceStatus: "live", messages: [],
+      codexFrame: { schema: "helix.codex_conversation_cloud_frame.v1", taskId: pairing.taskId,
+        turns: [{ id: "turn:visible", user: "Visible request", assistant: "Visible answer",
+          assistantPhase: "final_answer", status: "completed" }] } });
+    expect(frame.codexSourceStatus).toBe("live");
+    expect(frame.turns.map(turn => turn.lane)).toEqual(["codex_task", "codex_task"]);
+  });
+
   it("still rejects a different provider-qualified Codex task", () => {
     const frame = projectSessionActivity({ helixConversationId: "chat:owner",
       pairing: { ...pairing, taskId: "codex-task:01a03464-1f5e-7f93-bd17-e4ca8a0bec9e" },
+      nativeVerifiedBindingId: "binding:exact", codexSourceStatus: "live", messages: [],
+      codexFrame: { schema: "helix.codex_conversation_cloud_frame.v1", taskId: pairing.taskId,
+        turns: [{ id: "turn:other", user: "Private request", assistant: "Private answer",
+          assistantPhase: "final_answer", status: "completed" }] } });
+    expect(frame.codexSourceStatus).toBe("unpaired");
+    expect(frame.turns).toEqual([]);
+  });
+
+  it("rejects a codex deep link for a different task", () => {
+    const frame = projectSessionActivity({ helixConversationId: "chat:owner",
+      pairing: { ...pairing, taskId: "codex://threads/01a03464-1f5e-7f93-bd17-e4ca8a0bec9e" },
       nativeVerifiedBindingId: "binding:exact", codexSourceStatus: "live", messages: [],
       codexFrame: { schema: "helix.codex_conversation_cloud_frame.v1", taskId: pairing.taskId,
         turns: [{ id: "turn:other", user: "Private request", assistant: "Private answer",
@@ -272,6 +297,8 @@ describe("owner-private session activity projection", () => {
     expect(frame.turns).toEqual([expect.objectContaining({ lane: "responses_worker",
       kind: "decision", report: { status: "completed",
         text: "Selected walk_to_waypoint toward waypoint:one; awaiting temporal preflight. No action started." } })]);
+    expect(discordStreamSourceForTurn(frame, frame.turns[0],
+      new Map([["chat:owner", pairing.taskId]]))).toBeNull();
     for (const changed of [
       { ...activity, helix_conversation_id: "chat:other" },
       { ...activity, reasoning_binding_id: "binding:other" },
@@ -365,5 +392,43 @@ describe("owner-private session activity projection", () => {
       { ...second, helix_conversation_id: "chat:not-saved" },
     ] });
     expect(changed.turns).toEqual([]);
+  });
+
+  it("shows a verified Responses monitor event as status in Float All", () => {
+    const choice = normalizeResponsesActionActivity({
+      activity: { schema: "environment.responses_actor_activity.v1",
+        event_id: "responses_event:monitor-seed", helix_conversation_id: "chat:owner",
+        reasoning_binding_id: "binding:exact", binding_epoch: 2,
+        run_id: "run:one", goal_id: "goal:one", goal_revision: 1,
+        checkpoint_event_id: "checkpoint:one", decision_id: "decision:one",
+        phase: "proposed", action_code: "walk_to_waypoint", target_ref: "waypoint:one",
+        reason_code: null, observed_at: "2026-10-05T12:00:00.000Z",
+        provenance: "verified_responses_actor_boundary", raw_response_included: false,
+        private_reasoning_included: false, execution_authority: false,
+        action_performed: false, answer_authority: false, terminal_eligible: false },
+      profileRef: "profile:one", nodeRef: "minecraft_monitor:one",
+      environmentBindingRef: "environment:one", roomRef: "room:one",
+      sourceRef: "source:one", worldRef: "world:one", projectionSequence: 0,
+    });
+    const monitor = { ...choice, source_kind: "responses_monitor",
+      source_schema: "environment.responses_observation_monitor.v1",
+      lifecycle_stage: "monitor_observation_published", event_kind: "observation",
+      summary: "Responses observation (status): Player is standing still. Model interpretation of a measured snapshot; no action started.",
+      evidence_refs: ["evidence:one"] };
+    const page = { schema: "helix.adapter_ai_activity_page.v1" as const,
+      helix_conversation_id: "chat:owner", reasoning_binding_id: "binding:exact",
+      binding_epoch: 2, run_id: "run:one", events: [monitor],
+      adapter_results_status: "available" as const,
+      answer_authority: false as const, terminal_eligible: false as const,
+      raw_content_included: false as const, private_reasoning_included: false as const };
+    const frame = projectSessionActivity({ helixConversationId: "chat:owner",
+      currentChatTitle: "Owner chat", pairing, currentBindingEpoch: 2,
+      codexSourceStatus: "live", messages: [], codexFrame: null,
+      adapterPages: [page as never] });
+    expect(frame.responsesWorkerStatus).toBe("activity_recorded");
+    expect(frame.turns).toEqual([expect.objectContaining({ lane: "responses_worker",
+      kind: "status", sourceRun: expect.objectContaining({
+        adapterLabel: "Responses observation" }) })]);
+    expect(helixMessageCloudFrameSchema.safeParse(frame).success).toBe(true);
   });
 });

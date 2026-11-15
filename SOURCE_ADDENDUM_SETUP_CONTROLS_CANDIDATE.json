@@ -1,0 +1,65 @@
+{
+  "observed_at": "2026-11-13T17:45:20.912446+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/agent-access/SetupContractDialog.tsx",
+      "canonical_sha256": "acd7db6893c627c3bb7811f23e68b559b2b1040ac4565f3f93862f59d336e6b1",
+      "export_sha256": "988b2a1981b8839239c7bd4920a672e6913a9ffd6a6d2cd90adc75035054d9c9",
+      "bytes": 30647,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/CompanionResidentControl.tsx",
+      "canonical_sha256": "695cd69268b840312fbba551858cfe6bf0c360e18264e9b1aa235c3c9c77aaa1",
+      "export_sha256": "695cd69268b840312fbba551858cfe6bf0c360e18264e9b1aa235c3c9c77aaa1",
+      "bytes": 18587,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/SetupContractDialog.spec.tsx",
+      "canonical_sha256": "ff2dad51892b5b377f2ef465aec830bfc02269544fb55553c01767ae450b7482",
+      "export_sha256": "ff2dad51892b5b377f2ef465aec830bfc02269544fb55553c01767ae450b7482",
+      "bytes": 29374,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/CompanionResidentControl.spec.tsx",
+      "canonical_sha256": "c004298615a3e1cbe11d18555ff379a6f3abd2720b9765cd34c3b0ca3550cbbf",
+      "export_sha256": "f1b011a42e54aa28cef0969a479dd4fb63b81e4f8a3bf00722592ad7011f7681",
+      "bytes": 12739,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/ui/dialog.tsx",
+      "canonical_sha256": "1c15f7bfb4d278ab808f541749d28256e483277f779a1f325431038123b2c888",
+      "export_sha256": "1c15f7bfb4d278ab808f541749d28256e483277f779a1f325431038123b2c888",
+      "bytes": 3829,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Read complete SetupContractDialog, CompanionResidentControl and both test suites; read unchanged public Radix dialog wrapper and verified canonical/export parity. New files are first-party UI/test source; no new third-party source or assets copied.",
+    "Setup dialog displays exact account, installation, EXE/package hashes, declared task/chat, scope text, review revision and expiry. Changing selected purposes disables approval until a new matching revision. Failed owner inspection, expired/revoked status, absent exact scope or busy state disable approval.",
+    "The UI differentiates planned purposes from bound authority, room AI review intent from exact-source consent, setup expiry from underlying grants, personal-device enrollment from developer USB checks, and private/signed update continuation. Actual grant/review authority remains server/native owned.",
+    "Companion controls send explicit task/answer/preparation requests, display validated status and measured block differences, and keep Stop independent of other busy operations. Measured pages and targets explicitly do not prove full structure completion.",
+    "Fixed late actor preparation/native-install success and error messages overwriting a confirmed Stop. Both paths now honor the existing stop epoch and pending marker. The native operation itself is not canceled by this renderer guard.",
+    "Replaced the older world fixture label with world:fixture. Tests use literal synthetic accounts/tasks/receipts and mocked fetch; no real game world, model, account or permission is accessed.",
+    "Confirmed the parent inbox keys the dialog by request ID, review revision and review attempt, and keys resident controls by request ID. Parent behavior still requires full review."
+  ],
+  "limits": [
+    "Private unfrozen source proposal only; no publication, restart, native grant or game operation.",
+    "Shared setup projection and parent inbox/endpoint implementations are separate omitted dependencies; no installed or backend-authority acceptance is claimed.",
+    "The late-preparation message fix is newer than running R380. Existing backend operation cancellation and the attended game/GPT Live handoff remain separate.",
+    "Full SetupContractInbox, Agent Access entry and account portal review remain open."
+  ]
+}

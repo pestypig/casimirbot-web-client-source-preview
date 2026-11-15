@@ -1,0 +1,57 @@
+{
+  "observed_at": "2026-11-13T17:22:06.462037+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/RoomMediaBridge.ts",
+      "canonical_sha256": "53fae80cf946f7a339542d5081f2e362e786665a946ffdcb0f01baae89492fd2",
+      "export_sha256": "53fae80cf946f7a339542d5081f2e362e786665a946ffdcb0f01baae89492fd2",
+      "bytes": 16806,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "7d9ac801d709e77dd1f7f52a263562b654aa50fcd36460cc3574e8b755ef967e"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/RoomMediaBridgeContracts.ts",
+      "canonical_sha256": "b341f5a1456b4223cc24742f199bf37665d67566f0811b9a5c74c12b28f93443",
+      "export_sha256": "b341f5a1456b4223cc24742f199bf37665d67566f0811b9a5c74c12b28f93443",
+      "bytes": 2213,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "c35008ebcec31959f3b41e18cac3a0666d4fd86f6a22076bd8f15584672d8a8a"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/__tests__/RoomMediaBridge.lifecycle.spec.ts",
+      "canonical_sha256": "0cca4eb5f184a0f368a7f2990130b8a039e163c9e7a5cdc90e65fbaa90d62de6",
+      "export_sha256": "0cca4eb5f184a0f368a7f2990130b8a039e163c9e7a5cdc90e65fbaa90d62de6",
+      "bytes": 6103,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/__tests__/useSharedLiveRoomMediaBridge.spec.tsx",
+      "canonical_sha256": "472542612bdc8a47a147b9cb7558b325f8b662b7b21507e2c6637a2598688aed",
+      "export_sha256": "472542612bdc8a47a147b9cb7558b325f8b662b7b21507e2c6637a2598688aed",
+      "bytes": 5572,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Read the complete room media bridge, projection contracts, new lifecycle tests and unchanged hook tests. First-party browser WebRTC coordination and synthetic fixtures; no audio, credentials, personal accounts, assets or third-party implementation exported.",
+    "The existing bridge uses room participants, consent, a provider-detached mode for human voice, signaling and a separate GPT Live media boundary. Existing two-person implementation rejects the unsupported three-person voice profile before requesting a microphone.",
+    "A new six-case regression suite reproduced four failures: late microphone acquisition for participant/owner after close, late permission rejection changing the closed projection, and a late microphone after room-consent withdrawal.",
+    "The correction stops every track in a microphone stream returned to a closed bridge and returns before peer construction/signaling. Late denial leaves the closed projection intact. Normal admitted participant startup and cleanup still pass.",
+    "Existing hook tests cover waiting for teardown before replacement, closing on room identity change and explicit provider-detached human voice. These tests mock the underlying bridge; only the new lifecycle tests execute the exported bridge.",
+    "Consent, source grants, provider funding and game-action authority remain separate; this source does not grant any of them."
+  ],
+  "limits": [
+    "Unfrozen private source proposal; not committed or published.",
+    "The microphone cancellation fix and its tests are newer than running R380 and require a future installed check.",
+    "Mocked media tests do not qualify attended microphone playback, Discord call, provider mixing, paid model usage or Minecraft/GPT Live context continuity.",
+    "The complete asynchronous owner-mixer restoration lifecycle remains outside this focused cancellation fix.",
+    "Existing helper modules and shared contracts remain separate preview/runtime inputs; this is not a standalone application."
+  ]
+}

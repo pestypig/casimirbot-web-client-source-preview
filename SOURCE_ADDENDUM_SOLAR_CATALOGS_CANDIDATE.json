@@ -1,0 +1,123 @@
+{
+  "observed_at": "2026-11-13T20:43:12.340161+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/DailySolarEvents.tsx",
+      "canonical_sha256": "3d80ea90349158ddaae209dea434fcabdfb02ae610fcf563a87b532e553e5566",
+      "export_sha256": "157e42146e419391541b79e126e792e85e5cb2b34e7f03aaa0dc757c297160c1",
+      "bytes": 9161,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/SolarPatrolArtifacts.tsx",
+      "canonical_sha256": "b94b50bd7a251802adb19f690d45323c81fee0116d2bb21df55c7a469fe42341",
+      "export_sha256": "3711a31ec372d6ae3b4ee7d96fc3492ac230a8ae52401e655d75e1435a9834ed",
+      "bytes": 7017,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/NeutrinoArtifacts.tsx",
+      "canonical_sha256": "e08f577b49893002fa284e0e04457acc29432e50cd90bfc242c29143ecc567c5",
+      "export_sha256": "7c6d0f37b4e33d391c2f3d4af69bdd3f437c127ce6c3f1877aa58ac7384e030f",
+      "bytes": 6035,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/SolarComparisonResult.tsx",
+      "canonical_sha256": "c12e29bae65dd14439a18f4cabc86be72d85821a162e1e90321d573873ed8fb2",
+      "export_sha256": "c12e29bae65dd14439a18f4cabc86be72d85821a162e1e90321d573873ed8fb2",
+      "bytes": 3648,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/__tests__/daily-solar-events.spec.tsx",
+      "canonical_sha256": "9f075493297fe5340e64158401927886317003d3f12ef52ee18e1da766a1a8de",
+      "export_sha256": "9f075493297fe5340e64158401927886317003d3f12ef52ee18e1da766a1a8de",
+      "bytes": 1887,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/__tests__/solar-patrol-artifacts.spec.tsx",
+      "canonical_sha256": "1a55053ce18748c71d8304bfa03a0712e089cf5c12e19a1424161dbd9095bb9a",
+      "export_sha256": "fffc75a9ec34b7081223a75126cbe40346969b92d4b8f6989885930b6850527a",
+      "bytes": 4117,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/__tests__/solar-comparison-result.spec.tsx",
+      "canonical_sha256": "18c08b8195b7ece581496f838f2cd408043f23505d13e430945da8cabd366543",
+      "export_sha256": "18c08b8195b7ece581496f838f2cd408043f23505d13e430945da8cabd366543",
+      "bytes": 2005,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/__tests__/daily-solar-catalog-validation.spec.tsx",
+      "canonical_sha256": "5b9d1dabb990af9b1b1ac034915c276dad511ed7812fdbd1ad9f54a4ae5b1e3c",
+      "export_sha256": "f1adf477ef085aace5f0fb53307af18e2a614acb9d6129a040a337e021c1f28d",
+      "bytes": 4110,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/__tests__/solar-patrol-catalog-validation.spec.tsx",
+      "canonical_sha256": "7a4782805015786c990ad0a71fe3ee86a42abb756caa1e66e18183c835e5f929",
+      "export_sha256": "08fbce515f66398804888df7b1a714e75a8648ca4bb7c6fac3ccfe7da9ce98d0",
+      "bytes": 3598,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/__tests__/neutrino-artifacts.spec.tsx",
+      "canonical_sha256": "fd5f4e64c1dd8751d6ee5f2f3ce86e4def967e7d99536df120f5a8386232a48c",
+      "export_sha256": "804d4a231ba0cd76e5f4edac492f4844984dd2e6ff663393a6f9912ba734463a",
+      "bytes": 2408,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/solar-catalog-view.ts",
+      "canonical_sha256": "c619636d3020a968d9fd9684591f01c988a7ce0a0452c14f60c97d98b788856f",
+      "export_sha256": "2b2f58473b5995a9534bffe965bca7d68e61c37742901deac705a9562a2a2c3d",
+      "bytes": 3125,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed complete daily HEK, DONKI patrol, IceCube artifact and platform comparison UI components and six browser suites. Public retained catalogs, source-linked media, approximate disk positions, owner-local viewed markers and numerical result displays remain distinct.",
+    "Reproduced twelve failures: six malformed catalog payloads crashed rendering; daily day/mode and patrol window mismatches were displayed; a non-default LMSAL movie port was admitted; patrol and neutrino citation anchors accepted executable URL schemes.",
+    "Added bounded presentation schemas for daily and patrol responses, reusing the canonical patrol report/window contracts. Daily requests check a 24-hour window and selected UTC day/mode; patrol requests require the exact requested window. Manifest count arrays are bounded for display, not independently source-verified.",
+    "Citation links now permit only HTTP(S) without embedded credentials. HEK embedded movies additionally require the existing exact LMSAL host/path, no query/fragment/credentials and a default port. Reel and artifact media paths use bounded source hashes; no third-party media bytes are included in this export.",
+    "Existing cancellation already rejected late day/catalog responses in the exercised cases. Public source reads remain passive. Viewed markers use per-profile local keys and bounded report/hash pairs, without enabling delivery or model actions.",
+    "Neutrino view validates its exact response window and canonical report/artifact shapes, matching context by native ID and revision hash. It labels detector arrival and possible coincidence without claiming a solar origin, emission time, causal relation or live solar-fusion measurement.",
+    "Comparison view uses the canonical result schema, explicit dated TSI uncertainty, archival correlation, source/result/input links and no-authority flags. Its unchanged test evaluates synthetic canonical operator input; this is UI/contract evidence, not independent scientific validation.",
+    "Twenty-two browser checks pass. Existing patrol fixtures now include the actual route schema/window and complete canonical report fields. All HTTP is mocked; no live provider downloads, dataset acquisition, inference, model funding or Discord operation occurred."
+  ],
+  "limits": [
+    "Private unfrozen source proposal, not an installed release, live acquisition or public publication. No scientific operator, adapter, proof or certificate semantics changed.",
+    "Shared report/replay/comparison schemas and scientific operators remain canonical dependencies outside this web cohort. UI checks do not prove archived data integrity, image pixels, celestial geometry, a detector measurement or causal significance.",
+    "The public HEK read endpoint may refresh its catalog on the server. Mocked browser tests do not qualify real provider freshness, provider availability, licensing of future downloaded media, or deployed server refresh behavior.",
+    "Day/catalog changes are tested for late async response rejection. Transient pre-effect rendering, real media decoding, network timeouts, account storage denial and every browser lifecycle variant remain separate acceptance work.",
+    "Star Watcher integration requires a fresh compile and tests against these updated dependencies. Five inherited intentional support-contact matches remain in owner publication review."
+  ]
+}

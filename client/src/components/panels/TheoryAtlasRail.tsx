@@ -5,6 +5,9 @@ import { PHYSICS_ATLAS_BLOCKS } from "@shared/theory/physics-atlas-blocks";
 export type TheoryAtlasLensId = PhysicsAtlasBlockId;
 
 const blockColors: Record<PhysicsAtlasBlockId, string> = {
+  relativity_history: "bg-blue-600",
+  evolutionary_biophysics: "bg-teal-600",
+  casimir_dp_quantum_foam: "bg-purple-600",
   stellar_evolution: "bg-fuchsia-700",
   astrochemistry_prebiotic: "bg-lime-700",
   cosmic_distance_ladder: "bg-amber-600",

@@ -23,7 +23,7 @@ export function NativeHostedRoomVoiceChannel({ roomId, selfParticipantId, member
     <div className="flex items-center justify-between gap-2">
       <div><p className="font-semibold text-cyan-100">🔊 Voice</p>
         <p className="text-slate-400">Human call · GPT Live is not listening</p></div>
-      <button type="button" onClick={() => void (state.active
+      <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-voice-channel.void-state-active-bridge-current-stop-bridge-current-start" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" onClick={() => void (state.active
         ? bridge.current?.stop() : bridge.current?.start())}
         className="rounded-md border border-cyan-300/30 px-2 py-1 text-cyan-100">
         {state.active ? "Leave voice" : "Join voice and share microphone"}

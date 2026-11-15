@@ -1,6 +1,7 @@
+import { isExperimentalLaunchPanelVisible, useExperimentalLaunchPanels } from "@/lib/workstation/experimentalLaunchPanels";
 import React from "react";
 import {
-  HELIX_USER_ACCOUNT_POLICY,
+  HELIX_SIGNED_OUT_ACCOUNT_POLICY,
   resolveHelixAccountPanelAccess,
   type HelixAccountCapabilityPolicy,
 } from "@shared/helix-account-session";
@@ -20,8 +21,10 @@ import {
   HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
   fetchAccountCapabilityPolicy,
   readCachedAccountCapabilityPolicy,
+  readCachedAccountProfileIdentity,
 } from "@/lib/workstation/accountCapabilityPolicy";
-import { isDiscoverableLaunchPanel, isUserLaunchPanel } from "@/lib/workstation/launchPanelPolicy";
+import { captureAccountOperationScope } from "@/lib/workstation/accountOperationScope";
+import { isAccountLaunchPanel } from "@/lib/workstation/launchPanelPolicy";
 import { isSolarSpecialistLaunchPanel } from "@/lib/workstation/solarSpecialistPanels";
 import {
   CasimirGuideRow,
@@ -102,6 +105,7 @@ export function CasimirGuideOverlay(props: {
   context?: CasimirGuideContext;
 }) {
   const context = props.context ?? EMPTY_CONTEXT;
+  const experimentalLaunchPanels = useExperimentalLaunchPanels();
   const { userSettings } = useHelixStartSettings();
   const language = getInterfaceLanguageOption(userSettings.interfaceLanguage);
   const { t } = useInterfaceText(language.code);
@@ -111,10 +115,10 @@ export function CasimirGuideOverlay(props: {
   const [workspaceView, setWorkspaceView] = React.useState<WorkspaceView>("root");
   const [searchQuery, setSearchQuery] = React.useState("");
   const [accountPolicy, setAccountPolicy] = React.useState<HelixAccountCapabilityPolicy>(
-    () => readCachedAccountCapabilityPolicy() ?? HELIX_USER_ACCOUNT_POLICY,
+    () => readCachedAccountCapabilityPolicy() ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY,
   );
-  const deviceCheckAccess = resolveHelixAccountPanelAccess(accountPolicy, "device-check");
-  const deviceCheckAvailable = deviceCheckAccess.state === "available" || isUserLaunchPanel("device-check");
+  const [accountIdentity, setAccountIdentity] = React.useState(readCachedAccountProfileIdentity);
+  const deviceCheckAvailable = isAccountLaunchPanel("device-check", accountPolicy);
   const environment = useCasimirGuideEnvironmentProjection(
     props.open && deviceCheckAvailable,
   );
@@ -129,7 +133,8 @@ export function CasimirGuideOverlay(props: {
     const handlePolicyChange = (event: Event) => {
       const policy = (event as CustomEvent<{ account_policy?: HelixAccountCapabilityPolicy | null }>).detail
         ?.account_policy;
-      setAccountPolicy(policy ?? readCachedAccountCapabilityPolicy() ?? HELIX_USER_ACCOUNT_POLICY);
+      setAccountPolicy(policy ?? readCachedAccountCapabilityPolicy() ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY);
+      setAccountIdentity(readCachedAccountProfileIdentity());
     };
     window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, handlePolicyChange as EventListener);
     return () => window.removeEventListener(
@@ -144,7 +149,7 @@ export function CasimirGuideOverlay(props: {
     void fetchAccountCapabilityPolicy()
       .then((policy: HelixAccountCapabilityPolicy) => { if (active) setAccountPolicy(policy); })
       .catch(() => {
-        if (active) setAccountPolicy(readCachedAccountCapabilityPolicy() ?? HELIX_USER_ACCOUNT_POLICY);
+        if (active) setAccountPolicy(readCachedAccountCapabilityPolicy() ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY);
       });
     return () => { active = false; };
   }, [props.open]);
@@ -159,20 +164,22 @@ export function CasimirGuideOverlay(props: {
       return;
     }
     let active = true;
+    const isCurrentAccount = captureAccountOperationScope();
+    setSocial(null);
     setSocialState("loading");
     void friendsPartiesApi.list().then((value: HelixFriendsPartiesResponse) => {
-      if (!active) return;
+      if (!active || !isCurrentAccount()) return;
       setSocial(value);
       setSocialState("ready");
     }).catch((error: unknown) => {
-      if (!active) return;
+      if (!active || !isCurrentAccount()) return;
       const status = typeof error === "object" && error && "status" in error
         ? Number((error as { status: number }).status)
         : 0;
       setSocialState(status === 401 || status === 403 ? "locked" : "failed");
     });
     return () => { active = false; };
-  }, [friendsAccess.state, props.open]);
+  }, [accountIdentity.profileId, accountIdentity.revision, friendsAccess.state, props.open]);
 
   React.useLayoutEffect(() => {
     if (props.open && !wasOpenRef.current) {
@@ -210,8 +217,7 @@ export function CasimirGuideOverlay(props: {
 
   const openPanel = React.useCallback((panelId: string) => {
     const panel = getPanelDef(panelId);
-    const access = resolveHelixAccountPanelAccess(accountPolicy, panelId);
-    if (!panel || (access.state !== "available" && !isUserLaunchPanel(panelId))) return;
+    if (!panel || !isAccountLaunchPanel(panelId, accountPolicy)) return;
     props.onOpenPanel(panelId);
     props.onClose();
   }, [accountPolicy, props.onClose, props.onOpenPanel]);
@@ -263,8 +269,7 @@ export function CasimirGuideOverlay(props: {
         state: "unavailable",
       };
     }
-    const access = resolveHelixAccountPanelAccess(accountPolicy, panelId);
-    if (access.state !== "available" && !isUserLaunchPanel(panelId)) {
+    if (!isAccountLaunchPanel(panelId, accountPolicy)) {
       return {
         id: rowId(options.idPrefix ?? "panel", panelId),
         label: options.label ?? panelTitle(panel),
@@ -300,10 +305,9 @@ export function CasimirGuideOverlay(props: {
   }, [context.activePanelId, panelRow, panelTitle, t]);
 
   const searchablePanels = React.useMemo(() => panelRegistry.filter((panel: PanelDefinition) => {
-    if (panel.startHidden || panel.skipTaskbar || isSolarSpecialistLaunchPanel(String(panel.id))) return false;
-    const access = resolveHelixAccountPanelAccess(accountPolicy, panel.id);
-    return access.state === "available" || isDiscoverableLaunchPanel(panel.id);
-  }), [accountPolicy]);
+    if (panel.startHidden || !isExperimentalLaunchPanelVisible(String(panel.id), experimentalLaunchPanels) || panel.skipTaskbar || isSolarSpecialistLaunchPanel(String(panel.id))) return false;
+    return isAccountLaunchPanel(panel.id, accountPolicy);
+  }), [accountPolicy, experimentalLaunchPanels]);
 
   const searchResults = React.useMemo(() => {
     const tokens = normalizeSearch(searchQuery);

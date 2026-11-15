@@ -50,8 +50,8 @@ export function RoomServiceEntry() {
     <p className="my-2 text-xs">Use the same account as your harness room connection. This link does not join a room or enable audio, AI or program actions.</p>
     <p className="my-2 break-all text-xs">{roomId}</p>
     <Auth0SignInButton returnTo={roomServiceReturnPath(roomId)} />
-    <button type="button" disabled={busy} onClick={open} className="mr-4 mt-3">{busy ? "Checking room access…" : "Open selected room"}</button>
-    <button type="button" onClick={() => { pending.current?.abort(); setDismissed(true); }}>Dismiss</button>
+    <button data-helix-control-id="helix.ask.shared_live_room.room-service-entry.open" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} onClick={open} className="mr-4 mt-3">{busy ? "Checking room access…" : "Open selected room"}</button>
+    <button data-helix-control-id="helix.ask.shared_live_room.room-service-entry.dismiss" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" onClick={() => { pending.current?.abort(); setDismissed(true); }}>Dismiss</button>
     {message ? <p role="status" className="mt-2 text-xs">{message}</p> : null}
   </section>;
 }

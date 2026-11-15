@@ -97,7 +97,7 @@ export function SelectedCampaignReceipt({
           <div className="mt-1 text-zinc-400">
             {translateText("June shift-lapse archive; separate from the active spherical v2 gate. Hash identity is not solver replay.")}
           </div>
-          <button
+          <button data-helix-control-id="workstation.panel.theory-badge-graph.warp-gr-nhm2-lens.open-doc-panel-data-current-program-ref" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
             type="button"
             onClick={() => openDocPanel(data.currentProgramRef)}
             className="mt-1 text-left text-sky-300 underline decoration-sky-700 underline-offset-2 hover:text-sky-100"

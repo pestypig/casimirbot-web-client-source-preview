@@ -4,6 +4,8 @@ import React from "react";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { HELIX_DEVELOPER_ACCOUNT_POLICY, HELIX_USER_ACCOUNT_POLICY } from "@shared/helix-account-session";
+import { cacheAccountCapabilityPolicy } from "@/lib/workstation/accountCapabilityPolicy";
 import * as agiApi from "@/lib/agi/api";
 import ImageLensPanel from "@/components/workstation/ImageLensPanel";
 import { HELIX_ASK_LIVE_EVENT_BUS_EVENT } from "@/lib/helix/liveEventsBus";
@@ -23,6 +25,7 @@ function loadLocalImage() {
 }
 
 beforeEach(() => {
+  cacheAccountCapabilityPolicy(null, null);
   useDocumentImageRegionStore.setState(initialRegionState, true);
   useVisualSourceCaptureStore.setState(initialVisualState, true);
   useScientificEvidenceWorkflowStore.getState().clear();
@@ -79,12 +82,49 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  cacheAccountCapabilityPolicy(null, null);
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
   cleanup();
 });
 
 describe("ImageLensPanel", () => {
+  it("keeps the developer-only texture tab out of the ordinary inspection view", () => {
+    cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY, "profile:image-lens-user");
+    render(<ImageLensPanel />);
+
+    expect(screen.getByRole("button", { name: "Inspect" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Realtime Texture Pack" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Choose image file" })).toBeInTheDocument();
+  });
+
+  it("closes a developer texture view when the account changes to an ordinary user", async () => {
+    cacheAccountCapabilityPolicy(HELIX_DEVELOPER_ACCOUNT_POLICY, "profile:image-lens-developer");
+    render(<ImageLensPanel />);
+    fireEvent.click(screen.getByRole("button", { name: "Realtime Texture Pack" }));
+    expect(screen.getByTestId("realtime-texture-pack-controls")).toBeInTheDocument();
+
+    cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY, "profile:image-lens-user");
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: "Realtime Texture Pack" })).not.toBeInTheDocument();
+      expect(screen.queryByTestId("realtime-texture-pack-controls")).not.toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Choose image file" })).toBeInTheDocument();
+    });
+  });
+
+  it("closes a developer texture view immediately on sign-out", async () => {
+    cacheAccountCapabilityPolicy(HELIX_DEVELOPER_ACCOUNT_POLICY, "profile:image-lens-developer");
+    render(<ImageLensPanel />);
+    fireEvent.click(screen.getByRole("button", { name: "Realtime Texture Pack" }));
+    expect(screen.getByTestId("realtime-texture-pack-controls")).toBeInTheDocument();
+
+    cacheAccountCapabilityPolicy(null, null);
+    await waitFor(() => {
+      expect(screen.queryByTestId("realtime-texture-pack-controls")).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Realtime Texture Pack" })).not.toBeInTheDocument();
+    });
+  });
+
   it("starts as a top image workspace with a central add affordance", () => {
     render(<ImageLensPanel />);
 
@@ -221,7 +261,7 @@ describe("ImageLensPanel", () => {
     expect(workflowStatus).toHaveTextContent("scientific_image_sidecar:panel");
     expect(workflowStatus).toHaveTextContent("Postulate refs:");
     fireEvent.click(screen.getByRole("button", { name: /advanced/i }));
-    expect(await screen.findByLabelText("Page")).toHaveValue("3");
+    expect(await screen.findByLabelText("Page")).toHaveValue(3);
     expect(screen.getByLabelText("Source kind")).toHaveValue("pdf_page_render");
   });
 

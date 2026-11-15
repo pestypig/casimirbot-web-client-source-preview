@@ -49,7 +49,7 @@ export function HelixAskConsoleRuntimeShell({
             <p className="mt-3 text-sm text-slate-300">
               Review your account, connection and exact-task pairing in Agent Access.
             </p>
-            <button
+            <button data-helix-control-id="helix.ask.helix-ask-console-runtime-shell.open-agent-access" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
               type="button"
               className="mt-2 rounded border border-cyan-700 px-3 py-2 text-sm text-cyan-100"
               onClick={() => {

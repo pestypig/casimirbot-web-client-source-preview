@@ -298,17 +298,22 @@ export function AgentAccountBindingReadiness() {
     if (!subscribe) return;
     return subscribe((candidate) => {
       const completion = parseDesktopAuth0AccountLinkCompletion(candidate);
+      if (!completion || completion.authorization_purpose !== "account_link") return;
       linkWaitGeneration.current += 1;
       linkStartRequest.current?.abort();
       setLinkBusy(false);
       setAwaitingCallback(false);
-      if (!completion) {
-        setLinkError(
-          "The desktop host returned an invalid account-link receipt.",
-        );
-        return;
-      }
       if (!completion.ok) {
+        if (completion.error === "friends_authorization_insufficient" ||
+            completion.error === "friends_connection_failed") {
+          setLinkError(completion.error === "friends_authorization_insufficient"
+            ? "Friends & Parties permission was not included. Its authorization configuration needs a maintainer check. Checking the separate account link status below."
+            : "The Friends & Parties connection failed. Checking the separate account link status below; retry Friends from Friends & Parties.");
+          // The account binding may already have completed. Read its status;
+          // the social callback itself is not proof of an active binding.
+          refresh();
+          return;
+        }
         const message =
           completion.error === "signed_tenant_claim_missing"
             ? "Auth0 signed in, but its access token is missing the CasimirBot tenant claim. Check the Auth0 post-login Action and try again."
@@ -318,6 +323,10 @@ export function AgentAccountBindingReadiness() {
                 ? "Auth0 authorized the link, but its token exchange failed. Try again."
                 : completion.error === "link_intent_expired"
                   ? "The Auth0 link request expired. Start a new link."
+                  : completion.error === "provider_subject_conflict"
+                    ? "This Auth0 identity is linked to another CasimirBot profile. Use the intended website account before starting a new link."
+                    : completion.error === "callback_transport_failed"
+                      ? "CasimirBot could not confirm the browser return with its local service. Check this EXE and retry the account link."
                   : "Auth0 account linking did not complete. You can try again.";
         setLinkError(message);
         return;
@@ -461,7 +470,7 @@ export function AgentAccountBindingReadiness() {
             </button>
           ) : null}
           {linkBusy && awaitingCallback ? (
-            <button
+            <button data-helix-control-id="workstation.panel.agent-access.agent-account-binding-readiness.stop-waiting" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
               type="button"
               onClick={() => {
                 linkWaitGeneration.current += 1;

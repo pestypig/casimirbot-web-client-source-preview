@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { HELIX_SIGNED_OUT_ACCOUNT_POLICY, type HelixAccountCapabilityPolicy } from "@shared/helix-account-session";
 import {
   ChevronDown,
   FileImage,
@@ -27,6 +28,11 @@ import { HELIX_ASK_CONTEXT_ID } from "@/lib/helix/voice-surface-contract";
 import { useHelixStartSettings } from "@/hooks/useHelixStartSettings";
 import { getInterfaceLanguageOption } from "@/lib/i18n/interfaceLanguage";
 import { useInterfaceText, type InterfaceTextResolver } from "@/lib/i18n/interfaceText";
+import {
+  HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
+  fetchAccountCapabilityPolicy,
+  readCachedAccountCapabilityPolicy,
+} from "@/lib/workstation/accountCapabilityPolicy";
 import type { InterfaceMessageId } from "@/lib/i18n/messages/types";
 import { useDocumentImageRegionStore, type DocumentImageRegionState } from "@/store/useDocumentImageRegionStore";
 import { useImageLensLiveSourceStore } from "@/store/useImageLensLiveSourceStore";
@@ -193,6 +199,34 @@ export default function ImageLensPanel() {
   const [lastSentFrame, setLastSentFrame] = useState<SentFrameState | null>(null);
   const [statusMessage, setStatusMessage] = useState(initialStatusMessage);
   const [workspaceMode, setWorkspaceMode] = useState<"inspect" | "realtime_texture_pack">("inspect");
+  const [accountPolicy, setAccountPolicy] = useState<HelixAccountCapabilityPolicy>(
+    () => readCachedAccountCapabilityPolicy() ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY,
+  );
+  const texturePackAvailable = accountPolicy.feature_flags.includes("realtime_texture_pack") &&
+    !accountPolicy.locked_features.includes("realtime_texture_pack");
+  const activeWorkspaceMode = texturePackAvailable ? workspaceMode : "inspect";
+
+  useEffect(() => {
+    let cancelled = false;
+    const refresh = () => {
+      setAccountPolicy(readCachedAccountCapabilityPolicy() ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY);
+      void fetchAccountCapabilityPolicy().then((policy) => {
+        if (!cancelled) setAccountPolicy(policy);
+      }).catch(() => {
+        if (!cancelled) setAccountPolicy(readCachedAccountCapabilityPolicy() ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY);
+      });
+    };
+    refresh();
+    window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, refresh);
+    return () => {
+      cancelled = true;
+      window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, refresh);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!texturePackAvailable) setWorkspaceMode("inspect");
+  }, [texturePackAvailable]);
   const source = useDocumentImageRegionStore((state: DocumentImageRegionState) => state.source);
   const naturalSize = useDocumentImageRegionStore((state: DocumentImageRegionState) => state.naturalSize);
   const cropDraft = useDocumentImageRegionStore((state: DocumentImageRegionState) => state.cropDraft);
@@ -513,20 +547,20 @@ export default function ImageLensPanel() {
               <button data-helix-interaction-kind="observe" data-helix-authority-state="client_local" data-helix-control-id="workstation.panel.image-lens.image-lens-panel.inspect"
                 type="button"
                 onClick={() => setWorkspaceMode("inspect")}
-                className={`rounded px-2 py-1 ${workspaceMode === "inspect" ? "bg-cyan-500/20 text-cyan-100" : "text-slate-400"}`}
+                className={`rounded px-2 py-1 ${activeWorkspaceMode === "inspect" ? "bg-cyan-500/20 text-cyan-100" : "text-slate-400"}`}
               >
                 Inspect
               </button>
-              <button data-helix-interaction-kind="navigate" data-helix-authority-state="client_local" data-helix-control-id="workstation.panel.image-lens.image-lens-panel.realtime-texture-pack"
+              {texturePackAvailable ? <button data-helix-interaction-kind="navigate" data-helix-authority-state="client_local" data-helix-control-id="workstation.panel.image-lens.image-lens-panel.realtime-texture-pack"
                 type="button"
                 onClick={() => setWorkspaceMode("realtime_texture_pack")}
-                className={`rounded px-2 py-1 ${workspaceMode === "realtime_texture_pack" ? "bg-fuchsia-500/20 text-fuchsia-100" : "text-slate-400"}`}
+                className={`rounded px-2 py-1 ${activeWorkspaceMode === "realtime_texture_pack" ? "bg-fuchsia-500/20 text-fuchsia-100" : "text-slate-400"}`}
               >
                 Realtime Texture Pack
-              </button>
+              </button> : null}
             </div>
           </div>
-          {workspaceMode === "inspect" ? <>
+          {activeWorkspaceMode === "inspect" ? <>
           <button data-helix-interaction-kind="configure" data-helix-authority-state="client_local" data-helix-control-id="workstation.panel.image-lens.image-lens-panel.file-input-ref-current-click"
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -589,7 +623,7 @@ export default function ImageLensPanel() {
           </button>
           </> : null}
         </div>
-        {workspaceMode === "inspect" ? <>
+        {activeWorkspaceMode === "inspect" ? <>
         <div className="mt-1 flex min-h-5 flex-wrap items-center gap-x-3 gap-y-1 text-[11px] leading-5">
           <span className="min-w-0 flex-1 truncate text-slate-400">{statusMessage}</span>
           {liveSourceActive ? (
@@ -641,7 +675,7 @@ export default function ImageLensPanel() {
         </> : null}
       </div>
 
-      {workspaceMode === "realtime_texture_pack" ? (
+      {activeWorkspaceMode === "realtime_texture_pack" ? (
         <RealtimeTexturePackControls />
       ) : (
       <main className="flex min-h-0 flex-1 flex-col overflow-hidden">

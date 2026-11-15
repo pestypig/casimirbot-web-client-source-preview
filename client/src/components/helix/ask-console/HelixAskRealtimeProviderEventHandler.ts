@@ -704,6 +704,7 @@ export const createHelixAskRealtimeProviderEventHandler = (input: {
         const response = readRecord(await postEvent(path, {
           event_type: "transcript.final",
           event_ref: eventRef,
+          provider_item_id: readString(event.item_id ?? event.itemId),
           transcript_text: transcript,
           transcript_text_char_count: transcript.length,
           runtime_agent_authority: input.runtimeAgentAuthority,
@@ -754,12 +755,15 @@ export const createHelixAskRealtimeProviderEventHandler = (input: {
           : null;
         const askRuntimeDispatch =
           workerAdmission?.dispatch.kind === "ask_runtime" ||
-          workerAdmission?.dispatch.kind === "ask_runtime_read_only";
+          workerAdmission?.dispatch.kind === "ask_runtime_read_only" ||
+          workerAdmission?.dispatch.kind === "ask_runtime_governed_world_command";
+        const governedWorldCommand =
+          workerAdmission?.dispatch.kind === "ask_runtime_governed_world_command";
         if (
           handoff.schema !== "helix.realtime_stage_play.ask_handoff.v1" ||
           handoff.transcript_observation_ref !== observationRef ||
           handoff.realtime_session_id !== input.realtimeSessionId ||
-          handoff.read_only !== true ||
+          handoff.read_only !== !governedWorldCommand ||
           handoff.transcript_is_user_intent_after_admission !== true ||
           handoff.reentry_required !== true ||
           handoff.answer_authority !== false ||
@@ -775,11 +779,16 @@ export const createHelixAskRealtimeProviderEventHandler = (input: {
           routeMetadata.invocationKind !== "stage_play_realtime_transcript_handoff" ||
           sourceTargetIntent.must_enter_backend_ask !== askRuntimeDispatch ||
           sourceTargetIntent.allow_client_shortcut !== false ||
-          sourceTargetIntent.admitted_readonly_handoff !== true ||
+          sourceTargetIntent.admitted_readonly_handoff !== !governedWorldCommand ||
+          (governedWorldCommand &&
+            (sourceTargetIntent.admitted_governed_world_command_handoff !== true ||
+             !String(handoff.thread_id ?? "").startsWith("helix-ask:room:"))) ||
           sourceTargetIntent.assistant_answer !== false ||
           sourceTargetIntent.raw_content_included !== false ||
           !forbiddenCapabilities.includes("workstation_mutation") ||
-          !forbiddenCapabilities.includes("workstation_action_execution") ||
+          (governedWorldCommand
+            ? forbiddenCapabilities.includes("workstation_action_execution")
+            : !forbiddenCapabilities.includes("workstation_action_execution")) ||
           !forbiddenCapabilities.includes("realtime_provider_tool_execution")
         ) {
           throw new Error("realtime_stage_play_ask_handoff_missing");

@@ -1,0 +1,76 @@
+{
+  "observed_at": "2026-11-14T01:58:44.122853+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomPlayerEmbodimentPanel.spec.tsx",
+      "canonical_sha256": "6e355778357c533dbcd04d8860be62c4d27870fc70a701ab2ccf9cdd6b6fd6a5",
+      "export_sha256": "2008676f9453b33ad1389ceb1044a8b7b31e7db288788d4e3df307ef37dbc3b7",
+      "bytes": 36487,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "18f431d7752baa1cd1103bd27ca6da75f0b1d19fcdc76af5b2e63879b485257b"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomSourceBindingsPanel.spec.tsx",
+      "canonical_sha256": "c49f962ca548cdbf8777ddd9103bb38c0ae9b58d4013a121a9a91734f967634c",
+      "export_sha256": "c49f962ca548cdbf8777ddd9103bb38c0ae9b58d4013a121a9a91734f967634c",
+      "bytes": 36043,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "cb3c205bae2e1147fa19376b3034303aa11e8aa20406c760f6838a74992a975c"
+    },
+    {
+      "path": "client/src/components/physics-glyphs/__tests__/workspace-panel.spec.tsx",
+      "canonical_sha256": "19ca9eaa53dd4c1e3ff0aca5315b75ed63685fa1f08931f8230ffc79d27a212a",
+      "export_sha256": "19ca9eaa53dd4c1e3ff0aca5315b75ed63685fa1f08931f8230ffc79d27a212a",
+      "bytes": 22423,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "320eec5dbbb04fe71685ed01aa2e681c20ff6988c1577eb5ce57bac3ad96a504"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomPlayerEmbodimentPanel.tsx",
+      "canonical_sha256": "e5464ddffcba2f380c75540e632c0ffe07c63000f643662504670acaaf16e7fe",
+      "export_sha256": "c40e01dcc0f7c5ea3b8f37b81b65f577d4e7f1bd2cacf86f00327c7875517b61",
+      "bytes": 56613,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomSourceBindingsPanel.tsx",
+      "canonical_sha256": "6be4c082e0f17d4170ba9bbfc6ec45b48c62ee22ea62a686eef9e7fa30ab114f",
+      "export_sha256": "6be4c082e0f17d4170ba9bbfc6ec45b48c62ee22ea62a686eef9e7fa30ab114f",
+      "bytes": 75743,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/PhysicsGlyphWorkspacePanel.tsx",
+      "canonical_sha256": "b8f428ad011397529b6edc82679adf91ba17a20ae8f2b03290bb0f0133ad7251",
+      "export_sha256": "2c629d426332193cf2cbcdf30e080ea41e1b1ea321d2e7289b61b1021c62b755",
+      "bytes": 14579,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Room and sticker test fixtures",
+    "capability": "Room source, Player Embodiment and Physics Glyph panel tests",
+    "current_maturity": "implemented",
+    "target_maturity": "typed fixture qualification",
+    "required_evidence": "Existing panel suites and scoped compiler",
+    "explicit_non_goals": "No production behavior, authority, game action, physical validation or installed acceptance changes",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "Player Embodiment fixtures now implement the existing complete environment and source-binding contracts instead of casting incomplete objects to never. The identity assignment uses supported, an existing valid contract value; all action authority remains separate.",
+    "Room source receipt fixtures accept the existing environment projection contract, allowing different IDs, adapters and stale identities. Variant fixtures use satisfies instead of deeply readonly literal types.",
+    "Testing Library role queries retain exact accessible-name strings without the unsupported exact option. The legacy contact-scenario test explicitly verifies its v1 discriminator before accessing states; other scenario versions remain supported.",
+    "All 42 existing tests passed before the changes. This is test-contract correction, not a reproduced runtime defect. Three production panel files are selected unchanged for export verification."
+  ],
+  "limits": [
+    "Unfrozen, unpublished and uninstalled. These synthetic panel tests do not establish real room membership, pairing, streaming, game execution, or Physics Glyph proof integrity.",
+    "Export tests load the three selected production panels from the preview; remaining dependencies use canonical bytes."
+  ]
+}

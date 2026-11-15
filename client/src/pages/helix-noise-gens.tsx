@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useMemo, useReducer, useRef } from "react";
+import { LocalMusicStudio } from "@/components/noise-gen/LocalMusicStudio";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import {
@@ -235,7 +236,7 @@ const readRecentUploads = (): RecentUploadEntry[] => {
   }
 };
 
-export default function HelixNoiseGensPage() {
+export function LegacyNoiseGensPage() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 6 },
@@ -1299,6 +1300,12 @@ export default function HelixNoiseGensPage() {
       ) : null}
     </DndContext>
   );
+}
+
+export default function HelixNoiseGensPage() {
+  const [legacy, setLegacy] = useState(false);
+  return legacy ? <><Button onClick={() => setLegacy(false)}>Back to local studio</Button><LegacyNoiseGensPage /></>
+    : <LocalMusicStudio onLegacy={() => setLegacy(true)} />;
 }
 function RenderInProgressCard({ job }: { job: RenderHistoryEntry }) {
   const isError = job.status === "error";

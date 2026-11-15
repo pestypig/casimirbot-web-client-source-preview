@@ -87,23 +87,23 @@ export default function EnvironmentSessionPreparationRequest(props: Props) {
   };
   return <section aria-label="Prepare environment session" className="mt-3 space-y-2 rounded border border-cyan-400/20 p-3">
     <label className="block">Room
-      <select aria-label="Preparation room" value={roomId} disabled={busy || queued}
+      <select data-helix-control-id="workstation.panel.agent-access.environment-session-preparation-request.preparation-room" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Preparation room" value={roomId} disabled={busy || queued}
         onChange={event => setRoomId(event.target.value)} className="ml-2 bg-slate-950">
         <option value="">Select a room</option>
         {rooms.map(room => <option key={room.room_id} value={room.room_id}>{room.title} · {room.room_id}</option>)}
       </select>
     </label>
     <label className="block">Requested session duration
-      <select aria-label="Requested session duration" value={duration} disabled={busy || queued}
+      <select data-helix-control-id="workstation.panel.agent-access.environment-session-preparation-request.requested-session-duration" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Requested session duration" value={duration} disabled={busy || queued}
         onChange={event => setDuration(Number(event.target.value))} className="ml-2 bg-slate-950">
         <option value={3600}>1 hour</option><option value={28800}>8 hours (development)</option>
       </select>
     </label>
-    <button type="button" disabled={!roomId || busy || expiredConfirmed} onClick={() => void submit()}
+    <button data-helix-control-id="workstation.panel.agent-access.environment-session-preparation-request.void-submit" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" disabled={!roomId || busy || expiredConfirmed} onClick={() => void submit()}
       className="rounded border border-cyan-400/30 px-3 py-2 disabled:opacity-50">
       {busy ? "Requesting…" : queued ? "Check preparation" : "Ready up this room"}
     </button>
-    {expiredConfirmed && <button type="button" disabled={busy} onClick={() => void submit(true)}
+    {expiredConfirmed && <button data-helix-control-id="workstation.panel.agent-access.environment-session-preparation-request.request-preparation-again" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" disabled={busy} onClick={() => void submit(true)}
       className="rounded border border-cyan-400/30 px-3 py-2 disabled:opacity-50">Request preparation again</button>}
     <p role="status" className="text-sm text-slate-300">{message}</p>
     {expiresAt && <p className="text-sm text-slate-300">

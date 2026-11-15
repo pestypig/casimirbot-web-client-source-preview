@@ -30,9 +30,9 @@ const capabilities = [
   {
     icon: ShieldCheck,
     label: "CasimirBot-managed AI",
-    status: "Future option",
+    status: "In qualification",
     description:
-      "Separate future AI plans are intended to include capped CasimirBot-paid API use. They do not grant hosted-room or program-action access and are not available to purchase yet.",
+      "The planned $5 monthly membership includes up to $1 of measured provider cost and a customer-set, all-in monthly cap. Eligible managed services will be added only after billing and installed-client checks. Membership does not grant device, room, Discord, or program-action permission, and public purchase is not open yet.",
   },
 ] as const;
 
@@ -49,8 +49,12 @@ export default function MarketLandingPage() {
           </a>
           <nav className="flex flex-wrap items-center gap-4 text-sm text-slate-300" aria-label="Main navigation">
             <a href="#how-it-works" className="transition hover:text-white">How it works</a>
+            <a href="/getting-started" className="transition hover:text-white">Get started</a>
             <a href="/llms.txt" className="transition hover:text-white">Public AI context</a>
+            <a href="/context/badges" className="transition hover:text-white">Badge catalog</a>
             <a href="/download" className="transition hover:text-white">Download</a>
+            <a href="https://github.com/pestypig/casimirbot-platform-overview#open-source-and-the-private-platform-repository" className="transition hover:text-white">Open source</a>
+            <a href="/discord" className="transition hover:text-white">Discord bot</a>
             <a href="/account" className="rounded-full border border-white/20 px-4 py-2 font-medium text-white transition hover:border-cyan-300/60">Account</a>
           </nav>
         </header>
@@ -98,7 +102,7 @@ export default function MarketLandingPage() {
             </article>
           </div>
           <p className="mt-6 max-w-3xl text-sm leading-6 text-slate-300">
-            Use only the lenses relevant to the question. If you use them in an answer, cite this page for the framework and cite independent evidence for claims about the world. <a className="text-cyan-200 underline" href="/llms.txt">Read the full public brief and source contracts</a>. <a className="text-cyan-200 underline" href="/agent-access">Live MCP tools</a> require a separate authorized connection.
+            Use only the lenses relevant to the question. If you use them in an answer, cite this page for the framework and cite independent evidence for claims about the world. <a className="text-cyan-200 underline" href="/llms.txt">Read the full public brief and source contracts</a>. <a className="text-cyan-200 underline" href="/context/badges">Browse the public badge catalog</a> for concepts, sources, and claim boundaries. <a className="text-cyan-200 underline" href="/agent-access">Live MCP tools</a> require a separate authorized connection.
           </p>
         </section>
 
@@ -124,9 +128,17 @@ export default function MarketLandingPage() {
           </div>
         </section>
 
+        <section aria-labelledby="open-source-title" className="border-t border-white/10 py-10">
+          <h2 id="open-source-title" className="text-2xl font-semibold text-white">Explore the source</h2>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300">
+            Browse CasimirBot’s reviewed open-source components, including the desktop host, web client, and Minecraft connectors. Each repository lists its selected source, license, and setup limits.
+          </p>
+          <a href="https://github.com/pestypig/casimirbot-platform-overview#open-source-and-the-private-platform-repository" className="mt-4 inline-flex items-center gap-2 text-sm text-cyan-200 underline underline-offset-4 hover:text-white">Browse the public repositories <ArrowRight className="h-4 w-4" /></a>
+        </section>
+
         <footer className="flex flex-col justify-between gap-4 border-t border-white/10 py-7 text-sm text-slate-400 sm:flex-row sm:items-center">
           <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-cyan-200" /> Connections and actions require their own permissions.</span>
-          <div className="flex gap-5"><a href="/account" className="hover:text-white">Account</a><a href="/download" className="hover:text-white">Download status</a></div>
+          <div className="flex gap-5"><a href="/getting-started" className="hover:text-white">Get started</a><a href="/account" className="hover:text-white">Account</a><a href="/download" className="hover:text-white">Download status</a></div>
         </footer>
       </div>
     </main>

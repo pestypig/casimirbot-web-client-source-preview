@@ -1,0 +1,99 @@
+{
+  "observed_at": "2026-11-13T20:00:28.721543+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/SolarDailyMoviePlayer.tsx",
+      "canonical_sha256": "4aaff27a228e0b53c3475b54539bb98a3bd724bcde3b65370315d55bf672f8f4",
+      "export_sha256": "acd7beb2571de086b146454456721f13ba7cb64e8d667a1d07fa7e674a5050b7",
+      "bytes": 33455,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/SolarDailyMoviePlayer.spec.tsx",
+      "canonical_sha256": "6b758e96e78a964364b119d74ae54ff38a3d8ce2690b8dbf73f74e2a78c9e3ba",
+      "export_sha256": "9c36e32b16ec4b2f66e466974f39fe3111e3fc87eb605dfcb8128a119cb35a72",
+      "bytes": 7348,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/SolarTimePlayer.tsx",
+      "canonical_sha256": "a2183c6930b94acb7a74d5d0b99ff0913635fccb117a9210bbf6fc4b2228aab1",
+      "export_sha256": "0538f44edf47c0873c8921275ca5f700c4fefce39de4c4f89b75d91d6eaaeb5c",
+      "bytes": 57238,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/SolarTimePlayer.account.spec.tsx",
+      "canonical_sha256": "bf4f166c2eefb01b468b036efd3071357ee9f09ebbe4892785bef2d942286e60",
+      "export_sha256": "3aa184a86d6d0720d08b7dc9b738ecdc18fdb81bb873fcec477a5accb4299cac",
+      "bytes": 4097,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/SolarTimePlayer.identity.spec.tsx",
+      "canonical_sha256": "561eddb3d2ea5f82efa37446f5a78fb1c4d2f74df26d3593590c7553cc4314cd",
+      "export_sha256": "5fd76005e8b84a3fe0f43e36c1c787fc45f06b795ae98b022a520024c96b06f7",
+      "bytes": 10290,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/solar-earth-view-pose.ts",
+      "canonical_sha256": "a5714a660faf9165a7e44a741e8324b8cc32c096ce349e5a8fd476701b99d8e5",
+      "export_sha256": "a5714a660faf9165a7e44a741e8324b8cc32c096ce349e5a8fd476701b99d8e5",
+      "bytes": 1049,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/solar-source-fetch.ts",
+      "canonical_sha256": "10d8ebfc10498a842628aa5cb466c2bc53e3f5f10c4210f903698d0ec326e66b",
+      "export_sha256": "10d8ebfc10498a842628aa5cb466c2bc53e3f5f10c4210f903698d0ec326e66b",
+      "bytes": 1966,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/solar-time-buffer.ts",
+      "canonical_sha256": "6fd02fe9d54e8e2e5b48f0d87933af639fc1287a5d805ade64d9ce91d171ff55",
+      "export_sha256": "6fd02fe9d54e8e2e5b48f0d87933af639fc1287a5d805ade64d9ce91d171ff55",
+      "bytes": 1159,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/solar-observation-replay.ts",
+      "canonical_sha256": "ae50f42301ebc78e6025d32ae4ec75766b90f9b527ddb349e39fc5240b437447",
+      "export_sha256": "ae50f42301ebc78e6025d32ae4ec75766b90f9b527ddb349e39fc5240b437447",
+      "bytes": 965,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed the complete daily movie player: explicit day loading, media byte-length/SHA-256 comparison, source clocks, HMI pair matching and exact JPEG response receipts, buffered playback, PFSS fallback selection, cleanup, rendering labels and links.",
+    "AIA movie integrity is compared with the dated manifest; HMI browse frames keep their own timestamps, hashes and ten-minute display window. Cached JPEGs and optional off-limb display remain browse imagery, not calibrated measurements or reconstructed 3D height.",
+    "GONG local solves and ROB PFSS candidates remain separate model sources with maximum source ages. Their model IDs, map IDs, index receipts and sampled line counts are checked by the existing code; display rotation remains approximate.",
+    "Reproduced two canceled-response UI regressions: a late GONG day JSON body and a late failed ROB pair replaced the new request status. Added abort checks after body completion and before the ROB failure state is stored. Current errors remain visible; unmount aborts reads and releases the retained movie URL.",
+    "Corrected the source-interval label from median to mean, matching the existing elapsed-time divided by interval-count calculation. No timing/model calculation changed.",
+    "The preceding reviewed SolarTimePlayer account key remount also retires this daily renderer on profile changes. The sampled account and source identity regressions are rerun alongside daily lifecycle tests."
+  ],
+  "limits": [
+    "Private unfrozen source proposal, not installed or published. R380 lacks this late-response fix and the earlier sampled-player fixes.",
+    "Daily tests use synthetic four-byte media and mocked Canvas/video/HTTP, with real byte hashing and day/catalog parsing. They do not demonstrate playable media, actual WebGL frames, live NASA/ROB availability or scientific validity.",
+    "Daily source manifests are minimally validated by the existing client; matching provider retention routes and full live input qualification remain separate. Source URLs and declared hashes do not authenticate upstream observations.",
+    "Per-frame JPEG memory capacity, actual video play/pause/decode timing and late native play-promise behavior remain installed/browser qualification. No new provider download, model solve or live render was run.",
+    "The unchanged sampled/globe dependency still has its own source and installed checks; SolarRobPfssBrowser and SolarMagneticGlobe export review remain held.",
+    "Five inherited intentional support-contact matches remain in final owner publication review."
+  ]
+}

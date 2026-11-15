@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { resolveActiveHelixAskSession } from "@/lib/helix/helixAskChatSessions";
-import { useAgiChatStore } from "@/store/useAgiChatStore";
+import { getCurrentAgiChatStorageKey, useAgiChatStore } from "@/store/useAgiChatStore";
 import { useHelixAskWorkspaceSessionStore } from "@/store/useHelixAskWorkspaceSessionStore";
 import { useWorkstationClipboardStore } from "@/store/useWorkstationClipboardStore";
 import { useWorkstationLayoutStore } from "@/store/useWorkstationLayoutStore";
@@ -122,7 +122,7 @@ describe("workstation stores", () => {
           storage.delete(key);
         },
         setItem: (key: string, value: string) => {
-          if (key === "workstation-clipboard-history:v1") {
+          if (key.startsWith("workstation-clipboard-history:v2:")) {
             throw new Error("Quota exceeded");
           }
           storage.set(key, value);
@@ -169,7 +169,7 @@ describe("workstation stores", () => {
           storage.delete(key);
         },
         setItem: (key: string, value: string) => {
-          if (key === "agi-chat-sessions-v1" && throwNextChatWrite) {
+          if (key === getCurrentAgiChatStorageKey() && throwNextChatWrite) {
             throwNextChatWrite = false;
             throw new Error("Quota exceeded");
           }
@@ -195,7 +195,7 @@ describe("workstation stores", () => {
       expect(inMemoryMessage?.content).toBe(hugeContent);
       expect(JSON.stringify(inMemoryMessage?.helixAsk ?? {})).toContain("y".repeat(100));
 
-      const stored = storage.get("agi-chat-sessions-v1");
+      const stored = storage.get(getCurrentAgiChatStorageKey());
       expect(stored).toBeTruthy();
       expect(stored?.length ?? 0).toBeLessThan(80_000);
       expect(stored).toContain("saved chat copy");
@@ -257,7 +257,7 @@ describe("workstation stores", () => {
     });
 
     const memory = useWorkstationSessionMemoryStore.getState();
-    memory.rememberDraft(`workstation-notes:${note.id}:body`, "<p>body</p>");
+    memory.rememberDraft(`${notes.storage_scope_key}:${note.id}:body`, "<p>body</p>");
 
     const layout = useWorkstationLayoutStore.getState();
     const snapshot = layout.captureLayoutSnapshot();
@@ -267,11 +267,11 @@ describe("workstation stores", () => {
     expect(registry.artifacts).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          artifact_id: `workstation-note:${note.id}`,
+          artifact_id: `workstation-note:${notes.storage_scope_key}:${note.id}`,
           artifact_type: "workstation_note",
           owner_scope: "browser_guest",
           storage_backend: "localStorage",
-          sync_status: "profile_candidate",
+          sync_status: "local_only",
         }),
         expect.objectContaining({
           artifact_id: `helix-chat-session:${sessionId}`,
@@ -283,7 +283,7 @@ describe("workstation stores", () => {
           title: "Registry chat",
         }),
         expect.objectContaining({
-          artifact_id: `workstation-session-draft:workstation-notes:${note.id}:body`,
+          artifact_id: `workstation-session-draft:${notes.storage_scope_key}:${note.id}:body`,
           artifact_type: "workstation_session_draft",
           owner_scope: "surface_session_only",
           storage_backend: "sessionStorage",
@@ -299,7 +299,7 @@ describe("workstation stores", () => {
         }),
       ]),
     );
-    expect(registry.profile_ready_artifact_count).toBe(2);
+    expect(registry.profile_ready_artifact_count).toBe(1);
     expect(registry.session_only_artifact_count).toBe(1);
   });
 

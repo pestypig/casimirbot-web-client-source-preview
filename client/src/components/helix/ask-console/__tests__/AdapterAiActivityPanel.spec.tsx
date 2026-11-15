@@ -58,6 +58,21 @@ describe("Adapter AI run activity", () => {
       .toBeInTheDocument();
   });
 
+  it("labels a read-only Responses interpretation as an observation", () => {
+    const base = page("chat:first", "run:one", "source:first");
+    const monitor = { ...base.events[0], source_kind: "responses_monitor",
+      lifecycle_stage: "monitor_observation_published",
+      source_schema: "environment.responses_observation_monitor.v1",
+      summary: "Responses observation (status): Player is standing still. Model interpretation of a measured snapshot; no action started.",
+      evidence_refs: ["evidence:one"] };
+    render(<AdapterAiActivityPanel pages={[{ ...base, events: [monitor] } as never]}
+      chatTitles={[]} />);
+    expect(screen.getByText("Responses worker · observation interpretation"))
+      .toBeInTheDocument();
+    fireEvent.click(screen.getByText("Observation provenance"));
+    expect(screen.getByText(/Observation evidence:one/)).toBeInTheDocument();
+  });
+
   it("shows a read failure instead of an empty-run claim", () => {
     render(<AdapterAiActivityPanel pages={[]} chatTitles={[]}
       requestedChatIds={["chat:first"]}

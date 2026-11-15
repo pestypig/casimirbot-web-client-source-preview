@@ -10,7 +10,7 @@ import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/account
 export function NativeHostedRoomInterpreterStatus({ roomId, authority, isOwner = false,
   capacityProfile }: {
   roomId: string; authority: string; isOwner?: boolean;
-  capacityProfile?: "two_person_voice" | "three_human_text";
+  capacityProfile?: "two_person_voice" | "three_person_voice" | "three_human_text";
 }) {
   const [status, setStatus] = useState<HostedRoomInterpreterStatus | null>(null);
   const [error, setError] = useState("");
@@ -135,21 +135,21 @@ export function NativeHostedRoomInterpreterStatus({ roomId, authority, isOwner =
         : status.session ? "Interpreter preparation pending; shared AI is inactive."
           : "No shared AI interpreter is prepared for this room."
       : "Checking this room's AI status…")}</p>
-    <button type="button" className="mt-2 rounded border border-fuchsia-300/30 px-2 py-1 text-fuchsia-100"
+    <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-status.refresh-ai-status" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" className="mt-2 rounded border border-fuchsia-300/30 px-2 py-1 text-fuchsia-100"
       onClick={() => void refresh()}>Refresh AI status</button>
     {isOwner && status && !status.session ?
-      <button type="button" disabled={preparing} onClick={() => void prepare()}
+      <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-status.prepare-shared-ai-for-this-room" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={preparing} onClick={() => void prepare()}
         className="ml-2 mt-2 rounded border border-fuchsia-300/30 px-2 py-1 text-fuchsia-100 disabled:opacity-40">
         Prepare shared AI for this room
       </button> : null}
     {isOwner && status?.session?.state === "configuration_pending" && window.casimirDesktop?.liveConnection ?
-      <button type="button" disabled={selecting} onClick={() => void selectKey()}
+      <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-status.use-my-configured-api-key-for-this-hosted-room" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={selecting} onClick={() => void selectKey()}
         className="ml-2 mt-2 rounded border border-fuchsia-300/30 px-2 py-1 text-fuchsia-100 disabled:opacity-40">
         Use my configured API key for this hosted room
       </button> : null}
     {isOwner && capacityProfile === "three_human_text" && status?.session?.state === "configured" &&
       status.session.usage_ceiling_turns === 1 && !status.session.evaluation_profile ?
-      <button type="button" disabled={activating} onClick={() => void activateEvaluation()}
+      <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-status.enable-three-member-text-evaluation" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={activating} onClick={() => void activateEvaluation()}
         className="ml-2 mt-2 rounded border border-fuchsia-300/30 px-2 py-1 text-fuchsia-100 disabled:opacity-40">
         Enable three-member text evaluation
       </button> : null}

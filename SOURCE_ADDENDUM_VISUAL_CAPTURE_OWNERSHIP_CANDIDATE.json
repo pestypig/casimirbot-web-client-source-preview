@@ -1,0 +1,71 @@
+{
+  "observed_at": "2026-11-14T00:51:01.767547+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/useHelixAskVisualSourceCaptureRuntime.ts",
+      "canonical_sha256": "e03287d1381c49423113e1d14976485b96c0071fbaec09252c506b4404ef2481",
+      "export_sha256": "0732fdc3f6f3e88031db40c2d9995fcd05e925adc121db798f87753a3917bb46",
+      "bytes": 35367,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "39e71d8bb73f43724b8ff8018b08ed14c53b53a28d818e8188f721178b92ccf7"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/useHelixAskVisualSourceCaptureRuntime.spec.tsx",
+      "canonical_sha256": "079702eb3eebdda399306662ebfa56512c64a768c2080ac2c5fea8454c4cc317",
+      "export_sha256": "079702eb3eebdda399306662ebfa56512c64a768c2080ac2c5fea8454c4cc317",
+      "bytes": 7217,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/helix/__tests__/visual-source-media.spec.ts",
+      "canonical_sha256": "9da342f77fce8cf79ad9a5c0fbf1c2417ec654d62a5bd3208ae5a88aa61b558f",
+      "export_sha256": "9b076bc2dc39a439672764adecb8a96cfbaa5fd095b0d5737de0eec65063a5c7",
+      "bytes": 8622,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskActionToolbar.visual-source.spec.tsx",
+      "canonical_sha256": "138bf2dcd971ab5becbf83bd18467746095ef3515c656248b64acfc524bc09a5",
+      "export_sha256": "138bf2dcd971ab5becbf83bd18467746095ef3515c656248b64acfc524bc09a5",
+      "bytes": 5823,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeControls.visual-source.spec.tsx",
+      "canonical_sha256": "1b5d34b962f3c47ef4d169470c389a580c3f82222a9b7dd1451ca5fa91925327",
+      "export_sha256": "a958fe8826682a09f149bcc7032f3b18b70d62bf28d67ee4a7464f834358298e",
+      "bytes": 10699,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "work_scope": {
+    "program_gate": "G8 existing source/room qualification",
+    "workstream": "Visual capture stream ownership",
+    "capability": "Existing browser visual source feeding GPT Live context",
+    "lifecycle_stage": "Capture and cleanup",
+    "reaction_timescale": "Browser picker and source registration completion",
+    "authority_owner": "Existing account controls and user-selected browser source",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with typed capture ownership and local lifecycle checks",
+    "required_evidence": "Successful capture, ended track, cancellation, unmount, tab audio and denied picker behavior",
+    "explicit_non_goals": "No real browser capture, game or provider action, new consent or source authority",
+    "downstream_gate_unlocked": "None; installed and attended handoff remain open"
+  },
+  "review": [
+    "Separated the captured non-null source identity and active stream from the nullable stream reference used for failure cleanup. The ended-track callback retains the exact registered source; audio registration and attachment retain the active stream.",
+    "The missing-stream guard reports an explicit internal capture error before dereferencing a null stream. Valid media results already require a stream; this is defensive validation, not a newly proven user-visible runtime failure.",
+    "Five mounted-hook cases passed before and after the refactor: completed capture followed by track end, cancellation before late media, unmount before late source registration, tab audio attachment and detach, and denied media. The initial diagnostic run lacked jsdom and is not a regression baseline.",
+    "Existing source-media helpers, toolbar and Live Vision coordination tests are selected unchanged. Media, source registration, frame production and store attachment are synthetic. No live capture or external provider was used."
+  ],
+  "limits": [
+    "Local source/type qualification only. Browser permission behavior, actual frames/audio and installed GPT Live Minecraft continuity remain unverified here.",
+    "Standalone display-audio picker cancellation and other unselected source/room operations are outside these checks. Public source and download publication remain pending."
+  ]
+}

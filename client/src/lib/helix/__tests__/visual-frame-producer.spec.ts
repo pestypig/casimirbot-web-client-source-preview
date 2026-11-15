@@ -32,7 +32,7 @@ const createStream = (): MediaStream => {
   } as unknown as MediaStream;
 };
 
-const createPostJson = () => vi.fn(async (path: string) => {
+const createPostJson = () => vi.fn(async (path: string, _body?: Record<string, unknown>) => {
   if (path === "/api/agi/situation/visual-frame/analyze") {
     return {
       evidence: {
@@ -53,9 +53,9 @@ beforeEach(() => {
   vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => undefined);
   vi.spyOn(HTMLVideoElement.prototype, "videoWidth", "get").mockReturnValue(640);
   vi.spyOn(HTMLVideoElement.prototype, "videoHeight", "get").mockReturnValue(360);
-  vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({
-    drawImage: vi.fn(),
-  } as unknown as CanvasRenderingContext2D);
+  vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockImplementation(
+    (() => ({ drawImage: vi.fn() }) as unknown as CanvasRenderingContext2D) as unknown as HTMLCanvasElement["getContext"],
+  );
   vi.spyOn(HTMLCanvasElement.prototype, "toDataURL").mockReturnValue(jpegDataUrl);
   vi.stubGlobal("crypto", {
     subtle: {
@@ -72,6 +72,22 @@ afterEach(() => {
 });
 
 describe("visual frame producer client fan-out", () => {
+  it("reports an interval source inactive when its activation flag is absent", async () => {
+    const sourceId = "visual_source:missing-interval-state";
+    await runVisualFrameProducerOnce({
+      sourceId, threadId: "thread:test", stream: createStream(),
+      postJson: createPostJson(), captureMode: "interval", cadenceMs: 10_000,
+      liveRuntimeEligible: true,
+    });
+    try {
+      expect(isVisualFrameProducerSourceActive(sourceId)).toBe(true);
+      useVisualSourceCaptureStore.getState().patchProducer(sourceId, { interval_active: undefined });
+      expect(isVisualFrameProducerSourceActive(sourceId)).toBe(false);
+    } finally {
+      stopVisualFrameProducerInterval(sourceId);
+    }
+  });
+
   it("shares one captured JPEG with local and global sinks before server analysis", async () => {
     const postJson = createPostJson();
     const globalFrames: VisualFrameProducerClientFrame[] = [];

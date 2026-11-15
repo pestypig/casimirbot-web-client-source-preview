@@ -71,7 +71,7 @@ import {
   readCachedAccountCapabilityPolicy,
 } from "@/lib/workstation/accountCapabilityPolicy";
 import {
-  HELIX_USER_ACCOUNT_POLICY,
+  HELIX_SIGNED_OUT_ACCOUNT_POLICY,
   type HelixAccountCapabilityPolicy,
 } from "@shared/helix-account-session";
 import {
@@ -85,6 +85,7 @@ import {
 import {
   buildHelixAskSubmitBackendEntrypointRoutePlan,
   mergeHelixAskSubmitBackendEntrypointRunOptions,
+  resolveHelixAskSubmitRuntime,
 } from "@/components/helix/ask-console/HelixAskSubmitBackendEntrypointOptions";
 import {
   buildHelixAskDocViewerDebugSnapshotBinding,
@@ -474,6 +475,7 @@ import {
   filterHelixAskActiveTurnStreamRows,
   incrementHelixAskConsoleDropReason,
   shouldAdmitHelixAskExternalLiveEventToActiveStream,
+  type HelixAskConsoleStreamIngressDebug,
 } from "@/lib/helix/ask-active-turn-stream";
 export {
   buildNeedsRetrievalPlanEvent,
@@ -1124,6 +1126,8 @@ import {
   evaluateVoiceReasoningResponseAuthority,
   evaluateVoiceTurnSealGate,
   resolveVoiceAuthoritySuppression,
+  type ReasoningAttemptSource,
+  type ReasoningAttemptStatus,
 } from "@/lib/helix/voice/voice-turn-authority";
 export {
   mergeVoiceTranscriptDraft,
@@ -1269,6 +1273,7 @@ import {
   resolveVoicePlaybackGain,
   shouldBypassVoicePlaybackGraph,
   shouldUseVoicePlaybackAudioGraph,
+  type HelixAskVoicePlaybackRuntimeLifecycleReceiptInput,
 } from "@/components/helix/ask-console/HelixAskVoicePlaybackRuntime";
 export {
   isActivePlayback,
@@ -2205,7 +2210,7 @@ export type HelixTimelineEntryType =
 export type HelixTimelineEntry = {
   id: string;
   type: HelixTimelineEntryType;
-  source: ReasoningAttemptSource;
+  source: ReasoningAttemptSource | "reasoning";
   status: "queued" | "running" | "streaming" | "done" | "failed" | "suppressed";
   text: string;
   detail?: string | null;
@@ -2779,6 +2784,7 @@ type AskLocalWithFallbackResult = {
 
 type RunAskOptions = {
   source?: "manual" | "voice_auto";
+  serverAdmittedRuntimeAgentProvider?: HelixAgentRuntimeId;
   bypassWorkstationDispatch?: boolean;
   forceReasoningDispatch?: boolean; requiresBackendAskEntrypoint?: boolean;
   suppressWorkstationPayloadActions?: boolean;
@@ -2892,6 +2898,8 @@ type HelixAskReply = {
   terminal_artifact_kind?: string | null;
   agent_runtime?: HelixAgentRuntimeId | null;
   selected_agent_provider?: Record<string, unknown> | null;
+  equation_attempt_debug?: unknown;
+  equation_extraction_attempt?: unknown;
   pending_server_request?: Record<string, unknown> | null;
   resolved_turn_summary?: Record<string, unknown> | null;
   turn_id?: string | null;
@@ -3241,27 +3249,6 @@ type HelixAskReply = {
   };
 };
 
-type HelixAskConsoleStreamIngressDebug = {
-  schema: "helix.ask.console_stream_ingress_debug.v1";
-  turnId: string | null;
-  traceId: string | null;
-  startedAtMs: number | null;
-  rawStreamPacketCount: number;
-  transcriptPacketCount: number;
-  acceptedLiveEventCount: number;
-  replayedTranscriptEventCount: number;
-  droppedEventCount: number;
-  droppedReasons: Record<string, number>;
-  terminalTranscriptEventCount: number;
-  nonTranscriptPacketCount: number;
-  lastEventName: string | null;
-  lastTranscriptType: string | null;
-  lastAcceptedEventId: string | null;
-  lastAcceptedText: string | null;
-  lastDropReason: string | null;
-  lastUpdatedAtMs: number | null;
-};
-
 type HelixAskPillProps = {
   contextId: string;
   className?: string;
@@ -3457,7 +3444,7 @@ function resolveHelixVisibleTerminalKind(args: {
   if (terminalKind === "final_answer" || terminalKind === "final_failure") {
     return terminalKind;
   }
-  const pending = resolveHelixPendingInputRecord(args.reply, args.reply?.debug, ...(args.extraSources ?? []));
+  const pending = resolveHelixPendingInputRecord(...(args.extraSources ?? []));
   if (pending) return "pending_input";
   return String(terminalKind ?? args.fallback ?? "n/a");
 }
@@ -6397,14 +6384,6 @@ export function parseWorkstationActionCommand(value: string): HelixWorkstationAc
     return { action: "reopen_last_closed_panel" };
   }
 
-  const splitMatch = trimmed.match(/^(?:\/split|split)\s+(right|row|down|column)$/i);
-  if (splitMatch) {
-    return {
-      action: "split_active_group",
-      direction: /down|column/i.test(splitMatch[1]) ? "column" : "row",
-    };
-  }
-
   if (/^(?:\/settings|open settings|show settings)$/i.test(trimmed)) {
     return { action: "open_settings", tab: "preferences" };
   }
@@ -6476,7 +6455,7 @@ export function HelixAskPill({
     DEFAULT_HELIX_AGENT_RUNTIME_PROVIDERS,
   );
   const [accountCapabilityPolicy, setAccountCapabilityPolicy] = useState<HelixAccountCapabilityPolicy>(() =>
-    readCachedAccountCapabilityPolicy() ?? HELIX_USER_ACCOUNT_POLICY,
+    readCachedAccountCapabilityPolicy() ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY,
   );
   const canUseLiveAnswerVisualCaptureControls = !accountCapabilityPolicy.locked_features.includes(
     "live_answer_visual_capture_controls",
@@ -6583,7 +6562,7 @@ export function HelixAskPill({
         if (!cancelled) setAccountCapabilityPolicy(policy);
       })
       .catch(() => {
-        if (!cancelled) setAccountCapabilityPolicy(readCachedAccountCapabilityPolicy() ?? HELIX_USER_ACCOUNT_POLICY);
+        if (!cancelled) setAccountCapabilityPolicy(readCachedAccountCapabilityPolicy() ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY);
       });
     if (typeof window === "undefined") {
       return () => {
@@ -6592,7 +6571,7 @@ export function HelixAskPill({
     }
     const handlePolicyChanged = (event: Event) => {
       const detail = (event as CustomEvent<{ account_policy?: HelixAccountCapabilityPolicy | null }>).detail;
-      setAccountCapabilityPolicy(detail?.account_policy ?? HELIX_USER_ACCOUNT_POLICY);
+      setAccountCapabilityPolicy(detail?.account_policy ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY);
       setConsoleChannel(readExperimentalAskHelix() ? "private_ask" : "bound_task");
       consoleChannelChosenByOperatorRef.current = false;
       setLocalRoomTextOwner(null);
@@ -7617,7 +7596,7 @@ export function HelixAskPill({
                 publishBoundAgentSteeringProgress(clientEventRef, "acknowledged", progressTarget);
                 return;
               }
-              if (current.delivery_state !== "pending") {
+              if (current.delivery_state !== "pending" && current.delivery_state !== "picked_up") {
                 setBoundAgentState("unavailable");
                 setAskStatus(`Exact pickup ended with ${current.delivery_state}; no provider answer is claimed.`);
                 publishBoundAgentSteeringProgress(
@@ -9355,13 +9334,7 @@ export function HelixAskPill({
     });
   }, []);
 
-  const recordManualReadAloudLifecycleReceipt = useCallback((input: {
-    playbackStatus: "queued" | "started" | "paused" | "resumed" | "completed" | "cancelled" | "failed";
-    replyId: string;
-    cancelReason?: string | null;
-    error?: string | null;
-    positionMs?: number | null;
-  }) => {
+  const recordManualReadAloudLifecycleReceipt = useCallback((input: HelixAskVoicePlaybackRuntimeLifecycleReceiptInput) => {
     const activeUtterance = voiceAutoSpeakActiveUtteranceRef.current;
     const utteranceId = activeUtterance?.utteranceId ?? `manual_read_aloud:${input.replyId}`;
     const turnKey = activeUtterance?.turnKey ?? `manual:${input.replyId}`;
@@ -9614,7 +9587,6 @@ export function HelixAskPill({
     audio.setAttribute("playsinline", "true");
     audio.setAttribute("webkit-playsinline", "true");
     audio.setAttribute("autoplay", "true");
-    audio.playsInline = true;
     audio.autoplay = true;
     audio.volume = 1;
     if (typeof document !== "undefined") {
@@ -10059,13 +10031,7 @@ export function HelixAskPill({
     }): Promise<{
       blob: Blob;
       synthMs: number;
-      headers: {
-        provider: string | null;
-        profile: string | null;
-        cache: "hit" | "miss" | null;
-        normalizationBenchmark: string | null;
-        normalizationSkipReason: string | null;
-      };
+      headers: Awaited<ReturnType<typeof speakVoice>>["headers"];
     }> => {
       const startedAtMs = Date.now();
       const sleepWithAbort = async (ms: number): Promise<void> => {
@@ -10399,13 +10365,7 @@ export function HelixAskPill({
                 value: {
                   blob: Blob;
                   synthMs: number;
-                  headers: {
-                    provider: string | null;
-                    profile: string | null;
-                    cache: "hit" | "miss" | null;
-                    normalizationBenchmark: string | null;
-                    normalizationSkipReason: string | null;
-                  };
+                  headers: Awaited<ReturnType<typeof speakVoice>>["headers"];
                 };
               } | {
                 ok: false;
@@ -13429,8 +13389,10 @@ export function HelixAskPill({
         reasoningAttemptAbortControllerRef.current = askController;
         reasoningAttemptAbortAttemptIdRef.current = attempt.id;
         try {
-          let timedOut = false;
-          let timeoutKind: "idle" | "hard" = "idle";
+          const timeoutState: { timedOut: boolean; kind: "idle" | "hard" } = {
+            timedOut: false,
+            kind: "idle",
+          };
           let reasoningIdleTimeoutId: ReturnType<typeof setTimeout> | null = null;
           let reasoningHardTimeoutId: ReturnType<typeof setTimeout> | null = null;
           const clearReasoningTimeoutGuards = () => {
@@ -13444,9 +13406,9 @@ export function HelixAskPill({
             }
           };
           const abortForReasoningTimeout = (kind: "idle" | "hard") => {
-            if (timedOut) return;
-            timedOut = true;
-            timeoutKind = kind;
+            if (timeoutState.timedOut) return;
+            timeoutState.timedOut = true;
+            timeoutState.kind = kind;
             askController.abort();
           };
           const scheduleReasoningIdleTimeout = () => {
@@ -13522,14 +13484,14 @@ export function HelixAskPill({
                 signal: askController.signal,
               });
             } catch (error) {
-              if (timedOut) {
+              if (timeoutState.timedOut) {
                 const timeoutError = new Error(
-                  timeoutKind === "hard"
+                  timeoutState.kind === "hard"
                     ? `reasoning_timeout_hard:${HELIX_REASONING_ATTEMPT_HARD_TIMEOUT_MS}`
                     : `reasoning_timeout_idle:${HELIX_REASONING_ATTEMPT_IDLE_TIMEOUT_MS}`,
                 );
                 (timeoutError as { code?: string }).code =
-                  timeoutKind === "hard" ? "reasoning_timeout_hard" : "reasoning_timeout_idle";
+                  timeoutState.kind === "hard" ? "reasoning_timeout_hard" : "reasoning_timeout_idle";
                 throw timeoutError;
               }
               throw error;
@@ -17787,12 +17749,12 @@ export function HelixAskPill({
         `Finalized transcript offered to ${labelForPersonalVoiceDestination(personalVoiceDestination)}.`,
       );
       setVoiceInputError(null);
-      setVoiceInputState("idle");
+      setVoiceInputState("listening");
       return;
     }
     if (personalVoiceDestination !== "ask_helix") {
       setVoiceInputError(`${labelForPersonalVoiceDestination(personalVoiceDestination)} is unavailable. The transcript was not sent to another chat.`);
-      setVoiceInputState("idle");
+      setVoiceInputState("error");
       return;
     }
     voiceConfirmedTurnQueueRef.current = [
@@ -19243,7 +19205,6 @@ export function HelixAskPill({
       autoScrollAppliedCount: activeTurnStreamAutoScrollCountRef.current,
       lastAutoScrollAppliedAtMs: activeTurnStreamAutoScrollCountRef.current > 0 ? Date.now() : null,
       quietGapRowVisible,
-      quietGapRowShownCount: perf.quietGapRowShownCount,
       msSinceLastTranscriptEvent,
       ...perf,
     };
@@ -19694,9 +19655,8 @@ export function HelixAskPill({
               status: "failed",
               text: `Turn timed out after ${HELIX_ASK_TURN_CLIENT_WATCHDOG_MS}ms before a terminal result was returned.`,
               detail: "turn_timeout",
-              mode: inferredMode,
+              mode: "observe",
               traceId,
-              attemptId: manualAttempt?.id,
               meta: {
                 router_state: "S6_TERMINAL_GUARD",
                 router_fail_id: "RF_TURN_TIMEOUT",
@@ -19704,14 +19664,6 @@ export function HelixAskPill({
                 watchdog_ms: HELIX_ASK_TURN_CLIENT_WATCHDOG_MS,
               },
             });
-            if (manualAttempt) {
-              updateReasoningAttempt(manualAttempt.id, (current) => ({
-                ...current,
-                status: "failed",
-                suppression_reason: "turn_timeout",
-                completedAtMs: Date.now(),
-              }));
-            }
           } else if (aborted) {
             skipReply = true;
             setAskStatus("Generation stopped.");
@@ -19733,9 +19685,8 @@ export function HelixAskPill({
                 280,
               ),
               detail: "transport failure suppressed before terminal projection",
-              mode: inferredMode,
+              mode: "observe",
               traceId,
-              attemptId: manualAttempt?.id,
             });
           }
         }
@@ -20431,7 +20382,7 @@ export function HelixAskPill({
         (docsViewerWorkstationLane ||
           simpleConversationTurnLane ||
           (!forceReasoningDispatchForTurn &&
-            inferredMode === "read" &&
+            inferredMode === undefined &&
             isSimpleDirectPromptLaneCandidate(trimmed)));
       const allowBackgroundReasoningLane =
         !HELIX_E1_SINGLE_TURN_CONTRACT_FLAG || frozenRunAskDispatchPolicy === "workspace_then_reasoning";
@@ -20656,7 +20607,7 @@ export function HelixAskPill({
         let backendEntrypointRuntimeFingerprint: Record<string, unknown> = {};
         setAskStatus("Generating answer...");
         try {
-          const askModeForRequest =
+          const askModeForRequest: AskLocalMode =
             repoCodeEvidencePrompt
               ? "observe"
               : !manualDispatchHint || inferredMode === "observe"
@@ -20792,7 +20743,10 @@ export function HelixAskPill({
             const askTurnPayload = {
               ...buildHelixAskConsoleBackendTurnPayloadCore({
                 sessionId: backendSessionId,
-                agentRuntime: selectedAgentRuntime,
+                agentRuntime: resolveHelixAskSubmitRuntime({
+                  selectedRuntime: selectedAgentRuntime,
+                  serverAdmittedRuntimeAgentProvider: options?.serverAdmittedRuntimeAgentProvider,
+                }),
                 traceId,
                 turnId: runAskTurnId,
                 maxTokens: HELIX_ASK_OUTPUT_TOKENS,
@@ -21064,7 +21018,7 @@ export function HelixAskPill({
           responseProof = localResponse.proof;
           responseContextCapsule = localResponse.context_capsule;
           responseSituationContextPack = localResponse.situation_context_pack;
-          const firstEnvelopeAction = Array.isArray(responseActionEnvelope?.workstation_actions)
+          const firstEnvelopeAction: Record<string, unknown> | undefined = Array.isArray(responseActionEnvelope?.workstation_actions)
             ? responseActionEnvelope.workstation_actions[0]
             : undefined;
           const localResponseRecord = localResponse as unknown as Record<string, unknown>;
@@ -21689,12 +21643,12 @@ export function HelixAskPill({
             coerceText(terminalResolutionForFinal.terminalArtifactKind).trim() === "model_synthesized_answer" &&
             (
               localResponseRecord.terminal_artifact_kind === "model_synthesized_answer" ||
-              responseDebugPayload.terminal_artifact_kind === "model_synthesized_answer" ||
-              readAgentLoopAuditRecord(responseDebugPayload.resolved_turn_summary)?.terminal_artifact_kind === "model_synthesized_answer"
+              responseDebugPayload?.terminal_artifact_kind === "model_synthesized_answer" ||
+              readAgentLoopAuditRecord(responseDebugPayload?.resolved_turn_summary)?.terminal_artifact_kind === "model_synthesized_answer"
             ) &&
             (
               localResponseRecord.final_answer_source === "final_answer_draft" ||
-              responseDebugPayload.final_answer_source === "final_answer_draft"
+              responseDebugPayload?.final_answer_source === "final_answer_draft"
             ) &&
             Boolean(responseCanonicalSelectedFinalAnswer);
           const responseDebugSelectedFinalAnswer =
@@ -21747,7 +21701,7 @@ export function HelixAskPill({
                 : isHelixAgentRuntimeId(responseSelectedAgentProvider?.id)
                   ? responseSelectedAgentProvider.id
                   : null;
-          let responseDebugForReply =
+          let responseDebugForReply: HelixAskReply["debug"] =
             responseDebugPayload && typeof responseDebugPayload === "object"
               ? {
                   ...responseDebugPayload,
@@ -22051,7 +22005,7 @@ export function HelixAskPill({
                 eligible: directAutoSpeakEligible,
                 enqueued: directAutoSpeakEnqueued,
                 hasResponseText: Boolean(responseText),
-                manualAttempt,
+                manualAttempt: Boolean(manualAttempt),
                 evidenceGateBlocked: evidenceGateDecision.blocked,
                 preserveAuthoritativeTerminal,
                 terminalStateSuppressed: suppressVoiceForTerminalState,
@@ -22113,7 +22067,7 @@ export function HelixAskPill({
                 ? responseMode
                 : responseMode === "read"
                   ? "observe"
-                  : inferredMode;
+                  : inferredMode ?? "observe";
             const manualCertaintyClass: ObserverFinalizationCertainty = evidenceGateDecision.blocked
               ? "unknown"
               :
@@ -22228,9 +22182,9 @@ export function HelixAskPill({
                 mode: responseMode ?? inferredMode,
               });
             }
-            const responseRouteReasonCode = String(responseEnvelope?.route_reason_code ?? "").trim();
-            const hasPendingServerRequest = Boolean(responseEnvelope?.pending_server_request);
-            const isClarifyTerminal = responseRouteReasonCode.startsWith("clarify:") || hasPendingServerRequest;
+            const responseRouteReasonCode = coerceText(localResponseRecord.route_reason_code ?? responseEnvelopeRecord?.route_reason_code).trim();
+            const hasPendingServerRequest = Boolean(resolveHelixPendingInputRecord(localResponseRecord, responseEnvelopeRecord, responseDebugPayload));
+            const isClarifyTerminal = !isHelixCanceledPendingTurn(localResponseRecord, responseEnvelopeRecord, responseDebugPayload) && (responseRouteReasonCode.startsWith("clarify:") || hasPendingServerRequest);
             addHelixTimelineEntry({
               type: responseMode === "act" || isClarifyTerminal ? "action_receipt" : "reasoning_final",
               source: "manual",
@@ -22468,7 +22422,7 @@ export function HelixAskPill({
       const suppressWorkstationPayloadActions =
         pending?.suppressWorkstationPayloadActions === true || isStagePlayMailboxWake;
       const externalTurnId =
-        String(pending?.traceId ?? "").trim() || `external:${claimId}`;
+        `external:${claimId}`;
       clearPendingHelixAskPrompt();
       if (askBusy) {
         pendingExternalAskPromptRef.current = pending;
@@ -22493,6 +22447,7 @@ export function HelixAskPill({
       }
       void runAsk(question, undefined, {
         bypassWorkstationDispatch,
+        serverAdmittedRuntimeAgentProvider: pending?.serverAdmittedRuntimeAgentProvider,
         forceReasoningDispatch, requiresBackendAskEntrypoint: pending?.requiresBackendAskEntrypoint === true,
         suppressWorkstationPayloadActions,
         answerContract,
@@ -23625,7 +23580,10 @@ export function HelixAskPill({
     errorLineState,
     turnListState,
   });
-  const privateApiChannelAvailable = accountCapabilityPolicy.account_type === "developer" &&
+  const personalProviderConnectionAvailable =
+    accountCapabilityPolicy.feature_flags.includes("profile_connections") &&
+    !accountCapabilityPolicy.locked_features.includes("profile_connections");
+  const privateApiChannelAvailable = personalProviderConnectionAvailable &&
     typeof window !== "undefined" && Boolean(window.casimirDesktop?.liveConnection);
   const localRoomForConsole = isLocalRoomTextOwnerAdmitted(localRoomTextOwner, activeSharedRoomIdForAsk)
     ? localRoomTextOwner : null;
@@ -23654,7 +23612,8 @@ export function HelixAskPill({
       (message.id.startsWith("reasoning_steering:") || message.id.startsWith("bound-steering:")));
   const consoleSurfaceFrameState = {
     ...surfaceFrameState,
-    settings: <PrivateAskConnectionMenu enabled={accountCapabilityPolicy.account_type === "developer"}
+    settings: <PrivateAskConnectionMenu enabled={personalProviderConnectionAvailable}
+      privateInspectorEnabled={accountCapabilityPolicy.account_type === "developer"}
       scope={agentRuntimePickerModel.selectedRuntime}
       onSelectPrivateApiChat={() => setConsoleChannel("private_api")} />,
   };
@@ -24187,7 +24146,7 @@ export function HelixAskPill({
               presentationSourceLabel: finalAnswerPresentation.sourceLabel,
               finalAnswerSourceLabel,
               transcriptTerminalSource: transcriptTerminal.source,
-            });
+            }) ?? "";
             const turnStreamRows = buildHelixContinuousTurnStreamRows({
               replyId: reply.id,
               question: reply.question,

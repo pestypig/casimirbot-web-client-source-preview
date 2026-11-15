@@ -1,0 +1,105 @@
+{
+  "observed_at": "2026-11-13T21:59:45.423327+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/HelixAskPill.tsx",
+      "canonical_sha256": "5861377b32a7a5fb7ddc341e423ca2f8d1bf21072a763351a61671b579b89014",
+      "export_sha256": "aded218e55487a485ec0aa8602e13589ae374fc32c1715250d361629cbc037ea",
+      "bytes": 1049184,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "e7533b46ff98c9c339ebdbe9adbcb9aea43bfebd4e02cdf2bdec490b5442b5a5"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeSubmitPlan.ts",
+      "canonical_sha256": "31a68b6200e73806f370dff49434bb58d7b023084bccd944a96f769b16eb82f0",
+      "export_sha256": "31a68b6200e73806f370dff49434bb58d7b023084bccd944a96f769b16eb82f0",
+      "bytes": 3569,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "c9f6f535de5478ffc476f64e9dc6c8303a14e7de73ae3d4c3af38a0d86055e63"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskSubmitBackendEntrypointOptions.ts",
+      "canonical_sha256": "63e87643260171a9263d6b4a465a7638a87eafb616ee40c42707316f8acfa993",
+      "export_sha256": "63e87643260171a9263d6b4a465a7638a87eafb616ee40c42707316f8acfa993",
+      "bytes": 5074,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "f25378c0914222be5dbbb0ead00f81a621e2ad1838d641d946f1588d9ac07817"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeTransport.ts",
+      "canonical_sha256": "8462b5ada9199b1e7fff3a51ee947392db87fa5702d4040ea7c1f4a2cebef28d",
+      "export_sha256": "8462b5ada9199b1e7fff3a51ee947392db87fa5702d4040ea7c1f4a2cebef28d",
+      "bytes": 7407,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "42214df64eae85469939f761dc7a9ef4e8dc66f181701c27d1e95e4b5354fc13"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyConsoleInventory.ts",
+      "canonical_sha256": "0fce3a7168107bca9d61ce8908d3983813d4e2e9ceac2af72390dacfcf400fe1",
+      "export_sha256": "abef8021f069fb6600588c1bc98db8303035ae2d74a8ca005476bb79f88bb036",
+      "bytes": 83435,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "e70edf78c9b631654b78c66ae08ac93b3a7de6fb4cb1f8514522a3c889da916c"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskBackendEntrypointPolicy.spec.ts",
+      "canonical_sha256": "e0c588def68e214301396d5d6450bba973fa2d99e382376cc2e87237e4ec8565",
+      "export_sha256": "e0c588def68e214301396d5d6450bba973fa2d99e382376cc2e87237e4ec8565",
+      "bytes": 23294,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "8ae3aa3a3da17581016aed959f507b1196140911dc86341d6ccc1698d91715a4"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskSubmitHandoffParity.spec.ts",
+      "canonical_sha256": "226da43970e5ed884357a249f74909063ad791136325541451c05d90d747bd94",
+      "export_sha256": "226da43970e5ed884357a249f74909063ad791136325541451c05d90d747bd94",
+      "bytes": 3838,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-ui.spec.tsx",
+      "canonical_sha256": "44afff626cca19ea9b845e32265153733fb67628f7d23647e5be370f0e5c9a2a",
+      "export_sha256": "6a3bf75070cd6fae10b993779287bb2a7f4dd14d499cc8e557d9b9c82e0bd218",
+      "bytes": 289920,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "aa560fa6c0ae536d05c268702fd8f1debb679daa89f2e47a9e19e8fa300bf490"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-recrown.spec.ts",
+      "canonical_sha256": "c7a598b6497b5ad235f982dfb82b854b2cb18c668a5c2230595988bb9f1789f5",
+      "export_sha256": "da7b63264e3632b523f21b2c10dae32da428ba186502092b335a1e109201e4d5",
+      "bytes": 524824,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "c35cc0722406794383973415c401b553445c9d9394a6c81a2a8975807f25ca3d"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/workstation/physicsGlyphAskContext.ts",
+      "canonical_sha256": "c13310d44b7e705ff735bf75d11e046e7332fcbba434bc578d8b045005f4f781",
+      "export_sha256": "c13310d44b7e705ff735bf75d11e046e7332fcbba434bc578d8b045005f4f781",
+      "bytes": 1288,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed all selected runtime deltas against the preview, complete submission-plan/options/transport modules, Pill policy/event and backend submit call sites, and changed test expectations. Pill is a large legacy module; review of its delta is not a claim that every retained line or interactive path was freshly requalified.",
+    "Pill now defaults unresolved account policy to signed-out, admits personal provider connections by their feature/lock policy, and keeps developer-only inspector controls separate. Pending server-admitted runtime provider is forwarded to the backend payload rather than replaced by the visible picker. These client choices do not grant model funding or program actions.",
+    "Existing submit options preserve explicit Realtime handoff metadata through hard-tool classification and merge. Active same-profile Physics Glyph context forces backend routing; its unchanged account-bound helper was read and retains indexed byte parity. Backend validation remains required.",
+    "Runtime fix 36 reuses one explicit Realtime handoff predicate in both submission owners. Minimal transport now preserves admitted room metadata, transcript binding and backend requirement even when speech is conceptual. A retained regression failed before this change; typed conceptual prompts with stale tool flags remain separate.",
+    "Updated the live legacy source line inventory, browser environment for the Live-controls renderer test, layout assertions for channel-owned composers/conditional control titles/expandable timeline, and extracted-helper ownership assertions. Audit expectations now use existing normalized capability names; the manual debug-answer fixture includes the required backend-observed receipt. No action admission was loosened to make tests pass.",
+    "The broad suites combine helper behavior, server-rendered markup and static source assertions. Export aliases exercise selected production modules, while static reads and unselected dependencies use canonical files. Selected canonical/export bytes are checked independently; this is not a fully assembled exported-app test."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal; fix 36 and earlier post-R380 changes remain uninstalled. No provider/model request, new read grant, room mutation or game action occurred.",
+    "These tests do not mount the complete legacy Pill, establish real account-switch/native concurrency, verify server authorization or produce a Minecraft effect. Matching installed/domain and signed ordinary-account acceptance remain open.",
+    "Static extraction/ownership assertions are maintenance checks, not standalone behavioral proof. The test import hook needed 60 seconds for the large module; no behavior timeout or product retry limit changed.",
+    "Source compilation retains external npm and separately scoped dependencies. Shared contracts, native services, remaining Console integration and public release approval remain separate.",
+    "Five intentional support-contact matches elsewhere remain for final publication review. No physics, adapter contract or certificate semantics changed."
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "observed_at": "2026-11-13T14:55:38.379194+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/store/useAgiChatStore.ts",
+      "canonical_sha256": "cd7a7871d7a89e46ac62ade2027fad079454c8b29768ae8d75150520fa215093",
+      "export_sha256": "cd7a7871d7a89e46ac62ade2027fad079454c8b29768ae8d75150520fa215093",
+      "previous_proposal_sha256": "fa2263dd7eabd8abd545686264359655963c1053e4bab1f99807bb4c5a132df2",
+      "bytes": 26447,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useAgiChatStore.account-scope.spec.ts",
+      "canonical_sha256": "44034a0036e065b481b3a5ce14eb9d00e06677185102741f3204986bd07796d5",
+      "export_sha256": "44034a0036e065b481b3a5ce14eb9d00e06677185102741f3204986bd07796d5",
+      "previous_proposal_sha256": null,
+      "bytes": 2698,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useAgiChatStore.appendMessageOnce.spec.ts",
+      "canonical_sha256": "acb212e281a1f9f85a0de8a81a384f62fee19e647e2936d28b1c9688c73a2d2e",
+      "export_sha256": "acb212e281a1f9f85a0de8a81a384f62fee19e647e2936d28b1c9688c73a2d2e",
+      "previous_proposal_sha256": "67a43f42bc6d9f53df76b52214a5ca636722d92c77dcd113f3756372eeaf73cd",
+      "bytes": 6673,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useAgiChatStore.pairedBinding.spec.ts",
+      "canonical_sha256": "2df2ae29d1ba68c808221084ee609d01bce42bca3eb9a54815e624db2b99fedb",
+      "export_sha256": "2df2ae29d1ba68c808221084ee609d01bce42bca3eb9a54815e624db2b99fedb",
+      "previous_proposal_sha256": "500ff74e9fd56b7fd9a8f54d2d7f4fd8eed55e2f60e1a9f1eac280b72aaf9fba",
+      "bytes": 1793,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useWorkspaceMemoryRegistryStore.ts",
+      "canonical_sha256": "95f98855c60f6ac20fbd11dbbd85de2525840585125aa5996a5f75c26451d805",
+      "export_sha256": "95f98855c60f6ac20fbd11dbbd85de2525840585125aa5996a5f75c26451d805",
+      "previous_proposal_sha256": "a9c389216760045bc1b92940f58349c2e0aa0cd54add7cd1dd25278b90b61b0e",
+      "bytes": 6424,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useWorkspaceMemoryRegistryStore.account-scope.spec.ts",
+      "canonical_sha256": "233a444c3a6ef5522980695f7e9831e250dfa4893b83d96f4eb27082d23ca194",
+      "export_sha256": "233a444c3a6ef5522980695f7e9831e250dfa4893b83d96f4eb27082d23ca194",
+      "previous_proposal_sha256": null,
+      "bytes": 2172,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/store/useAgiChatStore.concurrent-sessions.spec.ts",
+      "canonical_sha256": "bedf92a5d78a8d9e477f7e5bdc003748add3296e3ed44199aeffe43395aaab4f",
+      "export_sha256": "f1a7339d805059f3fd07ebc3c5353527ca3361cbf96247a43841e9266f6edf00"
+    }
+  ],
+  "review": [
+    "Read complete chat store, memory registry and all five related tests; shared chat/registry type definitions also inspected as omitted dependencies.",
+    "Chat sessions, current selection and cached task-binding projections use profile-specific storage. Unknown account identity, signed-out guest and named accounts have separate keys. Account events swap the in-memory store and persistence key together; legacy shared storage remains unclaimed.",
+    "Registry metadata follows the same profile key transition before chat artifacts are registered. This indexes storage and is not authorization for a server read, pairing, model run or game action.",
+    "appendMessageOnce suppresses duplicate IDs and preserves existing content on conflicts; only matching terminal-projection identity and recognized truncated-prefix shape can restore a saved long message. The UI helper itself does not cryptographically validate terminal evidence; its upstream producer remains responsible.",
+    "Chat persistence bounds saved sessions/message lengths and retries with smaller representations under quota pressure. Cached bindings remain projections, not current authority. Synthetic alpha/beta fixtures contain no live account messages or credentials.",
+    "No canonical source edits. Proposed exports are the existing source used by R379; normalization is line endings only."
+  ],
+  "limits": [
+    "Private source proposal only; no commit, push or new build.",
+    "Focused local-store tests cannot prove cross-device sync, complete transcript durability, server authorization or live friend delivery.",
+    "Existing concurrent-session test unchanged in public preview.",
+    "Account policy is an earlier reviewed export dependency. Shared schemas and external dependencies remain separate source inputs."
+  ]
+}

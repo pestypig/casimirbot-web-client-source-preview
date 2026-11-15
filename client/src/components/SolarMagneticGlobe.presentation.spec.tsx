@@ -5,14 +5,16 @@ import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/reac
 import {solarGlobalRadialMapContentId,solarGlobalRadialMapSchema} from '../../../shared/solar-magnetic-dipole';
 import {prepareSolarMagneticViewRecipe} from '../../../shared/solar-magnetic-view-recipe';
 import {prepareSolarMagneticComparisonBundle} from '../../../shared/solar-magnetic-comparison-bundle';
-import {HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT} from '../lib/workstation/accountCapabilityPolicy';
+import {cacheAccountCapabilityPolicy} from '../lib/workstation/accountCapabilityPolicy';
+import {HELIX_USER_ACCOUNT_POLICY} from '../../../shared/helix-account-session';
 
 vi.mock('@react-three/fiber',()=>({Canvas:()=>React.createElement('canvas',{'aria-label':'rendered globe'}),useThree:()=>({})}));
 vi.mock('@react-three/drei',()=>({Line:()=>null,OrbitControls:()=>null}));
 import {SolarMagneticGlobe} from './SolarMagneticGlobe';
 
-beforeEach(()=>{vi.spyOn(HTMLCanvasElement.prototype,'getContext').mockReturnValue({} as any);});
-afterEach(()=>{cleanup();vi.restoreAllMocks();});
+beforeEach(()=>{cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY,'profile-one');
+  vi.spyOn(HTMLCanvasElement.prototype,'getContext').mockReturnValue({} as any);});
+afterEach(()=>{cleanup();vi.unstubAllGlobals();vi.restoreAllMocks();});
 
 it('loads the owner-retained exact bundle through the UI route and acknowledges its rendered identities',async()=>{
   const map=solarGlobalRadialMapSchema.parse({schemaVersion:'solar-global-radial-map/1',
@@ -40,6 +42,8 @@ it('loads the owner-retained exact bundle through the UI route and acknowledges 
     if(url.endsWith('/magnetic-presentation/presence')){
       revision=JSON.parse(String(init?.body)).revision;return json({ok:true});
     }
+    if(url.includes('/magnetic-presentation/import/pending?'))
+      return {ok:true,status:200,json:async()=>({request:null})};
     if(url.includes('/magnetic-presentation/pending?'))
       return json({ok:true,request:{requestId,expectedRevision:revision,bundleId:bundle.bundleId,
         expected:{bundleId:bundle.bundleId,mapContentId,pfssModelId:null,viewRecipeId:view.recipeId}}});
@@ -64,10 +68,12 @@ it('loads the owner-retained exact bundle through the UI route and acknowledges 
 
 it('does not load or acknowledge an MCP request when WebGL is unavailable',async()=>{
   vi.spyOn(HTMLCanvasElement.prototype,'getContext').mockReturnValue(null);
-  const fetcher=vi.fn(async(input:RequestInfo|URL)=>{
+  const fetcher=vi.fn(async(input:RequestInfo|URL,_init?:RequestInit)=>{
     const url=String(input);
     if(url.endsWith('/magnetic-presentation/presence'))
       return {ok:true,json:async()=>({ok:true})};
+    if(url.includes('/magnetic-presentation/import/pending?'))
+      return {ok:true,status:200,json:async()=>({request:null})};
     if(url.includes('/magnetic-presentation/pending?'))
       return {ok:true,json:async()=>({request:{requestId:'22222222-2222-4222-8222-222222222222',
         expectedRevision:1,bundleId:'solar-magnetic-bundle:'+'a'.repeat(64)}})};
@@ -112,6 +118,8 @@ it('does not replace a human-changed globe while the retained bundle is loading'
     if(url.endsWith('/magnetic-presentation/presence')){
       revision=JSON.parse(String(init?.body)).revision;return json({ok:true});
     }
+    if(url.includes('/magnetic-presentation/import/pending?'))
+      return {ok:true,status:200,json:async()=>({request:null})};
     if(url.includes('/magnetic-presentation/pending?'))
       return json({ok:true,request:{requestId:'22222222-2222-4222-8222-222222222222',
         expectedRevision:revision,bundleId:bundle.bundleId,
@@ -146,6 +154,8 @@ it('stops before owner bundle fetch if the account changes during session inspec
     if(url.endsWith('/magnetic-presentation/presence')){
       revision=JSON.parse(String(init?.body)).revision;return json({ok:true});
     }
+    if(url.includes('/magnetic-presentation/import/pending?'))
+      return {ok:true,status:200,json:async()=>({request:null})};
     if(url.includes('/magnetic-presentation/pending?'))
       return json({ok:true,request:{requestId:'22222222-2222-4222-8222-222222222222',
         expectedRevision:revision,bundleId:'solar-magnetic-bundle:'+'a'.repeat(64)}});
@@ -157,7 +167,7 @@ it('stops before owner bundle fetch if the account changes during session inspec
   render(<SolarMagneticGlobe/>);
   await waitFor(()=>expect(accountStarted).toBe(true));
   await act(async()=>{
-    window.dispatchEvent(new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT));
+    cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY,'profile-two');
     resolveAccount(jsonSession());
     await accountGate;
     await Promise.resolve();

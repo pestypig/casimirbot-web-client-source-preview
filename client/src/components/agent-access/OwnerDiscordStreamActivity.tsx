@@ -7,17 +7,18 @@ import { useGrantedCodexStreamActivity, type LocalCodexStreamGrant } from
 
 /** Ordinary linked owners get an activity Float without Cloud Agent DM access.
  * Every Codex frame comes from an exact, account-scoped native read grant. */
-export function OwnerDiscordStreamActivity({ roomId, open, grants, adapterPages,
+export function OwnerDiscordStreamActivity({ roomId, open, streamActive, grants, adapterPages,
   onActivityFrame }: {
   roomId: string;
   open: boolean;
+  streamActive: boolean;
   grants: readonly LocalCodexStreamGrant[];
   adapterPages: readonly HelixAdapterAiActivityPage[];
   onActivityFrame: (frame: HelixMessageCloudFrame) => void;
 }) {
-  const pages = useGrantedCodexStreamActivity(grants, open);
+  const pages = useGrantedCodexStreamActivity(grants, open || streamActive);
   useEffect(() => {
-    if (!open || !window.casimirDesktop?.showMessageCloud) return;
+    if ((!open && !streamActive) || !window.casimirDesktop) return;
     const frame = projectSessionActivity({
       helixConversationId: roomId,
       messages: [], codexFrame: null, codexSourceStatus: "unpaired",
@@ -31,8 +32,9 @@ export function OwnerDiscordStreamActivity({ roomId, open, grants, adapterPages,
       savedAdapterChats: grants.flatMap(grant => grant.helixConversationId
         ? [{ id: grant.helixConversationId, title: grant.title }] : []),
     });
-    void window.casimirDesktop.showMessageCloud(frame).catch(() => {});
+    if (open && window.casimirDesktop.showMessageCloud)
+      void window.casimirDesktop.showMessageCloud(frame).catch(() => {});
     onActivityFrame(frame);
-  }, [roomId, open, grants, pages, adapterPages, onActivityFrame]);
+  }, [roomId, open, streamActive, grants, pages, adapterPages, onActivityFrame]);
   return null;
 }

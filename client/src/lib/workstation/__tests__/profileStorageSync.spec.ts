@@ -16,10 +16,13 @@ import {
   useProfileStorageSync,
 } from "../profileStorageSync";
 import { useWorkspaceMemoryRegistryStore } from "@/store/useWorkspaceMemoryRegistryStore";
-import { useAgiChatStore } from "@/store/useAgiChatStore";
-import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "../accountCapabilityPolicy";
+import { agiChatStorageKeyForProfile, useAgiChatStore } from "@/store/useAgiChatStore";
+import { clipboardStorageKeyForProfile } from "@/store/useWorkstationClipboardStore";
+import { notesStorageKeyForProfile } from "@/store/useWorkstationNotesStore";
+import { cacheAccountCapabilityPolicy, HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "../accountCapabilityPolicy";
 
 const profileId = "user:test-profile";
+const scopedChatKey = agiChatStorageKeyForProfile(profileId);
 const emptyRegistry = (): HelixWorkspaceMemoryRegistrySnapshot => ({
   schema: "helix.workspace_memory_registry.v1",
   artifacts: [],
@@ -40,7 +43,7 @@ const registryWithProfileCandidate = (): HelixWorkspaceMemoryRegistrySnapshot =>
     profile_id: null,
     chat_session_id: "chat:test",
     title: "Browser chat",
-    storage_key: "agi-chat-sessions-v1",
+    storage_key: scopedChatKey,
     updated_at: "2026-07-06T12:00:00.000Z",
   }],
   local_only_artifact_count: 0,
@@ -50,6 +53,7 @@ const registryWithProfileCandidate = (): HelixWorkspaceMemoryRegistrySnapshot =>
 
 afterEach(() => {
   cleanup();
+  cacheAccountCapabilityPolicy(null, null);
   useAgiChatStore.setState({ sessions: {}, activeId: undefined, hydrated: false });
   useWorkspaceMemoryRegistryStore.setState({ artifacts: {} });
   window.localStorage.clear();
@@ -197,7 +201,211 @@ describe("O5 profile recovery before backup", () => {
     expect(payload.artifacts.every(artifact => artifact.profile_id === profileId)).toBe(true);
   });
 
-  for (const storageKey of ["fixture:agent-preferences", "agi-chat-sessions-v1"]) {
+  it("does not attach the shared legacy Notes key to a signed-in profile", () => {
+    const registry = registryWithProfileCandidate();
+    registry.artifacts = [{
+      ...registry.artifacts[0],
+      artifact_id: "workstation-note:legacy",
+      artifact_type: "workstation_note",
+      storage_key: "workstation-notes:v1",
+      owner_scope: "profile",
+      profile_id: profileId,
+      sync_status: "profile_synced",
+    }];
+    localStorage.setItem("workstation-notes:v1", "legacy note content");
+    const payload = buildProfileStoragePayload(registry, profileId);
+    expect(payload.entries).toEqual([]);
+    expect(payload.artifacts).toEqual([]);
+    expect(localStorage.getItem("workstation-notes:v1")).toBe("legacy note content");
+  });
+
+  it("never uploads a shared clipboard key or another profile's scoped history", () => {
+    const candidate = registryWithProfileCandidate().artifacts[0];
+    const otherKey = clipboardStorageKeyForProfile("profile:other");
+    const registry = emptyRegistry();
+    registry.artifacts = [
+      { ...candidate, artifact_id: "clipboard:legacy", storage_key: "workstation-clipboard-history:v1",
+        owner_scope: "profile", profile_id: profileId },
+      { ...candidate, artifact_id: "clipboard:other", storage_key: otherKey,
+        owner_scope: "profile", profile_id: profileId },
+    ];
+    localStorage.setItem("workstation-clipboard-history:v1", "legacy clipboard");
+    localStorage.setItem(otherKey, "another account's clipboard");
+    const payload = buildProfileStoragePayload(registry, profileId);
+    expect(payload.entries).toEqual([]);
+    expect(payload.artifacts).toEqual([]);
+    expect(localStorage.getItem("workstation-clipboard-history:v1")).toBe("legacy clipboard");
+    expect(localStorage.getItem(otherKey)).toBe("another account's clipboard");
+  });
+
+  it("does not restore shared or foreign clipboard history from a profile snapshot", async () => {
+    vi.useFakeTimers();
+    const otherKey = clipboardStorageKeyForProfile("profile:other");
+    localStorage.setItem("workstation-clipboard-history:v1", "current shared clipboard");
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      if (String(input) === "/api/account/session") {
+        return new Response(JSON.stringify({ session: { profile: { profile_id: profileId } } }));
+      }
+      return new Response(JSON.stringify({
+        schema: "helix.profile_storage_snapshot.v1", profile_id: profileId,
+        storage_backend: "profile_server",
+        entries: [
+          { storage_key: "workstation-clipboard-history:v1", storage_backend: "localStorage",
+            value: "old shared clipboard", size_bytes: 20, updated_at: "2026-10-15T00:00:00.000Z",
+            artifact_ids: ["clipboard:legacy"] },
+          { storage_key: otherKey, storage_backend: "localStorage",
+            value: "another account's clipboard", size_bytes: 27,
+            updated_at: "2026-10-15T00:00:00.000Z", artifact_ids: ["clipboard:other"] },
+        ],
+        artifacts: [
+          { ...registryWithProfileCandidate().artifacts[0], artifact_id: "clipboard:legacy",
+            storage_key: "workstation-clipboard-history:v1" },
+          { ...registryWithProfileCandidate().artifacts[0], artifact_id: "clipboard:other",
+            storage_key: otherKey },
+        ],
+        total_entry_bytes: 47, quota_bytes: 1024, updated_at: null,
+        raw_profile_content_included: true,
+      }));
+    }));
+    render(React.createElement(ProfileStorageSyncHarness));
+    await act(async () => { await Promise.resolve(); });
+    expect(localStorage.getItem("workstation-clipboard-history:v1"))
+      .toBe("current shared clipboard");
+    expect(localStorage.getItem(otherKey)).toBeNull();
+    expect(useWorkspaceMemoryRegistryStore.getState().artifacts["clipboard:legacy"])
+      .toBeUndefined();
+    expect(useWorkspaceMemoryRegistryStore.getState().artifacts["clipboard:other"])
+      .toBeUndefined();
+  });
+
+  it("backs up only the current account's scoped Notes key", () => {
+    const currentKey = notesStorageKeyForProfile(profileId);
+    const otherKey = notesStorageKeyForProfile("profile:other");
+    const candidate = registryWithProfileCandidate().artifacts[0];
+    const registry = emptyRegistry();
+    registry.artifacts = [
+      { ...candidate, artifact_id: "workstation-note:current", artifact_type: "workstation_note",
+        storage_key: currentKey, owner_scope: "profile", profile_id: profileId },
+      { ...candidate, artifact_id: "workstation-note:other", artifact_type: "workstation_note",
+        storage_key: otherKey, owner_scope: "profile", profile_id: profileId },
+    ];
+    localStorage.setItem(currentKey, "current notes");
+    localStorage.setItem(otherKey, "other notes");
+    const payload = buildProfileStoragePayload(registry, profileId);
+    expect(payload.entries.map(entry => entry.storage_key)).toEqual([currentKey]);
+    expect(payload.artifacts.map(artifact => artifact.profile_id)).toEqual([profileId]);
+    expect(localStorage.getItem(otherKey)).toBe("other notes");
+  });
+
+  it("does not restore another account's scoped Notes key", async () => {
+    vi.useFakeTimers();
+    const otherKey = notesStorageKeyForProfile("profile:other");
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      if (String(input) === "/api/account/session") {
+        return new Response(JSON.stringify({ session: { profile: { profile_id: profileId } } }));
+      }
+      return new Response(JSON.stringify({
+        schema: "helix.profile_storage_snapshot.v1", profile_id: profileId,
+        storage_backend: "profile_server",
+        entries: [{ storage_key: otherKey, storage_backend: "localStorage",
+          value: "another account's notes", size_bytes: 23,
+          updated_at: "2026-10-15T00:00:00.000Z", artifact_ids: ["workstation-note:other"] }],
+        artifacts: [{ ...registryWithProfileCandidate().artifacts[0],
+          artifact_id: "workstation-note:other", artifact_type: "workstation_note",
+          storage_key: otherKey }],
+        total_entry_bytes: 23, quota_bytes: 1024, updated_at: null,
+        raw_profile_content_included: true,
+      }));
+    }));
+    render(React.createElement(ProfileStorageSyncHarness));
+    await act(async () => { await Promise.resolve(); });
+    expect(localStorage.getItem(otherKey)).toBeNull();
+    expect(useWorkspaceMemoryRegistryStore.getState().artifacts["workstation-note:other"])
+      .toBeUndefined();
+  });
+
+  it("does not restore a profile snapshot over the shared legacy Notes key", async () => {
+    vi.useFakeTimers();
+    localStorage.setItem("workstation-notes:v1", "current local notes");
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      if (String(input) === "/api/account/session") {
+        return new Response(JSON.stringify({ session: { profile: { profile_id: profileId } } }));
+      }
+      return new Response(JSON.stringify({
+        schema: "helix.profile_storage_snapshot.v1",
+        profile_id: profileId,
+        storage_backend: "profile_server",
+        entries: [{
+          storage_key: "workstation-notes:v1",
+          storage_backend: "localStorage",
+          value: "another account's notes",
+          size_bytes: 23,
+          updated_at: "2026-10-15T00:00:00.000Z",
+          artifact_ids: ["workstation-note:legacy"],
+        }],
+        artifacts: [{
+          ...registryWithProfileCandidate().artifacts[0],
+          artifact_id: "workstation-note:legacy",
+          artifact_type: "workstation_note",
+          storage_key: "workstation-notes:v1",
+        }],
+        total_entry_bytes: 23,
+        quota_bytes: 1024,
+        updated_at: null,
+        raw_profile_content_included: true,
+      }));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(React.createElement(ProfileStorageSyncHarness));
+    await act(async () => { await Promise.resolve(); });
+    expect(fetchMock).toHaveBeenCalledWith("/api/account/profile-storage/snapshot", expect.anything());
+    expect(localStorage.getItem("workstation-notes:v1")).toBe("current local notes");
+    expect(useWorkspaceMemoryRegistryStore.getState().artifacts["workstation-note:legacy"]).toBeUndefined();
+  });
+
+  it("never uploads the shared legacy chat key even when its artifact is relabeled to this profile", () => {
+    const registry = registryWithProfileCandidate();
+    registry.artifacts[0] = { ...registry.artifacts[0],
+      storage_key: "agi-chat-sessions-v1", owner_scope: "profile", profile_id: profileId };
+    localStorage.setItem("agi-chat-sessions-v1", JSON.stringify({ state: {
+      sessions: { old: { id: "old", title: "Unassigned chat", messages: [] } },
+    } }));
+    const payload = buildProfileStoragePayload(registry, profileId);
+    expect(payload.entries).toEqual([]);
+    expect(payload.artifacts).toEqual([]);
+    expect(localStorage.getItem("agi-chat-sessions-v1")).toContain("Unassigned chat");
+  });
+
+  it("does not restore a profile snapshot over the shared legacy chat key", async () => {
+    vi.useFakeTimers();
+    cacheAccountCapabilityPolicy(null, profileId);
+    localStorage.setItem("agi-chat-sessions-v1", "current unassigned chat");
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      if (String(input) === "/api/account/session") {
+        return new Response(JSON.stringify({ session: { profile: { profile_id: profileId } } }));
+      }
+      return new Response(JSON.stringify({
+        schema: "helix.profile_storage_snapshot.v1", profile_id: profileId,
+        storage_backend: "profile_server",
+        entries: [{ storage_key: "agi-chat-sessions-v1", storage_backend: "localStorage",
+          value: "old server chat", size_bytes: 15, updated_at: "2026-10-15T00:00:00.000Z",
+          artifact_ids: ["helix-chat-storage:legacy"] }],
+        artifacts: [{ ...registryWithProfileCandidate().artifacts[0],
+          artifact_id: "helix-chat-storage:legacy", storage_key: "agi-chat-sessions-v1" }],
+        total_entry_bytes: 15, quota_bytes: 1024, updated_at: null,
+        raw_profile_content_included: true,
+      }));
+    }));
+    render(React.createElement(ProfileStorageSyncHarness));
+    await act(async () => { await Promise.resolve(); });
+    expect(localStorage.getItem("agi-chat-sessions-v1")).toBe("current unassigned chat");
+    expect(useAgiChatStore.getState().sessions).toEqual({});
+    expect(useWorkspaceMemoryRegistryStore.getState().artifacts["helix-chat-storage:legacy"])
+      .toBeUndefined();
+  });
+
+  for (const storageKey of ["fixture:agent-preferences", "agi-chat-sessions-v1",
+    agiChatStorageKeyForProfile("profile:other")]) {
     it(`O5 identity: excludes another profile's ${storageKey} without relabeling or deleting it`, () => {
       const registry = registryWithProfileCandidate();
       registry.artifacts[0] = { ...registry.artifacts[0], storage_key: storageKey,
@@ -259,6 +467,7 @@ describe("O5 profile recovery before backup", () => {
   for (const failure of ["unavailable", "wrong_profile", "hung_body"] as const) {
     it(`blocks backup after ${failure}, then retries restoration before saving`, async () => {
       vi.useFakeTimers();
+      cacheAccountCapabilityPolicy(null, profileId);
       useAgiChatStore.getState().newSession("Fresh unsynced chat");
       let failRestore = true;
       let restoreReads = 0;
@@ -335,6 +544,7 @@ describe("O5 profile recovery before backup", () => {
 
   it("also pauses an existing backup queue when a remount cannot restore the profile", async () => {
     vi.useFakeTimers();
+    cacheAccountCapabilityPolicy(null, profileId);
     useAgiChatStore.getState().newSession("Queued fixture chat");
     let restoreUnavailable = false;
     let posts = 0;
@@ -366,6 +576,56 @@ describe("O5 profile recovery before backup", () => {
 });
 
 describe("profile storage sync consent", () => {
+  it.each(["debounced", "interval"] as const)("detaching stops %s backup, preserves its queue and survives remount until reattached", async (source) => {
+    vi.useFakeTimers();
+    const candidate = { ...registryWithProfileCandidate().artifacts[0], storage_key: "fixture:detach" };
+    localStorage.setItem(candidate.storage_key, "retained unsynced content");
+    useWorkspaceMemoryRegistryStore.getState().upsertArtifact(candidate);
+    let posts = 0;
+    const heldPost = source === "debounced" ? 1 : 2;
+    let finish!: (response: Response) => void;
+    let heldSignal: AbortSignal | undefined;
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (String(input) === "/api/account/session") return new Response(JSON.stringify({ session: { profile: { profile_id: profileId } } }));
+      if (init?.method === "POST") {
+        posts++;
+        if (posts === heldPost) {
+          heldSignal = init.signal ?? undefined;
+          return new Promise<Response>(resolve => { finish = resolve; });
+        }
+        return new Response(JSON.stringify({ ok: posts > heldPost, message: "fixture offline" }));
+      }
+      return new Response(JSON.stringify({ profile_id: profileId, entries: [], artifacts: [] }));
+    }));
+    const view = render(React.createElement(ProfileStorageSyncHarness));
+    await act(async () => { await Promise.resolve(); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(source === "debounced" ? 1500 : 12_000); });
+    expect(posts).toBe(heldPost);
+    const queueKey = `helix.profileStorage.pendingSync:${profileId}`;
+    const queued = localStorage.getItem(queueKey);
+    expect(queued).toContain("retained unsynced content");
+    await act(async () => { revokeProfileStorageAttachConsent(profileId); });
+    expect(heldSignal?.aborted).toBe(true);
+    await act(async () => {
+      finish(new Response(JSON.stringify({ ok: true })));
+      await vi.advanceTimersByTimeAsync(24_000);
+    });
+    expect(posts).toBe(heldPost);
+    expect(localStorage.getItem(queueKey)).toBe(queued);
+    view.unmount();
+    render(React.createElement(ProfileStorageSyncHarness));
+    await act(async () => { await Promise.resolve(); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(15_000); });
+    expect(isProfileStorageAttachConsentGranted(profileId)).toBe(false);
+    expect(posts).toBe(heldPost);
+    expect(localStorage.getItem(queueKey)).toBe(queued);
+    await act(async () => { grantProfileStorageAttachConsent(profileId); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(1500); });
+    expect(posts).toBe(heldPost + 1);
+    expect(localStorage.getItem(queueKey)).toBeNull();
+    expect(localStorage.getItem(candidate.storage_key)).toBe("retained unsynced content");
+  });
+
   it("does not save browser-local profile candidates until attach consent is granted", () => {
     const registry = registryWithProfileCandidate();
 
@@ -387,7 +647,7 @@ describe("profile storage sync consent", () => {
 
     revokeProfileStorageAttachConsent(profileId);
 
-    expect(window.localStorage.getItem(profileStorageAttachConsentKey(profileId))).toBeNull();
+    expect(window.localStorage.getItem(profileStorageAttachConsentKey(profileId))).toBe("0");
     expect(shouldSaveProfileStorageSnapshot({ profileId, registry })).toBe(false);
   });
 
@@ -455,6 +715,7 @@ describe("profile storage sync consent", () => {
   });
 
   it("captures Helix Ask chats as profile storage even before registry rehydration", () => {
+    cacheAccountCapabilityPolicy(null, profileId);
     const chatState = JSON.stringify({
       state: {
         sessions: {
@@ -472,7 +733,7 @@ describe("profile storage sync consent", () => {
       },
       version: 0,
     });
-    window.localStorage.setItem("agi-chat-sessions-v1", chatState);
+    window.localStorage.setItem(scopedChatKey, chatState);
     grantProfileStorageAttachConsent(profileId);
 
     expect(shouldSaveProfileStorageSnapshot({ profileId, registry: emptyRegistry() })).toBe(true);
@@ -480,22 +741,23 @@ describe("profile storage sync consent", () => {
     const payload = buildProfileStoragePayload(emptyRegistry(), profileId);
     expect(payload.artifacts).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        artifact_id: "helix-chat-storage:agi-chat-sessions-v1",
+        artifact_id: `helix-chat-storage:${scopedChatKey}`,
         artifact_type: "helix_chat_session",
-        storage_key: "agi-chat-sessions-v1",
+        storage_key: scopedChatKey,
       }),
     ]));
     expect(payload.entries).toEqual(expect.arrayContaining([
       expect.objectContaining({
-        storage_key: "agi-chat-sessions-v1",
+        storage_key: scopedChatKey,
         value: chatState,
-        artifact_ids: ["helix-chat-storage:agi-chat-sessions-v1"],
+        artifact_ids: [`helix-chat-storage:${scopedChatKey}`],
       }),
     ]));
   });
 
   it("auto-attaches signed-in profiles so local Helix Ask chats are written", async () => {
     vi.useFakeTimers();
+    cacheAccountCapabilityPolicy(null, profileId);
     const chatState = JSON.stringify({
       state: {
         sessions: {
@@ -513,7 +775,7 @@ describe("profile storage sync consent", () => {
       },
       version: 0,
     });
-    window.localStorage.setItem("agi-chat-sessions-v1", chatState);
+    window.localStorage.setItem(scopedChatKey, chatState);
     const postedSnapshots: unknown[] = [];
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
@@ -560,7 +822,7 @@ describe("profile storage sync consent", () => {
     expect(postedSnapshots).toHaveLength(1);
     expect(postedSnapshots[0]).toMatchObject({
       entries: [expect.objectContaining({
-        storage_key: "agi-chat-sessions-v1",
+        storage_key: scopedChatKey,
         value: chatState,
       })],
     });
@@ -568,6 +830,7 @@ describe("profile storage sync consent", () => {
 
   it("restores profile Helix Ask chats into the live chat store before backup", async () => {
     vi.useFakeTimers();
+    cacheAccountCapabilityPolicy(null, profileId);
     const chatState = JSON.stringify({
       state: {
         sessions: {
@@ -607,12 +870,12 @@ describe("profile storage sync consent", () => {
           profile_id: profileId,
           storage_backend: "profile_server",
           entries: [{
-            storage_key: "agi-chat-sessions-v1",
+            storage_key: scopedChatKey,
             storage_backend: "localStorage",
             value: chatState,
             size_bytes: chatState.length,
             updated_at: "2026-07-07T03:01:00.000Z",
-            artifact_ids: ["helix-chat-storage:agi-chat-sessions-v1"],
+            artifact_ids: [`helix-chat-storage:${scopedChatKey}`],
           }],
           artifacts: [],
           total_entry_bytes: chatState.length,
@@ -646,7 +909,7 @@ describe("profile storage sync consent", () => {
     normalized.state.reasoningTaskBindings = {};
     expect(postedSnapshots[0]).toMatchObject({
       entries: [expect.objectContaining({
-        storage_key: "agi-chat-sessions-v1",
+        storage_key: scopedChatKey,
         value: JSON.stringify(normalized),
       })],
     });
@@ -690,7 +953,8 @@ describe("profile storage sync consent", () => {
 
   it("keeps a browser-local pending sync queue when profile backup fails and clears it after retry", async () => {
     vi.useFakeTimers();
-    window.localStorage.setItem("agi-chat-sessions-v1", JSON.stringify([{ id: "chat:test" }]));
+    cacheAccountCapabilityPolicy(null, profileId);
+    window.localStorage.setItem(scopedChatKey, JSON.stringify([{ id: "chat:test" }]));
     useWorkspaceMemoryRegistryStore.getState().upsertArtifact({
       artifact_id: "artifact:chat",
       artifact_type: "helix_chat_session",
@@ -700,7 +964,7 @@ describe("profile storage sync consent", () => {
       profile_id: null,
       chat_session_id: "chat:test",
       title: "Browser chat",
-      storage_key: "agi-chat-sessions-v1",
+      storage_key: scopedChatKey,
       updated_at: "2026-07-06T12:00:00.000Z",
     });
     grantProfileStorageAttachConsent(profileId);

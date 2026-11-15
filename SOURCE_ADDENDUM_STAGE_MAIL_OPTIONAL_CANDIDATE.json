@@ -1,0 +1,54 @@
+{
+  "observed_at": "2026-11-14T03:08:28.253357+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/panels/StagePlayBadgeGraphPanel.tsx",
+      "canonical_sha256": "ebde0a19d74101b996cc925dd6ccd092d77d2b30041ec437127b991246a2b82b",
+      "export_sha256": "ebde0a19d74101b996cc925dd6ccd092d77d2b30041ec437127b991246a2b82b",
+      "bytes": 623471,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "f5d8e0b9238da3d16dcf39b92e1bfc69a4ab72ddaa308d498f0e7495887de676"
+    },
+    {
+      "path": "client/src/components/__tests__/stage-play-badge-graph-panel.spec.tsx",
+      "canonical_sha256": "601fcf6b5c6e7d98c3d0e264c59d6edb164a3772911efa2b0eeee493cad64d68",
+      "export_sha256": "601fcf6b5c6e7d98c3d0e264c59d6edb164a3772911efa2b0eeee493cad64d68",
+      "bytes": 215904,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "6c55c781d047cd72a60ec04c80524bc47b1ddd88bcfd49a9dda1fe97717100d3"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [],
+  "runtime_fix_number": 58,
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Passive Stage Play mail rendering",
+    "capability": "Optional wake and mail metadata display",
+    "lifecycle_stage": "Existing mailbox render",
+    "reaction_timescale": "Panel refresh",
+    "authority_owner": "Existing server mail/wake/room grants",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with optional-field-safe rendering",
+    "required_evidence": "Mounted regression before/after, existing full panel suite, scoped compiler",
+    "explicit_non_goals": "No wake dispatch, pairing, program action, provider invocation, terminal claim or mail schema changes",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "A wake with a deck but no optional packetIds previously crashed while computing deck colors. The display now uses the existing wake-request fallback when no packet ID is present.",
+    "An omitted mail analysisState previously crashed label formatting. Missing analysis/freshness now display unknown; absent confidence retains the warning tone without pretending a numeric value.",
+    "The evidence-reference sorter declares the optional strings it already receives and explicitly narrows its existing truthy filter; sorting and empty-value exclusion remain unchanged.",
+    "Two mounted regressions use the existing panel harness and assert no non-GET requests. The corrected baseline failed at the packet-index and label-formatting sites. An initial fixture accidentally used items instead of mailItems; its partial result is retained but not used as evidence for both defects.",
+    "Both source and suite matched public preview before this slice. Only these reviewed changes are newly qualified; other existing Stage Play contract errors remain open.",
+    "Adding the existing suite to the reviewed compiler roots exposed seven pre-existing fixture diagnostics. The pointer helper now uses the testing-library target type, five dot-all expressions use equivalent ES2017-compatible character classes, and the environment fixture uses its actual observation_not_assistant_answer context role. Original assertions and production authority are preserved.",
+    "The existing environment identity fixture now supplies the full current LiveAnswerEnvironment contract: line schema, lines, subgoals, summary and compact-context/raw-data flags replace obsolete line_keys, active_lines and token_budget fields. Query identity assertions are unchanged. Both intermediate compiler receipts are retained."
+  ],
+  "limits": [
+    "Unfrozen, unpublished, uninstalled source qualification. Mocked queries prove panel behavior, not authenticated room membership or game/GPT Live delivery.",
+    "The fixture exercises optional fields, not arbitrary malformed nested data. Model/provider and program actions remain outside this check."
+  ]
+}

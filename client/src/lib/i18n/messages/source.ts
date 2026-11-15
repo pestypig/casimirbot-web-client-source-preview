@@ -1941,7 +1941,7 @@ export const interfaceSourceMessages = {
   },
   "account.discord.title": {
     id: "account.discord.title",
-    defaultMessage: "Discord Companion Sessions",
+    defaultMessage: "Active Discord command sessions",
     description: "Section title for Discord companion sessions.",
     context: "Account panel Discord section.",
     glossaryTerms: ["session"],
@@ -1949,7 +1949,7 @@ export const interfaceSourceMessages = {
   },
   "account.discord.description": {
     id: "account.discord.description",
-    defaultMessage: "Linked Discord sessions use web profile linking. The bot never collects account passwords.",
+    defaultMessage: "This list shows active command sessions on this installation. A remembered Captain Keyes account link may still be active on the website; check /helix status in Discord. The bot never collects account passwords.",
     description: "Security note for Discord session linking.",
     context: "Account panel Discord section.",
     glossaryTerms: ["profile", "session"],
@@ -1957,7 +1957,7 @@ export const interfaceSourceMessages = {
   },
   "account.discord.empty": {
     id: "account.discord.empty",
-    defaultMessage: "No Discord companion sessions are active.",
+    defaultMessage: "No active Discord command sessions are visible here. This does not mean a remembered account link was removed.",
     description: "Empty state for Discord companion sessions.",
     context: "Account panel Discord section.",
     glossaryTerms: ["session"],

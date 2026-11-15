@@ -26,7 +26,8 @@ import {
 import { useAgiChatStore } from "@/store/useAgiChatStore";
 import { useWorkspaceMemoryRegistryStore } from "@/store/useWorkspaceMemoryRegistryStore";
 import { buildProfileStoragePayload } from "@/lib/workstation/profileStorageSync";
-import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/accountCapabilityPolicy";
+import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, cacheAccountCapabilityPolicy } from "@/lib/workstation/accountCapabilityPolicy";
+import { HELIX_DEVELOPER_ACCOUNT_POLICY, HELIX_USER_ACCOUNT_POLICY } from "@shared/helix-account-session";
 import { AGENT_CONNECTION_INVALIDATED_EVENT } from "@/lib/agent-access/connectionObservation";
 
 const response = (body: unknown, status = 200): Response =>
@@ -141,6 +142,7 @@ const nativeFetch = (
 beforeEach(() => {
   window.history.replaceState(null, "", "/");
   window.localStorage.clear();
+  cacheAccountCapabilityPolicy(HELIX_DEVELOPER_ACCOUNT_POLICY);
   delete window.casimirDesktop;
   useAgiChatStore.setState({ activeId: undefined });
   useWorkspaceMemoryRegistryStore.setState({ artifacts: {} });
@@ -148,6 +150,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  cacheAccountCapabilityPolicy(null);
   vi.useRealTimers();
   clearPendingWorkstationGuidance();
   vi.unstubAllGlobals();
@@ -155,6 +158,204 @@ afterEach(() => {
 });
 
 describe("AgentConnectionSetup", () => {
+  it("checks an ordinary account without developer trust reads or native developer startup", async () => {
+    cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY);
+    const startMcpTunnel = vi.fn();
+    window.casimirDesktop = {
+      getRuntimeSnapshot: vi.fn(async () => null),
+      getMcpTunnelState: vi.fn(async () => fullTunnelState),
+      startMcpTunnel,
+    };
+    const fetchMock = nativeFetch(() => response(connectionStatus(false)));
+    vi.stubGlobal("fetch", fetchMock);
+    render(<AgentConnectionSetup />);
+    expect(screen.queryByRole("button", { name: "Start Harness" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Trust this device for Full Harness" })).not.toBeInTheDocument();
+    expect(screen.queryByText(/installed private MCP tunnel/)).not.toBeInTheDocument();
+    expect(screen.getByText(/A personal Full Harness connection is not available in this build/)).toBeInTheDocument();
+    expect(screen.getByTestId("agent-setup-shared-status")).toHaveTextContent(
+      "Personal Codex transport: not available",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Check connection" }));
+    await waitFor(() => expect(fetchMock.mock.calls.some(([url]) => String(url).startsWith(AGENT_CONNECTION_READINESS_ENDPOINT))).toBe(true));
+    expect(await screen.findByText(/Connection check complete\. Review the transport and exact-task status above/)).toBeInTheDocument();
+    expect(screen.queryByText(/Checking this account's connection/)).not.toBeInTheDocument();
+    expect(fetchMock.mock.calls.some(([url]) => url === FULL_HARNESS_TRUST_ENDPOINT)).toBe(false);
+    expect(startMcpTunnel).not.toHaveBeenCalled();
+  });
+  it("does not direct an ordinary browser account to a nonexistent tunnel setup", () => {
+    cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY);
+    render(<AgentConnectionSetup />);
+    expect(screen.getByText(/This build cannot start a personal Full Harness connection for an ordinary account/)).toBeInTheDocument();
+    expect(screen.queryByText(/account-issued local tunnel/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Starting the private MCP tunnel and binding its exact AI task/)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Check connection" })).toBeInTheDocument();
+  });
+  it("reports the ordinary-account transport blocker without a dead-end start action", async () => {
+    cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY);
+    window.localStorage.setItem(AGENT_CONNECTION_SETUP_STORAGE_KEY, JSON.stringify({
+      schema: AGENT_CONNECTION_SETUP_STORAGE_KEY,
+      selected_profile: "codex_app",
+      viewed_step: "check",
+    }));
+    vi.stubGlobal("fetch", nativeFetch(() => response({
+      ...connectionStatus(true),
+      proof_basis: "none",
+    })));
+    render(<AgentConnectionSetup />);
+    expect(await screen.findByText("Personal Full Harness is not available in this build")).toBeInTheDocument();
+    expect(screen.getByText(/private developer tunnel cannot be enabled for this account/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Open local transport setup" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Highlight next step" })).not.toBeInTheDocument();
+  });
+  it("guides an ordinary account to separate P1 approval when native enrollment is available", async () => {
+    cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY);
+    window.localStorage.setItem(AGENT_CONNECTION_SETUP_STORAGE_KEY, JSON.stringify({
+      schema: AGENT_CONNECTION_SETUP_STORAGE_KEY,
+      selected_profile: "codex_app",
+      viewed_step: "check",
+    }));
+    const startMcpTunnel = vi.fn();
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(async () => undefined),
+      getMcpTunnelState: vi.fn(async () => fullTunnelState),
+      startMcpTunnel,
+      personalMcpP1Connection: vi.fn(async () => ({ available: true })),
+    };
+    vi.stubGlobal("fetch", nativeFetch(() => response({
+      ...connectionStatus(true),
+      proof_basis: "none",
+    })));
+    render(<AgentConnectionSetup />);
+    expect(await screen.findByText("Check personal Codex access")).toBeInTheDocument();
+    expect(screen.getAllByText(/separate computer and Codex approvals in Account & Sessions/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/keep CasimirBot running and reload Codex's local MCP connection/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/retry in the same chat/).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/restart Codex and ask this exact task/)).not.toBeInTheDocument();
+    expect(screen.queryByText("Personal Full Harness is not available in this build")).not.toBeInTheDocument();
+    expect(screen.getByText(/local stdio entry, not an OAuth Source or developer tunnel/)).toBeInTheDocument();
+    expect(screen.queryByText(/matching Source's authorization is active/)).not.toBeInTheDocument();
+    expect(screen.getByTestId("agent-setup-shared-status")).toHaveTextContent(
+      "Personal Codex transport: setup available; not verified",
+    );
+    expect(screen.getAllByRole("button", { name: "Open Account & Sessions" }).length).toBeGreaterThan(0);
+    expect(startMcpTunnel).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Review AI connection settings" }));
+    expect(await screen.findByText(/Connect Codex locally there with a separate client-scope approval/)).toBeInTheDocument();
+    expect(screen.queryByLabelText("Server address")).not.toBeInTheDocument();
+    expect(screen.queryByText(/Use only the server address and the AI app's OAuth sign-in/)).not.toBeInTheDocument();
+  });
+  it("prefers personal Codex setup over the developer tunnel when both are available", async () => {
+    const startMcpTunnel = vi.fn();
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(async () => undefined),
+      getMcpTunnelState: vi.fn(async () => fullTunnelState),
+      startMcpTunnel,
+      personalMcpP1Connection: vi.fn(async () => ({ available: true })),
+    };
+    const fetchMock = nativeFetch(() => response(connectionStatus(false)));
+    vi.stubGlobal("fetch", fetchMock);
+    render(<AgentConnectionSetup />);
+    expect(await screen.findByText("Check Codex connection")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Check connection" }));
+    await waitFor(() => expect(fetchMock.mock.calls.some(([url]) =>
+      String(url).startsWith(AGENT_CONNECTION_READINESS_ENDPOINT))).toBe(true));
+    expect(startMcpTunnel).not.toHaveBeenCalled();
+    expect(screen.getByTestId("agent-setup-shared-status")).toHaveTextContent(
+      "Personal Codex transport: setup available; not verified",
+    );
+  });
+  it("waits for personal Codex inspection before offering developer startup", async () => {
+    let resolveInspection!: (value: { available: boolean }) => void;
+    const startMcpTunnel = vi.fn();
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(async () => undefined),
+      startMcpTunnel,
+      personalMcpP1Connection: vi.fn(() => new Promise<{ available: boolean }>(resolve => { resolveInspection = resolve; })),
+    };
+    vi.stubGlobal("fetch", nativeFetch(() => response(connectionStatus(false))));
+    render(<AgentConnectionSetup />);
+    const pendingButton = screen.getByRole("button", { name: "Checking Codex route…" });
+    expect(pendingButton).toBeDisabled();
+    fireEvent.click(pendingButton);
+    expect(startMcpTunnel).not.toHaveBeenCalled();
+    await act(async () => resolveInspection({ available: true }));
+    expect(await screen.findByText("Check Codex connection")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Check connection" })).toBeEnabled();
+    expect(startMcpTunnel).not.toHaveBeenCalled();
+  });
+  it("keeps a developer account on the personal contract path for a selected Codex task", async () => {
+    window.localStorage.setItem(AGENT_CONNECTION_SETUP_STORAGE_KEY, JSON.stringify({
+      schema: AGENT_CONNECTION_SETUP_STORAGE_KEY,
+      selected_profile: "codex_app", viewed_step: "check",
+    }));
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(async () => undefined),
+      startMcpTunnel: vi.fn(),
+      personalMcpP1Connection: vi.fn(async () => ({ available: true })),
+    };
+    vi.stubGlobal("fetch", nativeFetch(() => response(connectionStatus(false))));
+    render(<AgentConnectionSetup />);
+    expect(await screen.findByText("Check personal Codex access")).toBeInTheDocument();
+    expect(screen.getByTestId("agent-setup-shared-status")).toHaveTextContent(
+      "Personal Codex transport: setup available; not verified",
+    );
+    expect(screen.getAllByRole("button", { name: "Open Account & Sessions" }).length)
+      .toBeGreaterThan(0);
+    expect(screen.queryByRole("button", { name: "Open local transport setup" }))
+      .not.toBeInTheDocument();
+  });
+  it("keeps the local approval route when authorization refresh advances to connect", async () => {
+    cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY);
+    window.localStorage.setItem(AGENT_CONNECTION_SETUP_STORAGE_KEY, JSON.stringify({
+      schema: AGENT_CONNECTION_SETUP_STORAGE_KEY, selected_profile: "codex_app", viewed_step: "authorize",
+    }));
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(async () => undefined), personalMcpP1Connection: vi.fn(async () => ({ available: true })) };
+    vi.stubGlobal("fetch", nativeFetch(() => response(connectionStatus(false))));
+    render(<AgentConnectionSetup />);
+    expect(await screen.findByText(/Connect Codex locally there with a separate client-scope approval/)).toBeInTheDocument();
+    expect(screen.queryByLabelText("Server address")).not.toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Open Account & Sessions" }).length).toBeGreaterThan(0);
+  });
+  it("keeps the OAuth server address for another MCP app when Codex P1 is available", async () => {
+    cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY);
+    window.localStorage.setItem(AGENT_CONNECTION_SETUP_STORAGE_KEY, JSON.stringify({
+      schema: AGENT_CONNECTION_SETUP_STORAGE_KEY, selected_profile: "standard_mcp", viewed_step: "connect",
+    }));
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(async () => undefined), personalMcpP1Connection: vi.fn(async () => ({ available: true })) };
+    vi.stubGlobal("fetch", nativeFetch(() => response(connectionStatus(false))));
+    render(<AgentConnectionSetup />);
+    expect(await screen.findByText(/choose its OAuth sign-in flow/)).toBeInTheDocument();
+    expect(screen.getByLabelText("Server address")).toBeInTheDocument();
+    expect(screen.queryByText(/Connect Codex locally there with a separate client-scope approval/)).not.toBeInTheDocument();
+  });
+  it("does not send a local-stdio account into OAuth recovery before its first MCP call", async () => {
+    cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY);
+    window.localStorage.setItem(AGENT_CONNECTION_SETUP_STORAGE_KEY, JSON.stringify({
+      schema: AGENT_CONNECTION_SETUP_STORAGE_KEY, selected_profile: "codex_app", viewed_step: "check",
+    }));
+    let finishInspection!: (value: { available: boolean }) => void;
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(async () => undefined), personalMcpP1Connection: vi.fn(() =>
+      new Promise<{ available: boolean }>(resolve => { finishInspection = resolve; })) };
+    const guidance: Array<{ panelId?: string; targetId?: string }> = [];
+    const observeGuidance = (event: Event) => guidance.push((event as CustomEvent).detail);
+    window.addEventListener(HELIX_WORKSTATION_GUIDANCE_EVENT, observeGuidance);
+    const baseline = connectionStatus(false);
+    const missingAuthorization = buildHelixAgentClientReadiness({
+      agentSelected: true, provider_application: "available", client_authorization: "missing",
+      client_presence: "offline", catalog_sync: "stale", thread_attachment: "not_attached",
+      continuation_readiness: "unavailable", environment_readiness: "not_selected",
+    });
+    vi.stubGlobal("fetch", nativeFetch(() => response({ ...baseline, readiness: missingAuthorization })));
+    try {
+      render(<AgentConnectionSetup />);
+      await act(async () => { await Promise.resolve(); });
+      expect(guidance.some(item => item.targetId === "auth0-account-link")).toBe(false);
+      await act(async () => finishInspection({ available: true }));
+      expect(await screen.findByText("Check personal Codex access")).toBeInTheDocument();
+      expect(screen.queryByText("Authorize the matching MCP connection")).not.toBeInTheDocument();
+      expect(screen.queryByText(/Link this CasimirBot profile through the native OAuth window/)).not.toBeInTheDocument();
+      expect(screen.getAllByRole("button", { name: "Open Account & Sessions" }).length).toBeGreaterThan(0);
+      await waitFor(() => expect(guidance.some(item => item.panelId === "account-session")).toBe(true));
+      expect(guidance.some(item => item.targetId === "auth0-account-link")).toBe(false);
+    } finally { window.removeEventListener(HELIX_WORKSTATION_GUIDANCE_EVENT, observeGuidance); }
+  });
   it("rechecks a stale developer trust blocker after account-policy invalidation without granting trust",async()=>{
     window.localStorage.setItem(AGENT_CONNECTION_SETUP_STORAGE_KEY,JSON.stringify({schema:AGENT_CONNECTION_SETUP_STORAGE_KEY,selected_profile:"codex_app",viewed_step:"check"}));
     window.casimirDesktop={getRuntimeSnapshot:vi.fn(async()=>null),getMcpTunnelState:vi.fn(async()=>fullTunnelState)};
@@ -745,6 +946,22 @@ describe("AgentConnectionSetup", () => {
     );
   });
 
+  it("forwards a pending setup-contract presentation to its owner inbox", async () => {
+    const targetId = "setup-contract-review:11111111-1111-4111-8111-111111111111";
+    window.casimirDesktop = Object.freeze({ getRuntimeSnapshot: vi.fn(async () => null),
+      getPendingWorkstationGuidance: vi.fn(async () => ({ kind: "user_attention",
+        panelId: "agent-access", targetId, label: "Review this setup contract" })) });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response(connectionStatus(true))));
+    const observed = vi.fn();
+    window.addEventListener(HELIX_WORKSTATION_GUIDANCE_EVENT, observed);
+    try {
+      render(<AgentConnectionSetup />);
+      await waitFor(() => expect(observed).toHaveBeenCalledWith(expect.objectContaining({
+        detail: expect.objectContaining({ targetId }),
+      })));
+    } finally { window.removeEventListener(HELIX_WORKSTATION_GUIDANCE_EVENT, observed); }
+  });
+
   it("uses the one-shot native presentation marker when the preload bridge is degraded", async () => {
     window.history.replaceState(
       null,
@@ -1072,7 +1289,7 @@ describe("AgentConnectionSetup", () => {
 
     render(<AgentConnectionSetup />);
     expect(screen.getByText(/Browser view: this page can check only the service at its current address/i)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Check current service" }));
+    fireEvent.click(screen.getByRole("button", { name: "Check connection" }));
 
     await screen.findByText(/cannot start the installed private MCP tunnel/i);
     expect(screen.getByRole("heading", { name: "Choose your AI app" })).toBeInTheDocument();
@@ -1575,6 +1792,12 @@ describe("AgentConnectionSetup", () => {
       "human_only",
     );
     fireEvent.click(revokeButton);
+    expect(screen.getByRole("alert")).toHaveTextContent("as well as its runtime binding");
+    expect(fetchMock).not.toHaveBeenCalledWith(
+      "/api/account/session/agent-connections/reasoning-bindings/reasoning_binding%3Areload-test/revoke",
+      expect.anything(),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Confirm revoke chat pairing" }));
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith(
         "/api/account/session/agent-connections/reasoning-bindings/reasoning_binding%3Areload-test/revoke",
@@ -1779,6 +2002,26 @@ describe("AgentConnectionSetup", () => {
     expect(checkbox).toBeChecked();
     expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith("/claims"))).toBe(false);
     await act(async () => { await vi.advanceTimersByTimeAsync(10_000); });
+    expect(reads()).toBe(2);
+  });
+
+  it("does not repeatedly recheck the same expired heartbeat", async () => {
+    vi.useFakeTimers();
+    useAgiChatStore.setState({ activeId: "helix-chat-test" });
+    window.localStorage.setItem(AGENT_CONNECTION_SETUP_STORAGE_KEY, JSON.stringify({
+      schema: AGENT_CONNECTION_SETUP_STORAGE_KEY, selected_profile: "codex_app", viewed_step: "ready",
+    }));
+    const candidate = connectionStatus(true);
+    candidate.heartbeat_expires_at = new Date(Date.now() + 100).toISOString();
+    const fetchMock = vi.fn(async (url: string) => String(url).includes("/readiness")
+      ? response(candidate) : response({ error: "reasoning_binding_not_found" }, 404));
+    vi.stubGlobal("fetch", fetchMock);
+    await act(async () => { render(<AgentConnectionSetup />); });
+    const reads = () => fetchMock.mock.calls.filter(([url]) => String(url).includes("/readiness")).length;
+    expect(reads()).toBe(1);
+    await act(async () => { await vi.advanceTimersByTimeAsync(1_000); });
+    expect(reads()).toBe(2);
+    await act(async () => { await vi.advanceTimersByTimeAsync(2_000); });
     expect(reads()).toBe(2);
   });
 
@@ -2159,5 +2402,30 @@ describe("AgentConnectionSetup", () => {
     expect(
       await screen.findByText(/pending Full Harness start resumed successfully/i),
     ).toBeInTheDocument();
+  });
+  it("does not resume a pending developer harness start after switching to an ordinary account", async () => {
+    const startMcpTunnel = vi.fn().mockRejectedValueOnce(new Error("device trust required"));
+    window.casimirDesktop = Object.freeze({
+      getRuntimeSnapshot: vi.fn(async () => null),
+      getMcpTunnelState: vi.fn(async () => fullTunnelState),
+      startMcpTunnel,
+    });
+    let finishTrust!: (response: Response) => void;
+    vi.stubGlobal("fetch", vi.fn((url: string, init?: RequestInit) =>
+      url === FULL_HARNESS_TRUST_ENDPOINT && init?.method === "PUT"
+        ? new Promise<Response>((resolve) => { finishTrust = resolve; })
+        : Promise.resolve(url === FULL_HARNESS_TRUST_ENDPOINT
+          ? response({ trust: fullHarnessTrust(false) })
+          : response(connectionStatus(false))),
+    ));
+    render(<AgentConnectionSetup />);
+    fireEvent.click(await screen.findByRole("button", { name: "Start Harness" }));
+    await waitFor(() => expect(startMcpTunnel).toHaveBeenCalledTimes(1));
+    fireEvent.click(await screen.findByRole("button", { name: "Trust this device for Full Harness" }));
+    await waitFor(() => expect(finishTrust).toBeTypeOf("function"));
+    act(() => cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY));
+    await act(async () => finishTrust(response({ trust: fullHarnessTrust(true) })));
+    expect(startMcpTunnel).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("button", { name: "Start Harness" })).not.toBeInTheDocument();
   });
 });

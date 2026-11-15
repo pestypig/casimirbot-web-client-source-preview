@@ -2285,14 +2285,38 @@ describe("panelActionAdapters", () => {
         context_role: "tool_evidence",
         ask_context_policy: "evidence_only",
       });
-      expect(result.artifact?.exact_badge_ids).toEqual(
-        expect.arrayContaining(["nhm2.closure.source_residual", "nhm2.qei.sampling_window"]),
-      );
+      // Symbol/payload overlap locates a likely candidate; it is not exact
+      // semantic identity (the shared reflector contract distinguishes them).
+      expect(result.artifact?.exact_badge_ids).toContain("nhm2.closure.source_residual");
+      expect(result.artifact?.exact_badge_ids).not.toContain("nhm2.qei.sampling_window");
+      expect(result.artifact?.likely_badge_ids).toContain("nhm2.qei.sampling_window");
       expect(useTheoryMapOverlayStore.getState().source).toBe("discussion_reflection");
       expect(useTheoryMapOverlayStore.getState().softRegions.length).toBeGreaterThan(0);
       expect(useScientificCalculatorStore.getState().currentLatex).toBe("");
       expect(useScientificCalculatorStore.getState().lastSolve).toBeNull();
       expect(useScientificCalculatorStore.getState().lastTheoryLoadout).toBeNull();
+    });
+
+    it("keeps an explicit badge identity exact without making it answer authority", () => {
+      const result = executeHelixPanelAction(
+        {
+          panel_id: "theory-badge-graph",
+          action_id: "reflect_discussion_context",
+          args: { prompt: "nhm2.qei.sampling_window", overlay: false },
+        },
+        actionContext(),
+      );
+      expect(result.ok).toBe(true);
+      expect(result.artifact?.exact_badge_ids).toContain("nhm2.qei.sampling_window");
+      expect(result.artifact?.likely_badge_ids).not.toContain("nhm2.qei.sampling_window");
+      expect(result.artifact).toMatchObject({
+        assistant_answer: false,
+        terminal_eligible: false,
+        context_role: "tool_evidence",
+        ask_context_policy: "evidence_only",
+      });
+      expect(useScientificCalculatorStore.getState().lastSolve).toBeNull();
+      expect(hoisted.launchHelixAskPromptMock).not.toHaveBeenCalled();
     });
 
     it("returns reflection recommended actions without executing them", () => {
@@ -2387,7 +2411,9 @@ describe("panelActionAdapters", () => {
           noAutomaticEdgePromotion: true,
         }),
       });
-      expect(result.artifact?.candidates?.[0]).toMatchObject({
+      const candidates = result.artifact?.candidates;
+      if (!Array.isArray(candidates)) throw new Error("Expected frontier candidate evidence to be an array");
+      expect(candidates[0]).toMatchObject({
         candidate_id: expect.any(String),
         candidate_kind: expect.stringMatching(/candidate_connection|missing_intermediate_badge|unresolved_semantic_region/),
         status: expect.stringMatching(

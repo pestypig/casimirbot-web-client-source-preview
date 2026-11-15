@@ -121,7 +121,8 @@ export function SharedLiveRoomDialog({
             </p>
             <p id={descriptionId} className="mt-1 max-w-2xl text-[11px] leading-5 text-slate-400">
               Party Chat is separate from Ask Helix. Two-person voice uses a host-owned
-              GPT Live call after consent; three-person text has no shared voice. The native hosted
+              GPT Live call after consent; three-person text has no shared voice, and three-person
+              group media is pending. The native hosted
               room service is a separate path and supplies no model.
             </p>
           </div>
@@ -149,16 +150,21 @@ export function SharedLiveRoomDialog({
           ) : null}
 
           {nativeRoomPortal ? <div ref={onNativeRoomPortalTargetChange} />
-            : <NativeRoomConnectionPanel fieldIdPrefix={titleId} draftStore={roomDraftStore} />}
+            : <NativeRoomConnectionPanel fieldIdPrefix={titleId} draftStore={roomDraftStore}
+                realtimeSessionId={controller.realtimeSessionId} runtimeActive={controller.runtimeActive} />}
           <div className="mb-3 rounded-lg border border-fuchsia-300/20 bg-fuchsia-400/[0.04] p-3 text-xs">
             <p className="font-semibold text-fuchsia-100">{room?.capacity_profile === "three_human_text"
               ? "Three-person text room · developer evaluation"
+              : room?.capacity_profile === "three_person_voice"
+                ? "Three-person consent room · group voice bridge pending"
               : room ? "Two-person GPT Live room · assisted evaluation"
                 : "Local rooms · choose a conversation profile"}</p>
             <p className="mt-1 text-slate-400">{room?.capacity_profile === "three_human_text"
               ? "Three members can exchange attributed text. Shared voice is unavailable; optional AI use requires each author's exact-message release and a separate turn request."
+              : room?.capacity_profile === "three_person_voice"
+                ? "Three members can review voice consent, but GPT Live media is unavailable until the group bridge and Discord speaker attribution are installed."
               : room ? "Two members can share labeled visual frames and floor-controlled audio with one host-owned GPT Live call. This is separate from the hosted service room and its task connection."
-                : "Choose two-person voice or developer text-only conversation for up to three people. AI and task handoff remain separate actions."}</p>
+                : "Choose two-person voice, developer group-consent evaluation, or text-only conversation for up to three people. AI and task handoff remain separate actions."}</p>
           </div>
           {room ? (
             <SharedLiveRoomActivePanel

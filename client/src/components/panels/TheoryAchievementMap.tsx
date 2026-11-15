@@ -75,6 +75,9 @@ type TheoryAchievementMapProps = {
 };
 
 const ATLAS_GLOW_COLORS: Record<PhysicsAtlasBlockId, string> = {
+  relativity_history: "rgba(37, 99, 235, 0.72)",
+  evolutionary_biophysics: "rgba(13, 148, 136, 0.72)",
+  casimir_dp_quantum_foam: "rgba(147, 51, 234, 0.72)",
   stellar_evolution: "rgba(192, 38, 211, 0.72)",
   astrochemistry_prebiotic: "rgba(77, 124, 15, 0.72)",
   cosmic_distance_ladder: "rgba(217, 119, 6, 0.72)",

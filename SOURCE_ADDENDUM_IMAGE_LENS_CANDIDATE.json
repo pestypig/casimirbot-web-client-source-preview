@@ -1,0 +1,48 @@
+{
+  "observed_at": "2026-11-13T20:55:05.945054+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/workstation/ImageLensPanel.tsx",
+      "canonical_sha256": "020c53c5bacaaa8677198f37a9c6a8de6fc4f69c45cc0c0b55505a94988cca60",
+      "export_sha256": "020c53c5bacaaa8677198f37a9c6a8de6fc4f69c45cc0c0b55505a94988cca60",
+      "bytes": 43100,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "50eba9bdac8c0e9b5e547098c1be32f7690c954e585291a29f3f5b29fdc1dff5"
+    },
+    {
+      "path": "client/src/components/__tests__/image-lens-panel.spec.tsx",
+      "canonical_sha256": "9929b721452ce485e541f4e487ae43a4442e8f0d05a2322ecf0a0331a254257c",
+      "export_sha256": "9929b721452ce485e541f4e487ae43a4442e8f0d05a2322ecf0a0331a254257c",
+      "bytes": 20634,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "288a6abf0338d7e01fae720da2b778141251f1a5f6ebae7001333e300d1028ec"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "The normalized production delta adds account-policy observation and an explicit unlocked realtime_texture_pack feature check. The ordinary Inspect workspace remains available; missing/revoked feature access selects Inspect and unmounts texture controls.",
+    "Access is checked by feature grant, not directly by account type. Existing server policy controls which accounts currently receive that grant. UI visibility is not source, program, funding or provider authorization.",
+    "The policy cache rejects late session response bodies after an explicit account observation. Image Lens drops pending policy state updates on unmount. Same-capability account changes and all store/provider lifecycle transitions remain separate qualifications.",
+    "Existing browser tests now cover ordinary inspection, switching from the developer fixture to ordinary policy, and sign-out. The PDF page assertion is aligned with its numeric input. Existing crop receipt, Live Answer handoff, page navigation/recovery and observation-only copy tests pass with mocked local capture and HTTP.",
+    "Only the panel and its existing suite change in this cohort; unchanged account-policy code is reviewed as a dependency. No scientific operator, adapter contract, proof or certificate semantics change."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal. Deterministic source tests do not qualify installed ordinary-account behavior or a live provider session.",
+    "RealtimeTexturePackControls and other unchanged capture/API/shared/i18n dependencies are canonical test inputs; this cohort does not export or requalify their full implementation. Full public application and exact installed acceptance remain separate.",
+    "Tests do not run funded inference, real camera/screen capture, Discord or Minecraft actions. Crop byte contents and scientific claims are not physically verified.",
+    "Same-capability profile changes, malformed session payloads, late crop submissions, storage denial and every real browser lifecycle are not established by this feature-visibility review.",
+    "Five inherited intentional support-contact matches remain in final owner publication review."
+  ]
+}

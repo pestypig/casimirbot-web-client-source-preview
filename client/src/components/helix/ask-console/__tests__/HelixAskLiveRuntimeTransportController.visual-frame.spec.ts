@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, type Mock } from "vitest";
 
 import {
   HELIX_ASK_LIVE_RUNTIME_MAX_VISUAL_FRAME_BYTES,
@@ -25,14 +25,14 @@ const SERVER_SESSION_RESPONSE = {
 
 const startActiveController = async (args: {
   nowMs?: () => number;
-  send?: ReturnType<typeof vi.fn>;
+  send?: Mock<(data: string) => void>;
   readyState?: string;
 } = {}): Promise<{
   controller: HelixAskLiveRuntimeBrowserTransportController;
   dataChannel: HelixAskLiveRuntimeDataChannelLike;
-  send: ReturnType<typeof vi.fn>;
+  send: Mock<(data: string) => void>;
 }> => {
-  const send = args.send ?? vi.fn();
+  const send = args.send ?? vi.fn<(data: string) => void>();
   const dataChannel: HelixAskLiveRuntimeDataChannelLike = {
     close: vi.fn(),
     send,

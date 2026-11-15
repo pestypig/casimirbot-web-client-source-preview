@@ -1,0 +1,50 @@
+{
+  "observed_at": "2026-11-14T05:48:48.259254+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/lib/helix/ask-prompt-launch.ts",
+      "canonical_sha256": "ccb4182e781144c71c7dd57e7c99067cf4a6c6142c666bbbbb87726df0fc472e",
+      "export_sha256": "ccb4182e781144c71c7dd57e7c99067cf4a6c6142c666bbbbb87726df0fc472e",
+      "previous_public_sha256": "b9af837ef2e725cd2beb989bec49551d4c5de41d872f8f4242ef24c029f2d329",
+      "bytes": 11423,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/components/helix/HelixAskPill.tsx",
+      "canonical_sha256": "eaf9a79fc17573107edd0723903893c4d5f8389a7f90bccdb08990e1e914794f",
+      "export_sha256": "eaf9a79fc17573107edd0723903893c4d5f8389a7f90bccdb08990e1e914794f",
+      "previous_public_sha256": "9ecb4419556b97ddf553701ae8ae2e57f97870608d57147bc8331d87bc0718a8",
+      "bytes": 1047904,
+      "transformation": "identity"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/lib/helix/__tests__/ask-prompt-launch.spec.ts",
+      "canonical_sha256": "555a4d672c4418d1d544f44ade27d9e31a2e5c3779724476b672bce6b4838dcf"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-external-prompt-claim.spec.ts",
+      "canonical_sha256": "b1d72c5a2c44cae7c3b5b80d2003f6e4e48e32afe95aea286011a5c3177b08cd"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskTurnControls.postulate.spec.tsx",
+      "canonical_sha256": "3b81a3498a355a04a58e4d4800166e65f5f571549dc91b5902c072c6c13fddaa"
+    }
+  ],
+  "classification": "evidence normalization",
+  "source_frozen": false,
+  "published": false,
+  "review": [
+    "Declare the three generic route evidence metadata fields already sent by the postulate review button and retained by the existing prompt launcher. Only this module type declaration changes.",
+    "Use the admitted pending prompt claim ID for the external-turn cancellation diagnostic. The actual prompt launcher and persisted-prompt reader do not emit traceId; no new trace field or serialization path is invented.",
+    "Claim deduplication, dispatch guards, cancellation conditions and route/tool/approval behavior are unchanged. Unknown traceId fields on out-of-contract events no longer override this diagnostic label."
+  ],
+  "limits": [
+    "Existing launch, identity and postulate UI fixtures do not prove a live postulate execution, installed acceptance or friend delivery.",
+    "The diagnostic identity change does not establish any authority."
+  ],
+  "web_candidate_count": 494
+}

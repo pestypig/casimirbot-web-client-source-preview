@@ -1,0 +1,53 @@
+{
+  "observed_at": "2026-11-14T03:33:55.054230+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLanguageModelPicker.tsx",
+      "canonical_sha256": "942289aca29a5c258493ebfc94149e638c8b72f07f179e87c4e483e4d910587b",
+      "export_sha256": "942289aca29a5c258493ebfc94149e638c8b72f07f179e87c4e483e4d910587b",
+      "bytes": 5703,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "cd9e598d0a64497ae23661397b233c75d8f2192bd5934732c959fa352e3d1e40"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-minimal-runtime-shell.spec.tsx",
+      "canonical_sha256": "baa9a267b0c68c2ccf71426514fb09f9087ddfd99c81fc4dadd863f9aba9011b",
+      "export_sha256": "baa9a267b0c68c2ccf71426514fb09f9087ddfd99c81fc4dadd863f9aba9011b",
+      "bytes": 37864,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "18fdbce987bdbb0ca02fd24d25d5e0d3726ded5d5f6c4da2e49af0f111c3744c"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [],
+  "runtime_fix_number": 59,
+  "work_scope": {
+    "program_gate": "G8 existing release qualification; presentation-only parallel prerequisite, no parity gate advancement",
+    "workstream": "Policy-consistent model selection display",
+    "capability": "Pinned model selection and persistence",
+    "lifecycle_stage": "User configuration before submission",
+    "reaction_timescale": "UI selection and reopen",
+    "authority_owner": "Existing shared model policy and provider admission",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with policy-consistent menu",
+    "required_evidence": "Mounted selection/submission/reopen regression and existing shell suite; scoped compiler",
+    "explicit_non_goals": "No model policy change, funding, real provider call or source/terminal authority change",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "The picker hardcoded gpt-5.4-mini while the current shared policy accepts only its declared pinned IDs. The menu now derives entries from that exact policy list, keeping profile choices unchanged.",
+    "Pinned entries display their exact model ID and a neutral exact-model description. The stale lowest-cost claim is removed; no current provider availability or pricing claim is made.",
+    "The existing mounted shell test now selects each policy-listed model, verifies no turn starts on selection, checks the submitted explicit contract and persisted value, and remounts to verify the selected choice remains visible without another turn.",
+    "Before the production edit, the mounted regression could not find the current policy-listed choice. An earlier invocation before editing the fixture selected zero tests; that receipt is retained and not used as regression evidence.",
+    "Both selected files matched the public preview before this slice. Runtime sampling, provider funding and shared model policy are unchanged.",
+    "Adding the existing shell suite to compiler roots exposed ten invalid UUID mock values and three void-callback return mismatches. Deterministic valid UUIDs now replace those fixture identities consistently, including trace assertions; callbacks retain their pushes and return void. Original behavior assertions are preserved. Intermediate tests and compiler output are retained."
+  ],
+  "limits": [
+    "Unfrozen unpublished source qualification, not installed or real-model availability evidence.",
+    "Mounted tests inject a fake turn transport. The existing shared policy is the application contract, not evidence that an external provider accepts a model."
+  ]
+}

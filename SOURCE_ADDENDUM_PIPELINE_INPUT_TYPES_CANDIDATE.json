@@ -1,0 +1,52 @@
+{
+  "observed_at": "2026-11-14T06:41:33.299368+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/lib/pipeline-geometry.ts",
+      "canonical_sha256": "19fe9128abbd16b8229e3c53c525d7b4e4517e3fd58347923c3050e87fca2603",
+      "export_sha256": "19fe9128abbd16b8229e3c53c525d7b4e4517e3fd58347923c3050e87fca2603",
+      "previous_public_sha256": "ab5ab5729dbfd8ec2fbfef32e079faddc21a02c22b645914fef4f5c9c013c26b",
+      "bytes": 2432,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/hooks/use-energy-pipeline.ts",
+      "canonical_sha256": "e2bc86be6ab2d451bde6dfc4ba7f156a4032111a665ba77463294de5cde2e6e7",
+      "export_sha256": "75e36b304621ca1b5949a6e792d24f590f47f6632f4c127647d903ece59e65a2",
+      "previous_public_sha256": "e7f5b00bb21f196eb38d21a3c46cfb6a461cf04497a65dc030c776c2479cb526",
+      "bytes": 56606,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/lib/pipeline-geometry.spec.ts",
+      "canonical_sha256": "2c2b9076e3d94e12b60868424ce238db69b0ccb286e5e7cd077d7b4ff6a1dcf9"
+    }
+  ],
+  "server_type_evidence": {
+    "path": "server/energy-pipeline.ts",
+    "sha256": "0588e549276e9bb57cdc8d58e7b9061be528a7d31570c7433975c929d3ee6064",
+    "type": "MetricConstraintAudit",
+    "type_declaration_sha256": "22554732d315b5319dcba0de7a3f7c0d04adce9e7807c0ec51d38cc58f0368bb"
+  },
+  "review": [
+    "Separate geometry-only inputs from timing inputs; radius/hull helpers require only the geometry fields they consume. The timing resolver keeps the same stricter timing shape.",
+    "Mirror the existing server MetricConstraintAudit declaration using the existing client GrConstraintDiagnostics type; declare the already-emitted optional snapshot field.",
+    "Erased client type contracts only. No physical calculations, proof mapping, source selection, gate logic or certificate semantics change.",
+    "Reuse the existing PipelineSnapshot types for the three congruence_missing_* fields already emitted by the server and proof-pack mapper. Their values, computations and absence semantics are unchanged."
+  ],
+  "source_frozen": false,
+  "published": false,
+  "snapshot_type_evidence": {
+    "path": "client/src/types/pipeline.ts",
+    "sha256": "b6900eb7f5761d4b69d5555e2aca812d4a687a6d3638fc7cd27b885a8953b538",
+    "fields": [
+      "congruence_missing_parts",
+      "congruence_missing_count",
+      "congruence_missing_reason"
+    ]
+  }
+}

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Gamepad2, Loader2 } from "lucide-react";
+import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/accountCapabilityPolicy";
 import { helixMinecraftLocalLifecycleReceiptSchema, helixMinecraftLoopbackAddressSchema,
   helixMinecraftLocalServerLifecycleSchema } from "@shared/helix-minecraft-local-lifecycle";
 
@@ -24,67 +25,110 @@ export type MinecraftLocalLifecycleResult = Readonly<{
   serverAddress: string;
 }>;
 
-export const launchMinecraftLocalLifecycle = async (): Promise<MinecraftLocalLifecycleResult> => {
-  const selectionResponse = await fetch(ENDPOINT.replace(/launch$/, "selection"), { credentials: "include", signal: AbortSignal.timeout(10_000) });
-  const selection = await selectionResponse.json().catch(() => null);
-  const address = helixMinecraftLoopbackAddressSchema.safeParse(selection?.address);
-  if (!selectionResponse.ok || selection?.ok !== true || !address.success) {
-    throw new Error(selection?.message ?? "Select a prepared local server and player profile in desktop setup.");
+export const launchMinecraftLocalLifecycle = async (signal?: AbortSignal): Promise<MinecraftLocalLifecycleResult> => {
+  const account = new AbortController();
+  const changed = () => account.abort(new DOMException("Account changed", "AbortError"));
+  window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, changed);
+  try {
+    const operationSignal = AbortSignal.any([account.signal, ...(signal ? [signal] : [])]);
+    operationSignal.throwIfAborted();
+    const selectionSignal = AbortSignal.any([operationSignal, AbortSignal.timeout(10_000)]);
+    const selectionResponse = await fetch(ENDPOINT.replace(/launch$/, "selection"), { credentials: "include", signal: selectionSignal });
+    selectionSignal.throwIfAborted();
+    const selection = await selectionResponse.json().catch(() => null);
+    selectionSignal.throwIfAborted();
+    const address = helixMinecraftLoopbackAddressSchema.safeParse(selection?.address);
+    if (!selectionResponse.ok || selection?.ok !== true || !address.success) {
+      throw new Error(selection?.message ?? "Select a prepared local server and player profile in desktop setup.");
+    }
+    const launchSignal = AbortSignal.any([operationSignal, AbortSignal.timeout(280_000)]);
+    launchSignal.throwIfAborted();
+    const response = await fetch(ENDPOINT, {
+      method: "POST",
+      signal: launchSignal,
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        address: address.data,
+        operator_confirmation: true,
+      }),
+    });
+    launchSignal.throwIfAborted();
+    const body = (await response.json().catch(() => null)) as
+      | LifecycleResponse
+      | null;
+    launchSignal.throwIfAborted();
+    if (!response.ok || body?.ok !== true) {
+      const server = helixMinecraftLocalServerLifecycleSchema.safeParse(body?.server_lifecycle);
+      const partial = server.success
+        ? ` Server ${server.data.status} was observed at ${server.data.observed_at}; client setup did not complete.`
+        : "";
+      throw new Error(
+        (body?.message ?? body?.error ?? "Minecraft lifecycle request failed.") + partial,
+      );
+    }
+    const receipt = helixMinecraftLocalLifecycleReceiptSchema.safeParse(body.receipt);
+    if (!receipt.success) throw new Error("Minecraft returned an incomplete startup receipt. Check setup before retrying.");
+    return {
+      launcherAction: receipt.data.launcher_action,
+      connectionAction: receipt.data.connection_action,
+      serverAddress: receipt.data.server_address,
+    };
+  } finally {
+    window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, changed);
   }
-  const response = await fetch(ENDPOINT, {
-    method: "POST",
-    signal: AbortSignal.timeout(280_000),
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      address: address.data,
-      operator_confirmation: true,
-    }),
-  });
-  const body = (await response.json().catch(() => null)) as
-    | LifecycleResponse
-    | null;
-  if (!response.ok || body?.ok !== true) {
-    const server = helixMinecraftLocalServerLifecycleSchema.safeParse(body?.server_lifecycle);
-    const partial = server.success
-      ? ` Server ${server.data.status} was observed at ${server.data.observed_at}; client setup did not complete.`
-      : "";
-    throw new Error(
-      (body?.message ?? body?.error ?? "Minecraft lifecycle request failed.") + partial,
-    );
-  }
-  const receipt = helixMinecraftLocalLifecycleReceiptSchema.safeParse(body.receipt);
-  if (!receipt.success) throw new Error("Minecraft returned an incomplete startup receipt. Check setup before retrying.");
-  return {
-    launcherAction: receipt.data.launcher_action,
-    connectionAction: receipt.data.connection_action,
-    serverAddress: receipt.data.server_address,
-  };
 };
 
 export function MinecraftLocalLifecycleCard() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
+  const activeRequest = useRef<AbortController | null>(null);
+  useEffect(() => {
+    const cancel = () => {
+      activeRequest.current?.abort();
+      activeRequest.current = null;
+    };
+    const changed = () => {
+      cancel();
+      setBusy(false);
+      setMessage(null);
+      setOk(false);
+    };
+    window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, changed);
+    return () => {
+      cancel();
+      window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, changed);
+    };
+  }, []);
 
   const launchAndJoin = async (): Promise<void> => {
+    if (activeRequest.current) return;
+    const request = new AbortController();
+    activeRequest.current = request;
+    const current = () => activeRequest.current === request && !request.signal.aborted;
     setBusy(true);
     setMessage(null);
     setOk(false);
     try {
-      const receipt = await launchMinecraftLocalLifecycle();
+      const receipt = await launchMinecraftLocalLifecycle(request.signal);
+      if (!current()) return;
       setOk(true);
       setMessage(
         `Client setup completed for ${receipt.serverAddress} (${receipt.launcherAction}, ${receipt.connectionAction}). Waiting for game observation.`,
       );
     } catch (error) {
+      if (!current()) return;
       setMessage(
         error instanceof Error
           ? error.message
           : "Minecraft lifecycle request failed.",
       );
     } finally {
-      setBusy(false);
+      if (current()) {
+        activeRequest.current = null;
+        setBusy(false);
+      }
     }
   };
 

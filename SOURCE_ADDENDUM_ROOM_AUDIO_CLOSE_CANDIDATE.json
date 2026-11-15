@@ -1,0 +1,84 @@
+{
+  "observed_at": "2026-11-14T00:27:03.877216+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/RoomAudioMixer.ts",
+      "canonical_sha256": "4c59d86883214958a0c110ce34dcd65c3e6600cf7bb0f920418d18ffae81b561",
+      "export_sha256": "4c59d86883214958a0c110ce34dcd65c3e6600cf7bb0f920418d18ffae81b561",
+      "bytes": 3005,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "d4174af7089db22666bddadfebeb539125cd2713f6b9f8fe066cba14b3f8d128"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/RoomAudioPlayback.ts",
+      "canonical_sha256": "510baff54ab2a807ba56a93a571b6fe8d3eb24654c6899223957a42d7961c35e",
+      "export_sha256": "510baff54ab2a807ba56a93a571b6fe8d3eb24654c6899223957a42d7961c35e",
+      "bytes": 1275,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "c9741a081a3bad1832a3226edba669409200de0d7ff68cc3c72c1133c2dce48f"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/RoomMediaBridge.ts",
+      "canonical_sha256": "9e649279fb88caac149c2cfebd83005c260485adae794153725279081deaf28e",
+      "export_sha256": "9e649279fb88caac149c2cfebd83005c260485adae794153725279081deaf28e",
+      "bytes": 17109,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "53fae80cf946f7a339542d5081f2e362e786665a946ffdcb0f01baae89492fd2"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/__tests__/RoomAudioMixer.spec.ts",
+      "canonical_sha256": "02a3d24cc9f91c8404e655a51a631bda9471e1041835fb957ec68ff9c87365b4",
+      "export_sha256": "02a3d24cc9f91c8404e655a51a631bda9471e1041835fb957ec68ff9c87365b4",
+      "bytes": 4387,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "05206b8504e81a6ee836bfdd31ce8198f014b20163569319fac789e40ef35dec"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/__tests__/RoomAudioPlayback.spec.ts",
+      "canonical_sha256": "f0c5e9bd4d68d41e6c3309d73b7cc4019011e9a460364d0cb4aaf55cb267c530",
+      "export_sha256": "f0c5e9bd4d68d41e6c3309d73b7cc4019011e9a460364d0cb4aaf55cb267c530",
+      "bytes": 2461,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "59c413d4345420cb4df7fdb15f5166607a0cf4cd416ef48ca5cccdb893050c8a"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/media-bridge/__tests__/RoomMediaBridge.lifecycle.spec.ts",
+      "canonical_sha256": "5d711d098a4006ee8645b87c333d7830e6ad55fbc4413a0b42dda794e9aaa248",
+      "export_sha256": "5d711d098a4006ee8645b87c333d7830e6ad55fbc4413a0b42dda794e9aaa248",
+      "bytes": 8967,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "0cca4eb5f184a0f368a7f2990130b8a039e163c9e7a5cdc90e65fbaa90d62de6"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "work_scope": {
+    "program_gate": "G8, independent existing room qualification",
+    "workstream": "Room media shutdown",
+    "capability": "Browser playback and mixer lifecycle",
+    "lifecycle_stage": "presentation and media resource cleanup",
+    "reaction_timescale": "Deferred browser audio operation completion",
+    "authority_owner": "Existing room consent and GPT Live transport controls",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with local shutdown regressions",
+    "required_evidence": "Deferred resolve/reject after close; unchanged admitted input path; exact export parity",
+    "explicit_non_goals": "No room admission, real audio, provider request, game action or attended acceptance",
+    "downstream_gate_unlocked": "None; live acceptance remains open"
+  },
+  "review": [
+    "Runtime fix 47 ignores completion of browser play requests after close. Neither playing nor blocked callbacks can be delivered from a closed playback owner; its resume returns false.",
+    "The mixer rechecks its own closed state after awaited context resume. A rejection caused by close returns false, while errors during an open session still propagate. Readiness requires the current context to be running. Closing stops only the owned mixed output, not borrowed microphone tracks.",
+    "The owning media bridge retains the exact pending mixer across awaits and checks close/identity before replacement, failure reporting and projection updates. A late resume no longer dereferences a mixer already cleared by close or starts provider input replacement.",
+    "Audio inline intent is expressed with the playsinline attribute rather than an undeclared HTMLAudioElement property. The existing fake element implements that standard DOM method.",
+    "Four helper regressions failed before repair. The parent test exposed two unhandled null-reference rejections despite its nine assertion cases reporting passed; its nonzero process exit and default reporter log are preserved. Positive admitted mixing and existing microphone/consent tests remain enabled.",
+    "Six exact files reviewed against saved hashes. Tests use synthetic audio, transport and boundary fixtures; no microphone, browser peer connection, provider or game service was used."
+  ],
+  "limits": [
+    "Unfrozen, unpublished and uninstalled. These deterministic tests do not establish actual heard audio or cross-device behavior.",
+    "Provider track replacement already in flight when close starts still requires separate ordering and transport-generation qualification. This repair prevents stale projections and null references; it does not claim that provider replacement/restore races are solved.",
+    "Other late signaling callbacks and final installed session/consent revocation acceptance remain separate."
+  ]
+}

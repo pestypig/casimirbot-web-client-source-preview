@@ -37,6 +37,7 @@ const mocks = vi.hoisted(() => ({
     receipt: { client_receipt_ref: "receipt:transport:test" },
   })),
   stopTransport: vi.fn(async () => undefined),
+  setLocalPlaybackMuted: vi.fn(),
   recordVisualFrameReceipt: vi.fn(),
 }));
 
@@ -58,6 +59,7 @@ vi.mock("../HelixAskLiveRuntimeTransportController", () => ({
       startTransport: mocks.startTransport,
       stopTransport: mocks.stopTransport,
       setMicrophoneEnabled: () => true,
+      setLocalPlaybackMuted: mocks.setLocalPlaybackMuted,
       sendVisualFrame: mocks.sendVisualFrame,
     };
   },
@@ -148,12 +150,14 @@ describe("Helix Ask GPT Live visual consent", () => {
     mocks.sendVisualFrame.mockClear();
     mocks.startTransport.mockClear();
     mocks.stopTransport.mockClear();
+    mocks.setLocalPlaybackMuted.mockClear();
     mocks.recordVisualFrameReceipt.mockClear();
     useVisualSourceCaptureStore.setState({ producers: {} });
     vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({
       ok: true,
       realtime_session_id: "realtime:visual-consent-test",
       sdp_exchange_requested: true,
+      admitted_session_expires_at_ms: Date.now() + 60_000,
     }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
@@ -164,6 +168,40 @@ describe("Helix Ask GPT Live visual consent", () => {
     cleanup();
     vi.unstubAllGlobals();
     useVisualSourceCaptureStore.setState({ producers: {} });
+  });
+
+  it("keeps local playback mute through explicit session renewal", async () => {
+    render(<Harness />);
+    act(() => latestSession!.setLocalPlaybackMuted(true));
+    await act(async () => { await latestSession!.start(); });
+    expect(latestSession?.active).toBe(true);
+    expect(mocks.setLocalPlaybackMuted).toHaveBeenLastCalledWith(true);
+    await act(async () => { expect(await latestSession!.renew()).toBe(true); });
+    expect(mocks.startTransport).toHaveBeenCalledTimes(2);
+    expect(mocks.setLocalPlaybackMuted.mock.calls).toEqual([[true], [true]]);
+    expect(latestSession?.localPlaybackMuted).toBe(true);
+    expect(latestSession?.microphoneEnabled).toBe(false);
+    expect(latestSession?.visualInputEnabled).toBe(false);
+  });
+
+  it.each(["stop", "unmount"])("does not start late browser media after %s while server admission is pending", async kind => {
+    let finish!: (value: Response) => void;
+    vi.stubGlobal("fetch", vi.fn((url: string) => url.includes("/session/start")
+      ? new Promise<Response>(resolve => { finish = resolve; })
+      : Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 }))));
+    const view = render(<Harness />);
+    let starting!: Promise<boolean>;
+    act(() => { starting = latestSession!.start(); });
+    if (kind === "stop") await act(async () => { await latestSession!.stop(); });
+    else view.unmount();
+    await act(async () => {
+      finish(new Response(JSON.stringify({ ok: true, realtime_session_id: "realtime:late-admission",
+        sdp_exchange_requested: true }), { status: 200 }));
+      expect(await starting).toBe(false);
+    });
+    expect(mocks.startTransport).not.toHaveBeenCalled();
+    expect(vi.mocked(globalThis.fetch)).toHaveBeenCalledWith(
+      "/api/agi/realtime/session/realtime%3Alate-admission/stop", expect.anything());
   });
 
   it("blocks a same-turn frame immediately after Vision Off, before effect cleanup", async () => {

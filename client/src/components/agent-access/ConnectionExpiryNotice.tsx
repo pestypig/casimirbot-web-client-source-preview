@@ -22,7 +22,7 @@ export default function ConnectionExpiryNotice({ deadline, label, recovery }: {
     {seconds === 0 && !dismissed ? <div role="alert" className="mt-2 rounded bg-amber-950 p-3 text-amber-50">
       <p>{recovery}</p>
       <p>No app restart is needed. This notice does not renew or grant permission.</p>
-      <button type="button" onClick={() => setDismissed(true)} className="mt-2 rounded border px-3 py-1">Dismiss expiry notice</button>
+      <button data-helix-control-id="workstation.panel.agent-access.connection-expiry-notice.dismiss-expiry-notice" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" onClick={() => setDismissed(true)} className="mt-2 rounded border px-3 py-1">Dismiss expiry notice</button>
     </div> : null}
   </div>;
 }

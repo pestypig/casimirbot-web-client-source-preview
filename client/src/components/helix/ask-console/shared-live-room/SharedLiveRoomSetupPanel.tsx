@@ -12,7 +12,7 @@ export function SharedLiveRoomSetupPanel({
 }) {
   const [roomTitle, setRoomTitle] = useState("");
   const [joinCode, setJoinCode] = useState("");
-  const [capacityProfile, setCapacityProfile] = useState<"two_person_voice" | "three_human_text">("two_person_voice");
+  const [capacityProfile, setCapacityProfile] = useState<"two_person_voice" | "three_person_voice" | "three_human_text">("two_person_voice");
   const developer = readCachedAccountCapabilityPolicy()?.account_type === "developer";
   return (
     <div className="grid gap-4 md:grid-cols-2">
@@ -23,8 +23,8 @@ export function SharedLiveRoomSetupPanel({
         className="rounded-xl border border-white/10 bg-white/[0.03] p-3"
         onSubmit={(event) => {
           event.preventDefault();
-          const requested = developer && capacityProfile === "three_human_text"
-            ? controller.createRoom(roomTitle, "three_human_text") : controller.createRoom(roomTitle);
+          const requested = developer && capacityProfile !== "two_person_voice"
+            ? controller.createRoom(roomTitle, capacityProfile) : controller.createRoom(roomTitle);
           void requested.then((ok) => {
             if (ok) setRoomTitle("");
           });
@@ -46,9 +46,10 @@ export function SharedLiveRoomSetupPanel({
         />
         {developer ? <label className="mt-2 block text-xs text-slate-300">
           Room profile
-          <select value={capacityProfile} onChange={event => setCapacityProfile(event.target.value as typeof capacityProfile)}
+          <select data-helix-control-id="helix.ask.shared_live_room.shared-live-room-setup-panel.select" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" value={capacityProfile} onChange={event => setCapacityProfile(event.target.value as typeof capacityProfile)}
             className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-sm text-slate-100">
             <option value="two_person_voice">Two people · GPT Live voice available after consent</option>
+            <option value="three_person_voice">Three people · voice bridge pending · developer evaluation</option>
             <option value="three_human_text">Three people · text only · developer evaluation</option>
           </select>
         </label> : null}
@@ -130,7 +131,7 @@ export function SharedLiveRoomSetupPanel({
                 >
                   <span className="block font-semibold">{candidate.title}</span>
                   <span className="mt-0.5 block text-[10px] text-slate-500">
-                    {`${candidate.participants.filter(participant => participant.presence !== "left").length}/${candidate.capacity_profile === "three_human_text" ? 3 : 2}`}
+                    {`${candidate.participants.filter(participant => participant.presence !== "left").length}/${candidate.max_participants}`}
                     {candidate.capacity_profile === "three_human_text" ? " · text only" : ""} · {candidate.status}
                   </span>
                 </button>

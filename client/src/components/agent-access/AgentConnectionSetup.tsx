@@ -39,6 +39,7 @@ import DurableTaskPairing from "./DurableTaskPairing";
 import {
   deriveHelixAgentSetupNextAction,
   HELIX_AGENT_SETUP_PROCEDURE,
+  LOCAL_STDIO_MCP_STARTUP_REQUEST,
   PERSONAL_MCP_STARTUP_REQUEST,
 } from "@shared/helix-agent-setup-procedure";
 import EnvironmentSessionReadyUp from "./EnvironmentSessionReadyUp";
@@ -55,7 +56,7 @@ import {
 import { CASIMIRBOT_PUBLIC_ORIGIN } from "@/lib/agent-access/agentAccessContent";
 import { useAgiChatStore } from "@/store/useAgiChatStore";
 import { useWorkspaceMemoryRegistryStore } from "@/store/useWorkspaceMemoryRegistryStore";
-import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/accountCapabilityPolicy";
+import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, readCachedAccountCapabilityPolicy } from "@/lib/workstation/accountCapabilityPolicy";
 import { AGENT_CONNECTION_INVALIDATED_EVENT } from "@/lib/agent-access/connectionObservation";
 import {
   inspectLatestReasoningBinding,
@@ -147,7 +148,49 @@ export function AgentConnectionSetup() {
     undefined,
     restore,
   );
-  const nativeHarnessControlAvailable = Boolean(window.casimirDesktop?.startMcpTunnel);
+  const [developerAccount, setDeveloperAccount] = useState(() => readCachedAccountCapabilityPolicy()?.account_type === "developer");
+  const [personalMcpP1Available, setPersonalMcpP1Available] = useState(false);
+  const [personalMcpP1Checking, setPersonalMcpP1Checking] = useState(
+    () => Boolean(window.casimirDesktop?.personalMcpP1Connection),
+  );
+  const localStdioSetup = personalMcpP1Available &&
+    (setup.selectedProfile === "codex_app" || setup.viewedStep === "choose");
+  const developerTunnelRoute = developerAccount && !localStdioSetup;
+  const nativeHarnessControlAvailable = developerTunnelRoute && Boolean(window.casimirDesktop?.startMcpTunnel);
+  useEffect(() => {
+    const accountChanged = () => setDeveloperAccount(readCachedAccountCapabilityPolicy()?.account_type === "developer");
+    window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, accountChanged);
+    return () => window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, accountChanged);
+  }, []);
+  useEffect(() => {
+    let active = true;
+    let generation = 0;
+    const inspect = () => {
+      const request = ++generation;
+      setPersonalMcpP1Available(false);
+      setPersonalMcpP1Checking(Boolean(window.casimirDesktop?.personalMcpP1Connection));
+      void window.casimirDesktop?.personalMcpP1Connection?.("inspect")
+        .then(result => {
+          if (active && request === generation) {
+            setPersonalMcpP1Available(typeof result === "object" && result !== null &&
+              "available" in result && result.available === true);
+            setPersonalMcpP1Checking(false);
+          }
+        })
+        .catch(() => {
+          if (active && request === generation) {
+            setPersonalMcpP1Available(false);
+            setPersonalMcpP1Checking(false);
+          }
+        });
+    };
+    inspect();
+    window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, inspect);
+    return () => {
+      active = false;
+      window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, inspect);
+    };
+  }, []);
   const [remote, setRemote] = useState<RemoteState>({ kind: "idle" });
   const [codexPlugin, setCodexPlugin] =
     useState<DesktopCodexPluginState | null>(null);
@@ -168,6 +211,7 @@ export function AgentConnectionSetup() {
   );
   const [reasoningBinding, setReasoningBinding] =
     useState<BrowserReasoningBinding | null>(null);
+  const [revokeBindingIntent, setRevokeBindingIntent] = useState<string | null>(null);
   const [claimHandle, setClaimHandle] = useState<string | null>(null);
   const [bindingBusy, setBindingBusy] = useState(false);
   const [selectedRunVerification, setSelectedRunVerification] = useState<string | null>(null);
@@ -235,7 +279,7 @@ export function AgentConnectionSetup() {
       unsubscribe?.();
     };
   }, [setup.selectedProfile, transportInspectionRequest]);
-  const [diagnosticStatus, setDiagnosticStatus] = useState<string | { kind: "binding_check" } | null>(null);
+  const [diagnosticStatus, setDiagnosticStatus] = useState<string | { kind: "binding_check" | "account_check" } | null>(null);
   const [diagnosticPreview, setDiagnosticPreview] = useState<string | null>(null);
   const diagnosticGeneration = useRef(0);
   useEffect(() => () => { diagnosticGeneration.current++; }, []);
@@ -354,19 +398,6 @@ export function AgentConnectionSetup() {
         );
         if (parsed.data.readiness.client_authorization !== "active") {
           dispatch({ type: "view", step: "authorize" });
-          suppressLocalGuidanceHandling.current = true;
-          try {
-            requestWorkstationGuidance({
-              kind: "user_attention",
-              panelId: "agent-access",
-              targetId: "auth0-account-link",
-              label:
-                "Agent access needs authentication. Review the account status and choose Link Auth0 to open the secure native sign-in window.",
-              durationMs: 12_000,
-            });
-          } finally {
-            suppressLocalGuidanceHandling.current = false;
-          }
         } else if (
           parsed.data.proof_basis === "authenticated_presence_tool" &&
           parsed.data.readiness.agent_ready
@@ -394,6 +425,25 @@ export function AgentConnectionSetup() {
     },
     [setup.selectedProfile, setup.viewedStep],
   );
+  useEffect(() => {
+    // Wait for native route inspection before directing account recovery. A
+    // local Codex entry uses separate computer/client approvals, not OAuth.
+    if (personalMcpP1Checking || remote.kind !== "loaded" || remote.refreshing ||
+        remote.readFailed || remote.status.readiness.client_authorization === "active") return;
+    suppressLocalGuidanceHandling.current = true;
+    try {
+      requestWorkstationGuidance(localStdioSetup ? {
+        kind: "user_attention", panelId: "account-session",
+        label: "Review this account's separate computer and Codex approvals.",
+        durationMs: 12_000,
+      } : {
+        kind: "user_attention", panelId: "agent-access", targetId: "auth0-account-link",
+        label: "Agent access needs authentication. Review the account status and choose Link Auth0 to open the secure native sign-in window.",
+        durationMs: 12_000,
+      });
+    } finally { suppressLocalGuidanceHandling.current = false; }
+  }, [localStdioSetup, personalMcpP1Checking, remote]);
+
   const guidanceRefresh = useRef(refresh);
   guidanceRefresh.current = refresh;
   useEffect(() => {
@@ -402,6 +452,8 @@ export function AgentConnectionSetup() {
     // start transport, or infer consent; refresh validates the server response
     // and supersedes any older in-flight readiness request.
     const recheckAccount = () => {
+      pendingHarnessStart.current = false;
+      revealBindingAfterStart.current = false;
       disconnectGeneration.current++;setDisconnectConfirm(null);setOperationError(null);
       void guidanceRefresh.current();
     };
@@ -563,11 +615,17 @@ export function AgentConnectionSetup() {
       }
     };
     window.addEventListener(HELIX_WORKSTATION_GUIDANCE_EVENT, handleGuidance);
+    const forwardPending = (candidate: unknown) => {
+      const request = coerceWorkstationGuidanceRequest(candidate);
+      if (request?.targetId?.startsWith("setup-contract-review:")) {
+        requestWorkstationGuidance(request);
+      } else if (request) handleGuidanceRequest(request);
+    };
     const pending = consumePendingWorkstationGuidance();
-    if (pending) handleGuidanceRequest(pending);
+    if (pending) forwardPending(pending);
     void window.casimirDesktop?.getPendingWorkstationGuidance?.()
       .then((candidate) => {
-        if (!cancelled && candidate) handleGuidanceRequest(candidate);
+        if (!cancelled && candidate) forwardPending(candidate);
       })
       .catch(() => undefined);
     const unsubscribeTunnel = window.casimirDesktop?.onMcpTunnelState?.((candidate) => {
@@ -591,6 +649,7 @@ export function AgentConnectionSetup() {
   }, []);
 
   const readFullHarnessTrust = useCallback(async () => {
+    if (readCachedAccountCapabilityPolicy()?.account_type !== "developer") return;
     if (trustRead.current.controller || trustMutation.current.controller) return;
     const controller = new AbortController();
     const generation = ++trustRead.current.generation;
@@ -654,6 +713,7 @@ export function AgentConnectionSetup() {
   }, []);
 
   useEffect(() => {
+    if (!developerAccount) return;
     if (typeof window.casimirDesktop?.getRuntimeSnapshot !== "function") return;
     void readFullHarnessTrust();
     const recheckTrust = () => {
@@ -673,7 +733,7 @@ export function AgentConnectionSetup() {
       trustRead.current.controller?.abort();
       trustRead.current.controller = undefined;
     };
-  }, [readFullHarnessTrust]);
+  }, [developerAccount, readFullHarnessTrust]);
 
   useEffect(() => {
     if (setup.selectedProfile !== "codex_app") return;
@@ -694,19 +754,29 @@ export function AgentConnectionSetup() {
     ? HELIX_AGENT_CLIENT_PROFILES[setup.selectedProfile]
     : null;
   const status = remote.kind === "loaded" ? remote.status : null;
-  const setupNextAction = useMemo(() => deriveHelixAgentSetupNextAction({
-    profileSelected: Boolean(setup.selectedProfile),
-    statusFresh: remote.kind === "loaded" && !remote.readFailed,
-    readiness: status?.readiness,
-    authenticatedMcpCallObserved: status?.proof_basis === "authenticated_presence_tool",
-    transport: status?.proof_basis === "authenticated_presence_tool"
-      ? "ready"
-      : transportInspection !== "observed"
-        ? "unknown"
-        : onboardingTunnel?.ready && onboardingTunnel.processRunning
-          ? "ready" : "not_ready",
-  }), [remote, setup.selectedProfile, status?.proof_basis, status?.readiness,
-    transportInspection, onboardingTunnel]);
+  const setupNextAction = useMemo(() => {
+    const action = deriveHelixAgentSetupNextAction({
+      profileSelected: Boolean(setup.selectedProfile),
+      statusFresh: remote.kind === "loaded" && !remote.readFailed,
+      readiness: status?.readiness,
+      authenticatedMcpCallObserved: status?.proof_basis === "authenticated_presence_tool",
+      transport: status?.proof_basis === "authenticated_presence_tool"
+        ? "ready"
+        : !developerTunnelRoute ? "unknown"
+          : transportInspection !== "observed" ? "unknown"
+            : onboardingTunnel?.ready && onboardingTunnel.processRunning ? "ready" : "not_ready",
+    });
+    if (localStdioSetup &&
+        remote.kind === "loaded" && !remote.readFailed &&
+        status?.proof_basis !== "authenticated_presence_tool" &&
+        ["authorization", "catalog", "transport"].includes(action.checkpoint)) {
+      return { checkpoint: "transport", actor: "owner", title: "Check personal Codex access",
+        instruction: "Review the separate computer and Codex approvals in Account & Sessions. Once configured, use this exact Codex chat for one read-only personal MCP call. If its tools timed out before CasimirBot opened, keep CasimirBot running and reload Codex's local MCP connection, then retry in the same chat. Do not create a new chat, repeat device approval, connect an OAuth Source, or start the developer tunnel.",
+        state: "action_required" } as const;
+    }
+    return action;
+  }, [developerTunnelRoute, localStdioSetup, remote, setup.selectedProfile,
+    status?.proof_basis, status?.readiness, transportInspection, onboardingTunnel]);
   const acceptedDurablePolling = Boolean(reasoningBinding?.pairing_id &&
     reasoningBinding.status === "active" && reasoningBinding.continuation_transport === "polling" &&
     reasoningBinding.helix_conversation_id === activeChatId &&
@@ -721,7 +791,15 @@ export function AgentConnectionSetup() {
     : "This task's continuation was unavailable at the last check. Ask that same AI task to refresh its CasimirBot presence. While this panel is visible, it checks automatically every five seconds and enables binding when the server confirms readiness.";
   // Connection guidance follows the latest read; operation receipts such as
   // copying diagnostics remain separate strings, not cached readiness proof.
-  const diagnosticMessage = typeof diagnosticStatus === "string" ? diagnosticStatus : diagnosticStatus
+  const diagnosticMessage = typeof diagnosticStatus === "string" ? diagnosticStatus : diagnosticStatus?.kind === "account_check"
+    ? onboardingPhase === "checking_readiness"
+      ? "Checking this account's connection. This check does not create a tunnel or bind an AI task."
+      : remote.kind === "loaded" && !remote.readFailed
+        ? "Connection check complete. Review the transport and exact-task status above; this check did not create a tunnel or bind an AI task."
+        : remote.kind === "signed_out"
+          ? "Sign in to this CasimirBot profile before checking its connection. No tunnel or task binding was created."
+          : "Connection could not be verified. Recheck after the service is available; no tunnel or task binding was created."
+    : diagnosticStatus
     ? status?.readiness.agent_ready && acceptedDurablePolling
       ? "Approved task pairing checked. The same task can pick up steering while running; this check does not renew pairing or environment permissions."
       : status?.readiness.agent_ready && status.readiness.continuation_readiness !== "unavailable"
@@ -760,11 +838,13 @@ export function AgentConnectionSetup() {
     ((remote.kind === "loaded" && remote.readFailed) ||
       (status.readiness.continuation_readiness === "unavailable" && !acceptedDurablePolling) || !status.readiness.agent_ready ||
       (Boolean(activeChatId) && reasoningBinding?.status !== "active" && !status.verified_run_association));
+  const inspectedExpiredHeartbeat = useRef<string | null>(null);
   useEffect(() => {
     if (!setup.selectedProfile || !["ready", "check"].includes(setup.viewedStep) ||
         !status?.heartbeat_expires_at) return;
     const deadline = Date.parse(status.heartbeat_expires_at);
     if (!Number.isFinite(deadline)) return;
+    if (deadline <= Date.now() && inspectedExpiredHeartbeat.current === status.heartbeat_expires_at) return;
     let timer: number;
     const inspectAtDeadline = () => {
       // This is a status read, never a heartbeat or consent renewal. Keep the
@@ -774,6 +854,7 @@ export function AgentConnectionSetup() {
         timer = window.setTimeout(inspectAtDeadline, 250);
         return;
       }
+      inspectedExpiredHeartbeat.current = status.heartbeat_expires_at;
       void guidanceRefresh.current();
     };
     timer = window.setTimeout(inspectAtDeadline,
@@ -920,10 +1001,20 @@ export function AgentConnectionSetup() {
 
   const startHarness = async (): Promise<void> => {
     if (
+      personalMcpP1Checking ||
       onboardingPhase === "starting_native_harness" ||
       onboardingPhase === "checking_readiness"
     )
       return;
+    if (!developerTunnelRoute || readCachedAccountCapabilityPolicy()?.account_type !== "developer") {
+      revealBindingAfterStart.current = false;
+      pendingHarnessStart.current = false;
+      setOnboardingPhase("checking_readiness");
+      setOperationError(null);
+      setDiagnosticStatus({ kind: "account_check" });
+      await refresh(setup.selectedProfile ?? "codex_app", setup.viewedStep);
+      return;
+    }
     if (!nativeHarnessControlAvailable) {
       revealBindingAfterStart.current = false;
       pendingHarnessStart.current = false;
@@ -990,6 +1081,7 @@ export function AgentConnectionSetup() {
   };
 
   const updateFullHarnessTrust = async (trusted: boolean): Promise<void> => {
+    if (readCachedAccountCapabilityPolicy()?.account_type !== "developer") return;
     if (trustBusy || trustReadBusy || fullHarnessTrust === null || trustMutation.current.controller) return;
     const controller = new AbortController();
     const generation = ++trustMutation.current.generation;
@@ -1072,7 +1164,7 @@ export function AgentConnectionSetup() {
         setTrustBusy(false);
       }
     }
-    if (!parsed?.trusted || !pendingHarnessStart.current) return;
+    if (!parsed?.trusted || !pendingHarnessStart.current || readCachedAccountCapabilityPolicy()?.account_type !== "developer") return;
 
     setOnboardingPhase("starting_native_harness");
     try {
@@ -1160,7 +1252,9 @@ export function AgentConnectionSetup() {
       case "authorize":
         return {
           title: "Authorize agent access",
-          body: "Link this CasimirBot profile through the native OAuth window. No token is copied into this chat or page.",
+          body: localStdioSetup
+            ? "Review the separate computer and Codex approvals in Account & Sessions for this CasimirBot profile."
+            : "Link this CasimirBot profile through the native OAuth window. No token is copied into this chat or page.",
         };
       case "connect":
         return {
@@ -1191,6 +1285,7 @@ export function AgentConnectionSetup() {
         };
     }
   }, [
+    localStdioSetup,
     selected?.display_name,
     setup.viewedStep,
     status?.catalog_reenumeration_required,
@@ -1328,6 +1423,7 @@ export function AgentConnectionSetup() {
       setReasoningBinding(binding);
       rememberReasoningTaskBinding(binding);
       setClaimHandle(null);
+      setRevokeBindingIntent(null);
     } catch {
       setOperationError(
         "CasimirBot could not revoke the current reasoning-task binding.",
@@ -1338,7 +1434,7 @@ export function AgentConnectionSetup() {
   };
 
   const nativeTrustControl =
-    typeof window.casimirDesktop?.getRuntimeSnapshot === "function" ? (
+    developerTunnelRoute && typeof window.casimirDesktop?.getRuntimeSnapshot === "function" ? (
       <div
         className="mt-3 rounded-lg border border-cyan-300/20 bg-cyan-400/5 p-3"
         data-helix-guidance-target="full-harness-trust"
@@ -1361,7 +1457,7 @@ export function AgentConnectionSetup() {
               this profile and device. This never grants in-environment
               Minecraft actions, trading, answer, or terminal authority.
             </span>
-            <button
+            <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.void-update-full-harness-trust-full-harness-trust-trusted-true" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
               type="button"
               disabled={trustBusy || trustReadBusy || fullHarnessTrust === null}
               onClick={() =>
@@ -1398,7 +1494,7 @@ export function AgentConnectionSetup() {
                   ? "Sign in through Account & Sessions before checking Full Harness device trust. This failed read does not revoke existing device trust."
                   : "CasimirBot could not read this device's current trust status. Recheck device trust to retry the status read; this does not change approval."
               : "Read the current device trust status before another decision. Rechecking does not repeat the change."}</p>
-            <button
+            <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.void-read-full-harness-trust" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
               type="button"
               disabled={trustReadBusy || trustBusy}
               onClick={() => void readFullHarnessTrust()}
@@ -1411,7 +1507,7 @@ export function AgentConnectionSetup() {
           <p className="mt-2 text-[11px] leading-4 text-cyan-100" role="status">Checking device trust…</p>
         ) : null}
         {trustRecoveryPanel ? (
-          <button
+          <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.request-workstation-guidance-kind-user-attention-panel-id-trust-recovery" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
             type="button"
             className="mt-2 rounded border border-cyan-200/30 px-2.5 py-1.5 text-[11px] text-cyan-100"
             onClick={() => requestWorkstationGuidance({
@@ -1451,9 +1547,10 @@ export function AgentConnectionSetup() {
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
           {setup.viewedStep !== "choose" && setup.viewedStep !== "check" && setup.viewedStep !== "ready" ? (
-            <button
+            <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.void-start-harness" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
               type="button"
               disabled={
+                personalMcpP1Checking ||
                 onboardingPhase === "starting_native_harness" ||
                 onboardingPhase === "checking_readiness"
               }
@@ -1473,7 +1570,8 @@ export function AgentConnectionSetup() {
                 ? "Starting harness…"
                 : onboardingPhase === "checking_readiness"
                   ? "Checking connection…"
-                  : nativeHarnessControlAvailable ? "Start Harness" : "Check current service"}
+                  : personalMcpP1Checking ? "Checking Codex route…"
+                  : nativeHarnessControlAvailable ? "Start Harness" : "Check connection"}
             </button>
           ) : null}
           <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[10px] uppercase tracking-wide text-slate-300">
@@ -1482,7 +1580,7 @@ export function AgentConnectionSetup() {
               : `Step ${Math.max(1, ["choose", "account", "authorize", "connect", "check", "ready"].indexOf(setup.viewedStep) + 1)} of 6`}
           </span>
           {setup.viewedStep === "ready" && status?.authenticated_profile_ref && activeChatId ? (
-            <button type="button" className="rounded-lg border border-cyan-300/40 bg-cyan-400/10 px-3 py-2 text-xs font-semibold text-cyan-50"
+            <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.const-section-document-get-element-by-id-agent-exact-task-pairing-sectio" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="rounded-lg border border-cyan-300/40 bg-cyan-400/10 px-3 py-2 text-xs font-semibold text-cyan-50"
               onClick={() => {
                 const section = document.getElementById("agent-exact-task-pairing");
                 section?.scrollIntoView?.({ behavior: "smooth", block: "start" });
@@ -1502,11 +1600,14 @@ export function AgentConnectionSetup() {
         {currentCopy.body}
       </p>
       <p className="mt-2 text-xs text-cyan-100/85" role="status" data-testid="agent-setup-shared-status">
-        Full Harness transport: {transportInspection === "checking" ? "checking" :
+        {developerTunnelRoute ? <>Full Harness transport: {transportInspection === "checking" ? "checking" :
           transportInspection !== "observed" ? "not verified" :
           onboardingTunnel?.ready && onboardingTunnel.processRunning && onboardingTunnel.scope === "full_helix_agent"
             ? "Ready locally" : onboardingTunnel?.ready && onboardingTunnel.processRunning
-              ? "read-only locally" : "stopped or unavailable"}.
+              ? "read-only locally" : "stopped or unavailable"}</> :
+          <>Personal Codex transport: {status?.proof_basis === "authenticated_presence_tool"
+            ? "authenticated MCP check-in observed" : localStdioSetup
+              ? "setup available; not verified" : "not available"}</>}.
         {" "}Exact AI task: {remote.kind === "loaded" && !remote.readFailed && status?.readiness.agent_ready
           ? "verified by authenticated check-in" : "not currently verified"}.
       </p>
@@ -1517,14 +1618,24 @@ export function AgentConnectionSetup() {
           data-agent-setup-next-action={setupNextAction.checkpoint}
         >
           <p className="font-semibold text-amber-100">
-            Next action · {setupNextAction.actor === "agent" ? "AI task" : "You"}
+            {setupNextAction.checkpoint === "transport" && !developerTunnelRoute && !localStdioSetup
+              ? "Connection unavailable"
+              : `Next action · ${setupNextAction.actor === "agent" ? "AI task" : "You"}`}
           </p>
-          <p className="mt-1 font-semibold">{setupNextAction.title}</p>
-          <p className="mt-1 text-amber-50/85">{setupNextAction.instruction}</p>
-          <button type="button" className="mt-3 rounded border border-amber-200/45 px-3 py-1.5 font-semibold"
-            onClick={highlightNextStep}>Highlight next step</button>
+          <p className="mt-1 font-semibold">{setupNextAction.checkpoint === "transport" && !developerTunnelRoute
+            ? localStdioSetup ? setupNextAction.title : "Personal Full Harness is not available in this build"
+            : setupNextAction.title}</p>
+          <p className="mt-1 text-amber-50/85">{setupNextAction.checkpoint === "transport" && !developerTunnelRoute
+            ? localStdioSetup
+              ? setupNextAction.instruction
+              : "The private developer tunnel cannot be enabled for this account. Device Check can report its status, but repeating sign-in or MFA will not create a personal connection."
+            : setupNextAction.instruction}</p>
+          {setupNextAction.checkpoint !== "transport" || developerTunnelRoute ? (
+            <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.highlight-next-step" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="mt-3 rounded border border-amber-200/45 px-3 py-1.5 font-semibold"
+              onClick={highlightNextStep}>Highlight next step</button>
+          ) : null}
           {setupNextAction.checkpoint === "first_read_only_call" ? (
-            <button
+            <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.agent-setup-startup-request" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
               id="agent-setup-startup-request"
               data-helix-guidance-target="agent-setup-startup-request"
               type="button"
@@ -1532,7 +1643,8 @@ export function AgentConnectionSetup() {
               onClick={() => void (async () => {
                 try {
                   if (!navigator.clipboard?.writeText) throw new Error("clipboard_unavailable");
-                  await navigator.clipboard.writeText(PERSONAL_MCP_STARTUP_REQUEST);
+                  await navigator.clipboard.writeText(localStdioSetup
+                    ? LOCAL_STDIO_MCP_STARTUP_REQUEST : PERSONAL_MCP_STARTUP_REQUEST);
                   setSetupRequestCopyStatus("Read-only startup request copied. Paste it into this exact AI task.");
                 } catch {
                   setSetupRequestCopyStatus("Copy failed. Clipboard access is unavailable.");
@@ -1542,15 +1654,15 @@ export function AgentConnectionSetup() {
               Copy read-only startup request
             </button>
           ) : setupNextAction.checkpoint === "catalog" ? (
-            <button
+            <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.agent-setup-review-connection" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
               id="agent-setup-review-connection"
               data-helix-guidance-target="agent-setup-review-connection"
               type="button"
               className="mt-3 rounded border border-amber-200/45 px-3 py-1.5 font-semibold"
               onClick={() => dispatch({ type: "view", step: "connect" })}
             >Review matching MCP connection</button>
-          ) : setupNextAction.checkpoint === "transport" ? (
-            <button
+          ) : setupNextAction.checkpoint === "transport" && developerTunnelRoute ? (
+            <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.agent-setup-open-transport" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
               id="agent-setup-open-transport"
               data-helix-guidance-target="agent-setup-open-transport"
               type="button"
@@ -1561,6 +1673,14 @@ export function AgentConnectionSetup() {
                 durationMs: 12000,
               })}
             >Open local transport setup</button>
+          ) : setupNextAction.checkpoint === "transport" && localStdioSetup ? (
+            <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.open-account-sessions" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="mt-3 rounded border border-amber-200/45 px-3 py-1.5 font-semibold"
+              onClick={() => requestWorkstationGuidance({
+                kind: "user_attention", panelId: "account-session",
+                label: "Review this account's separate computer and Codex approvals.",
+                durationMs: 12000,
+              })}
+            >Open Account & Sessions</button>
           ) : null}
           {setupRequestCopyStatus ? <p role="status" className="mt-2">{setupRequestCopyStatus}</p> : null}
         </section>
@@ -1579,7 +1699,10 @@ export function AgentConnectionSetup() {
       <details className="mt-3 rounded border border-white/10 p-3 text-xs text-slate-300">
         <summary className="cursor-pointer font-semibold">Exact-task setup order and checkpoints</summary>
         <ol className="mt-2 list-decimal space-y-1 pl-5">
-          {HELIX_AGENT_SETUP_PROCEDURE.steps.map(step => <li key={step.id}>
+          {(localStdioSetup
+            ? [...HELIX_AGENT_SETUP_PROCEDURE.local_stdio_steps,
+                ...HELIX_AGENT_SETUP_PROCEDURE.steps.filter(step => step.route !== "personal_mcp")]
+            : HELIX_AGENT_SETUP_PROCEDURE.steps).map(step => <li key={step.id}>
             <strong>{step.actor === "owner" ? "Owner" : "AI task"} · {step.label}.</strong>{" "}
             <span className="text-cyan-200">{step.route === "personal_mcp" ? "Personal MCP" : step.route === "task_pairing" ? "Optional pairing" : "Optional environment"}.</span>{" "}
             {step.evidence} {step.next}
@@ -1588,9 +1711,11 @@ export function AgentConnectionSetup() {
         <p className="mt-2">{HELIX_AGENT_SETUP_PROCEDURE.rule}</p>
         <p className="mt-2">Provider API setup is a separate path for assisted AI; task pairing is optional for ordinary personal MCP tools. Select the environment and review its action permissions separately before gameplay.</p>
       </details>
-      {!nativeHarnessControlAvailable ? (
+      {!window.casimirDesktop?.startMcpTunnel ? (
         <p className="mt-2 rounded-lg border border-amber-300/20 bg-amber-400/5 p-3 text-xs leading-5 text-amber-50/85">
-          Browser view: this page can check only the service at its current address. Starting the private MCP tunnel and binding its exact AI task must be done in the installed CasimirBot Agent Access panel. MCP can bring that native panel forward without approving anything.
+          {developerTunnelRoute
+            ? "Browser view: this page can check only the service at its current address. Starting the private MCP tunnel and binding its exact AI task must be done in the installed CasimirBot Agent Access panel. MCP can bring that native panel forward without approving anything."
+            : "Browser view: this page can check only the service at its current address. This build cannot start a personal Full Harness connection for an ordinary account; Device Check reports status but does not enable one."}
         </p>
       ) : null}
       {nativeTrustControl}
@@ -1600,19 +1725,22 @@ export function AgentConnectionSetup() {
           <div
             className="rounded-xl border border-cyan-300/30 bg-cyan-400/10 p-4"
             data-helix-guidance-target="agent-connection-fast-start"
-            data-helix-guidance-label="Start the harness to check this account and exact Codex connection."
+            data-helix-guidance-label={developerTunnelRoute
+              ? "Start the harness to check this account and exact Codex connection."
+              : "Check this account and exact Codex connection."}
           >
-            <p className="font-semibold text-cyan-50">Fast start with Codex</p>
+            <p className="font-semibold text-cyan-50">{developerTunnelRoute ? "Fast start with Codex" : "Check Codex connection"}</p>
             <p className="mt-1 text-xs leading-5 text-cyan-50/75">
-              One click checks this account and exact Codex connection. In the
-              installed desktop, this click also enables the existing full
-              developer harness for this app session. It never approves OAuth,
-              creates a Codex task, controls Codex UI, or grants environment
-              authority.
+              {developerTunnelRoute
+                ? "One click checks this account and exact Codex connection. In the installed desktop, this click also enables the existing full developer harness for this app session. It never approves OAuth, creates a Codex task, controls Codex UI, or grants environment authority."
+                : personalMcpP1Available
+                  ? "Check this account and exact Codex connection. Set up personal Codex access separately in Account & Sessions; this check does not approve the computer, connect Codex, or bind an AI task."
+                  : "Check this account and exact Codex connection. A personal Full Harness connection is not available in this build; the private developer tunnel is separate. This check cannot create a connection or bind an AI task."}
             </p>
-            <button
+            <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.void-start-harness.2" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
               type="button"
               disabled={
+                personalMcpP1Checking ||
                 onboardingPhase === "starting_native_harness" ||
                 onboardingPhase === "checking_readiness"
               }
@@ -1632,12 +1760,13 @@ export function AgentConnectionSetup() {
                 ? "Starting harness…"
                 : onboardingPhase === "checking_readiness"
                   ? "Checking connection…"
-                  : nativeHarnessControlAvailable ? "Start Harness" : "Check current service"}
+                  : personalMcpP1Checking ? "Checking Codex route…"
+                  : nativeHarnessControlAvailable ? "Start Harness" : "Check connection"}
             </button>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {Object.values(HELIX_AGENT_CLIENT_PROFILES).map((profile) => (
-              <button
+              <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.dispatch-type-choose-profile-profile-profile-id" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
                 key={profile.profile_id}
                 type="button"
                 onClick={() =>
@@ -1660,7 +1789,7 @@ export function AgentConnectionSetup() {
       ) : null}
 
       {setup.viewedStep === "account" ? (
-        <button
+        <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.open-account-sign-in" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
           type="button"
           data-helix-guidance-target="account-sign-in"
           className="mt-4 rounded border border-cyan-700 px-3 py-2 text-sm text-cyan-100"
@@ -1675,13 +1804,30 @@ export function AgentConnectionSetup() {
       ) : null}
 
       {setup.viewedStep === "authorize" ? (
-        <div className="mt-4">
-          <AgentAccountBindingReadiness />
-        </div>
+        localStdioSetup ? (
+          <div className="mt-4 rounded-lg border border-white/10 bg-black/20 p-4 text-xs leading-5 text-slate-200">
+            <p>Personal Codex access uses separate computer and client approvals on the verified CasimirBot account. It does not use a Codex OAuth Source.</p>
+            <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.open-account-sessions.2" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="mt-3 rounded border border-cyan-300/40 px-3 py-2 font-semibold"
+              onClick={() => requestWorkstationGuidance({ kind: "user_attention", panelId: "account-session",
+                label: "Review this account's separate computer and Codex approvals.", durationMs: 12000 })}
+            >Open Account & Sessions</button>
+          </div>
+        ) : <div className="mt-4"><AgentAccountBindingReadiness /></div>
       ) : null}
 
       {setup.viewedStep === "connect" && selected ? (
         <div className="mt-4 rounded-lg border border-white/10 bg-black/20 p-4">
+          {localStdioSetup ? <>
+            <ol className="list-decimal space-y-2 pl-5 text-xs leading-5 text-slate-300">
+              <li>Approve this computer in Account & Sessions with its own fresh authenticator code.</li>
+              <li>Connect Codex locally there with a separate client-scope approval.</li>
+              <li>After the app confirms the personal entry is configured, restart Codex and inspect the matching MCP tools in this task.</li>
+            </ol>
+            <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.open-account-sessions.3" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="mt-4 rounded border border-cyan-300/40 px-3 py-2 text-xs font-semibold text-cyan-100"
+              onClick={() => requestWorkstationGuidance({ kind: "user_attention", panelId: "account-session",
+                label: "Review this account's separate computer and Codex approvals.", durationMs: 12000 })}
+            >Open Account & Sessions</button>
+          </> : <>
           <ol className="list-decimal space-y-2 pl-5 text-xs leading-5 text-slate-300">
             {selected.profile_id === "codex_app" ? (
               <>
@@ -1728,7 +1874,7 @@ export function AgentConnectionSetup() {
           >
             Server address
           </label>
-          <input
+          <input data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.agent-mcp-url" data-helix-interaction-kind="configure" data-helix-authority-state="client_local"
             id="agent-mcp-url"
             readOnly
             value={mcpUrl}
@@ -1738,28 +1884,40 @@ export function AgentConnectionSetup() {
             Use only the server address and the AI app's OAuth sign-in. Never
             paste a credential here.
           </p>
+          </>}
         </div>
       ) : null}
 
       {setup.viewedStep === "check" ? (
         <div className="mt-4 rounded-lg border border-white/10 bg-black/20 p-4 text-xs leading-5 text-slate-200"
         >
-          <p className="font-semibold">Run the read-only check-in in your chosen Codex task</p>
-          <p className="mt-1">The EXE uses that authenticated receipt to verify MCP startup for this exact task. Message Codex pairing is optional and requires separate owner review. This page cannot create a check-in or wake an idle task.</p>
-          <p className="mt-2" role="status">Local transport: {transportInspection === "checking" ? "checking native status…" : transportInspection !== "observed" ? "not verified; inspect native setup" : onboardingTunnel?.ready && onboardingTunnel.processRunning ? "Ready locally; this does not prove AI connectivity" : "not Ready; review native setup before retrying the AI connection"}.</p>
+          <p className="font-semibold">{developerTunnelRoute ? "Run the read-only check-in in your chosen Codex task" : "Personal Full Harness connection status"}</p>
+          <p className="mt-1">{developerTunnelRoute
+            ? "The EXE uses that authenticated receipt to verify MCP startup for this exact task. Message Codex pairing is optional and requires separate owner review. This page cannot create a check-in or wake an idle task."
+            : localStdioSetup
+              ? "Complete the separate computer and Codex approvals in Account & Sessions, then restart Codex and request one read-only MCP call in this task. A configured entry alone does not prove task pickup or grant actions."
+              : "This build cannot start the personal connection for an ordinary account. Inspecting local status does not enable the private developer tunnel or bind a Codex task."}</p>
+          {developerTunnelRoute ? <p className="mt-2" role="status">Local transport: {transportInspection === "checking" ? "checking native status…" : transportInspection !== "observed" ? "not verified; inspect native setup" : onboardingTunnel?.ready && onboardingTunnel.processRunning ? "Ready locally; this does not prove AI connectivity" : "not Ready; review native setup before retrying the AI connection"}.</p> :
+            <p className="mt-2" role="status">Personal Codex transport: {status?.proof_basis === "authenticated_presence_tool" ? "authenticated MCP check-in observed" : localStdioSetup ? "setup available; task pickup not verified" : "not available"}.</p>}
           <div className="mt-3 flex flex-wrap gap-2">
-            <button type="button" className="rounded border border-white/20 px-3 py-1.5 font-semibold"
+            <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.review-ai-connection-settings" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="rounded border border-white/20 px-3 py-1.5 font-semibold"
               onClick={() => { revealBindingAfterStart.current = false; dispatch({ type: "view", step: "connect" }); }}
             >Review AI connection settings</button>
-            <button type="button" className="rounded border border-white/20 px-3 py-1.5 font-semibold"
+            {developerTunnelRoute ? <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.open-local-transport-setup" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="rounded border border-white/20 px-3 py-1.5 font-semibold"
               onClick={() => requestWorkstationGuidance({ kind: "user_attention", panelId: "device-check", label: "Inspect the local tunnel and its console. Ready locally is not proof of an authenticated AI task check-in.", durationMs: 12000 })}
-            >Open local transport setup</button>
-            {window.casimirDesktop?.getMcpTunnelState ? <button type="button" className="rounded border border-white/20 px-3 py-1.5 font-semibold"
+            >Open local transport setup</button> : null}
+            {localStdioSetup ? <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.open-account-sessions.4" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="rounded border border-white/20 px-3 py-1.5 font-semibold"
+              onClick={() => requestWorkstationGuidance({ kind: "user_attention", panelId: "account-session",
+                label: "Review this account's separate computer and Codex approvals.", durationMs: 12000 })}
+            >Open Account & Sessions</button> : null}
+            {developerTunnelRoute && window.casimirDesktop?.getMcpTunnelState ? <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.inspect-transport-again" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="rounded border border-white/20 px-3 py-1.5 font-semibold"
               disabled={transportInspection === "checking"} onClick={() => setTransportInspectionRequest(value => value + 1)}
             >Inspect transport again</button> : null}
           </div>
-          <p className="mt-3 text-amber-100/75">If Codex does not list the CasimirBot tools, finish its connection in Codex first. If a listed tool times out, check the tunnel console for a recent successful control-plane poll; local Ready alone does not prove Codex can reach this profile. Reconnecting a separate Device Check plugin or repeatedly pressing Check connection here cannot create task presence.</p>
-          <p className="mt-2 text-amber-100/75">If the AI reports “Session terminated” or “Unauthorized,” refresh or reconnect the matching connection in the AI app. If that app reports a failed tool refresh, stop the check-in loop: its connection has not been repaired. CasimirBot cannot infer success from local Ready or from opening the plugin page.</p>
+          {developerTunnelRoute ? <>
+            <p className="mt-3 text-amber-100/75">If Codex does not list the CasimirBot tools, finish its connection in Codex first. If a listed tool times out, check the tunnel console for a recent successful control-plane poll; local Ready alone does not prove Codex can reach this profile. Reconnecting a separate Device Check plugin or repeatedly pressing Check connection here cannot create task presence.</p>
+            <p className="mt-2 text-amber-100/75">If the AI reports “Session terminated” or “Unauthorized,” refresh or reconnect the matching connection in the AI app. If that app reports a failed tool refresh, stop the check-in loop: its connection has not been repaired. CasimirBot cannot infer success from local Ready or from opening the plugin page.</p>
+          </> : null}
         </div>
       ) : null}
 
@@ -1889,7 +2047,7 @@ export function AgentConnectionSetup() {
           ) : (
             <div className="mt-3 rounded border border-amber-300/20 p-3">
               <label className="block">
-                <input type="checkbox" checked={false} disabled aria-describedby="environment-run-preparation-needed" />{" "}
+                <input data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.input" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" type="checkbox" checked={false} disabled aria-describedby="environment-run-preparation-needed" />{" "}
                 Include a verified environment run in the new binding
               </label>
               <p id="environment-run-preparation-needed" className="mt-2">
@@ -2011,11 +2169,25 @@ export function AgentConnectionSetup() {
                 data-helix-authority-state="client_local"
                 type="button"
                 disabled={bindingBusy}
-                onClick={() => void revokeCurrentReasoningBinding()}
+                onClick={() => setRevokeBindingIntent(reasoningBinding.reasoning_binding_id)}
                 className="rounded-lg border border-rose-300/30 px-3 py-2 text-rose-100 disabled:opacity-50"
               >
                 Revoke binding
               </button>
+            ) : null}
+            {reasoningBinding && revokeBindingIntent === reasoningBinding.reasoning_binding_id &&
+            ["pending_claim", "active"].includes(reasoningBinding.status) ? (
+              <div role="alert" className="w-full rounded-lg border border-rose-300/40 p-3 text-rose-100">
+                <p>This revokes the owner-approved Codex chat pairing as well as its runtime binding. It does not only detach the Minecraft run. Reconnecting this chat requires a new owner-approved invitation.</p>
+                <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.keep-pairing" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="mr-2 mt-2 rounded-lg border border-white/20 px-3 py-2"
+                  disabled={bindingBusy} onClick={() => setRevokeBindingIntent(null)}>Keep pairing</button>
+                <button data-helix-authority-state="client_local" type="button" className="mt-2 rounded-lg border border-rose-300/50 px-3 py-2"
+                  data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.confirm-revoke-reasoning-binding"
+                  data-helix-interaction-kind="human_only" disabled={bindingBusy}
+                  onClick={() => { if (revokeBindingIntent === reasoningBinding.reasoning_binding_id) void revokeCurrentReasoningBinding(); }}>
+                  Confirm revoke chat pairing
+                </button>
+              </div>
             ) : null}
           </div>
         </details>
@@ -2042,11 +2214,11 @@ export function AgentConnectionSetup() {
       ) : null}
 
       <div className="mt-4 flex flex-wrap gap-2">
-        {window.casimirDesktop?.startMcpTunnel && setup.viewedStep !== "check" && setup.viewedStep !== "ready" ? (
-          <button
+        {nativeHarnessControlAvailable && setup.viewedStep !== "check" && setup.viewedStep !== "ready" ? (
+          <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.restore-the-native-full-harness-transport-and-recheck-setup-does-not-ren" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
             type="button"
             onClick={() => void startHarness()}
-            disabled={onboardingPhase === "starting_native_harness" || onboardingPhase === "checking_readiness"}
+            disabled={personalMcpP1Checking || onboardingPhase === "starting_native_harness" || onboardingPhase === "checking_readiness"}
             title="Restore the native Full Harness transport and recheck setup. Does not renew an idle AI task's presence, approve binding, or grant game actions."
             className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-300/25 bg-cyan-400/10 px-3 py-2 text-xs text-cyan-50 disabled:opacity-50"
           >
@@ -2055,7 +2227,7 @@ export function AgentConnectionSetup() {
           </button>
         ) : null}
         {setup.viewedStep !== "choose" ? (
-          <button
+          <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.back" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
             type="button"
             onClick={() => dispatch({ type: "back" })}
             className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-xs hover:bg-white/5"
@@ -2064,7 +2236,7 @@ export function AgentConnectionSetup() {
           </button>
         ) : null}
         {setup.viewedStep !== "choose" ? (
-          <button
+          <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.agent-setup-recheck" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
             type="button"
             id="agent-setup-recheck"
             data-helix-guidance-target="agent-setup-recheck"
@@ -2084,7 +2256,7 @@ export function AgentConnectionSetup() {
           </button>
         ) : null}
         {setup.viewedStep === "connect" ? (
-          <button
+          <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.i-added-it" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
             type="button"
             onClick={() => dispatch({ type: "view", step: "check" })}
             className="rounded-lg border border-cyan-300/25 bg-cyan-400/10 px-3 py-2 text-xs text-cyan-50"
@@ -2092,7 +2264,7 @@ export function AgentConnectionSetup() {
             I added it
           </button>
         ) : null}
-        <button
+        <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.explain" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
           type="button"
           onClick={() => dispatch({ type: "toggle_explanation" })}
           className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-xs hover:bg-white/5"
@@ -2101,7 +2273,7 @@ export function AgentConnectionSetup() {
           <CircleHelp className="h-3.5 w-3.5" aria-hidden="true" /> Explain
         </button>
         {setup.viewedStep !== "choose" ? (
-          <button
+          <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.copy-diagnostics" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
             type="button"
             onClick={() => void copyOnboardingDiagnostic()}
             className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-xs hover:bg-white/5"
@@ -2112,7 +2284,7 @@ export function AgentConnectionSetup() {
         ) : null}
       </div>
 
-      {diagnosticPreview ? <textarea aria-label="Sanitized onboarding diagnostics" readOnly value={diagnosticPreview}
+      {diagnosticPreview ? <textarea data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.sanitized-onboarding-diagnostics" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Sanitized onboarding diagnostics" readOnly value={diagnosticPreview}
         className="w-full min-h-40 rounded border p-2 text-xs" /> : null}
       {diagnosticStatus ? (
         <p className="mt-2 text-xs text-slate-300" role="status">
@@ -2130,7 +2302,7 @@ export function AgentConnectionSetup() {
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
             {codexPlugin?.status === "ready" && !setup.deviceCheckSkipped ? (
-              <button
+              <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.open-optional-device-check" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
                 type="button"
                 onClick={() => void window.casimirDesktop?.openCodexPlugin?.()}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 hover:bg-white/5"
@@ -2140,7 +2312,7 @@ export function AgentConnectionSetup() {
               </button>
             ) : null}
             {!setup.deviceCheckSkipped ? (
-              <button
+              <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.skip-device-check" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
                 type="button"
                 onClick={() => dispatch({ type: "skip_device_check" })}
                 className="rounded-lg border border-white/10 px-3 py-2 hover:bg-white/5"
@@ -2157,7 +2329,7 @@ export function AgentConnectionSetup() {
       {setup.selectedProfile && status?.oauth_binding_ref && status.readiness.client_authorization === "active" ? (
         <div className="mt-4 border-t border-white/10 pt-3">
           {!disconnectTargetMatches ? (
-            <button
+            <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.if-setup-selected-profile-disconnect-busy-readiness-refreshing-return-se" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
               type="button"
               disabled={disconnectBusy||readinessRefreshing}
               onClick={() => {
@@ -2176,7 +2348,7 @@ export function AgentConnectionSetup() {
                 This revokes the profile binding used by every AI client linked
                 through it.
               </span>
-              <button
+              <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.confirm-disconnect" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
                 type="button"
                 disabled={disconnectBusy||readinessRefreshing}
                 onClick={() => void disconnect()}
@@ -2184,7 +2356,7 @@ export function AgentConnectionSetup() {
               >
                 Confirm disconnect
               </button>
-              <button
+              <button data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.cancel" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
                 type="button"
                 onClick={() => setDisconnectConfirm(null)}
                 className="rounded-lg border border-white/10 px-3 py-2"

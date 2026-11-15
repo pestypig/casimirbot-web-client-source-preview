@@ -33,7 +33,7 @@ export function buildHelixAskRuntimePickerModel(args: {
 }): HelixAskRuntimePickerModel {
   const fallbackProvider = args.providers.find((provider) => provider.id === args.selectedRuntime) ?? args.providers[0] ?? null;
   const selectedRuntime = fallbackProvider?.id ?? args.selectedRuntime;
-  const items = args.providers.map((provider) => {
+  const items = args.providers.map((provider): HelixAskRuntimePickerItem => {
     const shortLabel = formatHelixAgentRuntimeShortLabel(provider);
     return {
       id: provider.id,

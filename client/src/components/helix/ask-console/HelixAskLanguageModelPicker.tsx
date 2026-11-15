@@ -1,7 +1,8 @@
 import React from "react";
-import type {
-  HelixLanguageModelProfileId,
-  HelixPinnedLanguageModelId,
+import {
+  HELIX_PINNED_LANGUAGE_MODEL_IDS,
+  type HelixLanguageModelProfileId,
+  type HelixPinnedLanguageModelId,
 } from "@shared/helix-language-model-policy";
 
 export type HelixAskLanguageModelPickerSelection =
@@ -60,13 +61,13 @@ const LANGUAGE_MODEL_PROFILE_ITEMS: Array<Omit<HelixAskLanguageModelPickerItem, 
     shortLabel: "AI Deep",
     description: "Higher reasoning",
   },
-  {
-    id: "pinned:gpt-5.4-mini",
-    selection: { kind: "pinned", model: "gpt-5.4-mini" },
-    label: "GPT-5.4 mini",
-    shortLabel: "AI 5.4 mini",
-    description: "Lowest-cost supported Codex model",
-  },
+  ...HELIX_PINNED_LANGUAGE_MODEL_IDS.map((model): Omit<HelixAskLanguageModelPickerItem, "selected"> => ({
+    id: `pinned:${model}`,
+    selection: { kind: "pinned", model },
+    label: model,
+    shortLabel: `AI ${model}`,
+    description: "Use this exact model",
+  })),
 ];
 
 export function buildHelixAskLanguageModelPickerModel(

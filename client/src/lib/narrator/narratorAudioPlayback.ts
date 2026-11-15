@@ -340,6 +340,7 @@ function playNarratorAudioStream(
       return;
     }
 
+    const sourceBufferMimeType: string = supportedMimeType;
     stopNarratorAudioPlayback();
     const mediaSource = new MediaSource();
     const url = URL.createObjectURL(mediaSource);
@@ -436,7 +437,7 @@ function playNarratorAudioStream(
       if (sourceOpened || settled) return;
       sourceOpened = true;
       try {
-        const sourceBuffer = mediaSource.addSourceBuffer(supportedMimeType);
+        const sourceBuffer = mediaSource.addSourceBuffer(sourceBufferMimeType);
         void pumpSourceBuffer(sourceBuffer).catch((error) => finalize(error));
       } catch (error) {
         finalize(error);

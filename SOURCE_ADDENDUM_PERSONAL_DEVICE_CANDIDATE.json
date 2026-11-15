@@ -1,0 +1,55 @@
+{
+  "observed_at": "2026-11-13T18:18:28.485033+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/workstation/PersonalMcpDeviceRegistration.tsx",
+      "canonical_sha256": "25eba7e72d0b3acdcb8496518823ec7270f2cdd66f9bee645f9c94a9d9e2f3c5",
+      "export_sha256": "25eba7e72d0b3acdcb8496518823ec7270f2cdd66f9bee645f9c94a9d9e2f3c5",
+      "bytes": 13751,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/PersonalMcpDeviceRegistration.spec.tsx",
+      "canonical_sha256": "87d045ab7708385a60851291eea8e31dc518849bcbdbfdf512ecadce2fb85c1e",
+      "export_sha256": "87d045ab7708385a60851291eea8e31dc518849bcbdbfdf512ecadce2fb85c1e",
+      "bytes": 13443,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/workstation/LocalDeveloperAccess.tsx",
+      "canonical_sha256": "127c09f0a138365e4db786c10b8c0d5ef64e7baf083833aa3784d531e38a3472",
+      "export_sha256": "127c09f0a138365e4db786c10b8c0d5ef64e7baf083833aa3784d531e38a3472",
+      "bytes": 7302,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "60643d4c154fe14374ea965ce05fd5ae0da22af7cd93eaa972dcc84691cf1109"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/LocalDeveloperAccess.spec.tsx",
+      "canonical_sha256": "4e2534ef9259c553d068b98670fe51775400910e6f468fd5ac956088b4de922c",
+      "export_sha256": "4e2534ef9259c553d068b98670fe51775400910e6f468fd5ac956088b4de922c",
+      "bytes": 6510,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "ff35dc122a81c67380c88843898f65e1c3704d57c0f79c964610eabfb4304d42"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Read personal device/Codex registration and its complete suite, plus the local developer USB component and its complete suite. AccountSessionPanel and InstalledServicesPanel parent changes remain separate review work.",
+    "Personal computer approval, personal Codex setup and finite task pairing remain separate authorities. Actions are explicit; native bridge status supplies bounded messages and completion receipts. No credential or approval is created by rendering.",
+    "Reproduced nine lifecycle regressions: late success/error for four setup actions across account-session replacement, and late browser-open completion after unmount starting a poll. Existing completion generations now guard action results, errors, final busy state and invalidation events. Session inspection resets busy state. No issued native operation is cancelled by this UI guard.",
+    "Private USB controls distinguish issuer ownership from ordinary account access. Issuer bootstrap is shown only with explicit canBootstrapIssuer; an existing issuer owner can renew. Import remains explicit; native enforcement and review remain authoritative. USB grants do not authorize model usage, game actions, room sources or task pairing."
+  ],
+  "limits": [
+    "Private unfrozen source proposal; no publication or native action performed.",
+    "Thirty mocked tests exercise UI only. Native account binding, credential custody, approval enforcement, installed behavior and final public release remain separate acceptance.",
+    "The new guards suppress stale action continuations. Native completion events rely on native owner attribution; this cohort does not qualify the complete cross-account backend/IPC lifecycle.",
+    "AccountSessionPanel, InstalledServicesPanel, AgentAccessPanel and their other dependencies remain under review. This is not a full application build.",
+    "Five intentional support-contact matches inherited from the previous candidate remain in the final owner publication review."
+  ]
+}

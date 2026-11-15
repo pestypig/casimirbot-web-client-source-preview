@@ -18,6 +18,17 @@ describe("private Ask connection entry",()=>{
   it("is absent and sends no requests without developer presentation admission",()=>{
     mount(false);expect(screen.queryByRole("button")).toBeNull();expect(fetcher).not.toHaveBeenCalled();
   });
+  it("offers personal keys and native chat without probing the developer MCP inspector",async()=>{
+    window.casimirDesktop={getRuntimeSnapshot:vi.fn(),liveConnection:vi.fn(async()=>({ok:true,code:"saved",state:{configured:false,source:"none"}})) as never};
+    render(<PrivateAskConnectionMenu enabled privateInspectorEnabled={false} scope="codex"/>);
+    open();
+    expect(await screen.findByLabelText("Gemini API key")).toBeTruthy();
+    expect(screen.queryByText("External MCP connection")).toBeNull();
+    expect(screen.queryByRole("button",{name:"Recheck private setup"})).toBeNull();
+    expect(fetcher).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button",{name:"Cloud Agent DM"}));
+    expect(await screen.findByLabelText("Message to private agent")).toBeTruthy();
+  });
   it("checks only private policy on explicit open, reuses inspector, and navigates without side effects",async()=>{
     mount();expect(fetcher).not.toHaveBeenCalled();open();await screen.findByRole("button",{name:"Check connection status"});
     expect(fetcher).toHaveBeenCalledTimes(1);expect(fetcher.mock.calls[0][0]).toBe("/api/agi/environment-connectors/private/directory/packages");

@@ -1,0 +1,88 @@
+{
+  "observed_at": "2026-11-14T02:43:51.121201+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/__tests__/DesktopUpdatePanel.spec.tsx",
+      "canonical_sha256": "f35a004bff1c46997fd3fc8a12d5c5217b3891a292c9eef226a0989ff73b615a",
+      "export_sha256": "f35a004bff1c46997fd3fc8a12d5c5217b3891a292c9eef226a0989ff73b615a",
+      "bytes": 5315,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "3703236d07e066110d5ccbb1d9ca2ff05345e5f2ef16a76c4b20945ba7b4e511"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/AgentAccountBindingReadiness.spec.tsx",
+      "canonical_sha256": "876c37dc3ab6fc518095479f912286a5d13358c3ca946872ed830692e7f10908",
+      "export_sha256": "876c37dc3ab6fc518095479f912286a5d13358c3ca946872ed830692e7f10908",
+      "bytes": 24208,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "d774d6255c552fa8d65e26d6f6e51b63068c2e283aebb2c0832e4662b5b455bd"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/RoomReviewScope.spec.tsx",
+      "canonical_sha256": "740789596a2c07b0667d39d251b54d9299bb31e1af8d8a8ec82e7ab09bbaa18d",
+      "export_sha256": "740789596a2c07b0667d39d251b54d9299bb31e1af8d8a8ec82e7ab09bbaa18d",
+      "bytes": 6667,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "bcc8fba4d375369e2d1fec48bfb7cfac267f4f852bc8319969199b1609fe91da"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/EnvironmentHomePanel.spec.tsx",
+      "canonical_sha256": "3e54538942146ad575989541966d720abe3c0d5a4444da034bb74df71857b594",
+      "export_sha256": "3e54538942146ad575989541966d720abe3c0d5a4444da034bb74df71857b594",
+      "bytes": 31339,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "a725eb6d6171d1bb0947ecfc75460d1fc2fce8d0d546ec6942548fd136ba4849"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/InstalledServicesPanel.spec.tsx",
+      "canonical_sha256": "41912071d2ba5c9a78cfdbad3e76cbd583cdcd260833d42ef48298ab36a94e9b",
+      "export_sha256": "41912071d2ba5c9a78cfdbad3e76cbd583cdcd260833d42ef48298ab36a94e9b",
+      "bytes": 30735,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "9dc9a9314e4a041addc9b9721fea88d828240afb86ed6c7bc7884d15bc0125f4"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/accountCapabilityPolicy.spec.ts",
+      "canonical_sha256": "8aa1d50e2aa985161fead54d51c41e2670c5b5fdb177f19e371095224a357566",
+      "export_sha256": "8aa1d50e2aa985161fead54d51c41e2670c5b5fdb177f19e371095224a357566",
+      "bytes": 7982,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "16de24c238b74c4c03f9ba7ce794e2fe2b8bcd83f0bc2b4a7563efe0661c9178"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/launchPanelPolicy.spec.ts",
+      "canonical_sha256": "5315be929088ffdbfaca88225ebbcc04d948266a882b028591bab5aa935f4474",
+      "export_sha256": "5315be929088ffdbfaca88225ebbcc04d948266a882b028591bab5aa935f4474",
+      "bytes": 9423,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "98783888e7f2e9ff105fdbb598cd0877aca67534536782ac6725c6f19a8baf8a"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [],
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Native account, room and service test contracts",
+    "capability": "Existing account recovery, room review, launch policy and desktop service tests",
+    "current_maturity": "implemented",
+    "target_maturity": "typed test fixtures",
+    "required_evidence": "Existing seven suites and scoped compiler",
+    "explicit_non_goals": "No production changes, account operation, pairing, installation or room mutation",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "Desktop update bridge fixtures supply the existing required runtime-snapshot method. Native environment mock signatures declare Promise-returning functions and request arguments actually used by the tests.",
+    "Account completion and response callbacks use mutable holders so callback assignment is represented in TypeScript. The same event sequence and expectations remain in place.",
+    "Room options now validate against the existing complete native-hosted-room schema, with no selected task or grant, and match the room passed to the panel. The invalid none status is replaced by the contract-defined null absence.",
+    "Native step-up test setup explicitly fails if its required fixture method is missing before configuring success or failure. Launcher visibility checks admit general string IDs in the test lookup set.",
+    "Only existing test files change. All original assertions remain; no production or authorization behavior is changed."
+  ],
+  "limits": [
+    "Unfrozen, unpublished source tests. No installed, native, two-profile or live-room acceptance is established.",
+    "Export validation runs the exported test files against canonical runtime dependencies; production input hashes are checked against the prior integration compile."
+  ]
+}

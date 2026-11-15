@@ -1,0 +1,78 @@
+{
+  "observed_at": "2026-11-13T15:26:26.270886+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/agent-access/AgentAccountBindingReadiness.tsx",
+      "canonical_sha256": "a4af13254eaad3a5c8aae435a294e88bcdca859caae4d8f64ba2683e49735ea1",
+      "export_sha256": "a4af13254eaad3a5c8aae435a294e88bcdca859caae4d8f64ba2683e49735ea1",
+      "previous_proposal_sha256": "271e64ed9b42395b1891498dfec5877aa3996a423bf85ca8d5876ee33dae893b",
+      "bytes": 21047,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/AgentAccountBindingReadiness.spec.tsx",
+      "canonical_sha256": "df5eabc05e0164d827f3047efdc512c79544f7a2652c36a3d6e26592fc5ea25c",
+      "export_sha256": "d774d6255c552fa8d65e26d6f6e51b63068c2e283aebb2c0832e4662b5b455bd",
+      "previous_proposal_sha256": "70ff3dfc5e6da06e4eeab61b77ab6ef608be0dab4deeb5e8afc9a0e129b8789a",
+      "bytes": 24044,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/auth/Auth0SignInButton.tsx",
+      "canonical_sha256": "2ae8aad015d5e817fef7f072cc95dbeb33c40a7072f3e5ea2dcbdb544bb819ff",
+      "export_sha256": "33921fb28f71da54d1bc02f4572236e85416cb1d3dd8dd22147d7064a36d5e73",
+      "previous_proposal_sha256": "e6d13209b7209b25a89f37896c9c4371a1f4c34da6be5571269266cacef726b7",
+      "bytes": 3946,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/auth/Auth0SignInButton.test.tsx",
+      "canonical_sha256": "a23627332d8c96030ce7790ae6f654d7b79788f45f440b8ef09b4d0874d5ce10",
+      "export_sha256": "a23627332d8c96030ce7790ae6f654d7b79788f45f440b8ef09b4d0874d5ce10",
+      "previous_proposal_sha256": "f7ead69ec20a497748d97735ff7368057355a1f4a74213232f0c0367cc08006c",
+      "bytes": 2780,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/ManagedWebsiteConnection.tsx",
+      "canonical_sha256": "579ae0d9659bea0b6b6ab76843025ac53d9e3caec22f6aee74103fe9c7f4169a",
+      "export_sha256": "d29217eaec02f42c56aff722c9cc1afbd8956991a94bdcb5fd4dc3d39ff05a98",
+      "previous_proposal_sha256": "ccf275f17193dcdbf90f6eb574057cb73306beae0b09882e9e7740208480cb12",
+      "bytes": 24282,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/ManagedWebsiteConnection.spec.tsx",
+      "canonical_sha256": "23e5b8ed7fa7d582c64c6fa25492a581631d6e1ad46b2e88d75ad6c1a3b9efcc",
+      "export_sha256": "4bb7acbdb755e7b82ba9e3f749abc9209f8b4a9a540d2cb9b4ddac77c80ad770",
+      "previous_proposal_sha256": "f82be76decfd06e3c690a693fb32fce2ead7fe9e7f613bdd7aef688c1b78dbc4",
+      "bytes": 20218,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/agent-access/connectionObservation.ts",
+      "canonical_sha256": "35765cc62bc02324ce59a9a67cb3b28b0c91b479d5fd15f7e72d84b6bc0f3e13",
+      "export_sha256": "8e298d4691a220ca2b1192684902afb925566c172a06d85f39e05b5746e30eed"
+    }
+  ],
+  "review": [
+    "Complete three implementation and three test files read. Existing first-party source plus explicit synthetic authorization/provider fixtures. No real tokens, session records, identities or private history exported.",
+    "Account binding readiness displays sanitized provider/HTTPS issuer/status/digested tenant references only, re-reads service state after callbacks, and keeps account linking separate from exact-task pairing.",
+    "Hung status and authorization-start requests are bounded. Stop-waiting releases UI without claiming submitted authorization was canceled. Browser sign-in removes a stale callback marker only after a new browser open succeeds; desktop success is not inferred from a URL marker.",
+    "Managed website connection recovers stalled start/check via local inspect without replaying a claim. Paid test controls retain explicit input and separate account/allowance checks; no live provider or payment action was invoked during this review.",
+    "Review found private-text and connection-status callbacks could cross account changes or unmount. Canonical UI now invalidates those callbacks and clears account-local prompts/status. Four regression cases failed before repair; all eighteen connection tests pass after. No submitted provider operation is canceled or automatically retried.",
+    "ManagedWebsiteConnection and its test are newer than R379. Remaining selected bytes are exact current canonical inputs; line-ending normalization only."
+  ],
+  "limits": [
+    "Unpublished source proposal; no commit, push, new EXE or deployment.",
+    "Mock/native-bridge tests do not prove Auth0 sign-in, installed acceptance, funding settlement or service-side authorization.",
+    "Public backend, native bridge, shared schema and library dependencies are separate inputs.",
+    "UI cancellation is not provider cancellation and does not change pairing, room, game or payer grants."
+  ]
+}

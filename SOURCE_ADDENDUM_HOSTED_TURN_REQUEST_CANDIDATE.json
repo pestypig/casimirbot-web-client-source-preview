@@ -1,0 +1,32 @@
+{
+  "observed_at": "2026-11-14T04:15:37.116723+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedRoomInterpreterTurnHistory.tsx",
+      "canonical_sha256": "a401d0fcb0d371c4623ac8b2c20d7437324f035edd07f81e4fcd5b62a8d00a35",
+      "export_sha256": "c6bc077c5f80e0840b3f144a84b212fa0f5724944cb5a0bbe15f8ec0aba9e7bb",
+      "previous_public_sha256": "790da507afcc5268ea502be2d3bd66580a79f3d6b2d6527af30b344514a8e68c",
+      "bytes": 22080,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeHostedRoomInterpreterTurnHistory.spec.tsx",
+      "canonical_sha256": "741477bf695b3af094ef7962358a3bb5c615431c8e8520316ff9158583e7371d"
+    }
+  ],
+  "classification": "presentation",
+  "source_frozen": false,
+  "published": false,
+  "review": [
+    "The file matched the existing public preview before editing.",
+    "Construct the two existing native request variants separately so the compiler preserves the action/ordinal relationship.",
+    "Payload values, owner controls, context review, room identity and provider invocation behavior are unchanged. No permission or provider call is added."
+  ],
+  "limits": [
+    "Canonical fixtures exercise mocked native/HTTP paths. No installed, funded-provider, GPT Live or Minecraft acceptance is established."
+  ]
+}

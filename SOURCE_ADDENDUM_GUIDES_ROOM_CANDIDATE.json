@@ -1,0 +1,101 @@
+{
+  "observed_at": "2026-11-13T14:00:17.929382+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/site/main.tsx",
+      "canonical_sha256": "7be1fc81b715b3251d45710674632132bbee84576a84b6328d4a08377d4774cd",
+      "export_sha256": "7be1fc81b715b3251d45710674632132bbee84576a84b6328d4a08377d4774cd",
+      "previous_public_sha256": "1039e37c03e2241f47aa764e02710067733de3ae23648135eb9287c748a89e41",
+      "bytes": 1398,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/site/site-download.tsx",
+      "canonical_sha256": "1d0e8a5c5c71937f3474f43880e5c15b21b04ba9863d83c88c5827cfdb1dcb82",
+      "export_sha256": "1d0e8a5c5c71937f3474f43880e5c15b21b04ba9863d83c88c5827cfdb1dcb82",
+      "previous_public_sha256": "3b57e1164d9e8488082463235f0db79db084e6fee576d56d793495e7a0395df5",
+      "bytes": 4184,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/site/site-room-presence.tsx",
+      "canonical_sha256": "bcc1665542ca531a0ef573e1c265991440f57011a1deb1a54722e08fdba2123f",
+      "export_sha256": "bcc1665542ca531a0ef573e1c265991440f57011a1deb1a54722e08fdba2123f",
+      "previous_public_sha256": null,
+      "bytes": 11785,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/pages/getting-started.tsx",
+      "canonical_sha256": "459c867e5f6e7228ce381ea9dba206d3f4dd4532bf97fa22b28df659f5bef28c",
+      "export_sha256": "2506fdc2bb1f603e42e35129eeb3da4ff785c8813fbc8565e11a627c651a1032",
+      "previous_public_sha256": null,
+      "bytes": 39367,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/pages/market-landing.tsx",
+      "canonical_sha256": "0f9a4815b839072bccf40efa3775924391afda3a870aade9b20f7232ba179a0b",
+      "export_sha256": "0293ef98befb25ae2d855843b6591d939f5bd13df86d6bcd37a5a6cb1c53c483",
+      "previous_public_sha256": "4a440d0a7d4eac690d40f95f29b00755ed28c81d5b05a8784578fb90f1b58ca9",
+      "bytes": 11779,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/pages/__tests__/site-room-presence.spec.tsx",
+      "canonical_sha256": "b8221490041e62f21cfda8f1fbaac4f6b79361416fac1266873577ebe17ff17d",
+      "export_sha256": "b8221490041e62f21cfda8f1fbaac4f6b79361416fac1266873577ebe17ff17d",
+      "previous_public_sha256": null,
+      "bytes": 7322,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Full new Getting Started page reviewed, including Friends/sticker/stream steps, scoped sharing, room presence, consent, exact-world source selection, Fabric setup, private JAR checksums and explicit pilot limits. Existing screenshots are references only and are not exported.",
+    "Landing navigation and source overview links expose supported repositories; managed plan copy remains proposed, in qualification and not open for public purchase.",
+    "Standalone public entry routes to guide and minimal room presence. Device-register/P1 approval pages remain separate pending source-review inputs.",
+    "Room page sends no presence request until an explicit Open selected room action. Exact-room response validation, presence generation guards and participant-only confirmed withdrawal preserve the existing server authority boundary. Invitations are explicit owner-only controls; synthetic invitation fixture is not a real secret.",
+    "Site download retains its typed approved-release metadata path and adds guide navigation; no mod URL or installer identity is invented."
+  ],
+  "limits": [
+    "Private working-copy proposal, no commit or publication.",
+    "Account setup modules, shared contracts, CSS, images, binaries and generated site are separate inputs. This preview is not standalone.",
+    "Source and synthetic checks do not prove real room membership, consent, game action, ordinary signed-account operation or public release availability.",
+    "Mod download URLs remain absent pending qualification and owner-reviewed release.",
+    "No invite, membership, presence or approval operation was sent to a real account/room."
+  ],
+  "recovery_and_launcher_followup": {
+    "reviewed_at": "2026-11-14T03:57:55.863286+00:00",
+    "scope": "Instructions for separate Friends authorization recovery and matching the Fabric launcher filename to the startup command.",
+    "limits": "Draft copy only; installed service restoration, attended Minecraft/GPT Live acceptance and publication remain pending."
+  },
+  "pairing_recovery_followup": {
+    "reviewed_at": "2026-11-14T08:30:01.539778+00:00",
+    "scope": "Preserve the exact receiving chat during tool recovery; verify native Friends completion and restart expired authorization from the intended installation.",
+    "published": false
+  },
+  "essential_pilot_followup": {
+    "reviewed_at": "2026-11-14T17:43:39.416245+00:00",
+    "scope": "Optional Essential integrated-world setup, separate game directories and identity checks; attended handoff remains unverified.",
+    "published": false
+  },
+  "essential_rehearsal_followup": {
+    "reviewed_at": "2026-11-14T18:52:48.686159+00:00",
+    "scope": "Observed in-world invite path and post-load pairing; existing-modpack local sensor evidence only. Hosted/GPT Live delivery remains unverified.",
+    "published": false
+  },
+  "restart_follow_note": {
+    "receipt": "r382-stop-restart-stream-receipts.json",
+    "scope": "Recipient explicitly follows again after sender restarts a share.",
+    "published": false
+  },
+  "audience_recovery_followup": {
+    "receipt": "r382-selected-friend-stream-receipts.json",
+    "scope": "Require a recipient before applying Selected friends; verify applied status; explicitly refollow after applying a changed audience.",
+    "published": false
+  }
+}

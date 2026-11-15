@@ -1,0 +1,57 @@
+{
+  "observed_at": "2026-11-13T22:23:35.458044+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/noise-gen/LocalMusicStudio.tsx",
+      "canonical_sha256": "e4e58c21a4d58a306224202ebc7fd7c4e2398947d38122468c6d73ebcdea061a",
+      "export_sha256": "e4e58c21a4d58a306224202ebc7fd7c4e2398947d38122468c6d73ebcdea061a",
+      "bytes": 19892,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/pages/helix-noise-gens.tsx",
+      "canonical_sha256": "6be93acca382fa95971b5c0f8c0142d3dc1a938ee29bb15c93c689d7f904bea0",
+      "export_sha256": "7327cd05d1c34b4aa785eb586db393b815d39fe052877315419abd141f2b9807",
+      "bytes": 51046,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "9992ed7f61a572112c016a19b99b81c27a58d3f102be8e5c0b220703afc49566"
+    },
+    {
+      "path": "client/src/pages/helix-core.panels.ts",
+      "canonical_sha256": "688a20e13122f01858143305103535c8f15108b59c8733d7c2e4d41a502e9364",
+      "export_sha256": "3f14e73a8520e53a5e8480bf6c6933107d0517c4d2bb4d3945e1eb8a7d25a99a",
+      "bytes": 19703,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "2e1550795c3e1c47d55037441ee20d54aa0b13e787f188fb9bd83945a03251c5"
+    },
+    {
+      "path": "client/src/components/noise-gen/LocalMusicStudio.test.tsx",
+      "canonical_sha256": "0629cd5c40debdb6ba1c4f3b42fd07e9b81fed31d6e4f4a7154d04561c356978",
+      "export_sha256": "0629cd5c40debdb6ba1c4f3b42fd07e9b81fed31d6e4f4a7154d04561c356978",
+      "bytes": 8264,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Reviewed the complete new LocalMusicStudio component and suite, selected page/registry deltas and their exact call sites, account-scope helper and music command/state contract. Legacy page, StemDaw and knowledge-store retained code is not claimed as freshly qualified in full; the latter two match their public preview bytes.",
+    "The Noise Gen entry opens local music, with an explicit Legacy library switch. Local music uses native state/configuration/import/grant/submit/export/revoke commands. Browser-library import copies only the selected bounded file; paired-chat lookup does not itself approve a music session. Native dialogs, grants, runtime custody and process limits remain authoritative.",
+    "Runtime fix 38 retires account-bound studio state and guards asynchronous continuations before and after native/library/binding reads. Late state or command completion cannot continue under a successor account. Ordered state reads retain the newest requested snapshot. Recipes now recompute when runtime or model references change for the same project.",
+    "Three failures were reproduced before the fix: stale account state, old command follow-up and stale recipe runtime/model references. Nine mocked tests now cover those cases, same-profile draft retention, account round trip, unmount, ordered reads, grant gating and typed recipe submission.",
+    "Stopping/revoking remains explicit. Closing the UI does not claim to unload a running model, revoke a native grant or undo an already accepted operation. No native model, file import, GPU job, model download or real grant was run during this review."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal; fix 38 and earlier post-R380 changes remain uninstalled.",
+    "Shared local-music recipe/protocol contracts and native/domain services remain separately scoped dependencies, absent from this web preview. Canonical tests use those current contracts and a mocked native bridge.",
+    "Local ACE-Step/Demucs setup, hardware/resource admission, audio quality, file custody, native consent and installed multi-account operation require their separate acceptance evidence.",
+    "The legacy library remains available but was not freshly exercised end to end. Browser-library asynchronous import and real native asset URL lifecycle are not fully qualified by these nine tests.",
+    "Compilation externalizes npm and separately scoped source. No full application typecheck, music-model license acceptance or signed release claim.",
+    "Five intentional support-contact matches elsewhere remain for exact public-candidate owner review."
+  ]
+}

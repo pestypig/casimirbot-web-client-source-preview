@@ -9,10 +9,9 @@ const finiteNumber = (value: unknown): number | null => {
   return Number.isFinite(num) ? num : null;
 };
 
-type PipelineGeometryLike = Pick<
-  EnergyPipelineState,
-  "bubble" | "hull" | "R" | "tau_LC_ms"
-> & {
+type PipelineGeometryLike = Pick<EnergyPipelineState, "bubble" | "hull" | "R">;
+
+type PipelineTimingLike = PipelineGeometryLike & Pick<EnergyPipelineState, "tau_LC_ms"> & {
   tauLC_ms?: number | null;
   lightCrossing?: {
     tauLC_ms?: number | null;
@@ -54,7 +53,7 @@ export const resolvePipelineHullReferenceRadiusM = (
 };
 
 export const resolvePipelineTauLcMs = (
-  state?: PipelineGeometryLike | null,
+  state?: PipelineTimingLike | null,
 ): number | null => {
   const directTau =
     finiteNumber(state?.tau_LC_ms) ??

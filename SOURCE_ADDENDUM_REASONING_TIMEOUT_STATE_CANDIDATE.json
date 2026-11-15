@@ -1,0 +1,52 @@
+{
+  "observed_at": "2026-11-14T05:14:38.960643+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/components/helix/HelixAskPill.tsx",
+      "canonical_sha256": "9ecb4419556b97ddf553701ae8ae2e57f97870608d57147bc8331d87bc0718a8",
+      "export_sha256": "9ecb4419556b97ddf553701ae8ae2e57f97870608d57147bc8331d87bc0718a8",
+      "previous_public_sha256": "8b7d54dbe4bb297facda5bdb842f7f34f04ad5bf032608596ce828e7a43cdec3",
+      "bytes": 1047945,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyConsoleInventory.ts",
+      "canonical_sha256": "02e557ee54d980b92bf9f06b5b863ec54526591cc6c7ae8c223ccefb16054a15",
+      "export_sha256": "02e557ee54d980b92bf9f06b5b863ec54526591cc6c7ae8c223ccefb16054a15",
+      "previous_public_sha256": "f9dc56842fd33c15a5a4256e89c87377af1b41c6373c72fba8761aee6c937697",
+      "bytes": 83463,
+      "transformation": "identity"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-ui.spec.tsx",
+      "canonical_sha256": "9008f427800a4bd80e32ac62dc5d638d03a86c1872ea894e3b7b83519ce973a8"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-recrown.spec.ts",
+      "canonical_sha256": "71ed02b0a3e5dcfe4c47defb4866fb3d658dc96da2e008997517796e02fd7e49"
+    }
+  ],
+  "classification": "evidence normalization",
+  "source_frozen": false,
+  "published": false,
+  "review": [
+    "The per-attempt timeout flag and kind now live in one explicitly typed mutable state object, shared by timer callbacks and the asynchronous error reader.",
+    "This prevents the compiler from incorrectly treating the closed-over local timeoutKind as permanently idle.",
+    "Timeout thresholds, progress reset, first-timeout-wins guard, abort, cleanup, error code/message and retry policy are unchanged.",
+    "Source inventory positions are refreshed from actual current lines; no readiness statuses changed."
+  ],
+  "inventory_measurements": {
+    "lineCountAtInventory": 24255,
+    "exportedComponentStartsAtLine": 6410,
+    "liveRenderSliceStartsAtLine": 23986,
+    "liveLegacyConsoleViewStartsAtLine": 23986
+  },
+  "limits": [
+    "The timeout-state change is local cancellation bookkeeping, not a new deadline, tool, pending-request or execution authority.",
+    "Source checks do not establish installed voice, live room or game acceptance."
+  ]
+}

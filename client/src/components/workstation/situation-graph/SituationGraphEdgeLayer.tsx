@@ -8,6 +8,8 @@ const laneLabel: Record<SituationGraphEdge["lane"], string> = {
   context: "context",
   command: "command",
   voice_output: "voice",
+  receipt: "receipt",
+  monitor_signal: "monitor signal",
 };
 
 const laneTone: Record<SituationGraphEdge["lane"], string> = {
@@ -18,6 +20,8 @@ const laneTone: Record<SituationGraphEdge["lane"], string> = {
   context: "border-cyan-300/35 text-cyan-100",
   command: "border-rose-300/35 text-rose-100",
   voice_output: "border-slate-300/35 text-slate-100",
+  receipt: "border-slate-300/35 text-slate-100",
+  monitor_signal: "border-cyan-300/35 text-cyan-100",
 };
 
 export function SituationGraphEdgeLayer({

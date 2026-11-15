@@ -52,7 +52,7 @@ const readBoolean = (value: unknown): boolean | null =>
 
 const readStringArray = (value: unknown): string[] =>
   Array.isArray(value)
-    ? value.filter((entry): entry is string => typeof entry === "string" && entry.trim()).map((entry) => entry.trim())
+    ? value.filter((entry): entry is string => typeof entry === "string" && entry.trim().length > 0).map((entry) => entry.trim())
     : [];
 
 const formatRefCount = (refs: string[], label: string): string | null =>

@@ -3,15 +3,21 @@ import { projectLocalPersonalConnection, type LocalPersonalConnectionStatus } fr
 import { privateEnvironmentStateSchema } from "@shared/desktop-environment-home";
 import { helixAgentConnectionStatusSchema } from "@shared/helix-agent-client-profile";
 import { privateClockHistoryDiscoverySchema, checkPrivateClockReceipt } from "@shared/private-clock-history";
-import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/accountCapabilityPolicy";
+import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, readCachedAccountCapabilityPolicy } from "@/lib/workstation/accountCapabilityPolicy";
 import { AGENT_CONNECTION_INVALIDATED_EVENT } from "@/lib/agent-access/connectionObservation";
 import { useWorkstationLayoutStore } from "@/store/useWorkstationLayoutStore";
 import { parseDesktopMcpTunnelState } from "@shared/desktop-mcp-tunnel";
 
 const button = "rounded border border-white/20 px-3 py-2 text-sm disabled:opacity-40";
+const privateClockConnectionAvailable = () => {
+  const policy = readCachedAccountCapabilityPolicy();
+  return policy?.feature_flags.includes("private_clock_connection") === true &&
+    !policy.locked_features.includes("private_clock_connection");
+};
 /** Durable progress is reconstructed from existing native/service records.
  * This view stores no credentials, consent, grants, or remembered readiness. */
 export default function LocalPersonalConnectionSetup() {
+  const [privateClockAvailable, setPrivateClockAvailable] = useState(privateClockConnectionAvailable);
   const openPanel = useWorkstationLayoutStore(s => s.openPanelInActiveGroup);
   const [status, setStatus] = useState<LocalPersonalConnectionStatus | null>(null);
   const [busy, setBusy] = useState(false);
@@ -74,7 +80,8 @@ export default function LocalPersonalConnectionSetup() {
   useEffect(() => {
     const clear = () => { tunnelFingerprint.current = null; generation.current++; abort.current?.abort(); pending.current = false; setBusy(false); setStatus(null);
       setMessage("Account, permission or transport changed. Inspect again before continuing."); };
-    window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, clear);
+    const accountChanged = () => { clear(); setPrivateClockAvailable(privateClockConnectionAvailable()); };
+    window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, accountChanged);
     window.addEventListener(AGENT_CONNECTION_INVALIDATED_EVENT, clear);
     const remove = window.casimirDesktop?.onMcpTunnelState?.(value => {
       const parsed = parseDesktopMcpTunnelState(value);
@@ -83,7 +90,7 @@ export default function LocalPersonalConnectionSetup() {
       if (parsed && tunnelFingerprint.current === JSON.stringify(parsed)) return;
       clear();
     });
-    return () => { generation.current++; abort.current?.abort(); remove?.(); window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, clear);
+    return () => { generation.current++; abort.current?.abort(); remove?.(); window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, accountChanged);
       window.removeEventListener(AGENT_CONNECTION_INVALIDATED_EVENT, clear); };
   }, []);
   useEffect(() => {
@@ -93,15 +100,16 @@ export default function LocalPersonalConnectionSetup() {
     window.addEventListener("focus", expire);
     return () => { clearTimeout(timer); window.removeEventListener("focus", expire); };
   }, [status]);
+  if (!privateClockAvailable) return null;
   return <section aria-label="Connect Codex locally" className="my-4 rounded-xl border border-cyan-300/20 bg-slate-900 p-4 text-slate-100">
     <h2 className="text-lg font-semibold">Optional personal-tool connection check</h2>
     <p className="mt-2 text-sm">This installed clock-tool qualification is separate from AI task pairing and Minecraft readiness. An unverified clock tool does not mean your paired task is disconnected.</p>
     <p className="mt-2 text-sm">Private local route: existing native Secure MCP Tunnel and reviewed installed clock. Your external client owns model access and charges. No subscription, room or task pairing is required for bounded personal tools.</p>
     <p className="mt-2 text-xs text-slate-400">Signed same-device stdio remains unavailable pending trust and IPC admission. Private tunnel qualification does not establish public or ordinary-user acceptance.</p>
     <div className="mt-3 flex flex-wrap gap-2">
-      <button type="button" className={button} disabled={busy} onClick={() => void inspect()}>Inspect / resume connection</button>
-      <button type="button" className={button} onClick={() => openPanel("device-check")}>Open protected native setup</button>
-      <button type="button" className={button} onClick={() => openPanel("environment-home")}>Program permission, Stop and history</button>
+      <button data-helix-control-id="workstation.panel.agent-access.local-personal-connection-setup.inspect-resume-connection" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className={button} disabled={busy} onClick={() => void inspect()}>Inspect / resume connection</button>
+      <button data-helix-control-id="workstation.panel.agent-access.local-personal-connection-setup.open-protected-native-setup" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className={button} onClick={() => openPanel("device-check")}>Open protected native setup</button>
+      <button data-helix-control-id="workstation.panel.agent-access.local-personal-connection-setup.program-permission-stop-and-history" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className={button} onClick={() => openPanel("environment-home")}>Program permission, Stop and history</button>
     </div>
     <p role="status" className="mt-3 text-sm">{message}</p>
     {status && <>
@@ -114,7 +122,7 @@ export default function LocalPersonalConnectionSetup() {
       ].map(([label,value]) => <div key={label}><dt className="text-slate-400">{label}</dt><dd className="break-all">{value.replaceAll("_"," ")}</dd></div>)}</dl>
       <p className="mt-3 text-sm">Next: {status.next.action.replaceAll("_"," ")} · {status.next.actor.replaceAll("_"," ")}. {status.next.reason}</p>
       <p className="mt-1 text-xs text-slate-400">Completion proof: {status.next.completion}</p>
-      <button type="button" className={`${button} mt-3`} onClick={() => openPanel(status.next.panel)}>Open next control</button>
+      <button data-helix-control-id="workstation.panel.agent-access.local-personal-connection-setup.open-next-control" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className={`${button} mt-3`} onClick={() => openPanel(status.next.panel)}>Open next control</button>
       <details className="mt-3 text-xs"><summary>Admitted connected-client recovery</summary><p className="mt-2">Inspect helix_public_ui_catalog, present the supported control with helix_workstation_human_control_present, or request / inspect / execute an existing helix_desktop_tunnel_transition. The native supervisor enforces consent and Stop. Keep request identity after uncertainty; never automatically renew or replay.</p></details>
     </>}
   </section>;

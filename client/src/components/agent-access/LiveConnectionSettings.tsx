@@ -6,7 +6,7 @@ import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/account
 import { ManagedConversationPreview } from "./ManagedConversationPreview";
 import { HELIX_LIVE_CONNECTION_CHANGED_EVENT } from "./LiveConnectionEvents";
 
-const messages: Record<LiveConnectionResult["code"], string> = {
+const messages = {
   saved: "Key saved securely. New GPT Live calls will use it; no app restart is needed.",
   disconnected: "GPT Live is disconnected for this profile. The launcher key will not be used as a fallback.",
   gemini_saved: "Gemini key saved for this profile.",
@@ -40,7 +40,13 @@ const messages: Record<LiveConnectionResult["code"], string> = {
   conversation_incomplete: "The managed turn did not complete. Start a new conversation before retrying.",
   conversation_permission_denied: "This key cannot use the Agents API.",
   conversation_stopped: "Managed turn stopped. Start a new conversation to continue.",
-};
+} satisfies Partial<Record<LiveConnectionResult["code"], string>>;
+
+// This settings panel handles only part of the shared native connection protocol.
+const messageForResult = (code: LiveConnectionResult["code"]): string =>
+  Object.hasOwn(messages, code)
+    ? messages[code as keyof typeof messages]
+    : "Connection status could not be confirmed. Reopen settings and try again.";
 
 export function LiveConnectionSettings({ model = "gpt-realtime-2.1", showManagedConversation = true }: { model?: LiveConnectionModel; showManagedConversation?: boolean }) {
   const id = useId();
@@ -60,7 +66,7 @@ export function LiveConnectionSettings({ model = "gpt-realtime-2.1", showManaged
     if (bridge) void bridge({ action: "inspect" }).then(result => {
       if (epoch !== generation.current) return;
       setState(result.state ?? null);
-      setMessage(result.ok ? "Save your key, then test model access before starting a call." : messages[result.code]);
+      setMessage(result.ok ? "Save your key, then test model access before starting a call." : messageForResult(result.code));
     }).catch(() => { if (epoch === generation.current) setMessage(messages.request_rejected); });
     return () => { ++generation.current; window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, clear); };
   }, [bridge]);
@@ -78,7 +84,7 @@ export function LiveConnectionSettings({ model = "gpt-realtime-2.1", showManaged
         setConnectionEpoch(value => value + 1);
         window.dispatchEvent(new Event(HELIX_LIVE_CONNECTION_CHANGED_EVENT));
       }
-      setMessage((messages[result.code] ?? messages.request_rejected) + (result.cleanupConfirmed === false
+      setMessage(messageForResult(result.code) + (result.cleanupConfirmed === false
         ? action === "save" || action === "disconnect"
           ? " An earlier room interpreter session or active turn could not be confirmed closed; check your OpenAI project's sessions."
           : " The temporary OpenAI test session could not be removed; check your project's sessions."

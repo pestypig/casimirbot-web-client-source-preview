@@ -2,11 +2,21 @@ import React, { useEffect, useRef, useState } from "react";
 import { DESKTOP_AUTH0_ROOM_CONTROL_PATH as CONTROL } from "@shared/desktop-auth0-account-link";
 import { hostedRoomTextListSchema, hostedRoomTextSendSchema,
   type HostedRoomTextMessage } from "@shared/hosted-room-text";
+import { helixSharedLiveRoomControlErrorCodeSchema } from "@shared/contracts/helix-shared-live-room-agent.v1";
 import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/accountCapabilityPolicy";
 import { NativeHostedRoomTextReleaseControls } from "./NativeHostedRoomTextReleaseControls";
 import { createRoomTextDraftStore, type RoomTextDraftStore } from "./RoomTextDraftStore";
 
 type Participant = { participant_id: string; display_name: string };
+const ROOM_TEXT_READ_DIAGNOSTICS = new Set([
+  "desktop_required", "session_required", "room_connection_required",
+  "room_authorization_insufficient", "room_authorization_invalid",
+  "room_forbidden", "room_not_found", "room_remote_rejected",
+  "room_transport_failed", "room_response_invalid", "insufficient_scope",
+  "account_policy_blocked", "room_account_unavailable",
+  "room_connection_changed", "room_connection_not_configured",
+  "room_connection_failed", "program_contract_unavailable", "internal_error",
+]);
 
 /** Human room text over the selected service connection. No model or task submission. */
 export function useNativeHostedRoomTextConversation({ roomId, authority, selfParticipantId, closed, draftStore }: {
@@ -41,11 +51,18 @@ export function useNativeHostedRoomTextConversation({ roomId, authority, selfPar
     const sequence = ++readSequence.current;
     readAbort.current?.abort();
     const controller = new AbortController(); readAbort.current = controller;
+    let failureDiagnostic = "";
     try {
       const response = await fetch(CONTROL, { method: "POST", credentials: "same-origin", cache: "no-store",
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         body: JSON.stringify({ operation: "text_list", room_id: roomId }), signal: controller.signal });
       if (!response.ok) {
+        const failure: unknown = await response.json().catch(() => null);
+        const code = failure && typeof failure === "object" && "error" in failure
+          ? (failure as { error: unknown }).error : null;
+        failureDiagnostic = typeof code === "string" && (ROOM_TEXT_READ_DIAGNOSTICS.has(code) ||
+          helixSharedLiveRoomControlErrorCodeSchema.safeParse(code).success)
+          ? ` (${code})` : ` (HTTP ${response.status})`;
         if (generation.current === epoch && !controller.signal.aborted &&
             [401, 403, 404, 410].includes(response.status)) {
           store.clear(identity); setDraft(""); pendingId.current = null;
@@ -57,11 +74,11 @@ export function useNativeHostedRoomTextConversation({ roomId, authority, selfPar
         throw Error("wrong_room");
       if (generation.current === epoch && readSequence.current === sequence && !controller.signal.aborted) {
         setMessages(receipt.messages); setAdmitted(true);
-        setError((current: string) => current === "Room messages could not be loaded." ? "" : current);
+        setError((current: string) => current.startsWith("Room messages could not be loaded.") ? "" : current);
       }
     } catch {
       if (generation.current === epoch && readSequence.current === sequence && !controller.signal.aborted) {
-        setMessages([]); setAdmitted(false); setError("Room messages could not be loaded.");
+        setMessages([]); setAdmitted(false); setError(`Room messages could not be loaded.${failureDiagnostic}`);
       }
     }
   };
@@ -138,14 +155,14 @@ function NativeHostedRoomTextConversationView({ roomId, authority, selfParticipa
     </div>
     {admitted && enableAiAccess && !onOpenInConsole ? <NativeHostedRoomTextReleaseControls roomId={roomId} authority={authority}
       selfParticipantId={selfParticipantId} messages={messages} closed={closed} /> : null}
-    {onOpenInConsole ? <button type="button" disabled={!admitted || closed}
+    {onOpenInConsole ? <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-text-conversation.write-in-console" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={!admitted || closed}
       className="mt-2 text-cyan-100 underline disabled:opacity-40"
       onClick={onOpenInConsole}>Write in Console</button> : <><label className="mt-2 block text-slate-300">Message to room members
-      <textarea value={draft} maxLength={2000} disabled={!admitted || sending || closed}
+      <textarea data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-text-conversation.textarea" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" value={draft} maxLength={2000} disabled={!admitted || sending || closed}
         onChange={event => updateDraft(event.target.value)}
         className="mt-1 w-full rounded border border-white/15 bg-slate-950 p-2 text-slate-100" rows={2} />
     </label>
-    <button type="button" disabled={!admitted || sending || closed || !draft.trim()}
+    <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-text-conversation.send-to-room" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={!admitted || sending || closed || !draft.trim()}
       onClick={() => void send()} className="mt-2 rounded border border-cyan-300/30 px-2 py-1 disabled:opacity-40">Send to room</button></>}
     {error ? <p role="status" className="mt-2 text-amber-100">{error}</p> : null}
   </section>;

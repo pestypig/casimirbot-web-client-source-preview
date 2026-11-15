@@ -39,7 +39,8 @@ export function ReviewedRoomInstructionPanel({ room }: { room: HelixSharedRealti
         ...(send ? { body: JSON.stringify({ room_id: room.room_id, attachment: reviewed!.attachment,
           capture: choice!.capture, instruction_text: choice!.local.text, approve_transfer: true }) } : {}), signal: controller.signal });
       const value = await response.json();
-      if (epoch !== generation.current || controller.signal.aborted) return;
+      if (epoch !== generation.current) return;
+      if (controller.signal.aborted) throw new Error("request_expired");
       if (!response.ok) throw new Error("rejected");
       if (send) {
         const receipt = reviewedRoomInstructionReceiptSchema.parse(value);
@@ -62,10 +63,10 @@ export function ReviewedRoomInstructionPanel({ room }: { room: HelixSharedRealti
   return <section aria-label="Transfer reviewed room instruction" className="rounded-xl border border-white/20 p-3 text-xs">
     <h3>Send captured speech to your native harness</h3>
     <p>Review the full instruction here. Only your selected native node can retrieve it, for up to ten minutes or the remaining attachment time. Queueing there uses the connected AI account.</p>
-    <button type="button" disabled={busy || room.status === "closed"} onClick={() => void run(false)}>Load captures for native transfer</button>
+    <button data-helix-control-id="helix.ask.shared_live_room.reviewed-room-instruction-panel.load-captures-for-native-transfer" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || room.status === "closed"} onClick={() => void run(false)}>Load captures for native transfer</button>
     {options ? <>
       <p>Selected node {options.attachment.node_ref.slice(-12)} · attachment revision {options.attachment.revision}</p>
-      <label>Captured instruction <select aria-label="Captured instruction to transfer" value={selected} disabled={busy}
+      <label>Captured instruction <select data-helix-control-id="helix.ask.shared_live_room.reviewed-room-instruction-panel.captured-instruction-to-transfer" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" aria-label="Captured instruction to transfer" value={selected} disabled={busy}
         onChange={event => setSelected(event.target.value)}>
         <option value="">Choose captured speech</option>
         {choices.map(({ capture }) => <option key={capture.handoff_id} value={capture.handoff_id}>
@@ -76,8 +77,8 @@ export function ReviewedRoomInstructionPanel({ room }: { room: HelixSharedRealti
       {chosen ? <>
         <p>Capture: <code>{chosen.capture.handoff_id}</code></p>
         <pre className="max-h-64 overflow-auto whitespace-pre-wrap">{chosen.local.text}</pre>
-        <label><input type="checkbox" checked={approved} disabled={busy} onChange={event => setApproved(event.target.checked)} />I approve transferring this exact instruction to my selected native harness.</label>
-        <button type="button" disabled={busy || !approved} onClick={() => void run(true)}>Transfer reviewed instruction</button>
+        <label><input data-helix-control-id="helix.ask.shared_live_room.reviewed-room-instruction-panel.input" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" type="checkbox" checked={approved} disabled={busy} onChange={event => setApproved(event.target.checked)} />I approve transferring this exact instruction to my selected native harness.</label>
+        <button data-helix-control-id="helix.ask.shared_live_room.reviewed-room-instruction-panel.transfer-reviewed-instruction" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || !approved} onClick={() => void run(true)}>Transfer reviewed instruction</button>
       </> : null}
     </> : null}
     {message ? <p role="status">{message}</p> : null}

@@ -112,3 +112,41 @@ it("continues the bounded display poll when a pairing becomes active after the c
   expect(screen.getByText("You · picked up by Codex task")).toBeTruthy();
   expect(screen.getByText("Late task report arrived.")).toBeTruthy();
 });
+
+it("shows an exact-task report that arrives after the first minute without reopening the panel", async () => {
+  vi.useFakeTimers();
+  const source = "typed:66666666-6666-4666-8666-666666666666";
+  inspect.mockResolvedValue({ status: "active", reasoning_binding_id: "binding:late",
+    binding_epoch: 1, helix_conversation_id: "chat:late", run_id: null });
+  const event = { schema: "helix.reasoning_steering_event.v1", steering_event_ref: "event:late",
+    reasoning_binding_id: "binding:late", binding_epoch: 1, cursor: 1,
+    client_event_ref: source, origin: "typed", delivery_state: "acknowledged",
+    instruction_sha256: "b".repeat(64), instruction_length: 20,
+    created_at: "2026-09-30T05:00:00.000Z", expires_at: "2026-09-30T05:10:00.000Z",
+    acknowledged_at: "2026-09-30T05:01:00.000Z", advisory_only: true,
+    execution_requested: false, evidence_satisfied: false,
+    provider_thread_content_included: false, hidden_reasoning_included: false,
+    answer_authority: false, terminal_eligible: false };
+  let resultReads = 0;
+  vi.stubGlobal("fetch", vi.fn(async (url: string) => {
+    if (url.includes("/personal-task-results")) return new Response(JSON.stringify({
+      schema: "helix.personal_task_result_owner_history.v1", ok: true,
+      task_report_only: true, minecraft_effect_verified: false, answer_authority: false,
+      reports: [],
+    }), { status: 200 });
+    if (url.includes("/personal-result")) return ++resultReads > 34
+      ? new Response(JSON.stringify({ schema: "helix.personal_task_result_owner_read.v1",
+        ok: true, task_report_only: true, minecraft_effect_verified: false,
+        answer_authority: false, receipt: { steering_event_ref: "event:late",
+          source_turn_id: source }, report: { status: "completed",
+          text: "Late report visible without remount.", evidence_refs: [] } }), { status: 200 })
+      : new Response(null, { status: 404 });
+    return new Response(JSON.stringify({ display_only: true, deliveries: [{ event }] }), { status: 200 });
+  }));
+  render(<BoundTaskConsoleHistory helixConversationId="chat:late"
+    messages={[{ id: "message:late", at: "2026-09-30T05:00:00.000Z",
+      content: "Check the connector", traceId: source }]} />);
+  await act(async () => { await vi.advanceTimersByTimeAsync(130_000); });
+  expect(resultReads).toBeGreaterThan(34);
+  expect(screen.getByText("Late report visible without remount.")).toBeTruthy();
+});

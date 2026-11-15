@@ -1,3 +1,4 @@
+import { captureAccountOperationScope } from "@/lib/workstation/accountOperationScope";
 import { useWorkstationClipboardStore } from "@/store/useWorkstationClipboardStore";
 import { emitHelixAskLiveEvent } from "@/lib/helix/liveEventsBus";
 import { HELIX_ASK_CONTEXT_ID } from "@/lib/helix/voice-surface-contract";
@@ -50,9 +51,11 @@ export async function writeClipboardWithReceipt(args: {
   traceId?: string;
   meta?: Record<string, unknown>;
 }): Promise<boolean> {
+  const isAccountCurrent = captureAccountOperationScope();
   if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) return false;
   try {
     await navigator.clipboard.writeText(args.text);
+    if (!isAccountCurrent()) return false;
     recordClipboardReceipt({
       direction: "write",
       text: args.text,
@@ -71,9 +74,11 @@ export async function readClipboardWithReceipt(args: {
   traceId?: string;
   meta?: Record<string, unknown>;
 }): Promise<string | null> {
+  const isAccountCurrent = captureAccountOperationScope();
   if (typeof navigator === "undefined" || !navigator.clipboard?.readText) return null;
   try {
     const value = await navigator.clipboard.readText();
+    if (!isAccountCurrent()) return null;
     recordClipboardReceipt({
       direction: "read",
       text: value,

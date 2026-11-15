@@ -16,6 +16,7 @@ export function SharedLiveRoomRuntimePanel({
   const runtimeBound = Boolean(room.runtime.realtime_session_ref_hash);
   const canConnect = Boolean(
     isOwner &&
+    room.capacity_profile !== "three_person_voice" &&
     room.readiness.ready &&
     controller.runtimeActive &&
     controller.realtimeSessionId &&
@@ -33,6 +34,9 @@ export function SharedLiveRoomRuntimePanel({
   return (
     <section aria-labelledby={sectionId} className="rounded-xl border border-sky-300/15 bg-sky-950/10 p-3">
       <p id={sectionId} className="text-xs font-semibold text-sky-100">Shared GPT Live · assisted evaluation</p>
+      {room.capacity_profile === "three_person_voice" ? <p className="mt-2 text-xs text-amber-200">
+        Three-person consent is available for evaluation; the group media bridge is not connected yet.
+      </p> : null}
       <div className="mt-2 grid gap-1 text-[10px] text-slate-400 sm:grid-cols-2">
         <p>Room runtime: <span className="font-mono text-slate-200">{room.runtime.state}</span></p>
         <p>Transport owner: <span className="font-mono text-slate-200">{room.runtime.transport_owner}</span></p>
@@ -52,7 +56,9 @@ export function SharedLiveRoomRuntimePanel({
           <button data-helix-interaction-kind="act" data-helix-authority-state="blocked_pending_contract" data-helix-control-id="helix.ask.shared_live_room.shared-live-room-runtime-panel.connect-room-to-gpt-live"
             type="button"
             disabled={controller.busyAction !== null || !canConnect}
-            title={!controller.runtimeActive
+            title={room.capacity_profile === "three_person_voice"
+              ? "Group GPT Live media is unavailable until the multi-peer bridge is installed"
+              : !controller.runtimeActive
               ? "Start GPT Live before connecting the room"
               : !room.readiness.ready
                 ? "Both present members must finish required permission records"

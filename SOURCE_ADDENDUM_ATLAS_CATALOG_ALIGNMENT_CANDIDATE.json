@@ -1,0 +1,38 @@
+{
+  "observed_at": "2026-11-14T06:03:32.710329+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/components/panels/TheoryAtlasRail.tsx",
+      "canonical_sha256": "3571f9ea5a06d7c049e0727d7a7ab07a4948f972e95f698c3291e6b4abca7642",
+      "export_sha256": "3571f9ea5a06d7c049e0727d7a7ab07a4948f972e95f698c3291e6b4abca7642",
+      "previous_public_sha256": "9d36feec93e1ef16c02d55f1b4f4afddc7bf46093d76b527f74c25223d8ff811",
+      "bytes": 3480,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/components/panels/TheoryAchievementMap.tsx",
+      "canonical_sha256": "571074704b1eb419ebba00da65065f9e4c91fe6a214d1328071d09df4a2a9c1e",
+      "export_sha256": "571074704b1eb419ebba00da65065f9e4c91fe6a214d1328071d09df4a2a9c1e",
+      "previous_public_sha256": "94f8eb2ba2e08374c09414104f4f133cdd1ffebd5e89a157b7590fd0a40c1fdf",
+      "bytes": 49429,
+      "transformation": "identity"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [],
+  "classification": "catalog validation and presentation",
+  "review": [
+    "Register the two IDs already present in the canonical atlas: relativity_history and evolutionary_biophysics. Existing catalog entries, equations, sources, statuses and actions are unchanged.",
+    "Test ID set equality separately from rendering order, retaining the prior allowlist ordering and verifying the actual 14-entry catalog.",
+    "Supply explicit rail and glow colors for those two entries and the existing casimir_dp_quantum_foam ID. Colors do not indicate maturity or permission."
+  ],
+  "source_frozen": false,
+  "published": false,
+  "qualification_status": "pending",
+  "limits": [
+    "No physical relation, NHM2 candidate, certificate or authority policy changed.",
+    "Validation must not be described as physical viability.",
+    "Final combined typecheck, integrated build and installed acceptance remain pending."
+  ]
+}

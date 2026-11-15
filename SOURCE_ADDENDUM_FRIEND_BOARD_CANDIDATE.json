@@ -1,0 +1,103 @@
+{
+  "observed_at": "2026-11-13T14:14:22.734160+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendBoardApi.ts",
+      "canonical_sha256": "96b66bee293ddee497362b9ede0a3b68cbb1153f9fd05d9466d1609ce9c62519",
+      "export_sha256": "96b66bee293ddee497362b9ede0a3b68cbb1153f9fd05d9466d1609ce9c62519",
+      "previous_public_sha256": null,
+      "bytes": 1868,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendGlyphSticker.tsx",
+      "canonical_sha256": "40cd1538ba6f209f8ff8aa5e118cb379663c7df5bc6bcf94666a15f27ec13e5a",
+      "export_sha256": "40cd1538ba6f209f8ff8aa5e118cb379663c7df5bc6bcf94666a15f27ec13e5a",
+      "previous_public_sha256": null,
+      "bytes": 1717,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendHostedRoomMission.tsx",
+      "canonical_sha256": "4aae1cfd359faf181984033b7cfab30dbbefb786d014ed2c6da2f22c1f8e2261",
+      "export_sha256": "4aae1cfd359faf181984033b7cfab30dbbefb786d014ed2c6da2f22c1f8e2261",
+      "previous_public_sha256": null,
+      "bytes": 6151,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendArtifactWorkspace.tsx",
+      "canonical_sha256": "c0381a1e2020df1dab91f5a2474fc7f3509eba28ee937f0e99bba7284b2e7b33",
+      "export_sha256": "c0381a1e2020df1dab91f5a2474fc7f3509eba28ee937f0e99bba7284b2e7b33",
+      "previous_public_sha256": null,
+      "bytes": 6468,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendChatBoard.tsx",
+      "canonical_sha256": "1ed2e861ab18b5d5382f0e7ae7eee653c4e821052927cfe5b2b4a36851d9a687",
+      "export_sha256": "1ed2e861ab18b5d5382f0e7ae7eee653c4e821052927cfe5b2b4a36851d9a687",
+      "previous_public_sha256": null,
+      "bytes": 14676,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendsPartiesPanel.tsx",
+      "canonical_sha256": "ed11005f3be011486dfd8f22af65db7624c47283350a65fe5a3f0088e9c59925",
+      "export_sha256": "ed11005f3be011486dfd8f22af65db7624c47283350a65fe5a3f0088e9c59925",
+      "previous_public_sha256": "5e49facaf0e42e55af257f1a52edc8b1a2708a86f3433277503a066e57e4ae74",
+      "bytes": 23874,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/FriendHostedRoomMission.spec.tsx",
+      "canonical_sha256": "b61381ab662660473bb2e567487f0d031ca332b42512b70ae987412e8b73c8be",
+      "export_sha256": "b61381ab662660473bb2e567487f0d031ca332b42512b70ae987412e8b73c8be",
+      "previous_public_sha256": null,
+      "bytes": 4548,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/FriendArtifactWorkspace.spec.tsx",
+      "canonical_sha256": "e4490ff8019bd06e534da626e8269346d4c420ff5722ae66cbd9f00ec2b35db9",
+      "export_sha256": "e4490ff8019bd06e534da626e8269346d4c420ff5722ae66cbd9f00ec2b35db9",
+      "previous_public_sha256": null,
+      "bytes": 5896,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/FriendChatBoard.spec.tsx",
+      "canonical_sha256": "c3cd8016040808d19d21006ac7db1cf34b2f5817a1a9774ceedcc9c015433edd",
+      "export_sha256": "c3cd8016040808d19d21006ac7db1cf34b2f5817a1a9774ceedcc9c015433edd",
+      "previous_public_sha256": null,
+      "bytes": 10373,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/FriendsPartiesPanel.spec.tsx",
+      "canonical_sha256": "ec51bcb1c612d62a31f3f7aa5094101841c3b3f2c7d11730d79966f026607896",
+      "export_sha256": "ec51bcb1c612d62a31f3f7aa5094101841c3b3f2c7d11730d79966f026607896",
+      "previous_public_sha256": "4792a054f9477a4f45370634a1b1665e24deb70654019c65a966e6289f0d2203",
+      "bytes": 9995,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "All ten complete files read: parent Friends panel, chat board, glyph renderer wrapper, isolated copy, hosted mission entry, board requests and synthetic tests. First-party UI code only; no copied media or account data.",
+    "Accepted friend action opens existing hosted-room controls; another explicit action inspects an exact room under matching unexpired profile authorization. Account changes, wrong room and left membership suppress mission display. Existing owner review/result components remain the action authority boundary.",
+    "Message send and sticker cursor change use explicit request IDs; rendering/polling alone cannot propose room tasks. Sent artifact generation and digest are pinned; a pending new composition does not present an old generation as its result.",
+    "Received glyph store is isolated in memory. Connecting its client tools and queueing artifact context each require a separate click. Context copy labels qualitative claims and queue-only confirmation; no empirical certification, sender credential or program grant is transferred.",
+    "Glyph markup comes from the shared schema-checked scenario renderer, not an arbitrary message HTML field. Renderer and scene contracts remain separately reviewed shared dependencies.",
+    "Fixture accounts, rooms, request IDs and tokens are synthetic with mocked HTTP/native controls. Voice start/consent and hosted task action are not executed in these tests."
+  ],
+  "limits": [
+    "Private source proposal only; no commit, push, package, deployment or new authority.",
+    "Existing voice bridge/API, account/chat state, glyph store/transport, shared contracts and hosted mission controls are separate dependencies; this preview is not standalone.",
+    "Mocks and component tests do not establish real consent, room membership cutoff, game result, stream context pickup or native chat-log insertion.",
+    "Parent panel is read in full; local transport and actual party audio require their own qualification."
+  ]
+}

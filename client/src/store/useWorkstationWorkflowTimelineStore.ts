@@ -1,7 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import {
+  HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
+  readCachedAccountProfileIdentity,
+} from "@/lib/workstation/accountCapabilityPolicy";
 
-const WORKSTATION_TIMELINE_STORAGE_KEY = "workstation-workflow-timeline:v1";
+const WORKSTATION_TIMELINE_STORAGE_PREFIX = "workstation-workflow-timeline:v2:";
 const WORKSTATION_TIMELINE_MAX_ENTRIES = 320;
 
 export type WorkstationTimelineLane = "procedural" | "chat" | "clipboard" | "notes";
@@ -23,10 +27,27 @@ type WorkstationWorkflowTimelineState = {
   clear: () => void;
 };
 
+const timelineStorageKey = (profileId: string | null | undefined): string =>
+  `${WORKSTATION_TIMELINE_STORAGE_PREFIX}${profileId === undefined
+    ? "unresolved" : profileId === null ? "guest" : `profile:${encodeURIComponent(profileId)}`}`;
+
+function readStoredEntries(key: string): WorkstationTimelineEntry[] {
+  try {
+    const raw = typeof window === "undefined" ? null : window.localStorage.getItem(key);
+    const state = (JSON.parse(raw ?? "null") as { state?: { entries?: unknown } } | null)?.state;
+    return Array.isArray(state?.entries) ? state.entries.slice(0, WORKSTATION_TIMELINE_MAX_ENTRIES) : [];
+  } catch {
+    return [];
+  }
+}
+
+let currentTimelineStorageKey = timelineStorageKey(readCachedAccountProfileIdentity().profileId);
+const initialEntries = readStoredEntries(currentTimelineStorageKey);
+
 export const useWorkstationWorkflowTimelineStore = create<WorkstationWorkflowTimelineState>()(
   persist(
     (set) => ({
-      entries: [],
+      entries: initialEntries,
       addEntry: (entry) =>
         set((state) => {
           const complete: WorkstationTimelineEntry = {
@@ -46,11 +67,25 @@ export const useWorkstationWorkflowTimelineStore = create<WorkstationWorkflowTim
       clear: () => set({ entries: [] }),
     }),
     {
-      name: WORKSTATION_TIMELINE_STORAGE_KEY,
+      name: currentTimelineStorageKey,
+      skipHydration: true,
       partialize: (state) => ({ entries: state.entries }),
     },
   ),
 );
+
+if (typeof window !== "undefined") {
+  window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, () => {
+    const profileId = readCachedAccountProfileIdentity().profileId;
+    const nextKey = timelineStorageKey(profileId);
+    if (nextKey !== currentTimelineStorageKey) {
+      const entries = readStoredEntries(nextKey);
+      currentTimelineStorageKey = nextKey;
+      useWorkstationWorkflowTimelineStore.persist.setOptions({ name: nextKey });
+      useWorkstationWorkflowTimelineStore.setState({ entries });
+    }
+  });
+}
 
 export function recordWorkstationTimelineEntry(
   entry: Omit<WorkstationTimelineEntry, "id" | "ts"> & { id?: string; ts?: string },

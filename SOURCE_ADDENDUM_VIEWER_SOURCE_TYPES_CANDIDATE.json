@@ -1,0 +1,28 @@
+{
+  "observed_at": "2026-11-14T06:28:29.607220+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/components/AlcubierrePanel.tsx",
+      "canonical_sha256": "dd1e5718e1237a22749191077f7080e23a81736b4e718f2ab66170ae3cabb777",
+      "export_sha256": "f16189d7e7aeb7d33ea06e3f10558fedf2683250ca424d02c5711947e99b062f",
+      "previous_public_sha256": "39139796c48618c6462eb70a40120b8a8060f84ed5fed26385b3f7e807d508ff",
+      "bytes": 488198,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/lib/resolve-hull-dims.test.ts",
+      "canonical_sha256": "0c1e448f6aff8be74ecfedd04e7a45d93a919a95aa84b122c4a99cc030c961be"
+    }
+  ],
+  "review": [
+    "Use the resolver source union, including its existing authority fallback, for the cache invalidation reference.",
+    "Declare optional source metadata on the common planar slice shape without changing metric/lattice selection, channel values, cache invalidation or rendering.",
+    "Type-only presentation fix; no numerical model, physical viability, proof maturity, adapter or certificate semantics changed."
+  ],
+  "source_frozen": false,
+  "published": false
+}

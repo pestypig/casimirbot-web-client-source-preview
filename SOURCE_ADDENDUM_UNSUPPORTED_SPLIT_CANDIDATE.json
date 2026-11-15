@@ -1,0 +1,37 @@
+{
+  "observed_at": "2026-11-14T04:43:56.585266+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/components/helix/HelixAskPill.tsx",
+      "canonical_sha256": "8b7d54dbe4bb297facda5bdb842f7f34f04ad5bf032608596ce828e7a43cdec3",
+      "export_sha256": "8b7d54dbe4bb297facda5bdb842f7f34f04ad5bf032608596ce828e7a43cdec3",
+      "previous_public_sha256": "3af9325ff711bb1a4f5f1eccfa89abaa8ab23d442c43205978767361df6e1d44",
+      "bytes": 1047826,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-ui.spec.tsx",
+      "canonical_sha256": "9008f427800a4bd80e32ac62dc5d638d03a86c1872ea894e3b7b83519ce973a8",
+      "export_sha256": "cbe7e491faeffae4922344fdbebc52b34ebfc766235e066550fb90c2cdb31949",
+      "previous_public_sha256": "8f8e91351f6157aa7da40e0816fd7b718dde3fd9b704acec55a0f9feba2603d2",
+      "bytes": 290707,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [],
+  "classification": "tool admission",
+  "source_frozen": false,
+  "published": false,
+  "review": [
+    "Both files matched the latest reviewed public preview before editing.",
+    "Removed the parser shortcut that emitted split_active_group despite no corresponding workstation action contract, executor case or layout operation.",
+    "Unsupported split text returns no local workstation action and remains ordinary Ask input. No split capability was added and supported navigation shortcuts are retained.",
+    "Eight direct split forms failed the no-dispatch regression before removal; negated, conditional, historical, quoted, screen-visible and explanatory forms already returned no local action."
+  ],
+  "limits": [
+    "No claim of split-panel support. This removes dispatch of a nonexistent local action.",
+    "Local tests do not establish installed media, Friends delivery or Minecraft/GPT Live acceptance."
+  ]
+}

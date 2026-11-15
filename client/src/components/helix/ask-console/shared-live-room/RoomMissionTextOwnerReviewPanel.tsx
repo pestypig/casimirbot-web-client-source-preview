@@ -128,7 +128,7 @@ export function RoomMissionTextOwnerReviewPanel({ room, mission, messages }: {
   return <section aria-label="Owner room text mission review" className="mt-3 space-y-2 rounded border border-cyan-300/20 p-2">
     <h4 className="text-cyan-100">Member proposals for this task</h4>
     <p className="text-slate-400">Members must select a message first. Reviewing, approving and sending are separate actions. None grants Minecraft action authority.</p>
-    <button type="button" disabled={busy} onClick={() => void load()}
+    <button data-helix-control-id="helix.ask.shared_live_room.room-mission-text-owner-review-panel.void-load" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} onClick={() => void load()}
       className="rounded border border-white/20 px-2 py-1 disabled:opacity-40">{loaded ? "Refresh member proposals" : "Load member proposals"}</button>
     {loaded ? reviews.length ? <ul className="space-y-2">{reviews.map(review => {
       const selected = review.selection;
@@ -140,18 +140,18 @@ export function RoomMissionTextOwnerReviewPanel({ room, mission, messages }: {
         {message ? <p className="whitespace-pre-wrap text-slate-200">{message.text}</p> :
           <p className="text-amber-100">This exact message is not loaded in room chat. Refresh room text before review.</p>}
         <p className="text-slate-400">{selected.state === "approved" ? "Owner approved; not necessarily dispatched" : "Author selected; owner approval required"}</p>
-        {message ? <button type="button" disabled={busy} onClick={() => void verify(review)}
+        {message ? <button data-helix-control-id="helix.ask.shared_live_room.room-mission-text-owner-review-panel.verify-displayed-message" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} onClick={() => void verify(review)}
           className="mt-1 rounded border border-white/20 px-2 py-1 disabled:opacity-40">Verify displayed message</button> : null}
         {isVerified && selected.state === "selected" ? <div className="mt-2">
-          <label className="flex items-start gap-2"><input type="checkbox" checked={approveChecked}
+          <label className="flex items-start gap-2"><input data-helix-control-id="helix.ask.shared_live_room.room-mission-text-owner-review-panel.input" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" type="checkbox" checked={approveChecked}
             onChange={e => setApproveChecked(e.target.checked)} disabled={busy} />Approve this exact message for possible task dispatch. No task message is queued yet.</label>
-          <button type="button" disabled={busy || !approveChecked} onClick={() => void approve(review)}
+          <button data-helix-control-id="helix.ask.shared_live_room.room-mission-text-owner-review-panel.record-owner-approval" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || !approveChecked} onClick={() => void approve(review)}
             className="mt-1 rounded border border-cyan-300/30 px-2 py-1 disabled:opacity-40">Record owner approval</button>
         </div> : null}
         {isVerified && selected.state === "approved" ? <div className="mt-2">
-          <label className="flex items-start gap-2"><input type="checkbox" checked={sendChecked}
+          <label className="flex items-start gap-2"><input data-helix-control-id="helix.ask.shared_live_room.room-mission-text-owner-review-panel.input.2" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" type="checkbox" checked={sendChecked}
             onChange={e => setSendChecked(e.target.checked)} disabled={busy} />Send this approved message to the exact paired Codex task. Model usage may occur; game permissions remain separate.</label>
-          <button type="button" disabled={busy || !sendChecked} onClick={() => void dispatch(review)}
+          <button data-helix-control-id="helix.ask.shared_live_room.room-mission-text-owner-review-panel.send-approved-text-to-codex" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || !sendChecked} onClick={() => void dispatch(review)}
             className="mt-1 rounded border border-cyan-300/30 px-2 py-1 disabled:opacity-40">Send approved text to Codex</button>
         </div> : null}
       </li>;
@@ -160,7 +160,7 @@ export function RoomMissionTextOwnerReviewPanel({ room, mission, messages }: {
       <p>{event.delivery_state === "acknowledged" ? "Picked up by paired client" :
         event.delivery_state === "pending" ? "Queued; pickup unconfirmed" :
           `Delivery ${event.delivery_state}`}. No decision or game action is inferred.</p>
-      <button type="button" disabled={busy} onClick={() => void check()}
+      <button data-helix-control-id="helix.ask.shared_live_room.room-mission-text-owner-review-panel.check-task-pickup" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} onClick={() => void check()}
         className="mt-1 rounded border border-white/20 px-2 py-1 disabled:opacity-40">Check task pickup</button>
     </div> : null}
     {busy ? <p role="status">Checking exact room authority…</p> : null}

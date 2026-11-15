@@ -1,0 +1,113 @@
+{
+  "observed_at": "2026-11-13T19:03:22.890095+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/lib/workstation/jobExecutor.ts",
+      "canonical_sha256": "98ba466572afe7e3dc4ee5d98c7b25a3a64e77edbca5e63f54bfed23ad2fff32",
+      "export_sha256": "98ba466572afe7e3dc4ee5d98c7b25a3a64e77edbca5e63f54bfed23ad2fff32",
+      "bytes": 23474,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "8106236e189b067f657eb71695a902b12365402b24466edf361f965d7737a62e"
+    },
+    {
+      "path": "client/src/lib/workstation/workstationClipboard.ts",
+      "canonical_sha256": "a0ac54846e3939c0b6458b6fd45e8677a744d9f12c92c76e33d7f9a97e62be9a",
+      "export_sha256": "a0ac54846e3939c0b6458b6fd45e8677a744d9f12c92c76e33d7f9a97e62be9a",
+      "bytes": 3951,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "ac1cf65050384c1afbc3bc0a23878c8f8691aef329ba919489323f1263f267d3"
+    },
+    {
+      "path": "client/src/lib/workstation/accountOperationScope.ts",
+      "canonical_sha256": "126c3c774a9d5ac67ae2b2fb577465fca36ccfea4f9b33c915420afec33d8b90",
+      "export_sha256": "13a5c8dab5137d5d0cd5ad70910dc75828634ac59f4405354ee93f7be21c7faf",
+      "bytes": 602,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/jobExecutor.account-policy.spec.ts",
+      "canonical_sha256": "705ad035a0ecdaaf0124476346249462552a33b71921711767b1912160e50670",
+      "export_sha256": "705ad035a0ecdaaf0124476346249462552a33b71921711767b1912160e50670",
+      "bytes": 8229,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/workstationClipboard.account-scope.spec.ts",
+      "canonical_sha256": "86791209f539a833f7f488ed4525664974c7bd9c71f1c28741a6231279b56044",
+      "export_sha256": "2fdf515eff490ac26cb575431337e69196159331ddc8f574d86dcf77da1e60c0",
+      "bytes": 2297,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/pages/desktop.tsx",
+      "canonical_sha256": "a8224544fff4899141561e21d434d0cc3580f5b3512eb67c9f2db761ec4f9b3b",
+      "export_sha256": "a8224544fff4899141561e21d434d0cc3580f5b3512eb67c9f2db761ec4f9b3b",
+      "bytes": 45914,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "43aed0eec254cb1f5e4ffb8da958fa01b486f8ee824f8ed8711a74be8324a48d"
+    },
+    {
+      "path": "client/src/pages/mobile-start.tsx",
+      "canonical_sha256": "f53cbe739173fb3f4ae02e3e76ccd0a47a45b1207c5d6445acd7ca4ccc4c8ce8",
+      "export_sha256": "f53cbe739173fb3f4ae02e3e76ccd0a47a45b1207c5d6445acd7ca4ccc4c8ce8",
+      "bytes": 47289,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "be6a5432850126ee91886788df8ad08fcf3d4119307a47d5a5218a9d9e014463"
+    },
+    {
+      "path": "client/src/pages/__tests__/desktop.account-policy-source.spec.ts",
+      "canonical_sha256": "fc12a993fd3bb0479cc460fb0eb7fbb8696870506c26a2a1707245e44104c351",
+      "export_sha256": "fc12a993fd3bb0479cc460fb0eb7fbb8696870506c26a2a1707245e44104c351",
+      "bytes": 2214,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "c5214270fa42ff5429bc3190324f7caf90c58c1471306416193ebca4d84ccecf"
+    },
+    {
+      "path": "client/src/pages/__tests__/mobile-start.account-policy.spec.tsx",
+      "canonical_sha256": "6a217b30a52395e484d96e112389222e589a4bba54de174353a253083485b955",
+      "export_sha256": "6a217b30a52395e484d96e112389222e589a4bba54de174353a253083485b955",
+      "bytes": 10101,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "8676c60c27258d314adb285044ac3b24692899707b89dee0787c0e8efea70cb4"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/accountCapabilityPolicy.spec.ts",
+      "canonical_sha256": "16de24c238b74c4c03f9ba7ce794e2fe2b8bcd83f0bc2b4a7563efe0661c9178",
+      "export_sha256": "16de24c238b74c4c03f9ba7ce794e2fe2b8bcd83f0bc2b4a7563efe0661c9178",
+      "bytes": 7970,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed the existing client job executor against the public baseline, including generic panel admission and the explicitly named observable research workflow. This cohort does not introduce a new runtime or change prompt interpretation, model sampling or answer authority.",
+    "Generic jobs require the caller panel-admission callback, filter automatic panel selection and report denied steps as failures. The research workflow requires docs and notes, opens other panels only if admitted, rechecks after document reads and before saving, and chooses an admitted compare panel. A queued Ask remains pending reasoning, not a completed answer.",
+    "Nine added regression cases failed before the fix: same-policy A-to-B and A-to-B-to-A switches during document read; account or policy change during clipboard wait; late clipboard read/write receipts; late mobile job success, error and round-trip publication.",
+    "A shared client guard captures account identity and revision. Jobs stop admitting follow-up work when that observed account scope changes, suppress late live events and recheck panel admission immediately after clipboard completion. Desktop/mobile job receipts and exceptions are not published after their initiating account scope ends.",
+    "Clipboard reads and writes discard their late local receipt after identity changes. A pending OS write cannot be undone; no claim is made that account switching reverses a clipboard operation already issued.",
+    "Four previously reviewed entry-shell files are updated from their verified pre-edit snapshots. The other prior candidate hashes must remain unchanged. The account cache and its tests are unchanged reviewed dependencies."
+  ],
+  "limits": [
+    "Private unfrozen source proposal, not a signed installed release or public website publication.",
+    "Focused mocked tests cover async account attribution. Three desktop checks are source assertions, not a mounted desktop acceptance test. No real OS clipboard, native pairing, live room, provider call or game action occurred.",
+    "This guard observes client account cache identity/revision; server authorization, real cross-tab propagation, installed account transitions and existing emitted history need their independent qualification. Work completed before a switch is not erased.",
+    "The legacy deterministic research extraction and explicit workflow are retained. This review does not certify generic tool-runtime parity or convert workflow receipts into model answers.",
+    "Physics Glyph action adapter/capability registrations and the rest of the full panel runtime remain outside this cohort. Selected-entry compilation externalizes omitted dependencies and is not a full application build or type check.",
+    "Five intentional support-contact matches inherited from prior candidates remain in the final owner publication review."
+  ]
+}

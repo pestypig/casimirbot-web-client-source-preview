@@ -22,6 +22,8 @@ export function HelixConsoleSelectedComposer({ composer, selectedChannel, localR
   if (selectedChannel === "private_ask" || selectedChannel === "bound_task")
     return <HelixAskLegacyComposerSurface {...composer} />;
 
+  if (selectedChannel === "managed_text") return null;
+
   if (selectedChannel === "adapter_ai")
     return <HelixAskLegacyComposerSurface {...composer}
       destination={<div className="text-[11px] font-semibold text-cyan-100">Adapter AI · read-only run activity</div>}

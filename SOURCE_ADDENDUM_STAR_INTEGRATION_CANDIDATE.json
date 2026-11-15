@@ -1,0 +1,106 @@
+{
+  "observed_at": "2026-11-13T20:48:23.129803+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/pages/star-watcher-panel.tsx",
+      "canonical_sha256": "0c1d4069df0726f85fea578a84937054bed92f99e698db3dc629663328427e22",
+      "export_sha256": "f1d5914c885cd76549992246c112800192e315aec9a2f9c850d3bf2927f94270",
+      "bytes": 193754,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "6fdc13e058422d8d36847547516c7fd2995bc6c52260e6d96e45ce144f2f4b29"
+    },
+    {
+      "path": "client/src/lib/solar-retained-observation.ts",
+      "canonical_sha256": "d8055309c16cdd3b8352b25b4fc1fa5c3090d940b730834ae3142e9248c202ba",
+      "export_sha256": "5b8cdf5bcc7cf3c206108363146e7bc78b33e1254285cf1619e2925cc10fd1ac",
+      "bytes": 1431,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/__tests__/star-watcher-retained.spec.tsx",
+      "canonical_sha256": "9431039a6cdbcce66b87e9a060a709181c8047bf2944c1639afab924903462d2",
+      "export_sha256": "4ee9d9b428f20b5785bdf6463dc460399f7de6e0699f5e4ff5747db7a390c007",
+      "bytes": 11785,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/__tests__/star-watcher-navigation.spec.tsx",
+      "canonical_sha256": "9dfd91d9171eb3af6af852ccfa3b610d855daedc5024380eec2e63c57c68b571",
+      "export_sha256": "8d5f5c7f69ede0a47da9403312fd86519fe429339edaabbbd15786b7f28bd2aa",
+      "bytes": 35451,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "3a54534796573e3cbff47ea63dffcd58ab99b4ab00ac11e89cf3398bde70ff87"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/solar-observation-ownership.ts",
+      "canonical_sha256": "f13fb3891ff729363cc93bdf22963f362243bcc90a02b0844330d85b141c48b8",
+      "export_sha256": "46fdac454804111eddd5eaaa206838489d30714ebb4a6f5ce69b65e66a46bdc8",
+      "bytes": 255,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/solar-observation-view-store.ts",
+      "canonical_sha256": "478df497f3e7fda3ed2cdfe79c79c6a3640e4d2f702aa49968a95043fd791d8f",
+      "export_sha256": "478df497f3e7fda3ed2cdfe79c79c6a3640e4d2f702aa49968a95043fd791d8f",
+      "bytes": 1967,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/solar-observation-replay.ts",
+      "canonical_sha256": "ae50f42301ebc78e6025d32ae4ec75766b90f9b527ddb349e39fc5240b437447",
+      "export_sha256": "ae50f42301ebc78e6025d32ae4ec75766b90f9b527ddb349e39fc5240b437447",
+      "bytes": 965,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/solar-observation-ownership.spec.ts",
+      "canonical_sha256": "7d1a166d6d06c0f386f4974d8cabff6f1fec024820d67c5f92df7e37224603de",
+      "export_sha256": "e9b674e7c595b8b0aeaf1d54f9ce43252e5c4a3df33d40d701c61d609c262a30",
+      "bytes": 1692,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/__tests__/solar-observation-view-store.spec.tsx",
+      "canonical_sha256": "48e6e596b573b1535d308c000a593853674f8e040a7882004aebf865a9b31892",
+      "export_sha256": "48e6e596b573b1535d308c000a593853674f8e040a7882004aebf865a9b31892",
+      "bytes": 2315,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountOperationScope.ts",
+      "canonical_sha256": "126c3c774a9d5ac67ae2b2fb577465fca36ccfea4f9b33c915420afec33d8b90",
+      "export_sha256": "13a5c8dab5137d5d0cd5ad70910dc75828634ac59f4405354ee93f7be21c7faf",
+      "bytes": 602,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Star Watcher integrates previously reviewed daily HEK catalogs, source connection controls, reasoning budget, sampled playback and magnetic globe. Source choices and scientific clocks remain distinct; integration does not grant source access or model funding.",
+    "Retained-source fix 26 is now included after its dependent components were reviewed. Its four canonical files match their previously qualified hashes. Exact owner/listed receipt/archive/frame joins and account/selection cancellation reject stale imports. Retain and readback remain explicit actions.",
+    "Cache management visibility depends on the explicit unlocked feature grant. Account changes clear retained selections, source binding and renderer-memory observations. The memory store is bounded at 8 MB and does not persist across app restart.",
+    "Display hashes and source-retention receipts remain distinct from provider authentication and coordinate registration. Reopened observations keep original acquisition times. Retention failures fall back to an explicitly labeled display-only archive.",
+    "A fresh canonical bundle includes the corrected budget, GCN and catalog dependencies. Focused navigation and retained-observation tests exercise the real parent and source identity helpers with mocked HTTP and heavy visualization children."
+  ],
+  "limits": [
+    "Unfrozen private source proposal only. No installed acceptance, native source acquisition, public deployment or publication.",
+    "Focused browser tests mock heavy visualization components and native/HTTP results. WebGL rendering, actual provider credentials and source FITS custody remain separate acceptance boundaries.",
+    "Export compilation externalizes omitted dependencies and npm packages; export tests use canonical shared contracts and unchanged dependencies. This is not a standalone full public application build or TypeScript typecheck.",
+    "Scientific operators, proof/certificate semantics and adapter grants are unchanged. No physical validation is implied.",
+    "Pinned SporeTimeline CDN imports and the remaining existing public client paths still require review. Five intentional support-contact matches remain in the final owner publication review."
+  ]
+}

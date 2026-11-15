@@ -1,0 +1,58 @@
+{
+  "observed_at": "2026-11-13T14:37:39.510987+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendArtifactWorkspace.tsx",
+      "canonical_sha256": "a171066911856dae209ab3d616d8116e20eb40b589007d456defb84673a2c368",
+      "export_sha256": "a171066911856dae209ab3d616d8116e20eb40b589007d456defb84673a2c368",
+      "previous_proposal_sha256": "4adb4153d892fc4a36766ff900a91cff2d078c530aa07073c8bbe4575a1a61c6",
+      "bytes": 9461,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/FriendArtifactWorkspace.spec.tsx",
+      "canonical_sha256": "9f5ffaf2e3685fb51a4c2fc4d466fefbcba65d21c013ee8f984025236ebd271d",
+      "export_sha256": "9f5ffaf2e3685fb51a4c2fc4d466fefbcba65d21c013ee8f984025236ebd271d",
+      "previous_proposal_sha256": "e4490ff8019bd06e534da626e8269346d4c420ff5722ae66cbd9f00ec2b35db9",
+      "bytes": 5959,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/physics-glyphs/__tests__/received-workspace-rendering.spec.tsx",
+      "canonical_sha256": "a6bca250e6b2c13b4c92a322189c97ab32b1eddc27f69070022cd8081c704b4b",
+      "export_sha256": "a6bca250e6b2c13b4c92a322189c97ab32b1eddc27f69070022cd8081c704b4b",
+      "previous_proposal_sha256": "5ec5d16d902dd83da1a974b21b43cae40e597aae3a3df619a0e05b70b880296e",
+      "bytes": 4590,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/FriendArtifactContext.spec.tsx",
+      "canonical_sha256": "e9ef8b6a8d6f50f54f315c9a87f29e2c096d864eac8e5c75155ed107bf185726",
+      "export_sha256": "e9ef8b6a8d6f50f54f315c9a87f29e2c096d864eac8e5c75155ed107bf185726",
+      "previous_proposal_sha256": null,
+      "bytes": 6291,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "supersedes": [
+    "client/src/components/workstation/friends-parties/FriendArtifactWorkspace.tsx",
+    "client/src/components/workstation/friends-parties/__tests__/FriendArtifactWorkspace.spec.tsx",
+    "client/src/components/physics-glyphs/__tests__/received-workspace-rendering.spec.tsx"
+  ],
+  "review": [
+    "One authored Friends UI fix and one new mocked component test; two existing test mocks gain the account-change event constant required by the new store import. All changed lines reviewed.",
+    "Context lookup is scoped to the selected Helix chat. Active status, exact chat ID, nonempty binding ID and positive epoch are checked before steering. Current profile ID/revision and destination are rechecked across asynchronous boundaries.",
+    "One pending send per view; destination/account change or unmount/copy replacement aborts pending work. No late success/error notice is projected after cancellation. Already transmitted requests cannot be recalled by abort.",
+    "Context retains external-artifact/no-grant/no-additional-turn labels. No server protocol, pairing, model permission, game action or scientific rule changed."
+  ],
+  "limits": [
+    "Private proposal only; not in R378, not committed or published.",
+    "Mocked HTTP tests do not prove live queue delivery, native import, acknowledgement or installed acceptance.",
+    "useAgiChatStore and other omitted runtime dependencies require their own review.",
+    "No credential, account transcript, third-party media or research data introduced."
+  ]
+}

@@ -1,4 +1,4 @@
-import type { HelixAskResponseEnvelope } from "@shared/helix-ask-envelope";
+type HelixAskCopyEnvelopeSection = { title?: unknown; body?: unknown; citations?: unknown };
 
 function coerceText(value: unknown): string {
   if (value === null || value === undefined) return "";
@@ -16,7 +16,7 @@ export function normalizeHelixAskEnvelopeCitations(value: unknown): string[] {
 }
 
 export function formatEnvelopeSectionsForCopy(
-  sections: HelixAskResponseEnvelope["sections"],
+  sections: readonly HelixAskCopyEnvelopeSection[] | null | undefined,
   hideTitle?: string,
 ): string {
   if (!sections || sections.length === 0) return "";

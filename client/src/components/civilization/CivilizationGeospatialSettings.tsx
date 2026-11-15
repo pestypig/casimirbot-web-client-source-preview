@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { Check, LoaderCircle, MoreHorizontal, RefreshCw, X } from "lucide-react";
 import {
   Dialog,
@@ -14,6 +14,9 @@ import {
   saveCivilizationMapsBrowserKey,
   type CivilizationMapsKeyState,
 } from "./civilizationGeospatialClientConfig";
+import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, readCachedAccountCapabilityPolicy } from "@/lib/workstation/accountCapabilityPolicy";
+
+import { captureAccountOperationScope } from "@/lib/workstation/accountOperationScope";
 
 type ProviderStatus = {
   mapsTiles: { browserKeyConfigured: boolean };
@@ -114,54 +117,107 @@ export function CivilizationGeospatialSettings() {
   const [mapsKeyBusy, setMapsKeyBusy] = useState(false);
   const [mapsKeyMessage, setMapsKeyMessage] = useState("");
   const [routesKeyDraft, setRoutesKeyDraft] = useState("");
+  const mapsKeyReadRevision = useRef(0);
+  const providerReadRevision = useRef(0);
+  const mapsMutation = useRef<symbol | null>(null);
+  const routesMutation = useRef<symbol | null>(null);
+  const [accountViewRevision, setAccountViewRevision] = useState(0);
+  const beginMutation = (slot: typeof mapsMutation) => {
+    if (slot.current) return null;
+    const token = Symbol();
+    slot.current = token;
+    const accountCurrent = captureAccountOperationScope();
+    return () => slot.current === token && accountCurrent();
+  };
   const [routesKeyState, setRoutesKeyState] = useState<{ configured: boolean; source: string } | null>(null);
   const [routesKeyMessage, setRoutesKeyMessage] = useState("");
   const [routesKeyBusy, setRoutesKeyBusy] = useState(false);
+  const [routesKeyAvailable, setRoutesKeyAvailable] = useState(() => {
+    const policy = readCachedAccountCapabilityPolicy();
+    return policy?.account_type === "developer" &&
+      !policy.locked_features.includes("civilization_routes_key");
+  });
 
   const refreshSavedKeyState = useCallback(async () => {
+    const revision = ++mapsKeyReadRevision.current;
     try {
       const state = await loadCivilizationMapsBrowserKey();
+      if (revision !== mapsKeyReadRevision.current) return;
       setMapsKeyState(state);
       setMapsKeySaved(state.source === "desktop-profile" || state.source === "browser-origin");
       setMapsKeyMessage(state.migrationFailed
-        ? "This key still uses browser storage. Protected desktop storage is unavailable; it may need to be saved again after an address change."
+        ? "An older browser key is not linked to this account. Enter your own Maps key to save it here."
         : "");
     } catch {
+      if (revision !== mapsKeyReadRevision.current) return;
       setMapsKeySaved(false);
       setMapsKeyState({ key: null, source: "none" });
-      setMapsKeyMessage("Could not read the saved Maps key. Check that you are signed in as a developer in the desktop EXE.");
+      setMapsKeyMessage("Could not read the saved Maps key. Check that you are signed in to this desktop account.");
     }
   }, []);
 
+  useEffect(() => {
+    const onAccountChange = () => {
+      const policy = readCachedAccountCapabilityPolicy();
+      setRoutesKeyAvailable(policy?.account_type === "developer" &&
+        !policy.locked_features.includes("civilization_routes_key"));
+      mapsMutation.current = null; routesMutation.current = null;
+      providerReadRevision.current += 1;
+      setAccountViewRevision(value => value + 1);
+      setMapsKeyBusy(false); setRoutesKeyBusy(false);
+      setMapsKeyMessage(""); setRoutesKeyMessage("");
+      setStatus(null); setError(null);
+      mapsKeyReadRevision.current += 1;
+      setMapsKeyState({ key: null, source: "none" });
+      setMapsKeySaved(false);
+      setMapsKeyDraft("");
+      setRoutesKeyDraft("");
+      setRoutesKeyState(null);
+      void refreshSavedKeyState();
+    };
+    window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, onAccountChange);
+    return () => {
+      mapsKeyReadRevision.current += 1;
+      providerReadRevision.current += 1;
+      mapsMutation.current = null; routesMutation.current = null;
+      window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, onAccountChange);
+    };
+  }, [refreshSavedKeyState]);
+
   const refresh = useCallback(async (signal?: AbortSignal) => {
+    const revision = ++providerReadRevision.current;
+    const accountCurrent = captureAccountOperationScope();
+    const isCurrent = () => !signal?.aborted && revision === providerReadRevision.current && accountCurrent();
     setLoading(true);
     setError(null);
     try {
-      setStatus(await readProviderStatus(signal));
+      const next = await readProviderStatus(signal);
+      if (isCurrent()) setStatus(next);
     } catch {
-      if (!signal?.aborted) setError("Could not read application configuration.");
+      if (isCurrent()) setError("Could not read application configuration.");
     } finally {
-      if (!signal?.aborted) setLoading(false);
+      if (isCurrent()) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     if (!open) return;
     const controller = new AbortController();
+    const accountCurrent = captureAccountOperationScope();
     void refreshSavedKeyState();
     void refresh(controller.signal);
-    const inspect = nativeRoutes?.getCivilizationRoutesKeyState;
+    const inspect = routesKeyAvailable ? nativeRoutes?.getCivilizationRoutesKeyState : undefined;
     if (inspect) void inspect().then((result: unknown) => {
-      if (controller.signal.aborted) return;
+      if (controller.signal.aborted || !accountCurrent()) return;
       const value = result as { ok?: boolean; state?: { configured?: boolean; source?: string } };
       if (value?.ok && value.state) setRoutesKeyState({
         configured: value.state.configured === true,
         source: typeof value.state.source === "string" ? value.state.source : "none",
       });
       else setRoutesKeyMessage("Protected Routes key storage is unavailable.");
-    }).catch(() => { if (!controller.signal.aborted) setRoutesKeyMessage("Could not inspect protected Routes key storage."); });
+    }).catch(() => { if (!controller.signal.aborted && accountCurrent()) setRoutesKeyMessage("Could not inspect protected Routes key storage."); });
     return () => controller.abort();
-  }, [open, refresh, refreshSavedKeyState, nativeRoutes]);
+  }, [open, refresh, refreshSavedKeyState, nativeRoutes, routesKeyAvailable, accountViewRevision]);
 
   const saveRoutesKey = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -170,40 +226,53 @@ export function CivilizationGeospatialSettings() {
       setRoutesKeyMessage("That does not look like a Google API key. Check the value and try again.");
       return;
     }
+    const policy = readCachedAccountCapabilityPolicy();
+    if (policy?.account_type !== "developer" || policy.locked_features.includes("civilization_routes_key")) return;
     const save = nativeRoutes?.saveCivilizationRoutesKey;
     if (!save) { setRoutesKeyMessage("Protected Routes key storage is available in the desktop EXE only."); return; }
-    setRoutesKeyBusy(true);
+    const isCurrent = beginMutation(routesMutation);
+    if (!isCurrent) return;
+    setRoutesKeyDraft("");
     setRoutesKeyMessage("");
+    setRoutesKeyBusy(true);
     try {
       const result = await save(key) as { ok?: boolean; active?: boolean; code?: string; state?: { configured?: boolean; source?: string } };
+      if (!isCurrent()) return;
       if (!result?.ok) throw new Error(result?.code ?? "storage_unavailable");
-      setRoutesKeyDraft("");
       setRoutesKeyState({ configured: result.state?.configured === true, source: result.state?.source ?? "saved" });
       setRoutesKeyMessage(result.active
         ? "Routes key saved in protected storage and activated in the local service. It was not placed in browser storage."
         : "Routes key saved in protected storage, but the local service did not activate it. Restart this EXE before using Google Routes.");
       void refresh();
     } catch {
+      if (!isCurrent()) return;
       setRoutesKeyMessage("The Routes key could not be saved. Check that you are signed in as a developer in the desktop EXE.");
-    } finally { setRoutesKeyBusy(false); }
+    } finally { if (isCurrent()) { routesMutation.current = null; setRoutesKeyBusy(false); } }
   };
 
   const clearRoutesKey = async () => {
+    const policy = readCachedAccountCapabilityPolicy();
+    if (policy?.account_type !== "developer" || policy.locked_features.includes("civilization_routes_key")) return;
     const clear = nativeRoutes?.clearCivilizationRoutesKey;
     if (!clear) return;
+    const isCurrent = beginMutation(routesMutation);
+    if (!isCurrent) return;
+    setRoutesKeyDraft("");
+    setRoutesKeyMessage("");
     setRoutesKeyBusy(true);
     try {
       const result = await clear() as { ok?: boolean; active?: boolean; state?: { configured?: boolean; source?: string } };
+      if (!isCurrent()) return;
       if (!result?.ok) throw new Error("storage_unavailable");
-      setRoutesKeyDraft("");
       setRoutesKeyState({ configured: false, source: result.state?.source ?? "none" });
       setRoutesKeyMessage(result.active
         ? "Routes key cleared from protected storage and the local service."
         : "Routes key cleared from protected storage. Restart this EXE to clear it from the current service.");
       void refresh();
     } catch {
+      if (!isCurrent()) return;
       setRoutesKeyMessage("The Routes key could not be cleared.");
-    } finally { setRoutesKeyBusy(false); }
+    } finally { if (isCurrent()) { routesMutation.current = null; setRoutesKeyBusy(false); } }
   };
 
   const saveMapsKey = async (event: FormEvent<HTMLFormElement>) => {
@@ -214,10 +283,15 @@ export function CivilizationGeospatialSettings() {
       return;
     }
 
+    const isCurrent = beginMutation(mapsMutation);
+    if (!isCurrent) return;
+    setMapsKeyDraft("");
+    setMapsKeyMessage("");
+    mapsKeyReadRevision.current += 1;
     setMapsKeyBusy(true);
     try {
       const saved = await saveCivilizationMapsBrowserKey(key);
-      setMapsKeyDraft("");
+      if (!isCurrent()) return;
       setMapsKeySaved(true);
       setMapsKeyState(saved);
       setMapsKeyMessage(saved.source === "desktop-profile"
@@ -225,22 +299,29 @@ export function CivilizationGeospatialSettings() {
         : "Browser key saved in this browser. It was not sent to the app server.");
       window.dispatchEvent(new Event(CIVILIZATION_GEOSPATIAL_CONFIG_CHANGED_EVENT));
     } catch {
-      setMapsKeyMessage("The browser key could not be saved. Check desktop developer sign-in or browser storage.");
-    } finally { setMapsKeyBusy(false); }
+      if (!isCurrent()) return;
+      setMapsKeyMessage("The browser key could not be saved. Check desktop account sign-in or browser storage.");
+    } finally { if (isCurrent()) { mapsMutation.current = null; setMapsKeyBusy(false); } }
   };
 
   const forgetMapsKey = async () => {
+    const isCurrent = beginMutation(mapsMutation);
+    if (!isCurrent) return;
+    setMapsKeyDraft("");
+    setMapsKeyMessage("");
+    mapsKeyReadRevision.current += 1;
     setMapsKeyBusy(true);
     try {
       await clearCivilizationMapsBrowserKey();
+      if (!isCurrent()) return;
       setMapsKeySaved(false);
       setMapsKeyState({ key: null, source: "none" });
-      setMapsKeyDraft("");
       setMapsKeyMessage("Browser key removed from this device.");
       window.dispatchEvent(new Event(CIVILIZATION_GEOSPATIAL_CONFIG_CHANGED_EVENT));
     } catch {
+      if (!isCurrent()) return;
       setMapsKeyMessage("The saved browser key could not be cleared.");
-    } finally { setMapsKeyBusy(false); }
+    } finally { if (isCurrent()) { mapsMutation.current = null; setMapsKeyBusy(false); } }
   };
 
   const mapsReady = Boolean(mapsKeyState.key) || Boolean(status?.mapsTiles.browserKeyConfigured);
@@ -275,7 +356,7 @@ export function CivilizationGeospatialSettings() {
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3 rounded-lg border border-sky-300/20 bg-sky-300/5 p-3">
               <p className="text-xs leading-5 text-sky-100/90">
-                Status checks configuration; it does not test live API access, billing, or Earth Engine registration. Server credentials stay server-side. The Maps browser key is public by design and must be restricted in Google Cloud. The desktop EXE saves it in the retained local profile; a web browser uses that browser’s storage.
+                Status checks configuration; it does not test live API access, billing, or Earth Engine registration. Server credentials stay server-side. The Maps browser key is public by design and must be restricted in Google Cloud. The desktop EXE saves it for this account; a web browser uses that browser’s storage.
               </p>
               <button
                 type="button"
@@ -313,7 +394,7 @@ export function CivilizationGeospatialSettings() {
                 className="w-full rounded-md border border-white/15 bg-[#030907] px-3 py-2 font-mono text-xs text-white outline-none focus:border-emerald-300"
               />
               <p className="text-[11px] leading-4 text-slate-400">
-                This browser key is used by the map client. The desktop EXE keeps it in its local profile across rebuilds; a web browser keeps it in browser storage. It is not sent to the app server or shown again.
+                This browser key is used by the map client. The desktop EXE keeps it in a protected record for this account across rebuilds; a web browser keeps it in browser storage. It is not sent to the app server or shown again.
               </p>
               {mapsKeyMessage ? <p role="status" className="text-[11px] text-emerald-100">{mapsKeyMessage}</p> : null}
               <div className="flex flex-wrap gap-2">
@@ -338,10 +419,10 @@ export function CivilizationGeospatialSettings() {
               title="Google Maps Routes API"
               purpose="Optional route evidence for a selected Google-supported travel mode, displayed on the Google map. Its reader is implemented, but the dedicated server key still needs to be connected. It does not define the general infrastructure graph."
               setup="GOOGLE_MAPS_ROUTES_API_KEY"
-              ready={routesReady}
-              statusLabel={routesReady ? "Server key configured" : "Server key missing"}
+              ready={routesKeyAvailable && routesReady}
+              statusLabel={routesKeyAvailable ? routesReady ? "Server key configured" : "Server key missing" : "Developer-only credential"}
             />
-            {nativeRoutes?.saveCivilizationRoutesKey && <form onSubmit={(event) => void saveRoutesKey(event)} className="space-y-2 rounded-lg border border-cyan-300/20 bg-black/20 p-3">
+            {routesKeyAvailable && nativeRoutes?.saveCivilizationRoutesKey && <form onSubmit={(event) => void saveRoutesKey(event)} className="space-y-2 rounded-lg border border-cyan-300/20 bg-black/20 p-3">
               <label htmlFor={routesKeyInputId} className="block text-xs font-medium text-slate-200">
                 {routesKeyState?.configured ? "Replace protected Routes key" : "Save Routes key on this device"}
               </label>

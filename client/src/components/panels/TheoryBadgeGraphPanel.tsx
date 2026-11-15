@@ -6949,7 +6949,7 @@ export default function TheoryBadgeGraphPanel() {
         <Button
           data-helix-interaction-kind="configure"
           data-helix-authority-state="client_local"
-          data-helix-control-id="workstation.panel.theory-badge-graph.theory-badge-graph-panel.set-view-mode-list"
+          data-helix-control-id="workstation.panel.theory-badge-graph.theory-badge-graph-panel.atlas-inspector-list"
           type="button"
           size="sm"
           variant="outline"

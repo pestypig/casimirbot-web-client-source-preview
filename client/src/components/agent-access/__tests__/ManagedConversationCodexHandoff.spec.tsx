@@ -32,6 +32,47 @@ const active = (propose = false) => ({ view: { active: true, messages: [
 afterEach(() => { cleanup(); delete window.casimirDesktop; vi.clearAllMocks(); vi.unstubAllGlobals(); });
 
 describe("Cloud Agent DM to paired Codex", () => {
+  it("projects exact granted chat text for an active stream while the Float stays closed", async () => {
+    readConversation.mockReturnValue({ view: { active: true, messages: [] } });
+    const sourceRef = `codex-thread:${exactPairing.taskId}`;
+    const codexStreamGrants = vi.fn(async () => ({ status: "ready", frame: {
+      schema: "helix.codex_conversation_cloud_frame.v1", taskId: exactPairing.taskId,
+      helixConversationId: sourceRef, turns: [{ id: "turn:stream", user: "Read only",
+        assistant: "Visible shared update", assistantPhase: "final_answer", status: "completed" }],
+    } }));
+    const showMessageCloud = vi.fn();
+    const onActivityFrame = vi.fn();
+    const steering = vi.fn();
+    window.casimirDesktop = { codexStreamGrants, showMessageCloud } as unknown as NonNullable<Window["casimirDesktop"]>;
+    window.addEventListener(HELIX_BOUND_AGENT_STEERING_REQUEST_EVENT, steering);
+    try {
+      render(<ManagedConversationConsoleHistory helixConversationId="chat:exact" streamActive
+        pairingSnapshot={exactPairing} onActivityFrame={onActivityFrame} streamReadGrants={[{
+          sourceRef, threadId: exactPairing.taskId, title: "Shared chat", helixConversationId: null,
+          grantedAt: "2026-11-13T12:00:00.000Z",
+        }]} />);
+      await waitFor(() => expect(onActivityFrame).toHaveBeenCalledWith(expect.objectContaining({
+        source: "session_activity", turns: expect.arrayContaining([expect.objectContaining({
+          lane: "codex_task", report: expect.objectContaining({ text: "Visible shared update" }),
+        })]),
+      })));
+      expect(codexStreamGrants.mock.calls).toEqual([[{ operation: "read", sourceRef }]]);
+      expect(showMessageCloud).not.toHaveBeenCalled();
+      expect(steering).not.toHaveBeenCalled();
+    } finally { window.removeEventListener(HELIX_BOUND_AGENT_STEERING_REQUEST_EVENT, steering); }
+  });
+  it("continues projecting activity for an approved stream without reopening the Float", async () => {
+    readConversation.mockReturnValue({ view: { active: true, messages: [] } });
+    const showMessageCloud = vi.fn(async () => ({ status: "showing" }));
+    const onActivityFrame = vi.fn();
+    window.casimirDesktop = { showMessageCloud } as unknown as NonNullable<Window["casimirDesktop"]>;
+    render(<ManagedConversationConsoleHistory helixConversationId="chat:exact"
+      streamActive pairingSnapshot={exactPairing} onActivityFrame={onActivityFrame} />);
+    await waitFor(() => expect(onActivityFrame).toHaveBeenCalledWith(expect.objectContaining({
+      source: "session_activity", helixConversationId: "chat:exact",
+    })));
+    expect(showMessageCloud).not.toHaveBeenCalled();
+  });
   it("shares the console's verified pairing instead of racing a duplicate activity lookup", async () => {
     readConversation.mockReturnValue({ view: { active: true, messages: [] } });
     pairingLookup.mockReturnValue({ status: "unavailable", taskId: null });
@@ -56,6 +97,24 @@ describe("Cloud Agent DM to paired Codex", () => {
     });
     expect(inspectBinding).not.toHaveBeenCalled();
     expect(pairingLookup).toHaveBeenCalledWith(null);
+  });
+  it("projects an owner-verified native frame for a paired codex deep link", async () => {
+    readConversation.mockReturnValue({ view: { active: true, messages: [] } });
+    const showMessageCloud = vi.fn(async (_frame: unknown) => ({ status: "showing" }));
+    window.casimirDesktop = { showMessageCloud,
+      readCodexMirror: vi.fn(async () => ({ status: "ready", frame: {
+        schema: "helix.codex_conversation_cloud_frame.v1", taskId: exactPairing.taskId,
+        helixConversationId: "chat:exact",
+        turns: [{ id: "turn:visible", user: "Visible request", assistant: "Visible answer",
+          assistantPhase: "final_answer", status: "completed" }],
+      } })) } as unknown as NonNullable<Window["casimirDesktop"]>;
+    render(<ManagedConversationConsoleHistory helixConversationId="chat:exact"
+      messageCloudOpen overlayMode="all" pairingSnapshot={{ ...exactPairing,
+        taskId: `codex://threads/${exactPairing.taskId}` }} />);
+    await waitFor(() => expect(showMessageCloud).toHaveBeenCalledWith(expect.objectContaining({
+      source: "session_activity", codexSourceStatus: "live",
+      turns: expect.arrayContaining([expect.objectContaining({ lane: "codex_task" })]),
+    })));
   });
   it("uses a fresh owner-granted native read even while the pairing badge lookup is unavailable", async () => {
     readConversation.mockReturnValue({ view: { active: true, messages: [] } });

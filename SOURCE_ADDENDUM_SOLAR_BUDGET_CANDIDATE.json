@@ -1,0 +1,63 @@
+{
+  "observed_at": "2026-11-13T20:26:28.878495+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/SolarReasoningBudget.tsx",
+      "canonical_sha256": "0ce8fe9d0018195742c9db7c0fcff7851cde90afe4bbed2265b699039d9468b6",
+      "export_sha256": "25a4c9ec9d8acd34f108c302e12b3363084998f913d4ecefdd3c8e1e9220d3d3",
+      "bytes": 12150,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/__tests__/solar-reasoning-budget.spec.tsx",
+      "canonical_sha256": "61815a1fdcb07ac6699a995e9cca154d6c4df9b30ceab006ad8089eb35905b1e",
+      "export_sha256": "61815a1fdcb07ac6699a995e9cca154d6c4df9b30ceab006ad8089eb35905b1e",
+      "bytes": 2021,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/__tests__/solar-reasoning-budget-lifecycle.spec.tsx",
+      "canonical_sha256": "6488d01f727292b4c6abab5cc95d2b91a90ac002fbc5db110bd8f32cf4b8f743",
+      "export_sha256": "8ed159b9f109ebec00f256c311bece0787940d3654de6d85e82ed7058f578736",
+      "bytes": 12254,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/workstation/accountOperationScope.ts",
+      "canonical_sha256": "126c3c774a9d5ac67ae2b2fb577465fca36ccfea4f9b33c915420afec33d8b90",
+      "export_sha256": "13a5c8dab5137d5d0cd5ad70910dc75828634ac59f4405354ee93f7be21c7faf",
+      "bytes": 602,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed the complete solar budget component, both UI test suites, account operation guard, shared input schema and relevant owner-scoped API/store response shapes. The panel separates platform-funded posts from subscriber allowances, and native startup still forwards an explicit owner review request.",
+    "Reproduced ten client failures: malformed successful status crashed rendering; account changes left credentials and forms visible; late read/authorization results crossed account revisions; closing did not abort a read; direct submit bypassed disabled/platform-key checks; repeated submit duplicated a pending POST; a denied status refresh was overwritten with success; native credential remained until the owner review resolved.",
+    "Account identity and revision now key all local form/credential state. Account invalidation immediately aborts pending HTTP work; response and native completion guards reject old-account results, including A-to-B-to-A. Same-account capability refresh preserves explicit input choices.",
+    "Bounded schemas validate returned status arrays/rows and show-once credential shape. Both direct submit and button presentation check consent, finite limits, enabled status and selected executor availability; a synchronous lock prevents duplicate pending mutations. The shared input schema remains the request boundary.",
+    "Displayed accounting keeps provider observations distinct from invoices; Stop remains an explicit exact budget DELETE. Native start clears the entered credential before awaiting owner review, catches bridge failures and rejects late account results. The credential exists only in component memory/password fields; tests construct inert repeated-letter fixtures.",
+    "Twenty browser tests pass on canonical UI, and eight existing API tests pass with mocked storage/owner identity. No actual budget allocation, provider call, Discord post or native worker was invoked."
+  ],
+  "limits": [
+    "Private unfrozen source proposal only. No installed, live billing, database, platform-owner, native approval or actual Discord delivery acceptance.",
+    "Shared solar reasoning/account schemas, UI primitives, server allocation and native worker implementation remain separately qualified dependencies. This web cohort does not publish private service code or turn a developer allowance into customer entitlement.",
+    "Client account cache is an attribution/lifecycle guard; server authentication and exact configured operator remain authoritative. API tests use mocked identities/storage and do not prove production authorization.",
+    "Star Watcher retained-source changes are still held until remaining integration dependencies are reviewed. Five inherited support-contact matches remain in the final owner publication review."
+  ]
+}

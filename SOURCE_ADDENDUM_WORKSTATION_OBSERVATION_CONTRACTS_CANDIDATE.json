@@ -1,0 +1,67 @@
+{
+  "observed_at": "2026-11-14T04:34:49.603849+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/lib/workstation/workstationActionContract.ts",
+      "canonical_sha256": "b40d3027fd77a60bf18c0eddcd21a3940cd53948bdf596242b4305d9ebdbe69c",
+      "export_sha256": "7a121b559c7af48d2569606e1811e1f2527a3474961a260472b60e366590b351",
+      "previous_public_sha256": "35202213290ee13c1c4a2b90ed94646c5ad71ba731181043e185c624dc87eaf5",
+      "bytes": 9930,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/setupExecutionReceiptPost.ts",
+      "canonical_sha256": "1cb0353bd7c5e8e5a5a2fcde2d8a90ab15184a91c7839fc72e6ab816b40d0e46",
+      "export_sha256": "1084feba674ff41bba8785b833ec5b12fd699b5345762c2ca885ad2e176de000",
+      "previous_public_sha256": "c8ea988d28d37163ef0c06d242a1e405d86b8d4d54ab3db89aeae2aa57f32294",
+      "bytes": 2681,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/workstationActionLiveEvents.ts",
+      "canonical_sha256": "ccaa167e1fdb0893f45d0a36b3943f649fd57c7479f252c5799812a80ba5dbf4",
+      "export_sha256": "5b4d09549c0715217e52f69dffa037ea102edf7ac5f50e22792c6d8085868f21",
+      "previous_public_sha256": "f9631deb8f0305ccaf59093e0ee76c6527e976905d5aaea96e5fb1d8fec84c1d",
+      "bytes": 2539,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-pill-ui.spec.tsx",
+      "canonical_sha256": "0d1218702c99a95c14d4427449a28b9aea120aead8d30b78749ff7d4288cbecb",
+      "export_sha256": "8f8e91351f6157aa7da40e0816fd7b718dde3fd9b704acec55a0f9feba2603d2",
+      "previous_public_sha256": "6a3bf75070cd6fae10b993779287bb2a7f4dd14d499cc8e557d9b9c82e0bd218",
+      "bytes": 290220,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/lib/workstation/__tests__/setupExecutionReceiptPost.spec.ts",
+      "canonical_sha256": "c331a0d621b71b44e4d0e9a9aaf17d1c12b4235771e1222a4acb657bd0997872"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/workstationDeepLink.spec.ts",
+      "canonical_sha256": "e2ea06961713b162211a409fcd54836e42f8f0bab0586a1a7cf9164104516543"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-diagnostics.spec.ts",
+      "canonical_sha256": "9763f7fd8e9dc42172fe8dcb7708d9752207877191295bdb5badc88a3cb60c3a"
+    }
+  ],
+  "classification": "evidence normalization",
+  "source_frozen": false,
+  "published": false,
+  "review": [
+    "All three files matched the existing public preview before editing.",
+    "Setup receipt function types accept the panel-action variant already supplied by desktop and mobile run_panel_action cases; transport and server validation are unchanged.",
+    "Empty optional job strings normalize to undefined, matching the declared payload contract. Existing executor defaults treat null and undefined alike.",
+    "Capture the action name before exhaustive narrowing to preserve the existing live-event fallback. No new action type or action admission path is introduced.",
+    "The broad UI suite exposed an obsolete source assertion for console_stream_ingress_debug. It now verifies the existing typed ingress schema and actual console_assembly_debug.streamIngress export wiring; the diagnostics suite exercises preservation of those values. No production diagnostics change."
+  ],
+  "limits": [
+    "Local fixtures do not establish installed friend delivery, room delegation or Minecraft/GPT Live continuity.",
+    "Optional absent job fields are now omitted from serialized JSON rather than emitted as null."
+  ]
+}

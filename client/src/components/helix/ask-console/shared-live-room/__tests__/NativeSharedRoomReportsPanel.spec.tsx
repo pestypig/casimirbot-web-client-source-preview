@@ -94,3 +94,25 @@ it.each(["duplicate", "authority", "error"])("rejects a %s catalog without autom
   await screen.findByText(/Shared reports are unavailable/);
   expect(screen.queryByRole("button", { name: "Open shared report 1" })).toBeNull(); expect(f.fetcher).toHaveBeenCalledTimes(1);
 });
+
+it.each([
+  ["room_connection_required", /Refresh the connection in Hosted service rooms/],
+  ["room_connection_changed", /Refresh the connection in Hosted service rooms/],
+  ["insufficient_scope", /Room report read permission is missing/],
+  ["account_policy_blocked", /Shared Live Rooms access is disabled/],
+  ["room_forbidden", /Confirm this account and the room owner are present/],
+  ["room_runtime_conflict", /The shared report is no longer current/],
+  ["room_report_changed", /The shared report is no longer current/],
+  ["room_transport_failed", /The room service could not be reached/],
+  ["unrecognized-private-value", /Shared reports are unavailable/],
+  ["constructor", /Shared reports are unavailable/],
+])("offers bounded recovery for %s without retrying or exposing remote text", async (code, expected) => {
+  const f = fixture();
+  f.fetcher.mockResolvedValueOnce(json({ error: code, message: "private-server-detail" }, 403));
+  load();
+  await screen.findByText(expected);
+  expect(screen.queryByText("private-server-detail")).toBeNull();
+  expect(screen.queryByText("unrecognized-private-value")).toBeNull();
+  expect(screen.queryByRole("button", { name: "Open shared report 1" })).toBeNull();
+  expect(f.fetcher).toHaveBeenCalledTimes(1);
+});

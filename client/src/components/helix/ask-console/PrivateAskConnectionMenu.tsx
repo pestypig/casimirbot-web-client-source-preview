@@ -10,8 +10,8 @@ import {useWorkstationLayoutStore} from "@/store/useWorkstationLayoutStore";
 import {HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT} from "@/lib/workstation/accountCapabilityPolicy";
 import {HELIX_PRIVATE_API_CHAT_OPEN_EVENT} from "./ConsoleConversationEvents";
 
-export default function PrivateAskConnectionMenu({enabled,scope,onSelectPrivateApiChat}:{
-  enabled:boolean;scope:string;onSelectPrivateApiChat?:()=>void;
+export default function PrivateAskConnectionMenu({enabled,privateInspectorEnabled=enabled,scope,onSelectPrivateApiChat}:{
+  enabled:boolean;privateInspectorEnabled?:boolean;scope:string;onSelectPrivateApiChat?:()=>void;
 }){
   const openPanel=useWorkstationLayoutStore(state=>state.openPanelInActiveGroup);
   const nativeManagedChatAvailable=typeof window!=="undefined" && Boolean(window.casimirDesktop?.liveConnection);
@@ -26,7 +26,7 @@ export default function PrivateAskConnectionMenu({enabled,scope,onSelectPrivateA
     const reset=()=>{close();setManagedDraft("");};
     reset();window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,reset);
     return()=>{generation.current++;controller.current?.abort();window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,reset);};
-  },[enabled,scope]);
+  },[enabled,privateInspectorEnabled,scope]);
   useEffect(()=>{
     if(expires===null)return;
     const expire=()=>{
@@ -43,7 +43,7 @@ export default function PrivateAskConnectionMenu({enabled,scope,onSelectPrivateA
     return()=>{window.clearTimeout(timer);window.removeEventListener("focus",returned);document.removeEventListener("visibilitychange",returned);};
   },[expires,section]);
   const checkPolicy=async()=>{
-    if(!enabled)return;
+    if(!enabled||!privateInspectorEnabled)return;
     controller.current?.abort();
     const id=++generation.current,abort=new AbortController();controller.current=abort;
     setExpires(null);setMessage("Checking private connection setup availability…");
@@ -59,7 +59,8 @@ export default function PrivateAskConnectionMenu({enabled,scope,onSelectPrivateA
     }catch{if(id===generation.current)setMessage("Private connection setup is unavailable. Check your developer account and local harness.");}
     finally{window.clearTimeout(timer);if(id===generation.current)controller.current=null;}
   };
-  const show=()=>{if(!enabled||open)return;returnFocus.current=trigger.current;setSection("connections");setOpen(true);void checkPolicy();};
+  const show=()=>{if(!enabled||open)return;returnFocus.current=trigger.current;setSection("connections");setMessage("");setOpen(true);
+    if(privateInspectorEnabled)void checkPolicy();};
   const showManaged=()=>{if(!enabled||!nativeManagedChatAvailable||open)return;
     returnFocus.current=managedTrigger.current;setSection("managed-chat");setMessage("");setOpen(true);};
   useEffect(()=>{
@@ -69,11 +70,11 @@ export default function PrivateAskConnectionMenu({enabled,scope,onSelectPrivateA
   },[enabled,nativeManagedChatAvailable,open,onSelectPrivateApiChat]);
   if(!enabled)return null;
   return <>
-    <button ref={trigger} type="button" aria-label="Configure connection" aria-haspopup="dialog" aria-expanded={open&&section==="connections"}
+    <button data-helix-control-id="helix.ask.private-ask-connection-menu.configure-connection" ref={trigger} type="button" aria-label="Configure connection" aria-haspopup="dialog" aria-expanded={open&&section==="connections"}
       data-helix-ask-action-item="true" data-helix-interaction-kind="configure" data-helix-authority-state="client_local"
       className="inline-flex h-10 shrink-0 items-center justify-center rounded-full border border-white/10 px-3 text-cyan-100 focus-visible:ring-2 focus-visible:ring-cyan-300"
       onClick={()=>void show()}><MoreHorizontal className="h-4 w-4" aria-hidden="true"/></button>
-    {nativeManagedChatAvailable&&!onSelectPrivateApiChat?<button ref={managedTrigger} type="button" aria-label="Cloud Agent DM" aria-haspopup="dialog"
+    {nativeManagedChatAvailable&&!onSelectPrivateApiChat?<button data-helix-control-id="helix.ask.private-ask-connection-menu.cloud-agent-dm" ref={managedTrigger} type="button" aria-label="Cloud Agent DM" aria-haspopup="dialog"
       aria-expanded={open&&section==="managed-chat"} data-helix-ask-action-item="true"
       data-helix-interaction-kind="configure" data-helix-authority-state="client_local"
       className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-cyan-300/20 px-3 text-xs text-cyan-100 focus-visible:ring-2 focus-visible:ring-cyan-300"
@@ -84,22 +85,23 @@ export default function PrivateAskConnectionMenu({enabled,scope,onSelectPrivateA
         <DialogHeader><DialogTitle>Helix Console connections</DialogTitle>
           <DialogDescription>Manage your personal provider keys and MCP connections from any chat. Room provider access and program grants have separate owner controls. Codex App tasks keep their own connection.</DialogDescription></DialogHeader>
         <nav aria-label="Helix Console connection views" className="flex gap-2 text-sm">
-          <button type="button" aria-current={section==="connections"?"page":undefined} onClick={()=>setSection("connections")}
+          <button data-helix-control-id="helix.ask.private-ask-connection-menu.connections" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" aria-current={section==="connections"?"page":undefined} onClick={()=>setSection("connections")}
             className="rounded-lg border border-cyan-300/30 px-3 py-2">Connections</button>
-          {nativeManagedChatAvailable&&!onSelectPrivateApiChat?<button type="button" aria-current={section==="managed-chat"?"page":undefined} onClick={()=>setSection("managed-chat")}
+          {nativeManagedChatAvailable&&!onSelectPrivateApiChat?<button data-helix-control-id="helix.ask.private-ask-connection-menu.cloud-agent-dm.2" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" aria-current={section==="managed-chat"?"page":undefined} onClick={()=>setSection("managed-chat")}
             className="rounded-lg border border-cyan-300/30 px-3 py-2">Cloud Agent DM</button>:null}
         </nav>
         {section==="connections"?<>
           {open && <LiveConnectionSettings showManagedConversation={false}/>}
           {open && <GeminiConnectionSettings/>}
-          <h3 className="font-semibold">External MCP connection</h3>
-          {expires!==null?<PrivateConnectionInspector scope={`Helix Ask · ${scope}`} onOpenSetup={()=>{close();openPanel("agent-access");}}/>
-            :<><p role="status">{message}</p><button type="button" disabled={message.startsWith("Checking")}
-              onClick={()=>void checkPolicy()} className="rounded-lg border border-white/20 px-3 py-2 text-xs disabled:opacity-40">Recheck private setup</button></>}
+          {privateInspectorEnabled?<><h3 className="font-semibold">External MCP connection</h3>
+            {expires!==null?<PrivateConnectionInspector scope={`Helix Ask · ${scope}`} onOpenSetup={()=>{close();openPanel("agent-access");}}/>
+              :<><p role="status">{message}</p><button data-helix-control-id="helix.ask.private-ask-connection-menu.recheck-private-setup" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" disabled={message.startsWith("Checking")}
+                onClick={()=>void checkPolicy()} className="rounded-lg border border-white/20 px-3 py-2 text-xs disabled:opacity-40">Recheck private setup</button></>}
+          </>:null}
         </>:<>
           <p className="text-xs text-slate-300">This uses your own OpenAI key for a private Agents API conversation with bounded clock and public-context reads. It does not read room messages or directly steer a Codex App task.</p>
           <ManagedConversationPreview retainedDraft={managedDraft} onRetainedDraftChange={setManagedDraft}/>
-          <button type="button" onClick={()=>setSection("connections")} className="rounded-lg border border-white/20 px-3 py-2 text-sm">Set up OpenAI key</button>
+          <button data-helix-control-id="helix.ask.private-ask-connection-menu.set-up-open-ai-key" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" onClick={()=>setSection("connections")} className="rounded-lg border border-white/20 px-3 py-2 text-sm">Set up OpenAI key</button>
         </>}
       </DialogContent>
     </Dialog>

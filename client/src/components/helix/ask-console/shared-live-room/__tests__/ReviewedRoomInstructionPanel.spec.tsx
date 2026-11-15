@@ -31,7 +31,7 @@ function fixture(native = false) {
   const view = render(native ? <NativeRoomInstructionsPanel roomId={roomId} authority={authority} /> : <ReviewedRoomInstructionPanel room={room as never} />);
   return { fetcher, view };
 }
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); useRoomMissionHandoffReview.setState({ entries: [] }); });
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers(); useRoomMissionHandoffReview.setState({ entries: [] }); });
 async function review() {
   fireEvent.click(screen.getByRole("button", { name: "Load captures for native transfer" }));
   const select = await screen.findByRole("combobox", { name: "Captured instruction to transfer" });
@@ -86,10 +86,87 @@ it("queues by exact capture and private selection, without accepting or copying 
   expect(JSON.parse(String(f.fetcher.mock.calls[1][1]?.body))).toEqual({ room_id: roomId, selection_ref: catalog.selection_ref,
     selection_revision: 2, handoff_id: capture.handoff_id, use_reviewed_transfer: true });
 });
+it("offers a same-world choice without treating it as command authority", async () => {
+  const f = fixture(true);
+  f.fetcher.mockResolvedValueOnce(json({ ...catalog,
+    minecraft_world_pairs: [{
+      hosted_source_binding_id: "room_source_binding:hosted",
+      local_environment_binding_id: "environment:local",
+      world_id: "minecraft:world:exact",
+    }] }));
+  fireEvent.click(screen.getByRole("button", { name: "Load captured instructions" }));
+  const captureSelect = await screen.findByRole("combobox", {
+    name: "Captured instruction to queue" });
+  fireEvent.change(captureSelect, { target: { value: capture.handoff_id } });
+  fireEvent.change(screen.getByRole("combobox", {
+    name: "Minecraft world for reviewed instruction" }),
+  { target: { value: "0" } });
+  fireEvent.click(screen.getByRole("checkbox", {
+    name: /Queue the owner-reviewed instruction for this task/,
+  }));
+  f.fetcher.mockResolvedValueOnce(json({
+    schema: "helix.native_hosted_room_dispatch.v1", ok: true,
+    instruction_queued: true, task_pickup_confirmed: false,
+    execution_authority: false, answer_authority: false,
+    raw_content_included: false, terminal_eligible: false,
+    minecraft_world_identity_match: true,
+    minecraft_command_authority_granted: false,
+  }));
+  fireEvent.click(screen.getByRole("button", {
+    name: "Queue reviewed instruction" }));
+  await screen.findByText(/same-world check/);
+  expect(JSON.parse(String(f.fetcher.mock.calls[1][1]?.body)))
+    .toMatchObject({ minecraft_world: {
+      hosted_source_binding_id: "room_source_binding:hosted",
+      local_environment_binding_id: "environment:local",
+    } });
+});
 it("drops a native review on account change and ignores an in-flight catalog", async () => {
   const f = fixture(true); let release!: (value: Response) => void;
   f.fetcher.mockImplementationOnce(async () => new Promise(resolve => { release = resolve; }));
   fireEvent.click(screen.getByRole("button", { name: "Load captured instructions" }));
   act(() => window.dispatchEvent(new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT)));
   await act(async () => release(json(catalog))); expect(screen.queryByRole("combobox")).toBeNull();
+});
+
+it.each([false, true])("clears the review and shows recovery after a late catalog (native=%s)", async native => {
+  const f = fixture(native);
+  vi.useFakeTimers();
+  let release!: (value: Response) => void;
+  f.fetcher.mockImplementationOnce(async () => new Promise(resolve => { release = resolve; }));
+  fireEvent.click(screen.getByRole("button", { name: native
+    ? "Load captured instructions" : "Load captures for native transfer" }));
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(20001);
+    release(json(native ? catalog : options));
+  });
+  expect(screen.queryByRole("combobox")).toBeNull();
+  expect(screen.getByRole("status").textContent).toContain(native
+    ? "Captured instructions are unavailable" : "Native transfer is unavailable");
+  expect(f.fetcher).toHaveBeenCalledTimes(1);
+});
+
+it.each([false, true])("requires fresh review after an uncertain late handoff (native=%s)", async native => {
+  const f = fixture(native);
+  if (native) {
+    fireEvent.click(screen.getByRole("button", { name: "Load captured instructions" }));
+    fireEvent.change(await screen.findByRole("combobox", { name: "Captured instruction to queue" }),
+      { target: { value: capture.handoff_id } });
+  } else await review();
+  fireEvent.click(screen.getByRole("checkbox"));
+  vi.useFakeTimers();
+  let release!: (value: Response) => void;
+  f.fetcher.mockImplementationOnce(async () => new Promise(resolve => { release = resolve; }));
+  fireEvent.click(screen.getByRole("button", { name: native
+    ? "Queue reviewed instruction" : "Transfer reviewed instruction" }));
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(20001);
+    release(json(native ? { schema: "helix.native_hosted_room_dispatch.v1", ok: true,
+      instruction_queued: true, task_pickup_confirmed: false, execution_authority: false,
+      answer_authority: false, raw_content_included: false, terminal_eligible: false } : receipt()));
+  });
+  expect(screen.queryByRole("combobox")).toBeNull();
+  expect(screen.getByRole("status").textContent).toContain(native
+    ? "Queueing could not be confirmed" : "Transfer could not be confirmed");
+  expect(f.fetcher).toHaveBeenCalledTimes(2);
 });

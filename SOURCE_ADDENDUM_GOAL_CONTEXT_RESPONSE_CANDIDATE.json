@@ -1,0 +1,67 @@
+{
+  "observed_at": "2026-11-14T02:58:20.944261+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/workstation/LiveAnswerEnvironmentPanel.tsx",
+      "canonical_sha256": "1f43df739e8b880abd8f8bd8aec1d7b997dc97bff95840df09d449c4f6a4179f",
+      "export_sha256": "1f43df739e8b880abd8f8bd8aec1d7b997dc97bff95840df09d449c4f6a4179f",
+      "bytes": 329829,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "a8a0f9258fdb39a0a4c1550e5f73e571e894443cc85a3140226160ab539996ee"
+    },
+    {
+      "path": "client/src/components/workstation/guide/CasimirGuideMissionProjection.ts",
+      "canonical_sha256": "5597de2b23fac2c7d54a0b7451406858305f05eec79dfc0b1fea64c33c5c0598",
+      "export_sha256": "5597de2b23fac2c7d54a0b7451406858305f05eec79dfc0b1fea64c33c5c0598",
+      "bytes": 11030,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "bb443382aeb18b316afe67d880b06de5794dbe8669c365c191a6828593e51be6"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/goal-context-response.spec.ts",
+      "canonical_sha256": "709a0defa92c255ca9c98a0ba5b1a74c7850b41c7dd97d7efebd1904d652916f",
+      "export_sha256": "709a0defa92c255ca9c98a0ba5b1a74c7850b41c7dd97d7efebd1904d652916f",
+      "bytes": 3878,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/components/workstation/guide/__tests__/CasimirGuideMissionProjection.spec.tsx",
+      "canonical_sha256": "468b3d123916ffcb02efdcd1361fa3bd0bc6151ace55426bd1b3f674da13cf02",
+      "export_sha256": "89b75db510e3a5024ab6bddca2a193be31ec4ad436aad84058a1aa9089c41970",
+      "scope": "Existing public-parity Guide validation suite; not a new export."
+    }
+  ],
+  "runtime_fix_number": 57,
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Read-only environment and Guide projections",
+    "capability": "Live Answer goal-context refresh and unresolved objective display",
+    "lifecycle_stage": "Existing query response projection",
+    "reaction_timescale": "Panel refresh",
+    "authority_owner": "Existing server query and mission controller",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with null-safe response projection",
+    "required_evidence": "Null response regression before/after, Guide suite, scoped compiler and compile",
+    "explicit_non_goals": "No goal execution, room admission, pairing, action, provider or server contract changes",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "A successful goal-context endpoint response containing JSON null previously threw before the two context arrays could be cleared. The existing readRecord guard now normalizes non-object responses to the existing empty-record fallback; successful object arrays and query URL remain unchanged.",
+    "Eleven tests execute the actual panel response initializer and its two setter statements. Before the change, the null response failed and ten cases passed. Cases cover successful arrays, null/primitives/array/missing-field bodies, HTTP refusal, malformed JSON and network failure.",
+    "The Guide unresolved-objective filter now declares the exact type narrowing of its existing resolved exclusion. Sorting, display and controller authority are unchanged; emitted-code equality is checked.",
+    "Both existing production files matched public preview bytes before these narrow changes. The new source slice qualifies only the reviewed diff, not every behavior of those large panels."
+  ],
+  "limits": [
+    "Unfrozen, unpublished, uninstalled. Statement-level tests do not mount the complete Live Answer panel or prove end-to-end GPT Live context delivery.",
+    "Nested array entries retain the existing server-contract assumptions; this is outer-response normalization, not a full schema validator.",
+    "The export boundary tests read the actual preview panel. Existing Guide tests load the selected exported Guide module with canonical dependencies."
+  ]
+}

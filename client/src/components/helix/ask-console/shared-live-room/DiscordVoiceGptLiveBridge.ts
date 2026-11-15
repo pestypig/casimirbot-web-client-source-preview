@@ -3,6 +3,8 @@ import { discordVoiceBridgeTicketReceiptSchema, plausibleDiscordVoiceBridgeTicke
   "@shared/discord-voice-bridge";
 import { readHelixAskLiveMediaBoundary, type HelixAskLiveMediaBoundary } from
   "./media-bridge/HelixAskLiveMediaBoundary";
+import { DiscordIsolatedAudioRelay, type IsolatedAudioReceipt } from
+  "./DiscordIsolatedAudioRelay";
 
 export type DiscordVoiceBridgeState = "connecting" | "active" | "closed";
 
@@ -24,6 +26,19 @@ export function discordVoiceBridgeCloseMessage(event: Pick<CloseEvent, "code" | 
     : "Discord bridge disconnected.";
 }
 
+export function discordIsolatedSpeechTicketScope(
+  receipt: Pick<DiscordVoiceBridgeTicketReceipt, "realtime_session_id" | "provider_call_ref">,
+  realtimeSessionId: string,
+): { realtimeSessionId: string; providerCallRef: string } | null {
+  // Older admitted tickets can still carry the ordinary mixed audio bridge.
+  // Never accept isolated frames unless both v2 scope fields are present.
+  if (!receipt.realtime_session_id && !receipt.provider_call_ref) return null;
+  if (receipt.realtime_session_id !== realtimeSessionId || !receipt.provider_call_ref)
+    throw new Error("discord_isolated_speech_bridge_scope_unavailable");
+  return { realtimeSessionId: receipt.realtime_session_id,
+    providerCallRef: receipt.provider_call_ref };
+}
+
 /** Browser-only PCM transport between one consented Discord call and the
  * already-running owner GPT Live session. No room API receives audio bytes. */
 export class DiscordVoiceGptLiveBridge {
@@ -34,8 +49,9 @@ export class DiscordVoiceGptLiveBridge {
   private providerSource: MediaStreamAudioSourceNode | null = null;
   private providerInput: MediaStreamAudioDestinationNode | null = null;
   private boundary: HelixAskLiveMediaBoundary | null = null;
+  private isolatedRelay: DiscordIsolatedAudioRelay | null = null;
   private watchdog: ReturnType<typeof setInterval> | null = null;
-  private replaced = false;
+  private replacementTrack: MediaStreamTrack | null = null;
   private closed = false;
   private state: DiscordVoiceBridgeState = "connecting";
 
@@ -43,6 +59,10 @@ export class DiscordVoiceGptLiveBridge {
     realtimeSessionId: string;
     roomId: string;
     issueTicket(): Promise<unknown>;
+    onApprovedTicket?: (receipt: DiscordVoiceBridgeTicketReceipt) => void;
+    /** Separate, funded owner-key STT consumer. Not used by the ordinary
+     * mixed GPT Live bridge and not command authority by itself. */
+    onIsolatedSegment?: (receipt: IsolatedAudioReceipt) => Promise<void>;
     onState(state: DiscordVoiceBridgeState, message: string): void;
   }) {}
 
@@ -53,6 +73,7 @@ export class DiscordVoiceGptLiveBridge {
 
   async start(): Promise<void> {
     try {
+      if (this.closed) throw new Error("discord_voice_bridge_closed");
       const boundary = readHelixAskLiveMediaBoundary(this.input.realtimeSessionId);
       if (!boundary) throw new Error("gpt_live_media_unavailable");
       if (boundary.readProviderInputEnabled()) throw new Error("discord_voice_requires_laptop_mic_off");
@@ -64,10 +85,28 @@ export class DiscordVoiceGptLiveBridge {
       if (context.sampleRate !== 48_000 || !await context.resume().then(() => true).catch(() => false)) {
         throw new Error("discord_voice_audio_context_unavailable");
       }
-      const receipt = discordVoiceBridgeTicketReceiptSchema.parse(await this.input.issueTicket());
+      if (this.closed) throw new Error("discord_voice_bridge_closed");
+      const ticket = await this.input.issueTicket();
+      // Owner stop may finish while the ticket request is still in flight.
+      // A late receipt must not notify consumers or open another transport.
+      if (this.closed) throw new Error("discord_voice_bridge_closed");
+      const receipt = discordVoiceBridgeTicketReceiptSchema.parse(ticket);
       if (receipt.room.room_id !== this.input.roomId || !plausibleDiscordVoiceBridgeTicketExpiry(receipt.expires_at)) {
         throw new Error("discord_voice_ticket_scope_invalid");
       }
+      if (this.input.onIsolatedSegment) {
+        const isolatedScope = discordIsolatedSpeechTicketScope(receipt, this.input.realtimeSessionId);
+        if (isolatedScope) {
+          this.isolatedRelay = new DiscordIsolatedAudioRelay({
+            expected: { roomId: receipt.room.room_id,
+              invitationId: receipt.invitation_id,
+              ...isolatedScope },
+            onSegment: this.input.onIsolatedSegment,
+          });
+        }
+      }
+      this.input.onApprovedTicket?.(receipt);
+      if (this.closed) throw new Error("discord_voice_bridge_closed");
       const socket = new WebSocket(receipt.websocket_url);
       socket.binaryType = "arraybuffer";
       this.socket = socket;
@@ -77,7 +116,10 @@ export class DiscordVoiceGptLiveBridge {
       if (this.closed) throw new Error("discord_voice_bridge_closed");
       await this.prepareMedia(boundary);
       if (this.closed || socket.readyState !== WebSocket.OPEN) throw new Error("discord_voice_bridge_closed");
-      socket.send(JSON.stringify({ kind: "media_ready" }));
+      // The worker must not reserve a funded isolated segment unless this
+      // browser has installed the matching native receiver.
+      socket.send(JSON.stringify({ kind: "media_ready",
+        isolated_stt_supported: Boolean(this.isolatedRelay) }));
       await this.awaitReady(socket);
       if (this.closed) throw new Error("discord_voice_bridge_closed");
       this.update("active", "Discord call audio is connected to this open GPT Live session.");
@@ -158,15 +200,14 @@ export class DiscordVoiceGptLiveBridge {
       socket.send(frame);
     };
     const track = destination.stream.getAudioTracks()[0];
-    if (!track || this.closed || !await boundary.replaceProviderInputAudioTrack(track, { enableExternalAudio: true }).catch(() => false)) {
+    if (!track || this.closed) throw new Error("gpt_live_input_replace_failed");
+    this.replacementTrack = track;
+    if (!await boundary.replaceProviderInputAudioTrack(track, { enableExternalAudio: true }).catch(() => false)) {
       throw new Error("gpt_live_input_replace_failed");
     }
-    this.replaced = true;
-    // A socket closure can arrive while replaceTrack is pending. Close may
-    // already have run before replaced became true, so restore it here too.
+    // Restore only this bridge's input if a closure raced the replacement.
     if (this.closed) {
-      await boundary.restoreProviderInputAudioTrack().catch(() => false);
-      this.replaced = false;
+      await boundary.restoreProviderInputAudioTrack(track).catch(() => false);
       throw new Error("discord_voice_bridge_closed");
     }
   }
@@ -192,8 +233,31 @@ export class DiscordVoiceGptLiveBridge {
       socket.addEventListener("close", closed, { once: true });
     });
     socket.addEventListener("message", (event: MessageEvent) => {
-      if (typeof event.data === "string") return void this.close("Discord bridge protocol changed.");
+      if (typeof event.data === "string") {
+        const relay = this.isolatedRelay;
+        if (!relay) return void this.close("Discord bridge protocol changed.");
+        let kind: unknown;
+        try { kind = (JSON.parse(event.data) as { kind?: unknown }).kind; }
+        catch { return void this.close("Discord isolated audio metadata is invalid."); }
+        if (kind === "isolated_stt_begin") {
+          if (!relay.begin(event.data))
+            void this.close("Discord isolated audio metadata is invalid.");
+          return;
+        }
+        if (kind === "isolated_stt_end") {
+          void relay.end(event.data).then(ok => {
+            if (!ok) void this.close("Discord isolated audio could not be verified.");
+          }).catch(() => void this.close("Discord isolated audio could not be verified."));
+          return;
+        }
+        return void this.close("Discord bridge protocol changed.");
+      }
       const frame = event.data;
+      if (frame instanceof ArrayBuffer && new Uint8Array(frame)[0] === 3) {
+        if (!this.isolatedRelay?.chunk(frame))
+          void this.close("Discord isolated audio chunks are invalid.");
+        return;
+      }
       if (!(frame instanceof ArrayBuffer) || frame.byteLength < 5 || frame.byteLength > 11_521 ||
           (frame.byteLength - 1) % 4 !== 0) return void this.close("Discord audio input is invalid.");
       const bytes = new Uint8Array(frame);
@@ -211,17 +275,21 @@ export class DiscordVoiceGptLiveBridge {
     if (this.closed) return;
     this.closed = true;
     if (this.watchdog) clearInterval(this.watchdog);
+    this.isolatedRelay?.clear();
+    this.isolatedRelay = null;
     this.socket?.close();
     this.outputNode?.port.close();
     this.inputNode?.port.close();
     this.providerSource?.disconnect();
     this.outputNode?.disconnect();
     this.inputNode?.disconnect();
-    if (this.replaced && this.boundary === readHelixAskLiveMediaBoundary(this.input.realtimeSessionId)) {
-      await this.boundary?.restoreProviderInputAudioTrack().catch(() => false);
-    }
     this.providerInput?.stream.getTracks().forEach(track => track.stop());
-    await this.context?.close().catch(() => undefined);
+    const contextClosed = this.context?.close().catch(() => undefined);
+    let inputRestored: Promise<boolean> | undefined;
+    if (this.replacementTrack && this.boundary === readHelixAskLiveMediaBoundary(this.input.realtimeSessionId)) {
+      inputRestored = this.boundary?.restoreProviderInputAudioTrack(this.replacementTrack).catch(() => false);
+    }
     this.update("closed", message);
+    await Promise.all([contextClosed, inputRestored]);
   }
 }

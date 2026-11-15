@@ -145,9 +145,9 @@ export function NativeHostedRoomInterpreterProposalReview({ roomId, authority, d
     <p className="font-semibold text-fuchsia-100">AI reply and task review</p>
     <p className="mt-1 text-slate-400">Inspect a completed reply against the selected task, then write and explicitly approve your own instruction. The AI reply alone cannot steer the task.</p>
     <p className="mt-1 break-all text-slate-300">Room: {roomId}</p>
-    <button type="button" disabled={busy || disabled} onClick={() => void read()}>Load completed AI replies</button>
+    <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-proposal-review.load-completed-ai-replies" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || disabled} onClick={() => void read()}>Load completed AI replies</button>
     {turns.length ? <>
-      <select aria-label="AI reply to review" value={selected} disabled={busy || disabled}
+      <select data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-proposal-review.ai-reply-to-review" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" aria-label="AI reply to review" value={selected} disabled={busy || disabled}
         onChange={event => { setSelected(event.target.value); setPreview(null); setMessage("");
           setInstructionText(""); setApproved(false); setQueued(false); setLastAttempt(null); }}>
         <option value="">Choose a completed reply</option>
@@ -155,7 +155,7 @@ export function NativeHostedRoomInterpreterProposalReview({ roomId, authority, d
           {"turn_ordinal" in turn ? `Evaluation ${turn.turn_ordinal} · ` : ""}Reply to {turn.trigger_message_id}
         </option>)}
       </select>
-      <button type="button" disabled={busy || disabled || !selected}
+      <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-proposal-review.review-exact-source-and-task" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || disabled || !selected}
         onClick={() => void read(selected)}>Review exact source and task</button>
     </> : null}
     {preview ? <div className="mt-2 space-y-2 rounded border border-white/10 p-2">
@@ -167,20 +167,20 @@ export function NativeHostedRoomInterpreterProposalReview({ roomId, authority, d
       <p className="text-slate-400">Current source verified for review. The reply itself does not steer the task.</p>
       {!queued ? <>
         <label className="block">Your instruction for this Codex task
-          <textarea value={instructionText} disabled={busy || disabled || Boolean(lastAttempt)}
+          <textarea data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-proposal-review.textarea" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" value={instructionText} disabled={busy || disabled || Boolean(lastAttempt)}
             maxLength={4000} className="mt-1 block w-full rounded border border-white/20 bg-slate-950 p-2"
             onChange={event => { setInstructionText(event.target.value); setApproved(false); }} />
         </label>
-        <label className="flex items-start gap-2"><input type="checkbox" checked={approved}
+        <label className="flex items-start gap-2"><input data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-proposal-review.input" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" type="checkbox" checked={approved}
           disabled={busy || disabled || !instructionText.trim() || Boolean(lastAttempt)}
           onChange={event => setApproved(event.target.checked)} />
           I reviewed this room source, my instruction and the selected task. Queue my instruction for that task.
         </label>
-        <button type="button" disabled={busy || disabled || !approved || !instructionText.trim() || Boolean(lastAttempt)}
+        <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-proposal-review.queue-my-reviewed-instruction" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || disabled || !approved || !instructionText.trim() || Boolean(lastAttempt)}
           onClick={() => void dispatch()}>Queue my reviewed instruction</button>
       </> : null}
     </div> : null}
-    {lastAttempt && !queued ? <button type="button" disabled={busy || disabled}
+    {lastAttempt && !queued ? <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-proposal-review.retry-the-exact-queue-request" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || disabled}
       onClick={() => void dispatch(lastAttempt)}>Retry the exact queue request</button> : null}
     {message ? <p role="status" className="mt-2 text-amber-100">{message}</p> : null}
   </section>;

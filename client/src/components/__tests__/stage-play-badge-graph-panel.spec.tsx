@@ -1701,7 +1701,7 @@ async function showFullGraph() {
   await screen.findByTestId("stage-play-lane-observer");
 }
 
-function dispatchPointer(target: EventTarget, type: string, clientX: number, clientY: number) {
+function dispatchPointer(target: Parameters<typeof fireEvent>[0], type: string, clientX: number, clientY: number) {
   const event = new Event(type, { bubbles: true, cancelable: true });
   Object.defineProperties(event, {
     clientX: { value: clientX },
@@ -1726,6 +1726,39 @@ afterEach(() => {
 });
 
 describe("StagePlayBadgeGraphPanel", () => {
+  it.each(["wake packet IDs", "mail analysis state"])("renders mail without optional %s and does not start work", async omitted => {
+    renderPanel({ mailboxResponse: {
+      ok: true, schema: "stage_play_live_source_mail_list_response/v1",
+      requestedThreadId: "helix-ask:desktop", mailboxThreadId: "helix-ask:desktop",
+      mailItems: [{
+        artifactId: "stage_play_live_source_mail", schemaVersion: "stage_play_live_source_mail/v1",
+        mailId: "stage_play_live_source_mail:optional", sourceId: "source:visual-tab",
+        sourceKind: "visual_frame", status: "unread", threadId: "helix-ask:desktop",
+        sourceRefs: { sourceId: "source:visual-tab", frameRef: "visual_frame:optional" },
+        summary: { text: "Optional metadata test mail", preview: "Optional metadata test mail",
+          confidence: null, ...(omitted === "mail analysis state" ? {} : { analysisState: "analysis_ready" }) },
+        priorContext: {}, hints: {}, evidenceRefs: ["visual_frame:optional"],
+        createdAt: "2026-06-02T00:00:01.000Z",
+        assistant_answer: false, terminal_eligible: false, context_role: "tool_evidence", raw_content_included: false,
+      }],
+      wakeRequests: [{
+        artifactId: "stage_play_live_source_mail_wake_request", schemaVersion: "stage_play_live_source_mail_wake_request/v1",
+        wakeRequestId: "stage_play_live_source_mail_wake:optional", threadId: "helix-ask:desktop",
+        mailIds: ["stage_play_live_source_mail:optional"], sourceIds: ["source:visual-tab"],
+        ...(omitted === "wake packet IDs" ? {} : { packetIds: [] }),
+        deckPresetId: "stage_play_micro_reasoner_prompt_preset:optional", deckPresetTitle: "Regression deck",
+        status: "queued", lifecycleStage: "queued", reason: "unread_mail", decisionIds: [],
+        evidenceRefs: ["stage_play_live_source_mail:optional"],
+        queuedAt: "2026-06-02T00:00:02.000Z", updatedAt: "2026-06-02T00:00:02.000Z",
+        assistant_answer: false, terminal_eligible: false, context_role: "tool_evidence", raw_content_included: false,
+      }],
+      processedPackets: [], microReasonerRuns: [], wakeResults: [], decisions: [], watchJobPolicies: [], jobStates: [],
+    } });
+    expect((await screen.findAllByText("Regression deck")).length).toBeGreaterThan(0);
+    expect(screen.getByTestId("stage-play-badge-graph-scrollport")).toBeTruthy();
+    expect(vi.mocked(fetch).mock.calls.every(([, init]) => !init?.method || init.method === "GET")).toBe(true);
+  });
+
   it("defaults to the observer-first mail loop graph", async () => {
     renderPanel();
 
@@ -2558,7 +2591,7 @@ describe("StagePlayBadgeGraphPanel", () => {
     expect(screen.getByTestId("stage-play-packet-circuit-inspector")).toHaveTextContent(/Source Path\s*source:visual-tab/i);
     expect(screen.getByTestId("stage-play-packet-circuit-inspector")).toHaveTextContent(/Deck\s*Minecraft Minimal Operator/i);
     expect(screen.getByTestId("stage-play-packet-circuit-inspector")).toHaveTextContent(/Goal Context\s*1 non-terminal update/i);
-    expect(screen.getByTestId("stage-play-packet-circuit-inspector")).toHaveTextContent(/Dispatch\s*Receipt:.*Goal context:.*Panel:.*Narrator:.*Interrupt dispatch/s);
+    expect(screen.getByTestId("stage-play-packet-circuit-inspector")).toHaveTextContent(/Dispatch\s*Receipt:[\s\S]*Goal context:[\s\S]*Panel:[\s\S]*Narrator:[\s\S]*Interrupt dispatch/);
     expect(screen.getByTestId("stage-play-packet-circuit-inspector")).toHaveTextContent(/Authority\s*evidence only: assistant=false terminal=false raw=false/i);
     expect(screen.getByTestId("stage-play-applied-microdeck-checklist")).toBeTruthy();
     expect(screen.getAllByTestId("stage-play-applied-microdeck-chip").length).toBeGreaterThan(1);
@@ -2753,9 +2786,9 @@ describe("StagePlayBadgeGraphPanel", () => {
       /Loop\s*translation_loop:ui/i.test(node.textContent ?? "") &&
       /Deck\s*microdeck_output:translation-ui/i.test(node.textContent ?? "") &&
       /Transcript\s*(?:workstation_)?context_feed:translated_transcripts/i.test(node.textContent ?? "") &&
-      /Narrator\s*narrator:translated_transcript.*actuator:narrator_bind_stream/s.test(node.textContent ?? "") &&
+      /Narrator\s*narrator:translated_transcript[\s\S]*actuator:narrator_bind_stream/.test(node.textContent ?? "") &&
       /Dispatch\s*Live Answer:/i.test(node.textContent ?? "") &&
-      /Destination\s*live_answer:projection:translation-ui.*narrator:translated_transcript/s.test(node.textContent ?? "") &&
+      /Destination\s*live_answer:projection:translation-ui[\s\S]*narrator:translated_transcript/.test(node.textContent ?? "") &&
       /Authority\s*evidence only/i.test(node.textContent ?? "")
     )).toBe(true);
     expect(screen.getAllByTestId("stage-play-goal-context-transcript-refs").some((node) =>
@@ -2796,10 +2829,10 @@ describe("StagePlayBadgeGraphPanel", () => {
       /Authority\s*blocked terminal claim/i.test(node.textContent ?? "")
     )).toBe(true);
     expect(screen.getAllByTestId("stage-play-goal-context-authority-chips").some((node) =>
-      /assistant=false.*terminal=false.*raw=false/s.test(node.textContent ?? "")
+      /assistant=false[\s\S]*terminal=false[\s\S]*raw=false/.test(node.textContent ?? "")
     )).toBe(true);
     expect(screen.getAllByTestId("stage-play-goal-context-authority-chips").some((node) =>
-      /assistant=true.*terminal=true.*raw=true/s.test(node.textContent ?? "")
+      /assistant=true[\s\S]*terminal=true[\s\S]*raw=true/.test(node.textContent ?? "")
     )).toBe(true);
     expect(screen.getAllByTestId("stage-play-goal-context-dispatch").some((node) =>
       /Goal context|Panel|Narrator|Interrupt dispatch|Loop: running/i.test(node.textContent ?? "")
@@ -3628,6 +3661,27 @@ describe("StagePlayBadgeGraphPanel", () => {
     });
   });
 
+  it("reports current lifecycle checkpoints without treating pending voice as delivered", async () => {
+    const writeText = vi.fn(async (_value: string) => undefined);
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+    renderPanel({ mailboxResponse: {
+      mailItems: [], decisions: [], jobStates: [], watchJobPolicies: [], wakeRequests: [],
+      wakeResults: ["completed", "voice_delivered", "voice_pending"].map((lifecycleStage, index) => ({
+        wakeResultId: `wake-result:current-${index}`,
+        wakeRequestId: `wake:current-${index}`,
+        threadId: "helix-ask:desktop",
+        status: "skipped",
+        lifecycleStage,
+        decisionIds: [], evidenceRefs: [],
+        createdAt: "2026-06-02T00:00:07.000Z",
+      })),
+    } });
+    fireEvent.click(await screen.findByTestId("stage-play-copy-mail-loop-unified-trace"));
+    const copied = JSON.parse(String(writeText.mock.calls[0]?.[0] ?? "{}"));
+    expect(copied.terminalCoverage.map((entry: { reachedTerminalCheckpoint: boolean }) => entry.reachedTerminalCheckpoint)).toEqual([true, true, false]);
+    expect(copied.authority).toMatchObject({ assistant_answer: false, terminal_eligible: false });
+  });
+
   it("copies a unified mail-loop trace for paths that never reach final answers", async () => {
     const writeText = vi.fn(async (_value: string) => undefined);
     Object.defineProperty(navigator, "clipboard", {
@@ -4370,13 +4424,17 @@ describe("StagePlayBadgeGraphPanel", () => {
           status: "active",
           mode: "text_only",
           preset: "minecraft",
-          line_keys: [],
-          active_lines: [],
-          token_budget: 0,
+          line_schema: [],
+          lines: [],
+          subgoals: [],
+          latest_summary: "",
+          context_policy: "compact_context_pack_only",
+          raw_transcript_included: false,
+          raw_audio_included: false,
           evidence_refs: [],
           created_at: "2026-06-02T00:00:00.000Z",
           updated_at: "2026-06-02T00:00:00.000Z",
-          context_role: "tool_evidence",
+          context_role: "observation_not_assistant_answer",
           terminal_eligible: false,
           post_tool_model_step_required: true,
           assistant_answer: false,

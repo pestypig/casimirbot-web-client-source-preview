@@ -41,7 +41,7 @@ export function HelixAskComposerDestinationStrip({
     data-provider-delivery-claimed={String(model.providerDeliveryClaimed)}>
     {showSelector ? <label className="flex min-w-0 items-center gap-2 text-slate-400">
       <span className="shrink-0">Send to</span>
-      <select aria-label="Composer destination" name="helix-composer-destination"
+      <select data-helix-control-id="helix.ask.helix-ask-composer-destination-strip.composer-destination" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Composer destination" name="helix-composer-destination"
         title="Each destination keeps its own unsent draft"
         className="max-w-44 rounded-lg border border-slate-700 bg-slate-950 px-2 py-1 text-xs font-semibold text-slate-100"
         value={model.kind}
@@ -55,7 +55,7 @@ export function HelixAskComposerDestinationStrip({
       title={`${model.transportLabel} · ${model.actionLabel}`}>
       {destinationStatus(model)}
     </span>
-    {bindingNeeded && onOpenConnectionSetup ? <button type="button" onClick={openSetup}
+    {bindingNeeded && onOpenConnectionSetup ? <button data-helix-control-id="helix.ask.helix-ask-composer-destination-strip.set-up-task" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" onClick={openSetup}
       className="shrink-0 whitespace-nowrap rounded border border-cyan-700 px-2 py-1 text-cyan-100">Set up task</button> : null}
     {voiceStatus}
     <span className="sr-only">

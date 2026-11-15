@@ -1,0 +1,100 @@
+{
+  "observed_at": "2026-11-13T21:21:10.261892+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/agent-access/ManagedConversationConsoleHistory.tsx",
+      "canonical_sha256": "a88843dcd880f2781f370daedbe07b67da79b01b68ab873870104b181c9e0c84",
+      "export_sha256": "96a02476d485e58fb5e6abdf7ce34d2cfe853ee9b523a9d5e5c5e805c6406427",
+      "bytes": 30797,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "981350014db7660ba98bb67e63f856e4484ec527a9f668ebfe783158b1f6a765"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/ManagedConversationCodexHandoff.spec.tsx",
+      "canonical_sha256": "8dbbe0d34f0e88720c51dba2eaf8d6ee6fa11200ce6d92d646125fe8622442a1",
+      "export_sha256": "46a320a59370c28a3dc93e658a2a20f57e99f1e95e465bc42e0a3769ef9e1516",
+      "bytes": 27311,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "03ce22d44fa0475f97714329f88e6765b44e290bb70490bfe42b16b3a1d74d02"
+    },
+    {
+      "path": "client/src/components/agent-access/useGrantedCodexStreamActivity.ts",
+      "canonical_sha256": "efff7073f86359d9e99248be06a1d2ce361d6b66ae4f2b52c6339cf0245bdf72",
+      "export_sha256": "efff7073f86359d9e99248be06a1d2ce361d6b66ae4f2b52c6339cf0245bdf72",
+      "bytes": 2735,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "1add41cd13bc0457db4c2799951f863c42eb5c912cffdeecca278950f3e9fa30"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/useGrantedCodexStreamActivity.spec.ts",
+      "canonical_sha256": "f2ba9fdedcd74b16f399b027ad8241cd4152eed555db793a8f87dcac79ffeec3",
+      "export_sha256": "f2ba9fdedcd74b16f399b027ad8241cd4152eed555db793a8f87dcac79ffeec3",
+      "bytes": 5835,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/agent-access/useSavedCodexActivity.ts",
+      "canonical_sha256": "49195ee0095b686950d002f3d16c8d3d9e635d0e626200d5278adc07a5a1b86a",
+      "export_sha256": "46fb6c2d28f24cfb4717386e33342e9ce6000dc36fd97a7604d4314d04e3d8fa",
+      "bytes": 5153,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/useSavedCodexActivity.spec.ts",
+      "canonical_sha256": "44bedae0aab252a62d199535490e3a3162706acdf704a82ebd8d53016539b979",
+      "export_sha256": "eca482061118f07983f8f88c0de4f08fdf43c818525d690e59bf2d7b4acfcb62",
+      "bytes": 3839,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/OwnerDiscordStreamActivity.tsx",
+      "canonical_sha256": "a10dc36d7dec959654db33e9ad59254abf697cc2fb82d00cafd77eb4ed77af4b",
+      "export_sha256": "a10dc36d7dec959654db33e9ad59254abf697cc2fb82d00cafd77eb4ed77af4b",
+      "bytes": 1901,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/OwnerDiscordStreamActivity.spec.tsx",
+      "canonical_sha256": "fdad016bfef1c99c0f3bc2f6cd39eab7f6204fc17da3ce961705cabc4960fcf7",
+      "export_sha256": "fdad016bfef1c99c0f3bc2f6cd39eab7f6204fc17da3ce961705cabc4960fcf7",
+      "bytes": 1248,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/sessionActivityProjection.ts",
+      "canonical_sha256": "a8b39f9704758e574d4b7b4f97229030c17f614f63398c19d8dcd8ebc5776eb6",
+      "export_sha256": "a8b39f9704758e574d4b7b4f97229030c17f614f63398c19d8dcd8ebc5776eb6",
+      "bytes": 17236,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/sessionActivityProjection.spec.ts",
+      "canonical_sha256": "fdee81a476d7e94632cf0bd736451813cd6bc8f2f7f33cd1905db819ba283395",
+      "export_sha256": "fdee81a476d7e94632cf0bd736451813cd6bc8f2f7f33cd1905db819ba283395",
+      "bytes": 28455,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Managed conversation history keeps the exact-granted activity collector running for an approved stream when the Float is hidden. Activity callbacks receive the projected frame, but a hidden Float is not reopened. The parent delta and complete handoff suite were read; other existing handoff behavior is unchanged.",
+    "An explicit Cloud Agent DM function-call proposal includes the owner message and labels model-proposed instructions as untrusted advisory context. Stored pickup and task report remain separate from verified program effects. Ordinary conversation and stream frames do not dispatch a steering request in the selected tests.",
+    "Native exact-source reading checks the account and current grant before and after the local Codex read. SourceRef is codex-thread plus the normalized thread UUID. The native source was inspected as a dependency; no native authority change is exported here.",
+    "Runtime fix 33 keys client activity snapshots by all declared grant identity fields, including grantedAt and Helix association, and rejects mismatched task/source identities. Replacement clears displayed activity before effects run and retires pending reads. Four focused regression cases failed before this fix.",
+    "The saved-activity hook and suite are unchanged from the public base. Already-indexed owner stream projection and session projection files were hash verified. Existing sequential polling, unavailable-source removal, bounded reconnect display and task-report limits are retained.",
+    "Selected first-party TypeScript and synthetic test fixtures only. No real chat transcript, native profile, credential, installed runtime or third-party source is copied. The new integration check projects synthetic exact-granted text without opening the Float or emitting a steering request."
+  ],
+  "limits": [
+    "Unfrozen unpublished source-only proposal. The new client fix is not installed in R380. No pairing, account access, room audience, native authority, model funding or game action is changed.",
+    "Tests use mocked native/HTTP reads and local projection code. They do not establish installed auto-stream delivery, cross-account server enforcement, revocation latency or an attended Minecraft/GPT Live session.",
+    "Owner-scoped native checks remain authoritative. Client identity matching is defense in depth and a display lifecycle check, not independent authentication of a native receipt.",
+    "All account switching, late report parsing, browser event tampering and full app lifecycle combinations are not qualified by this selected suite. Unchanged handoff restoration and direct paired mirror paths remain separately bounded by their native/server checks.",
+    "Shared contracts, native readers, domain delivery and nonselected managed-conversation dependencies remain canonical inputs outside this selected source export. Five intentional support-contact matches elsewhere remain in final publication review."
+  ]
+}

@@ -1,4 +1,5 @@
 import type { DocumentTranslationUnit } from "@shared/document-translation";
+import { normalizeDocumentFreshnessStatus, normalizeDocumentProjectionStatus } from "./liveTranslationStatus";
 import {
   HELIX_LIVE_TRANSLATION_PROJECTION_TARGET_DOCS_CHUNK,
   normalizeHelixLiveTranslationProjectionTarget,
@@ -554,8 +555,8 @@ export function documentMarkdownTranslationEntryToInlineRenderState(
     sourceEventId: entry.sourceEventId,
     sourceEventMs: entry.sourceEventMs,
     observedAtMs: entry.observedAtMs,
-    projectionStatus: entry.projectionStatus,
-    freshnessStatus: entry.freshnessStatus,
+    projectionStatus: normalizeDocumentProjectionStatus(entry.projectionStatus),
+    freshnessStatus: normalizeDocumentFreshnessStatus(entry.freshnessStatus),
     terminalAuthorityStatus: entry.terminalAuthorityStatus ?? "not_terminal_authority",
     laneSessionId: entry.laneSessionId,
     observationLaneSessionId: entry.observationLaneSessionId,

@@ -37,7 +37,7 @@ import MetricFrameLens, {
   type SolveOrderSnapshot,
   type SolveOrderStatus,
 } from "@/components/HullViewer/MetricFrameLens";
-import { resolveHullDimsEffective } from "@/lib/resolve-hull-dims";
+import { resolveHullDimsEffective, type HullDimsEffectiveSource } from "@/lib/resolve-hull-dims";
 import {
   colorizeFieldProbe,
   colorizeWireframeOverlay,
@@ -3264,7 +3264,7 @@ const res = 256;
         : hullPreview?.targetDims,
     [hullDimsResolved, hullPreview?.targetDims],
   );
-  const lastHullDimsSourceRef = useRef<"preview" | "pipeline" | null>(null);
+  const lastHullDimsSourceRef = useRef<HullDimsEffectiveSource | null>(null);
   useEffect(() => {
     const nextSource = hullDimsResolved?.source ?? null;
     const prevSource = lastHullDimsSourceRef.current;
@@ -5480,7 +5480,9 @@ const res = 256;
     return { data, width: nx, height: ny, hasSdf: Boolean(latticeSdfSampler) };
   }, [axes, hullDomainScale, latticeFieldSampler, latticeSdfSampler, planarVizMode, res, volumeSource]);
 
-  const activePlanarSlice = useMemo(() => {
+  const activePlanarSlice = useMemo<
+    (NonNullable<typeof latticeSlice> & { source?: string }) | null
+  >(() => {
     if (planarVizMode === 0 && metricThetaSlice) return metricThetaSlice;
     return latticeSlice;
   }, [planarVizMode, metricThetaSlice, latticeSlice]);

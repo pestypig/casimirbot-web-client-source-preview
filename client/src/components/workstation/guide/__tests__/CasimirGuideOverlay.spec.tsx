@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 
 import React from "react";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   HELIX_DEVELOPER_ACCOUNT_POLICY,
@@ -22,6 +22,7 @@ const mocks = vi.hoisted(() => ({
   list: vi.fn(),
   policy: null as HelixAccountCapabilityPolicy | null,
   fetchPolicy: vi.fn(),
+  identity: { profileId: "profile:self" as string | null | undefined, revision: 0 },
 }));
 
 vi.mock("@/components/workstation/friends-parties/FriendsPartiesApi", () => ({
@@ -31,6 +32,7 @@ vi.mock("@/components/workstation/friends-parties/FriendsPartiesApi", () => ({
 vi.mock("@/lib/workstation/accountCapabilityPolicy", () => ({
   HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT: "helix-account-capability-policy-changed",
   readCachedAccountCapabilityPolicy: () => mocks.policy,
+  readCachedAccountProfileIdentity: () => ({ ...mocks.identity }),
   fetchAccountCapabilityPolicy: mocks.fetchPolicy,
 }));
 
@@ -60,6 +62,8 @@ describe("CasimirGuideOverlay", () => {
   beforeEach(() => {
     resetSharedLiveRoomGuideProjection();
     resetMissionGuideBindingForTest();
+    mocks.list.mockReset();
+    mocks.identity = { profileId: "profile:self", revision: 0 };
     mocks.policy = HELIX_DEVELOPER_ACCOUNT_POLICY;
     mocks.fetchPolicy.mockImplementation(async () => mocks.policy ?? HELIX_USER_ACCOUNT_POLICY);
     mocks.list.mockResolvedValue(socialResponse);
@@ -94,6 +98,50 @@ describe("CasimirGuideOverlay", () => {
     expect(screen.getByText("detached")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: /Friends & party controls/ }));
     expect(onOpenPanel).toHaveBeenCalledWith("friends-parties");
+  });
+
+  const switchProfile = (profileId: string) => {
+    mocks.identity = { profileId, revision: mocks.identity.revision + 1 };
+    window.dispatchEvent(new CustomEvent("helix-account-capability-policy-changed", {
+      detail: { account_policy: mocks.policy },
+    }));
+  };
+
+  it("clears the previous profile's party and refreshes when permissions are identical", async () => {
+    render(<CasimirGuideOverlay open onClose={vi.fn()} onOpenPanel={vi.fn()} />);
+    fireEvent.click(screen.getByRole("tab", { name: "Live Room" }));
+    expect(await screen.findByText("2 members · active")).toBeTruthy();
+    let finish!: (value: typeof socialResponse) => void;
+    mocks.list.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    act(() => switchProfile("profile:next"));
+    expect(screen.queryByText("2 members · active")).toBeNull();
+    expect(mocks.list).toHaveBeenCalledTimes(2);
+    await act(async () => finish({ ...socialResponse, party: { ...socialResponse.party, state: "next-profile" } }));
+    expect(screen.getByText("2 members · next-profile")).toBeTruthy();
+  });
+
+  it("discards a pending response across an A to B to A account round trip", async () => {
+    let finishOld!: (value: typeof socialResponse) => void;
+    mocks.list.mockImplementationOnce(() => new Promise(resolve => { finishOld = resolve; }));
+    render(<CasimirGuideOverlay open onClose={vi.fn()} onOpenPanel={vi.fn()} />);
+    fireEvent.click(screen.getByRole("tab", { name: "Live Room" }));
+    const fresh = { ...socialResponse, party: { ...socialResponse.party, state: "fresh-session" } };
+    mocks.list.mockResolvedValue(fresh);
+    act(() => { switchProfile("profile:next"); switchProfile("profile:self"); });
+    await act(async () => finishOld(socialResponse));
+    expect(screen.queryByText("2 members · active")).toBeNull();
+    expect(await screen.findByText("2 members · fresh-session")).toBeTruthy();
+  });
+
+  it("does not let a previous profile's late rejection lock the current social summary", async () => {
+    let rejectOld!: (value: unknown) => void;
+    mocks.list.mockImplementationOnce(() => new Promise((_resolve, reject) => { rejectOld = reject; }));
+    render(<CasimirGuideOverlay open onClose={vi.fn()} onOpenPanel={vi.fn()} />);
+    fireEvent.click(screen.getByRole("tab", { name: "Live Room" }));
+    act(() => switchProfile("profile:next"));
+    await act(async () => rejectOld({ status: 401 }));
+    expect(screen.queryAllByRole("button", { name: /requires an authenticated account session/ })).toHaveLength(0);
+    expect(await screen.findByText("2 members · active")).toBeTruthy();
   });
 
   it("projects redacted room state and navigates to the existing full room dialog", async () => {
@@ -323,7 +371,7 @@ describe("CasimirGuideOverlay", () => {
     expect(onOpenPanel).toHaveBeenCalledWith("agi-task-history");
   });
 
-  it("fails closed for user-policy destinations while preserving admitted routes", () => {
+  it("admits signed-in user destinations while preserving available routes", async () => {
     mocks.policy = HELIX_USER_ACCOUNT_POLICY;
     const onOpenPanel = vi.fn();
     render(<CasimirGuideOverlay
@@ -334,8 +382,8 @@ describe("CasimirGuideOverlay", () => {
     />);
 
     const friends = screen.getByRole("button", { name: /Friends & Voice Parties/ }) as HTMLButtonElement;
-    expect(friends.disabled).toBe(true);
-    expect(friends.textContent).toContain("This destination is locked by the active account policy.");
+    await waitFor(() => expect(friends.disabled).toBe(false));
+    expect(mocks.list).toHaveBeenCalled();
     fireEvent.click(screen.getByRole("tab", { name: "Environment" }));
     const device = screen.getByRole("button", { name: /Device Check/ }) as HTMLButtonElement;
     expect(device.disabled).toBe(false);
@@ -344,7 +392,6 @@ describe("CasimirGuideOverlay", () => {
     fireEvent.click(screen.getByRole("tab", { name: "Workspace" }));
     const docs = screen.getByRole("button", { name: /Resume Docs & Papers/ }) as HTMLButtonElement;
     expect(docs.disabled).toBe(false);
-    expect(mocks.list).not.toHaveBeenCalled();
   });
 
   it("moves between blades and enabled rows with directional keys", async () => {
@@ -411,7 +458,7 @@ describe("CasimirGuideOverlay", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("searches registered panels and exposes locked discoverable results without enabling them", async () => {
+  it("searches available panels while omitting named hidden panels", async () => {
     mocks.policy = HELIX_USER_ACCOUNT_POLICY;
     render(<CasimirGuideOverlay open onClose={vi.fn()} onOpenPanel={vi.fn()} />);
 
@@ -419,10 +466,26 @@ describe("CasimirGuideOverlay", () => {
     fireEvent.keyDown(screen.getByRole("dialog"), { key: "x" });
     const search = await screen.findByRole("searchbox", { name: "Search panels" });
     fireEvent.change(search, { target: { value: "code admin" } });
-    const codeAdmin = screen.getByRole("button", { name: /Code Admin/ }) as HTMLButtonElement;
-    expect(codeAdmin.disabled).toBe(true);
-    expect(codeAdmin.getAttribute("data-guide-row-state")).toBe("locked");
+    expect(screen.queryByRole("button", { name: /Code Admin/ })).toBeNull();
+    expect(screen.getByRole("button", { name: /No matching panels/ })).toBeTruthy();
+    fireEvent.change(search, { target: { value: "star watcher" } });
+    expect((screen.getByRole("button", { name: /Star Watcher/ }) as HTMLButtonElement).disabled).toBe(false);
     fireEvent.change(search, { target: { value: "taskbar" } });
+    expect(screen.getByRole("button", { name: /No matching panels/ })).toBeTruthy();
+  });
+
+  it("omits Star Watcher from search when this account explicitly locks it", async () => {
+    mocks.policy = {
+      ...HELIX_USER_ACCOUNT_POLICY,
+      locked_panels: [...HELIX_USER_ACCOUNT_POLICY.locked_panels, "star-watcher"],
+    };
+    render(<CasimirGuideOverlay open onClose={vi.fn()} onOpenPanel={vi.fn()} />);
+
+    fireEvent.click(screen.getByRole("tab", { name: "Workspace" }));
+    fireEvent.keyDown(screen.getByRole("dialog"), { key: "x" });
+    const search = await screen.findByRole("searchbox", { name: "Search panels" });
+    fireEvent.change(search, { target: { value: "star watcher" } });
+    expect(screen.queryByRole("button", { name: /Star Watcher/ })).toBeNull();
     expect(screen.getByRole("button", { name: /No matching panels/ })).toBeTruthy();
   });
 

@@ -1,13 +1,37 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { recordWorkstationTimelineEntry } from "@/store/useWorkstationWorkflowTimelineStore";
+import {
+  HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
+  readCachedAccountProfileIdentity,
+} from "@/lib/workstation/accountCapabilityPolicy";
 
-const WORKSTATION_CLIPBOARD_STORAGE_KEY = "workstation-clipboard-history:v1";
+const WORKSTATION_CLIPBOARD_STORAGE_PREFIX = "workstation-clipboard-history:v2:";
 const WORKSTATION_CLIPBOARD_MAX_ENTRIES = 120;
 const WORKSTATION_CLIPBOARD_MAX_PERSISTED_ENTRIES = 40;
 const WORKSTATION_CLIPBOARD_MAX_TEXT_CHARS = 4000;
 const WORKSTATION_CLIPBOARD_MAX_META_CHARS = 2000;
 const WORKSTATION_CLIPBOARD_MAX_STORAGE_CHARS = 160_000;
+
+export const clipboardStorageKeyForProfile = (profileId: string | null | undefined): string =>
+  `${WORKSTATION_CLIPBOARD_STORAGE_PREFIX}${profileId === undefined
+    ? "unresolved" : profileId === null ? "guest" : `profile:${encodeURIComponent(profileId)}`}`;
+
+function readStoredReceipts(key: string): WorkstationClipboardReceipt[] {
+  try {
+    const raw = typeof window === "undefined" ? null : window.localStorage.getItem(key);
+    const state = (JSON.parse(raw ?? "null") as { state?: { receipts?: unknown } } | null)?.state;
+    return Array.isArray(state?.receipts)
+      ? state.receipts.slice(0, WORKSTATION_CLIPBOARD_MAX_ENTRIES).map(normalizeReceiptForStorage)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+let currentClipboardProfileId = readCachedAccountProfileIdentity().profileId;
+let currentClipboardStorageKey = clipboardStorageKeyForProfile(currentClipboardProfileId);
+const initialReceipts = currentClipboardProfileId === undefined ? [] : readStoredReceipts(currentClipboardStorageKey);
 
 export type WorkstationClipboardDirection = "copy" | "paste" | "read" | "write";
 
@@ -128,7 +152,7 @@ const safeClipboardStorage = createJSONStorage<Pick<WorkstationClipboardState, "
 export const useWorkstationClipboardStore = create<WorkstationClipboardState>()(
   persist(
     (set) => ({
-      receipts: [],
+      receipts: initialReceipts,
       addReceipt: (receipt) =>
         set((state) => {
           const normalizedText = truncateText(receipt.text ?? "", WORKSTATION_CLIPBOARD_MAX_TEXT_CHARS);
@@ -157,8 +181,9 @@ export const useWorkstationClipboardStore = create<WorkstationClipboardState>()(
       clearReceipts: () => set({ receipts: [] }),
     }),
     {
-      name: WORKSTATION_CLIPBOARD_STORAGE_KEY,
+      name: currentClipboardStorageKey,
       storage: safeClipboardStorage,
+      skipHydration: true,
       partialize: (state) => ({
         receipts: state.receipts
           .slice(0, WORKSTATION_CLIPBOARD_MAX_PERSISTED_ENTRIES)
@@ -167,3 +192,17 @@ export const useWorkstationClipboardStore = create<WorkstationClipboardState>()(
     },
   ),
 );
+
+if (typeof window !== "undefined") {
+  window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, () => {
+    const nextProfileId = readCachedAccountProfileIdentity().profileId;
+    const nextKey = clipboardStorageKeyForProfile(nextProfileId);
+    if (nextKey !== currentClipboardStorageKey) {
+      const receipts = nextProfileId === undefined ? [] : readStoredReceipts(nextKey);
+      currentClipboardProfileId = nextProfileId;
+      currentClipboardStorageKey = nextKey;
+      useWorkstationClipboardStore.persist.setOptions({ name: nextKey });
+      useWorkstationClipboardStore.setState({ receipts });
+    }
+  });
+}

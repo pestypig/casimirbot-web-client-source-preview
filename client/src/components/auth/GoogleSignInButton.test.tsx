@@ -110,11 +110,15 @@ describe("GoogleSignInButton", () => {
     const initialize = vi.fn();
     const renderButton = vi.fn();
     const prompt = vi.fn();
-    window.google = { accounts: { id: { initialize, renderButton, prompt } } };
+    const maps = { importLibrary: vi.fn() };
+    window.google = { maps, accounts: { id: { initialize, renderButton, prompt } } };
 
     render(<GoogleSignInButton clientId="client-id" redirectTarget={null} promptOnLoad={false} />);
 
     await waitFor(() => expect(renderButton).toHaveBeenCalled());
+    expect(window.google?.maps).toBe(maps);
+    expect(maps.importLibrary).not.toHaveBeenCalled();
+
     expect(initialize).toHaveBeenCalledWith(expect.objectContaining({
       auto_select: false,
       button_auto_select: false,

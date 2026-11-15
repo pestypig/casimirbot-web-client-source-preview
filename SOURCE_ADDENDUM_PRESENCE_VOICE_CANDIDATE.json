@@ -1,0 +1,70 @@
+{
+  "observed_at": "2026-11-13T14:19:38.201324+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/workstation/friends-parties/useWorkstationSocialPresence.ts",
+      "canonical_sha256": "93328bdff5461bef953c5ce15fbef0370809914c49bcd1a049e26d83aef1d4a3",
+      "export_sha256": "93328bdff5461bef953c5ce15fbef0370809914c49bcd1a049e26d83aef1d4a3",
+      "previous_public_sha256": null,
+      "bytes": 1900,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/useWorkstationSocialPresence.spec.tsx",
+      "canonical_sha256": "1f993a011626c32c400cff707e6c2b64963036f37d6c15d966bab66669f2053e",
+      "export_sha256": "1f993a011626c32c400cff707e6c2b64963036f37d6c15d966bab66669f2053e",
+      "previous_public_sha256": null,
+      "bytes": 3070,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/VoicePartyMediaBridge.ts",
+      "canonical_sha256": "254ccef6ea3c69f6334a556dad59aa966010dba8ccdedcc366b3571100432739",
+      "export_sha256": "e176577c4d2341b95e1a995b8e7df8930169f83e886985ead151b7dc4b57a6b8",
+      "previous_public_sha256": "e00f7d47f67f2ace829eddf5d465ebd0e3e9ee2ab8f9ecf4f0b90a37056ae13c",
+      "bytes": 11114,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/useVoicePartyMediaBridge.ts",
+      "canonical_sha256": "4800b7d600b7d7d5a88945a21f94a66f9567a0db98b0ad1191f9adfca9392afe",
+      "export_sha256": "4800b7d600b7d7d5a88945a21f94a66f9567a0db98b0ad1191f9adfca9392afe",
+      "previous_public_sha256": "4f92701b17d311f2e9e66fc10d5e338f8b30aaa4ce8d5be4a04d94f89d418da4",
+      "bytes": 3085,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/VoicePartyMediaBridge.spec.ts",
+      "canonical_sha256": "a1ad9df4bb1121bb7188b3f7d34a327fce8ff3e54a6a5bc4aad051fa5ac0b35b",
+      "export_sha256": "a1ad9df4bb1121bb7188b3f7d34a327fce8ff3e54a6a5bc4aad051fa5ac0b35b",
+      "previous_public_sha256": "8231072f6ddeb81b81f940ce5d05472fa7bd082c45a183f057636b5e033e415a",
+      "bytes": 15964,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/useVoicePartyMediaBridge.spec.tsx",
+      "canonical_sha256": "27c27b55bf614d4b77068ee5365c0eb057f47c59914cbf9b6640405afeb42965",
+      "export_sha256": "27c27b55bf614d4b77068ee5365c0eb057f47c59914cbf9b6640405afeb42965",
+      "previous_public_sha256": null,
+      "bytes": 2522,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Six full files reviewed: workstation presence, voice bridge and hook, synthetic presence/media tests. No media recordings, credentials or live account values included.",
+    "Presence requires the current profile and Friends policy and discards stale profile results. It runs at workstation scope; its shell importer is located but remains a separate source-review input.",
+    "Voice startup is single-flight and rechecks closure after reporting connection, ICE admission and microphone acquisition. Tracks obtained after close are stopped without creating WebRTC or signaling.",
+    "The hook invalidates pending restart attempts on Stop, unmount or exact party/member identity change. Late projection callbacks cannot update the successor selection. Late transport statistics cannot report a closed connection as current.",
+    "Regression fixtures use fake tracks, mocked WebRTC/ICE/signaling and reserved example domains. Consent, actual microphone acquisition, audio, hosted room and paid model operations were not performed."
+  ],
+  "limits": [
+    "Private source proposal only; no commit, push, package, deployment or new authority.",
+    "Two production voice files changed after R378; this fix is not in any qualified installed package.",
+    "Shared contracts, party API, signaling/playback/recovery and workstation shell are separate dependencies.",
+    "Component tests do not qualify real audio, two-player Discord/GPT Live, signed ordinary-account operation or the complete release."
+  ]
+}

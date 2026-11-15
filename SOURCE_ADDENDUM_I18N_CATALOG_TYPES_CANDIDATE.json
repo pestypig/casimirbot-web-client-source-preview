@@ -1,0 +1,76 @@
+{
+  "observed_at": "2026-11-13T23:16:46.340903+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/lib/i18n/messages/catalogMetadata.ts",
+      "canonical_sha256": "a0f98f2117798292eea414147a0ea83cb29f8035fb24b0495796fe1140c75357",
+      "export_sha256": "97d95730dfbcbcbb7528300e6e566eb17b82a4e4b3cb43c586fee44c831d8897",
+      "bytes": 392,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "093df9c13017517943514624ca638cd36cda506b17abfc5ae8140f35bc9b691c"
+    },
+    {
+      "path": "client/src/lib/i18n/messages/runtimeCatalogs.ts",
+      "canonical_sha256": "6c9b06298490fca6485c8194b935e82e235888a1fec0744b74d0e889fbecdf12",
+      "export_sha256": "6c9b06298490fca6485c8194b935e82e235888a1fec0744b74d0e889fbecdf12",
+      "bytes": 2406,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "85a4553dba1bca110369b8dd8c79a433a0b314f9ee994d6f743896c9604c7cdb"
+    },
+    {
+      "path": "client/src/lib/i18n/messages/catalogTypes.ts",
+      "canonical_sha256": "9f0a9b910e3977ce79cefb5e6d168d8529d559b4dc68d41876774600415a9a0f",
+      "export_sha256": "9f0a9b910e3977ce79cefb5e6d168d8529d559b4dc68d41876774600415a9a0f",
+      "bytes": 752,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "30d7f8e628c6534b858c0157b9abeba6419f8cf66ef919e6dd8e7932e37d1202"
+    },
+    {
+      "path": "client/src/lib/i18n/messages/types.ts",
+      "canonical_sha256": "628485b00ea6393f4f63ffddd1c0eaae5a4b4c66c0fba9e98f9de490694f8e81",
+      "export_sha256": "628485b00ea6393f4f63ffddd1c0eaae5a4b4c66c0fba9e98f9de490694f8e81",
+      "bytes": 541,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "7e49e445d6cbe6fa5583a493180574502e508e91e33a6aabd477c633b5b310e2"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/i18n/__tests__/interfaceCatalog.spec.ts",
+      "canonical_sha256": "0cbe6515439c4b234a92bfabfe3b2bdaefd9284d33f72ac5ba601c0d89a1b888",
+      "export_sha256": "0cbe6515439c4b234a92bfabfe3b2bdaefd9284d33f72ac5ba601c0d89a1b888",
+      "bytes": 5024,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/i18n/__tests__/runtimeCatalogs.spec.tsx",
+      "canonical_sha256": "1d0c3217bb17655499ef6616eb2b40ad39154b8498f05d8ca286aecc82e16433",
+      "export_sha256": "1d0c3217bb17655499ef6616eb2b40ad39154b8498f05d8ca286aecc82e16433",
+      "bytes": 1080,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/AccountSessionPanel.i18n.spec.tsx",
+      "canonical_sha256": "ad6c1a026466478edaa4faf73476094afdceeca6fd65e1a8a5542e37c8f6d09a",
+      "export_sha256": "aaa621d7c1f09d59506c0393115948519730160f41aaf8225096ff27b9b8003f",
+      "bytes": 17018,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Read all four short type/catalog modules and both unchanged catalog integrity/runtime suites; compared existing account-language suite against its previously reviewed bytes.",
+    "Two imports now name SharedInterfaceLanguageCode, the actual exported union of eleven existing language codes. The local InterfaceLanguageCode alias remains the same union; no account or language eligibility changes.",
+    "Message catalog types import InterfaceMessageId for local use as well as re-exporting it. Message keys remain derived from the existing source catalog, with no added index signature or unchecked string widening.",
+    "The screenshot surface union now includes mobile-start, matching twenty-nine existing authored mobile screen entries. No catalog messages, reviewed counts or language loaders changed.",
+    "Existing tests check all source IDs and English values, partial catalog counts/placeholders and language selection, as well as switching away from a previous language. Tests use local catalogs and mocked account data; no translation provider was contacted."
+  ],
+  "limits": [
+    "Type-only source repair; emitted runtime equivalence and focused tests are separate from full graph type qualification.",
+    "No claim of linguistic review, complete translations, hosted localization behavior or installed UI acceptance.",
+    "Unfrozen and unpublished. Existing shader/data/metadata export holds and public-candidate contact review remain."
+  ]
+}

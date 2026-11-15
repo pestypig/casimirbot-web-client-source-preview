@@ -11,6 +11,31 @@ const stream = (audioTrack: MediaStreamTrack) => ({
 }) as unknown as MediaStream;
 
 describe("Shared Live Room human-input mixer", () => {
+  it.each(["resolve", "reject"] as const)("keeps a mixer closed when pending resume settles by %s", async outcome => {
+    let resolve!: () => void;let reject!: (error: Error) => void;
+    const pending = new Promise<void>((res, rej) => { resolve = res; reject = rej; });
+    let state: AudioContextState = "suspended";
+    const output = track();const owner = track();const participant = track();
+    const context = { currentTime: 0, get state() { return state; },
+      createMediaStreamDestination: () => ({ stream: stream(output) }),
+      createMediaStreamSource: () => ({ connect: vi.fn(), disconnect: vi.fn() }),
+      createGain: () => ({ gain: { value: 0, setValueAtTime: vi.fn() }, connect: vi.fn(), disconnect: vi.fn() }),
+      resume: vi.fn(() => pending),
+      // Model a close request whose browser state change lags its promise.
+      close: vi.fn(async () => undefined),
+    } as unknown as AudioContext;
+    const mixer = createSharedLiveRoomAudioMixer({ ownerMicrophone: stream(owner), participantMicrophone: stream(participant),
+      createAudioContext: () => context });
+    const resuming = mixer.resume();
+    await mixer.close();
+    if (outcome === "resolve") { state = "running";resolve(); }else reject(new Error("context closed during resume"));
+    expect(await resuming).toBe(false);
+    expect(await mixer.resume()).toBe(false);
+    await mixer.close();
+    expect(output.stop).toHaveBeenCalledOnce();expect(context.close).toHaveBeenCalledOnce();
+    expect(owner.stop).not.toHaveBeenCalled();expect(participant.stop).not.toHaveBeenCalled();
+  });
+
   it("connects exactly two human sources and gates them independently", async () => {
     const ownerTrack = track();
     const participantTrack = track();

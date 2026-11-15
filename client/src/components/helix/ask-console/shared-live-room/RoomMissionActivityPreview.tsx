@@ -85,7 +85,7 @@ export function RoomMissionActivityPreview({ mission }: {
       projections={events} />
     <p role="status" className="text-[11px] text-slate-400">{status}</p>
     {nativeHud()?.showEnvironmentMissionHud && mission.run_id ? <div className="space-y-1">
-      <button type="button" className="rounded border border-cyan-300/30 px-2 py-1"
+      <button data-helix-control-id="helix.ask.shared_live_room.room-mission-activity-preview.if-overlay-requested-current-set-overlay-status-stopping-over-game-hud-v" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" className="rounded border border-cyan-300/30 px-2 py-1"
         onClick={() => {
           if (overlayRequested.current) {
             setOverlayStatus("Stopping over-game HUD…");

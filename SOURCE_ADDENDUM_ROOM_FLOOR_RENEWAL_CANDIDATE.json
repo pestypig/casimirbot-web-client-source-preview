@@ -1,0 +1,72 @@
+{
+  "observed_at": "2026-11-14T02:06:38.583298+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/useHelixSharedLiveRoom.ts",
+      "canonical_sha256": "620e0246c6e6673a7260f4ccb7fc08948ab44be51856b5af7fed82831c6f7d84",
+      "export_sha256": "620e0246c6e6673a7260f4ccb7fc08948ab44be51856b5af7fed82831c6f7d84",
+      "bytes": 14501,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "8530034704dad345be77ef760490a4497d2c5f3de1461c6d1d55021079e44ade"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/useHelixSharedLiveRoom.floor-renewal.spec.tsx",
+      "canonical_sha256": "4fd5faffd6e663bdea7db7e9849fc4ecc0ff0abb185f94d524b402e34f2624e0",
+      "export_sha256": "ce31dfe5aac9599334afff17e194db7bd49ea8a67db1c2fcaf2d5b3febf5a7ed",
+      "bytes": 7064,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomFloorLease.ts",
+      "canonical_sha256": "9220846961952d7f11d3f533ec143b3516ec30192b5e73a63f702103ed9b52c0",
+      "export_sha256": "ed4af14dce6c12e0b8ed37e36cd4676c22f665a4e5882847bc83a4a9f5372d56",
+      "bytes": 1018,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomFloorLease.spec.ts",
+      "canonical_sha256": "ed8de339ec869c39b7a7c2ecde8e2745d0fdccadaf96e8ffa113fb5bf3ded0eb",
+      "export_sha256": "5e3e96b29e1a3265c7344dfdbded085adb3419594559deb037a38df03463b284",
+      "bytes": 1237,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomSelection.ts",
+      "canonical_sha256": "5f3a0ff2f6bdb18f614ad4d496bc93bd38368410bb007d2adda1ed55c2508712",
+      "export_sha256": "ebc2767cbeb3bf2612de5be5397b638a5e2b0de559c748bf086dde6f687a19fb",
+      "bytes": 1129,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Shared room floor renewal lifecycle",
+    "capability": "Shared room audio floor maintenance",
+    "lifecycle_stage": "Existing room session",
+    "reaction_timescale": "Three-second renewal interval",
+    "authority_owner": "Existing server room, consent and floor checks",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with stale response suppression",
+    "required_evidence": "Failing hook lifecycle cases before fix; passing canonical/export cases; scoped compiler and integration compile",
+    "explicit_non_goals": "No new authority, pairing, session start, provider call or game action",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "The automatic speaking-floor timer now requires a non-null selected room, permits one pending renewal per effect lifetime, and suppresses results after cleanup. It also rejects a response with a different room ID.",
+    "Switching rooms, leaving, losing the eligible transport, reconnecting, or unmounting retires the old effect. Successful current responses still update the existing selection and collection; rejected calls can retry on the next ordinary interval.",
+    "Six of ten new mounted-hook lifecycle cases fail against the prior hook. Sync, media, debug and visual peripherals are mocked; the actual hook, floor eligibility and room selection functions run. Existing three floor-eligibility tests are retained unchanged.",
+    "Reviewed complete unchanged floor eligibility and selection helpers. Their server-authority semantics are unchanged; the new guard governs local asynchronous projection only."
+  ],
+  "limits": [
+    "Unfrozen, unpublished and uninstalled. Synthetic room responses do not establish real voice, membership, consent, exact pairing or Minecraft handoff.",
+    "Already-dispatched server requests are not cancelled or undone by local effect cleanup. Other explicit room actions and poll lifecycles remain separate.",
+    "Export tests load the selected hook and two helpers; other dependencies remain canonical."
+  ]
+}

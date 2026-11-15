@@ -44,7 +44,8 @@ export function SharedLiveRoomOwnerResultsPanel({ room, onProcessed }: {
       }
     } catch (error) {
       if (!abort.signal.aborted) {
-        setHidden(error instanceof RoomResultRequestError && error.code === "room_result_developer_required");
+        setHidden(error instanceof RoomResultRequestError &&
+          ["room_result_account_policy_blocked", "room_result_developer_required"].includes(error.code));
         setMessage(error instanceof RoomResultRequestError
           ? `Results unavailable (${error.code}). Refresh after restoring the room connection and report access.`
           : "Could not check results. Refresh to try again.");
@@ -93,11 +94,11 @@ export function SharedLiveRoomOwnerResultsPanel({ room, onProcessed }: {
   return <section className="rounded-xl border border-cyan-300/20 bg-cyan-400/[0.04] p-3" aria-label="Owner task results">
     <div className="flex items-center justify-between gap-3">
       <h3 className="text-xs font-semibold text-cyan-100">Explain a task result to the room</h3>
-      <button type="button" className="rounded border border-white/20 px-2 py-1 text-xs" disabled={busy || loading}
+      <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-owner-results-panel.refresh-results" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" className="rounded border border-white/20 px-2 py-1 text-xs" disabled={busy || loading}
         onClick={() => void refresh()}>Refresh results</button>
     </div>
     <label className="mt-2 block text-xs">Report location
-      <select aria-label="Report location" value={source} disabled={busy || loading || room.status === "closed"}
+      <select data-helix-control-id="helix.ask.shared_live_room.shared-live-room-owner-results-panel.report-location" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" aria-label="Report location" value={source} disabled={busy || loading || room.status === "closed"}
         className="ml-2 rounded border border-white/20 bg-slate-950 p-1"
         onChange={event => { const mode = event.target.value === "hosted" ? "hosted" : "local"; setSource(mode); void refresh(mode); }}>
         <option value="local">Private task reports</option>
@@ -111,7 +112,7 @@ export function SharedLiveRoomOwnerResultsPanel({ room, onProcessed }: {
     {source === "hosted" && hostedCatalog && !hostedCatalog.reports.length ? <p className="mt-2 text-xs">No owner-approved reports are currently available.</p> : null}
     {choices?.length ? <div className="mt-3 space-y-3 text-xs">
       <label className="block">Task report
-        <select aria-label="Task report" value={selectedRef} disabled={busy || loading}
+        <select data-helix-control-id="helix.ask.shared_live_room.shared-live-room-owner-results-panel.task-report" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" aria-label="Task report" value={selectedRef} disabled={busy || loading}
           className="mt-1 block w-full rounded border border-white/20 bg-slate-950 p-2"
           onChange={event => { setSelectedRef(event.target.value); setConsent(false); setMessage(""); setTurnId(null); }}>
           <option value="">Select a report…</option>
@@ -122,15 +123,15 @@ export function SharedLiveRoomOwnerResultsPanel({ room, onProcessed }: {
       </label>
       {(source === "hosted" ? hostedCatalog?.has_more : catalog?.limited) ? <p>Showing the 20 most recent reports.</p> : null}
       <label className="block">What should the room understand?
-        <textarea aria-label="What should the room understand?" value={question} maxLength={12000} disabled={busy}
+        <textarea data-helix-control-id="helix.ask.shared_live_room.shared-live-room-owner-results-panel.what-should-the-room-understand" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" aria-label="What should the room understand?" value={question} maxLength={12000} disabled={busy}
           className="mt-1 block w-full rounded border border-white/20 bg-slate-950 p-2"
           onChange={event => { setQuestion(event.target.value); setConsent(false); setMessage(""); setTurnId(null); }} />
       </label>
-      <label className="flex items-start gap-2"><input type="checkbox" checked={consent} disabled={busy || !hasSelection}
+      <label className="flex items-start gap-2"><input data-helix-control-id="helix.ask.shared_live_room.shared-live-room-owner-results-panel.input" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" type="checkbox" checked={consent} disabled={busy || !hasSelection}
         onChange={event => setConsent(event.target.checked)} />
         <span>Send the selected report to the configured Codex provider and share its supported explanation with room members. This may use the provider's API allowance.</span>
       </label>
-      <button type="button" className="rounded border border-cyan-300/30 px-3 py-2 text-cyan-100 disabled:opacity-50"
+      <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-owner-results-panel.void-explain" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" className="rounded border border-cyan-300/30 px-3 py-2 text-cyan-100 disabled:opacity-50"
         disabled={busy || loading || !hasSelection || !consent || !question.trim() || room.status === "closed"}
         onClick={() => void explain()}>{busy ? "Preparing explanation…" : "Explain to room"}</button>
     </div> : null}

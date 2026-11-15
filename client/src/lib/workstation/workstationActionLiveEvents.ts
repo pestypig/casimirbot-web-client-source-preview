@@ -7,6 +7,7 @@ export function createWorkstationActionTraceId(actionName: string): string {
 }
 
 function summarizeAction(action: HelixWorkstationAction): string {
+  const actionName = action.action;
   switch (action.action) {
     case "open_panel":
       return `open panel ${action.panel_id}`;
@@ -35,7 +36,7 @@ function summarizeAction(action: HelixWorkstationAction): string {
     case "run_job":
       return "run workstation job";
     default:
-      return action.action;
+      return actionName;
   }
 }
 

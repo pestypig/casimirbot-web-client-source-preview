@@ -6,7 +6,7 @@ import {
 } from "./HelixAskStatusLine";
 
 export type HelixAskConsoleVoiceStatusSurfaceProps = {
-  label: string;
+  label: string | null;
   state: HelixAskVoiceInputStatus;
 };
 

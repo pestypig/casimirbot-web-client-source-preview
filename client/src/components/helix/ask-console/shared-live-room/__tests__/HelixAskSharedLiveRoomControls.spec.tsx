@@ -11,6 +11,8 @@ import { HELIX_SHARED_LIVE_ROOM_OPEN_DIALOG_EVENT } from
   "../SharedLiveRoomGuideProjection";
 import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/accountCapabilityPolicy";
 import { RoomServiceEntry } from "../RoomServiceEntry";
+import { clearPendingExactRoomReviewNavigation,
+  requestExactRoomReviewNavigation } from "@/lib/workstation/exactRoomReviewNavigation";
 
 const hookState = vi.hoisted(() => ({
   controller: null as HelixSharedLiveRoomController | null,
@@ -27,10 +29,24 @@ vi.mock("../SharedLiveRoomDialog", () => ({
 afterEach(() => {
   cleanup();
   hookState.controller = null;
+  clearPendingExactRoomReviewNavigation();
   window.history.replaceState({}, "", "/");
 });
 
 describe("Helix Ask shared-room thread scope", () => {
+  it("consumes one exact owner review after Party Chat mounts", async () => {
+    const openRoom = vi.fn(async () => true);
+    hookState.controller = { room: null, selfParticipant: null, openRoom } as unknown as
+      HelixSharedLiveRoomController;
+    expect(requestExactRoomReviewNavigation({ roomId: "shared_realtime_room:exact",
+      environmentBindingId: "environment:exact" }))
+      .toBe("waiting_for_room_control");
+    render(<HelixAskSharedLiveRoomControls realtimeSessionId={null}
+      runtimeActive={false} realtimeModel="gpt-realtime" />);
+    await waitFor(() => expect(openRoom).toHaveBeenCalledWith(
+      "shared_realtime_room:exact", expect.any(AbortSignal)));
+    expect(openRoom).toHaveBeenCalledTimes(1);
+  });
   it("connects the browser entry to the real dialog controller only after a fresh exact-room read", async () => {
     window.history.replaceState({}, "", "/desktop?service_room=shared_realtime_room%3Aexact");
     const openRoom = vi.fn(async () => true);
@@ -82,6 +98,20 @@ describe("Helix Ask shared-room thread scope", () => {
     } else {
       expect(screen.queryByRole("dialog")).toBeNull();
     }
+  });
+  it("opens native Rooms for a hosted destination without reading another local room", async () => {
+    const openRoom = vi.fn(async () => true);
+    hookState.controller = {
+      room: { room_id: "room:local", status: "ready", participants: [],
+        runtime: { state: "idle", transport_owner: "none", realtime_session_ref_hash: null } },
+      selfParticipant: null, openRoom,
+    } as unknown as HelixSharedLiveRoomController;
+    render(<HelixAskSharedLiveRoomControls realtimeSessionId={null}
+      runtimeActive={false} realtimeModel="gpt-realtime" />);
+    act(() => window.dispatchEvent(new CustomEvent(HELIX_SHARED_LIVE_ROOM_OPEN_DIALOG_EVENT,
+      { detail: { hostedRoomId: "shared_realtime_room:ce03ad8e-d0cb-4d73-8324-94b069f8e8c8" } })));
+    expect(await screen.findByRole("dialog")).toBeTruthy();
+    expect(openRoom).not.toHaveBeenCalled();
   });
   it("reads the exact requested room before showing settings and ignores cancelled navigation", async () => {
     const makeRoom = (id: string) => ({ room_id: id, status: "ready", participants: [],

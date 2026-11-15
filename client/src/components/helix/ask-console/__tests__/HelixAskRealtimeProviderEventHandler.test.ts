@@ -3,6 +3,29 @@ import { describe, expect, it } from "vitest";
 import { createHelixAskRealtimeProviderEventHandler } from "../HelixAskRealtimeProviderEventHandler";
 
 describe("Helix Ask Realtime provider event relay correlation", () => {
+  it("passes the provider item ID separately from its event ID on a final transcript", async () => {
+    const posts: Array<Record<string, unknown>> = [];
+    const handler = createHelixAskRealtimeProviderEventHandler({
+      realtimeSessionId: "realtime:test", runtimeAgentAuthority: "codex",
+      nowMs: () => 1_000,
+      postEvent: async (_path, body) => {
+        posts.push(body);
+        return { ok: true, realtime_transcript_observations: [
+          { observation_ref: "observation:test" } ] };
+      },
+    });
+    await handler.handle({
+      event_id: "event:transcript-completed", item_id: "msg_003",
+      type: "conversation.item.input_audio_transcription.completed",
+      transcript: "Build a small shelter here",
+    });
+    expect(posts).toContainEqual(expect.objectContaining({
+      event_type: "transcript.final",
+      event_ref: "event:transcript-completed",
+      provider_item_id: "msg_003",
+    }));
+  });
+
   it("projects the terminal relay id into response and playback transport receipts", async () => {
     const receipts: Array<Record<string, unknown>> = [];
     const handler = createHelixAskRealtimeProviderEventHandler({

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -32,11 +32,19 @@ import {
   parseDesktopMinecraftRunProfileState,
   type DesktopMinecraftRunProfileState,
 } from "@shared/desktop-minecraft-run-profile";
+import {
+  parseDesktopMinecraftIntegratedWorldState,
+  type DesktopMinecraftIntegratedWorldState,
+} from "@shared/desktop-minecraft-integrated-world";
 import { useRuntimeSurface } from "@/lib/runtime/RuntimeSurfaceProvider";
+import { personalMcpP1UnavailableMessage } from
+  "@/lib/workstation/personalMcpP1Availability";
 import { useWorkstationLayoutStore } from "@/store/useWorkstationLayoutStore";
 import {
   HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
+  fetchAccountCapabilityPolicy,
   readCachedAccountCapabilityPolicy,
+  readCachedAccountProfileIdentity,
 } from "@/lib/workstation/accountCapabilityPolicy";
 
 const statusClass: Record<HelixEnvironmentDeviceCheck["health"], string> = {
@@ -69,12 +77,31 @@ const formatAge = (milliseconds: number | null): string => {
   return `${hours}h ago`;
 };
 
+const subscribeAccountProfile = (listener: () => void): (() => void) => {
+  window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, listener);
+  return () => window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, listener);
+};
+const readAccountProfileRevision = (): number => readCachedAccountProfileIdentity().revision;
+
 export default function DeviceCheckPanel() {
+  const profileRevision = useSyncExternalStore(
+    subscribeAccountProfile, readAccountProfileRevision, () => 0,
+  );
+  // Reset observations, drafts and pending UI work only when identity changes.
+  return <DeviceCheckProfilePanel key={profileRevision} />;
+}
+
+function DeviceCheckProfilePanel() {
   const runtime = useRuntimeSurface();
   const [accountPolicy, setAccountPolicy] = useState<HelixAccountCapabilityPolicy | null>(
     () => readCachedAccountCapabilityPolicy(),
   );
   const developerControlsAvailable = accountPolicy?.account_type === "developer";
+  const personalControlsAvailable = accountPolicy?.account_type === "user";
+  const minecraftWorldControlsAvailable = developerControlsAvailable || personalControlsAvailable;
+  const [personalMcpP1Available, setPersonalMcpP1Available] = useState(false);
+  const [personalMcpP1Phase, setPersonalMcpP1Phase] = useState<string>("unavailable");
+  const personalP1ReadGeneration = useRef(0);
   const [devices, setDevices] = useState<HelixEnvironmentDeviceCheck[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -84,6 +111,7 @@ export default function DeviceCheckPanel() {
   const [codexOpening, setCodexOpening] = useState(false);
   const [codexError, setCodexError] = useState<string | null>(null);
   const [tunnel, setTunnel] = useState<DesktopMcpTunnelState | null>(null);
+  const tunnelReadGeneration = useRef(0);
   const [tunnelId, setTunnelId] = useState("");
   const [runtimeApiKey, setRuntimeApiKey] = useState("");
   const [tunnelBusy, setTunnelBusy] = useState(false);
@@ -96,19 +124,54 @@ export default function DeviceCheckPanel() {
   const [transitionError, setTransitionError] = useState<string | null>(null);
   const [minecraftRunProfile, setMinecraftRunProfile] =
     useState<DesktopMinecraftRunProfileState | null>(null);
+  const [minecraftIntegratedWorld, setMinecraftIntegratedWorld] =
+    useState<DesktopMinecraftIntegratedWorldState | null>(null);
   const [minecraftProfileBusy, setMinecraftProfileBusy] = useState(false);
   const [minecraftProfileError, setMinecraftProfileError] = useState<string | null>(null);
 
+  const refreshTunnelState = useCallback((clearCurrent: boolean) => {
+    const generation = ++tunnelReadGeneration.current;
+    if (clearCurrent) setTunnel(null);
+    const bridge = window.casimirDesktop;
+    if (!bridge?.getMcpTunnelState) {
+      setTunnelError("This desktop build does not include Secure MCP Tunnel support.");
+      return;
+    }
+    void bridge.getMcpTunnelState().then((candidate) => {
+      if (generation !== tunnelReadGeneration.current) return;
+      const parsed = parseDesktopMcpTunnelState(candidate);
+      if (!parsed) {
+        setTunnelError("The desktop host returned an invalid tunnel state.");
+        return;
+      }
+      setTunnel(parsed);
+      setTunnelError(null);
+    }).catch(() => {
+      if (generation === tunnelReadGeneration.current) {
+        setTunnelError("The desktop host could not inspect the tunnel runtime.");
+      }
+    });
+  }, []);
+
   useEffect(() => {
     const onPolicyChange = (event: Event) => {
-      const policy = (event as CustomEvent<{
+      const detail = (event as CustomEvent<{
         account_policy?: HelixAccountCapabilityPolicy | null;
-      }>).detail?.account_policy;
-      setAccountPolicy(policy ?? readCachedAccountCapabilityPolicy());
+        account_profile_changed?: boolean;
+      }>).detail;
+      setAccountPolicy(detail?.account_policy ?? readCachedAccountCapabilityPolicy());
+      if (runtime.surface === "desktop_native") {
+        // A policy refresh for the same profile is not a sign-out. Keep the
+        // last observation visible while native identity is revalidated.
+        refreshTunnelState(detail?.account_profile_changed === true);
+      }
     };
     window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, onPolicyChange);
+    if (!readCachedAccountCapabilityPolicy()) {
+      void fetchAccountCapabilityPolicy().catch(() => undefined);
+    }
     return () => window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, onPolicyChange);
-  }, []);
+  }, [refreshTunnelState, runtime.surface]);
 
   useEffect(() => {
     if (developerControlsAvailable) return;
@@ -117,6 +180,35 @@ export default function DeviceCheckPanel() {
     setTransitionConsentAvailable(false);
     setRuntimeApiKey("");
   }, [developerControlsAvailable]);
+
+  useEffect(() => {
+    if (!minecraftWorldControlsAvailable) setMinecraftIntegratedWorld(null);
+  }, [minecraftWorldControlsAvailable]);
+
+  const refreshPersonalMcpP1 = useCallback(async () => {
+    const generation = ++personalP1ReadGeneration.current;
+    setPersonalMcpP1Available(false);
+    setPersonalMcpP1Phase("unavailable");
+    if (runtime.surface !== "desktop_native" || !personalControlsAvailable) return;
+    const inspect = window.casimirDesktop?.personalMcpP1Connection;
+    if (!inspect) return;
+    try {
+      const result = await inspect("inspect");
+      if (generation !== personalP1ReadGeneration.current) return;
+      const candidate = result as { available?: unknown; phase?: unknown } | null;
+      setPersonalMcpP1Available(candidate?.available === true);
+      setPersonalMcpP1Phase(typeof candidate?.phase === "string"
+        ? candidate.phase : "unavailable");
+    } catch {
+      if (generation === personalP1ReadGeneration.current)
+        setPersonalMcpP1Phase("unavailable");
+    }
+  }, [personalControlsAvailable, runtime.surface]);
+
+  useEffect(() => {
+    void refreshPersonalMcpP1();
+    return () => { personalP1ReadGeneration.current++; };
+  }, [refreshPersonalMcpP1]);
 
   const refresh = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
@@ -201,6 +293,21 @@ export default function DeviceCheckPanel() {
     return () => { cancelled = true; };
   }, [developerControlsAvailable, runtime.surface]);
 
+  useEffect(() => {
+    if (runtime.surface !== "desktop_native" || !minecraftWorldControlsAvailable) return;
+    let cancelled = false;
+    const inspectIntegrated = window.casimirDesktop?.getMinecraftIntegratedWorld;
+    if (inspectIntegrated) void inspectIntegrated().then((candidate) => {
+      if (cancelled) return;
+      const parsed = parseDesktopMinecraftIntegratedWorldState(candidate);
+      if (parsed) setMinecraftIntegratedWorld(parsed);
+      else setMinecraftProfileError("The desktop host returned an invalid integrated-world selection.");
+    }).catch(() => {
+      if (!cancelled) setMinecraftProfileError("The integrated-world selection could not be inspected.");
+    });
+    return () => { cancelled = true; };
+  }, [minecraftWorldControlsAvailable, runtime.surface]);
+
   const runMinecraftProfileOperation = useCallback(async (
     operation: (() => Promise<unknown>) | undefined,
   ) => {
@@ -215,6 +322,24 @@ export default function DeviceCheckPanel() {
       setMinecraftProfileError(
         caught instanceof Error ? caught.message : "The Minecraft profile operation failed.",
       );
+    } finally {
+      setMinecraftProfileBusy(false);
+    }
+  }, []);
+
+  const runIntegratedWorldOperation = useCallback(async (
+    operation: (() => Promise<unknown>) | undefined,
+  ) => {
+    if (!operation) return;
+    setMinecraftProfileBusy(true);
+    setMinecraftProfileError(null);
+    try {
+      const parsed = parseDesktopMinecraftIntegratedWorldState(await operation());
+      if (!parsed) throw new Error("invalid integrated-world selection");
+      setMinecraftIntegratedWorld(parsed);
+    } catch (caught) {
+      setMinecraftProfileError(caught instanceof Error ? caught.message :
+        "The integrated-world operation failed.");
     } finally {
       setMinecraftProfileBusy(false);
     }
@@ -266,12 +391,13 @@ export default function DeviceCheckPanel() {
   }, []);
 
   const refreshAll = useCallback(async () => {
-    const operations: Promise<unknown>[] = [refresh()];
+    const operations: Promise<unknown>[] = [refresh(), refreshPersonalMcpP1()];
     if (developerControlsAvailable && runtime.surface === "desktop_native" && tunnel?.configured) {
       operations.push(refreshTransitionRequests());
     }
     await Promise.all(operations);
-  }, [developerControlsAvailable, refresh, refreshTransitionRequests, runtime.surface, tunnel?.configured]);
+  }, [developerControlsAvailable, refresh, refreshPersonalMcpP1,
+    refreshTransitionRequests, runtime.surface, tunnel?.configured]);
 
   useEffect(() => {
     if (!developerControlsAvailable || runtime.surface !== "desktop_native" || !tunnel?.configured) return;
@@ -323,29 +449,20 @@ export default function DeviceCheckPanel() {
   useEffect(() => {
     if (runtime.surface !== "desktop_native") return;
     const bridge = window.casimirDesktop;
-    if (!bridge?.getMcpTunnelState) {
-      setTunnelError("This desktop build does not include Secure MCP Tunnel support.");
-      return;
-    }
-    let cancelled = false;
-    const accept = (candidate: unknown) => {
-      if (cancelled) return;
+    refreshTunnelState(false);
+    const removeListener = bridge?.onMcpTunnelState?.((candidate) => {
       const parsed = parseDesktopMcpTunnelState(candidate);
-      if (!parsed) {
-        setTunnelError("The desktop host returned an invalid tunnel state.");
-        return;
+      if (parsed) {
+        setTunnel(parsed);
+        setTunnelError(null);
       }
-      setTunnel(parsed);
-    };
-    void bridge.getMcpTunnelState().then(accept).catch(() => {
-      if (!cancelled) setTunnelError("The desktop host could not inspect the tunnel runtime.");
+      else setTunnelError("The desktop host returned an invalid tunnel state.");
     });
-    const removeListener = bridge.onMcpTunnelState?.(accept);
     return () => {
-      cancelled = true;
+      tunnelReadGeneration.current += 1;
       removeListener?.();
     };
-  }, [runtime.surface]);
+  }, [refreshTunnelState, runtime.surface]);
 
   const runTunnelOperation = useCallback(
     async (operation: () => Promise<unknown>) => {
@@ -390,7 +507,7 @@ export default function DeviceCheckPanel() {
   const tunnelRecoveryMessage = tunnel?.recovery.phase === "scheduled"
     ? `Self-repair scheduled (${tunnel.recovery.attemptCount}/${tunnel.recovery.maxAttempts} attempts used)`
     : tunnel?.recovery.phase === "revalidating"
-      ? "Self-repair is revalidating the exact developer session"
+      ? "Self-repair is revalidating the exact account session"
       : tunnel?.recovery.phase === "restarting"
         ? `Self-repair is restoring read-only coordination (attempt ${tunnel.recovery.attemptCount}/${tunnel.recovery.maxAttempts})`
         : tunnel?.recovery.phase === "exhausted"
@@ -465,10 +582,32 @@ export default function DeviceCheckPanel() {
           </span>
         </div>
 
+        {runtime.surface === "desktop_native" && personalControlsAvailable ? (
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-cyan-400/20 bg-cyan-400/5 p-3"
+            data-testid="device-check-personal-harness">
+            <div>
+              <p className="text-sm font-medium text-cyan-100">Personal Full Harness</p>
+              <p className="mt-1 text-xs text-slate-400" role="status">
+                {personalMcpP1Available
+                  ? "Local Codex setup is available for this installation. Account and device approval are checked separately."
+                  : personalMcpP1UnavailableMessage(personalMcpP1Phase) ??
+                    "Local Codex setup is unavailable."}
+              </p>
+            </div>
+            {personalMcpP1Available ? <button type="button"
+              onClick={() => useWorkstationLayoutStore.getState().openPanelInActiveGroup("account-session")}
+              className="inline-flex items-center gap-2 rounded border border-cyan-400/30 px-3 py-2 text-xs font-medium text-cyan-100 hover:bg-cyan-400/10">
+              <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+              Set up Full Harness
+            </button> : null}
+          </div>
+        ) : null}
+
         {runtime.surface === "desktop_native" ? (
           <div
             className="mb-4 rounded-lg border border-emerald-400/20 bg-emerald-400/5 p-3"
             data-testid="device-check-mcp-tunnel"
+            data-helix-guidance-target="device-check-mcp-tunnel"
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="max-w-2xl">
@@ -478,9 +617,11 @@ export default function DeviceCheckPanel() {
                 <p className="mt-1 text-xs leading-5 text-slate-400">
                   {developerControlsAvailable
                     ? "Outbound-only developer connection to OpenAI Secure MCP Tunnel. Read-only Device Check and local-supervisor coordination remain the automatic default. Starting Full Harness grants a finite developer-session tunnel scope; OAuth, room, capability, and environment authority remain separate. Automatic recovery restores read-only only."
-                    : "Read-only connector and local tunnel status. Open Account & Sessions to sign in or activate local developer access. Tunnel controls appear after that access is active."}
+                    : tunnel?.configured
+                      ? "This saved read-only tunnel is separate from the personal Full Harness connection above. It can be started, stopped, or forgotten here."
+                      : "The private tunnel is not required for ordinary Full Harness. Personal local-connection status is shown above."}
                 </p>
-                {!developerControlsAvailable ? (
+                {!developerControlsAvailable && !tunnel?.configured ? (
                   <button type="button" className="mt-2 rounded-md border border-cyan-400/30 px-3 py-2 text-xs text-cyan-100"
                     onClick={() => useWorkstationLayoutStore.getState().openPanelInActiveGroup("account-session")}>Open Account &amp; Sessions</button>
                 ) : null}
@@ -492,7 +633,9 @@ export default function DeviceCheckPanel() {
                 </p>
                 {tunnel?.failureCode === "control_plane_auth_invalidated" ? (
                   <p className="mt-1 text-xs text-rose-200" role="alert" data-testid="device-check-tunnel-control-plane-failure">
-                    The local tunnel endpoints are responding, but repeated remote control-plane polls rejected its runtime key. Remote MCP is unavailable. Obtain a replacement restricted key for the same tunnel ID, then stop, clear, save, and start the tunnel. Confirm a fresh authenticated check-in from the intended AI task afterward.
+                    {developerControlsAvailable
+                      ? "The local tunnel endpoints are responding, but repeated remote control-plane polls rejected its runtime key. Remote MCP is unavailable. Obtain a replacement restricted key for the same tunnel ID, then stop, clear, save, and start the tunnel. Confirm a fresh authenticated check-in from the intended AI task afterward."
+                      : "The local tunnel endpoints are responding, but remote polls rejected this account's runtime key. Stop the tunnel and contact support to restore enrollment."}
                   </p>
                 ) : null}
                 {tunnel?.ready ? (
@@ -559,7 +702,7 @@ export default function DeviceCheckPanel() {
               </div>
             ) : null}
 
-            {developerControlsAvailable && tunnel?.configured ? (
+            {tunnel?.configured ? (
               <div className="mt-3 flex flex-wrap gap-2">
                 {!tunnel.processRunning ? (
                   <>
@@ -575,7 +718,7 @@ export default function DeviceCheckPanel() {
                       <Play className="h-3.5 w-3.5" aria-hidden="true" />
                       Start read-only tunnel
                     </button>
-                    <button
+                    {developerControlsAvailable ? <button
                       type="button"
                       disabled={tunnelBusy}
                       onClick={() => {
@@ -586,11 +729,11 @@ export default function DeviceCheckPanel() {
                     >
                       <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
                       Start full developer MCP
-                    </button>
+                    </button> : null}
                   </>
                 ) : (
                   <>
-                    {tunnel.scope === "local_supervisor_coordination_and_device_check" ? (
+                    {developerControlsAvailable && tunnel.scope === "local_supervisor_coordination_and_device_check" ? (
                       <button
                         type="button"
                         disabled={tunnelBusy}
@@ -714,16 +857,43 @@ export default function DeviceCheckPanel() {
           </div>
         ) : null}
 
-        {runtime.surface === "desktop_native" && developerControlsAvailable ? (
+        {runtime.surface === "desktop_native" && minecraftWorldControlsAvailable ? (
           <div
             className="mb-4 rounded-lg border border-cyan-400/20 bg-cyan-400/5 p-3"
             data-testid="device-check-minecraft-run-profile"
+            data-helix-guidance-target="device-check-minecraft-run-profile"
           >
             <p className="text-sm font-medium text-cyan-100">Local Minecraft profile</p>
             <p className="mt-1 text-xs leading-5 text-slate-400">
-              Select both the dedicated Fabric server folder and the Fabric client game directory once for this Casimir profile. Opaque pairing then reaches each exact local inbox without exposing a pairing code or letting an agent choose a filesystem path.
+              Select an integrated single-player world hosted through Minecraft. The native folder picker keeps the choice with this signed-in profile; selecting a world does not start the game or grant Minecraft actions.
             </p>
             <p className="mt-2 break-all font-mono text-[11px] text-slate-300">
+              {minecraftIntegratedWorld?.configured
+                ? `Integrated world: ${minecraftIntegratedWorld.worldFolder} · ${minecraftIntegratedWorld.gameDirectory}`
+                : "No integrated world selected"}
+            </p>
+            <p className="mt-1 text-xs text-slate-400">
+              When an integrated world is selected, local sensor pairing targets that world’s Fabric game directory. Dedicated-server launch settings remain separate.
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button type="button" disabled={minecraftProfileBusy}
+                onClick={() => void runIntegratedWorldOperation(
+                  window.casimirDesktop?.selectMinecraftIntegratedWorld,
+                )}
+                className="inline-flex items-center gap-2 rounded-md border border-cyan-400/30 bg-cyan-400/10 px-3 py-2 text-xs font-medium text-cyan-100 disabled:opacity-50">
+                <FolderOpen className="h-3.5 w-3.5" aria-hidden="true" />
+                {minecraftIntegratedWorld?.configured ? "Change integrated world" : "Select integrated world"}
+              </button>
+              {minecraftIntegratedWorld?.configured ? <button type="button"
+                disabled={minecraftProfileBusy}
+                onClick={() => void runIntegratedWorldOperation(
+                  window.casimirDesktop?.clearMinecraftIntegratedWorld,
+                )}
+                className="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-300 disabled:opacity-50">
+                Forget integrated world
+              </button> : null}
+            </div>
+            {developerControlsAvailable ? <><p className="mt-2 break-all font-mono text-[11px] text-slate-300">
               {minecraftRunProfile?.configured
                 ? `Server: ${minecraftRunProfile.label} · ${minecraftRunProfile.runDirectory}`
                 : "No local Minecraft server profile selected"}
@@ -770,7 +940,7 @@ export default function DeviceCheckPanel() {
                   Forget selection
                 </button>
               ) : null}
-            </div>
+            </div></> : null}
             {minecraftProfileError ? (
               <p className="mt-2 text-xs text-rose-200" role="alert">{minecraftProfileError}</p>
             ) : null}

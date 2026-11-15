@@ -16,6 +16,7 @@ import {
   requiresHelixAskBackendEntrypoint,
 } from "./HelixAskBackendEntrypointPolicy";
 import type { HelixAskMinimalRuntimeSubmitPlan } from "./HelixAskMinimalRuntimeSubmitPlan";
+import { hasHelixAskRealtimeBackendHandoff } from "./HelixAskSubmitBackendEntrypointOptions";
 
 export type HelixAskMinimalRuntimeTurnPayload = {
   sessionId?: string;
@@ -85,6 +86,7 @@ export function buildHelixAskMinimalRuntimeTurnPayload(args: {
   if (!envelope?.question.trim()) return null;
   const question = envelope.question.trim();
   const conceptualToolExplanationWithoutExecution =
+    !hasHelixAskRealtimeBackendHandoff(args.submitPlan.pendingPrompt) &&
     isConceptualToolExplanationWithoutExecution(question);
   const requiresBackendAskEntrypoint =
     !conceptualToolExplanationWithoutExecution &&

@@ -135,7 +135,7 @@ const postRoomMutation = async (
 
 export type HelixSharedLiveRoomApi = {
   listRooms(): Promise<HelixSharedRealtimeRoom[]>;
-  createRoom(title?: string, capacityProfile?: "two_person_voice" | "three_human_text"): Promise<HelixSharedRealtimeRoom>;
+  createRoom(title?: string, capacityProfile?: "two_person_voice" | "three_person_voice" | "three_human_text"): Promise<HelixSharedRealtimeRoom>;
   joinRoom(inviteCode: string): Promise<HelixSharedRealtimeRoom>;
   getRoom(roomId: string): Promise<HelixSharedRealtimeRoom>;
   createInvite(roomId: string): Promise<{

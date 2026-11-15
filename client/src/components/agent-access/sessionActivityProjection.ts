@@ -19,7 +19,7 @@ const bounded = (value: string, limit: number): string => value.length <= limit
  * recognized Codex prefixes may be equivalent; another task remains denied. */
 const matchesCodexTask = (pairedTaskId: string | null | undefined, nativeTaskId: string): boolean => {
   if (!pairedTaskId) return true;
-  const bare = pairedTaskId.replace(/^(?:codex-task:|codex-thread:local:|codex:thread:)/i, "");
+  const bare = pairedTaskId.replace(/^(?:codex:\/\/threads\/|codex-task:|codex-thread:local:|codex:thread:)/i, "");
   return bare.toLowerCase() === nativeTaskId.toLowerCase();
 };
 
@@ -197,14 +197,15 @@ export function projectSessionActivity(input: {
       const parsed = helixOperatorActivityEventSchema.safeParse(raw);
       if (!parsed.success) continue;
       const event = parsed.data;
-      if (event.source_kind !== "responses_action" ||
+      if (!["responses_action", "responses_monitor"].includes(event.source_kind) ||
           event.helix_conversation_ref !== input.helixConversationId ||
           event.reasoning_binding_ref !== displayPairing.bindingId ||
           event.reasoning_binding_epoch !== input.currentBindingEpoch ||
           event.visibility !== "profile" || event.redaction_state !== "sanitized" ||
           event.raw_content_included || event.answer_authority) continue;
       responsesTurns.push({ id: `responses:${event.activity_event_id.slice(0, 140)}`,
-        lane: "responses_worker", kind: "decision", author: "responses_worker",
+        lane: "responses_worker", kind: event.source_kind === "responses_monitor"
+          ? "status" : "decision", author: "responses_worker",
         prompt: "", delivery: "reported", report: {
           status: event.outcome === "blocked" || event.outcome === "failed" ||
             event.outcome === "canceled" ? "unable" : "completed",
@@ -231,7 +232,7 @@ export function projectSessionActivity(input: {
           displayPairing.bindingId !== page.reasoning_binding_id ||
           input.currentBindingEpoch !== page.binding_epoch)) continue;
     for (const event of page.events) {
-      if (!["responses_action", "adapter_action_result"].includes(event.source_kind) ||
+      if (!["responses_action", "responses_monitor", "adapter_action_result"].includes(event.source_kind) ||
           event.run_id !== page.run_id ||
           event.helix_conversation_ref !== page.helix_conversation_id ||
           event.reasoning_binding_ref !== page.reasoning_binding_id ||
@@ -240,7 +241,7 @@ export function projectSessionActivity(input: {
           event.raw_content_included || event.answer_authority) continue;
       responsesTurns.push({ id: `adapter:${event.activity_event_id.slice(0, 152)}`,
         lane: event.source_kind === "adapter_action_result" ? "minecraft_adapter" : "responses_worker",
-        kind: event.source_kind === "adapter_action_result" ? "status" : "decision",
+        kind: event.source_kind === "responses_action" ? "decision" : "status",
         author: event.source_kind === "adapter_action_result" ? "minecraft_adapter" : "responses_worker",
         prompt: "", delivery: "reported", report: {
           status: event.outcome === "blocked" || event.outcome === "failed" ||
@@ -250,7 +251,8 @@ export function projectSessionActivity(input: {
           chatTitle, runId: page.run_id,
           adapterRef: event.source_ref ?? event.node_ref,
           adapterLabel: event.source_kind === "adapter_action_result" ?
-            "Adapter result" : "Responses choice" } });
+            "Adapter result" : event.source_kind === "responses_monitor" ?
+              "Responses observation" : "Responses choice" } });
     }
   }
   return {

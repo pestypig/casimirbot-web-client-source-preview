@@ -107,13 +107,13 @@ export function NativeHostedRoomInterpreterResultsPanel({ roomId, authority, dis
     <p className="font-semibold text-fuchsia-100">Task results from reviewed AI replies</p>
     <p className="break-all text-slate-300">Room: {roomId}</p>
     <p>After the selected Codex task picks up an approved instruction, its report stays private to the host. Review does not post it to the room.</p>
-    <button type="button" disabled={busy || disabled} onClick={() => void read()}>Refresh AI-sourced task results</button>
+    <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-results-panel.refresh-ai-sourced-task-results" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || disabled} onClick={() => void read()}>Refresh AI-sourced task results</button>
     {message ? <p role="status">{message}</p> : null}
     {catalog ? <>
       {!catalog.results.length ? <p>No current AI-sourced task results.</p> : null}
       {catalog.results.map((result, index) => <div key={result.result_ref}>
         <span>Result {index + 1} · task reported {result.task_status}</span>{" "}
-        <button type="button" disabled={busy || disabled} onClick={() => void read(result)}>Review result {index + 1}</button>
+        <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-results-panel.review-result" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || disabled} onClick={() => void read(result)}>Review result {index + 1}</button>
       </div>)}
       {catalog.has_more ? <p>Showing the 20 most recent results.</p> : null}
     </> : null}
@@ -122,7 +122,7 @@ export function NativeHostedRoomInterpreterResultsPanel({ roomId, authority, dis
       <p>This is a task observation, not a verified program effect or a room answer.</p>
       <pre className="whitespace-pre-wrap break-words">{preview.result_text}</pre>
       <p>Sharing sends this exact owner-approved report to room <code>{roomId}</code> on {authority} for current members to read.</p>
-      <button type="button" disabled={busy || disabled} onClick={() => void share()}>Share reviewed AI task result</button>
+      <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-interpreter-results-panel.share-reviewed-ai-task-result" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || disabled} onClick={() => void share()}>Share reviewed AI task result</button>
     </article> : null}
   </section>;
 }

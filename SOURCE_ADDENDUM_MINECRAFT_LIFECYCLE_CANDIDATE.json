@@ -1,0 +1,40 @@
+{
+  "observed_at": "2026-11-13T16:20:12.000728+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/MinecraftLocalLifecycleCard.tsx",
+      "canonical_sha256": "29a2f291077d7f9e7ce538a1c14f2947c6fec6008f834328e621860402f8c031",
+      "export_sha256": "8af2b591dc6c676307cdb5357ccbae44a53d16c1f8dde575cd70080e150d27de",
+      "previous_proposal_sha256": "233df8a8def801408d6f86b9b61e48b3af165a5a2053d050da4ac06f70ea1b77",
+      "bytes": 6674,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/MinecraftLocalLifecycleCard.spec.tsx",
+      "canonical_sha256": "53f319f133dd8860511e111dfb4a8bb58469d29f11c0359efd64d23b80881b60",
+      "export_sha256": "53f319f133dd8860511e111dfb4a8bb58469d29f11c0359efd64d23b80881b60",
+      "previous_proposal_sha256": "679ea5fa124f3f167962e732e051763664049b46d3e40d380a7ef6629af92b08",
+      "bytes": 7670,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Read the complete lifecycle card/helper and all thirteen tests. First-party React/TypeScript, synthetic process/profile/loopback fixtures; no runtime profile, credential, private transcript, game asset or third-party source copied.",
+    "Startup is an explicit operator action against a fixed same-origin endpoint. Saved loopback selection is validated before launch; operator_confirmation remains explicit. No arbitrary path, shell arguments or game action is exposed.",
+    "The helper links account changes and caller cancellation to request abort signals. Selection and launch deadlines are checked after response headers and JSON decoding before follow-up or result publication.",
+    "The card clears status on account changes, cancels on unmount and prevents stale result/error/finally handlers from changing the replacement operation. The helper also protects direct callers after it begins.",
+    "A typed startup receipt yields setup-completed text while awaiting game observation; partial server effects are shown when client setup fails. An incomplete success is rejected.",
+    "Existing account-policy source was reviewed in an earlier cohort. Shared lifecycle schemas are canonical test dependencies, outside this web export. These two files are copied with newline normalization only."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal; not a standalone application, installed acceptance or public release.",
+    "The lifecycle fix is newer than R379. Aborting renderer work does not terminate an already-admitted native launch, server or client.",
+    "HTTP is mocked. Tests do not prove EULA acceptance, installed mods, native server launch, Minecraft play, room delegation or GPT Live continuity.",
+    "The player panel and its corrected test need their own full source review. Work before another caller enters this helper remains that caller lifecycle responsibility."
+  ]
+}

@@ -147,7 +147,7 @@ export default function DesktopUpdatePanel() {
               {privateState.rollbackBuild ? <p className="mt-1 text-xs text-slate-400">Rollback retained: {privateState.rollbackBuild}</p> : null}
               {privateState.lastHandoff ? <p className="mt-2 text-xs text-slate-400">Last switch: {privateState.lastHandoff.from} → {privateState.lastHandoff.to}</p> : null}
               {privateState.errorCode ? <p className="mt-3 rounded border border-rose-400/30 bg-rose-400/10 p-3 text-xs text-rose-100">{privateUpdateError(privateState.errorCode)}</p> : null}
-              <p className="mt-4 text-xs text-slate-400">The same profile is retained. An unexpired exact-task pairing may recover, but Full Harness must be enabled by its owner again after restart. No Minecraft control or grant is renewed by updating.</p>
+              <p className="mt-4 text-xs text-slate-400">The same profile is retained. An unexpired exact-task pairing may recover. An active owner-approved setup contract can restart Full Harness automatically after account, developer grant, device trust, and package checks. Otherwise, Full Harness needs owner approval. No Minecraft control or grant is renewed by updating.</p>
               <div className="mt-5 flex flex-wrap gap-2">
                 <button type="button" onClick={() => { setPrivateDeferred(false); void refreshPrivateState(); }}
                   className="rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-xs hover:border-cyan-400/50">Refresh</button>

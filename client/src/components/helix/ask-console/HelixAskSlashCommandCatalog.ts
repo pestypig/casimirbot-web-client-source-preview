@@ -1,6 +1,5 @@
 import {
-  HELIX_USER_ACCOUNT_POLICY,
-  HELIX_USER_WORKSTATION_PANEL_IDS,
+  HELIX_SIGNED_OUT_ACCOUNT_POLICY,
   resolveHelixAccountPanelAccess,
   resolveHelixWorkstationCapabilityAccess,
   type HelixAccountCapabilityPolicy,
@@ -238,7 +237,7 @@ export function buildHelixAskSlashCommandCatalogForPolicy(
   policy: HelixAccountCapabilityPolicy | null | undefined,
   translate?: HelixAskSlashCommandTranslate,
 ): HelixAskSlashCommandCatalogItem[] {
-  const accountPolicy = policy ?? HELIX_USER_ACCOUNT_POLICY;
+  const accountPolicy = policy ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY;
   const curated = listHelixAskSlashCommandCatalog().map((item) => ({
     ...item,
     label: item.labelMessageId && translate ? translate(item.labelMessageId) : item.label,
@@ -259,9 +258,8 @@ export function buildHelixAskSlashCommandMenuItems(args: {
   includeLocked?: boolean;
   translate?: HelixAskSlashCommandTranslate;
 }): HelixAskSlashCommandMenuItem[] {
-  const accountPolicy = args.accountPolicy ?? HELIX_USER_ACCOUNT_POLICY;
+  const accountPolicy = args.accountPolicy ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY;
   const runtimeId = args.runtime?.id?.trim() ?? "";
-  const publicPanelIds = new Set<string>(HELIX_USER_WORKSTATION_PANEL_IDS);
   return buildHelixAskSlashCommandCatalogForPolicy(accountPolicy, args.translate)
     .map((item): HelixAskSlashCommandMenuItem => {
       const runtimeAvailable =
@@ -272,13 +270,11 @@ export function buildHelixAskSlashCommandMenuItems(args: {
             capability_id: item.capabilityId,
             permission_profile_required: item.permissionRequired,
           });
-      const fallbackPanelAccess = access.state === "available" || !item.fallbackPanelId
-        ? null
-        : resolveHelixAccountPanelAccess(accountPolicy, item.fallbackPanelId);
-      const fallbackPanelIsCanonicalPublic = item.fallbackPanelId
-        ? publicPanelIds.has(item.fallbackPanelId)
-        : false;
-      const resolvedAccess = fallbackPanelAccess?.state === "available" || fallbackPanelIsCanonicalPublic
+      const fallbackPanelAccess = access.reason === "capability_outside_account_policy" &&
+        !item.developerOnly && item.fallbackPanelId
+        ? resolveHelixAccountPanelAccess(accountPolicy, item.fallbackPanelId)
+        : null;
+      const resolvedAccess = fallbackPanelAccess?.state === "available"
         ? { state: "available" as const, reason: null }
         : access;
       return {

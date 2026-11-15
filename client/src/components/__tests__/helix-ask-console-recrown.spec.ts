@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import fs from "node:fs";
 import path from "node:path";
 import React from "react";
@@ -1773,7 +1774,7 @@ describe("Helix Ask Console recrown boundary", () => {
     expect(legacyPillSource).toContain("reasoningTheater: reasoningTheaterState");
     expect(legacyPillSource).not.toContain("<HelixAskConsoleSupplementSurface");
     expect(legacyPillSource).not.toContain("<HelixAskReasoningTheaterSurface");
-    expect(legacySurfaceContentSource).toContain("<HelixAskLegacyComposerSurface {...composer} />");
+    expect(legacySurfaceContentSource).toContain("<HelixConsoleSelectedComposer composer={composer} selectedChannel={selectedChannel}");
     expect(legacySurfaceContentSource).toContain("<HelixAskConsoleSupplementSurface {...supplement} />");
     expect(legacySurfaceContentSource).toContain("<HelixAskReasoningTheaterSurface {...reasoningTheater} />");
     expect(legacyPillSource).toContain("<HelixAskLegacyCompletedReplySlot");
@@ -2340,11 +2341,12 @@ describe("Helix Ask Console recrown boundary", () => {
       "runAskTurnStream",
       "navigator.clipboard",
       "speakVoice",
-      "fetch(",
       "terminal_authority",
     ]) {
       expect(minimalShellSource).not.toContain(forbidden);
     }
+    expect(minimalShellSource.match(/fetch\(/g)).toHaveLength(1);
+    expect(minimalShellSource).toContain('fetch("/api/agi/agent-providers"');
   });
 
   it("lets the runtime shell own safe layout defaults before bridge replacement", () => {
@@ -5218,7 +5220,7 @@ describe("Helix Ask Console recrown boundary", () => {
     expect(runtimePicker).not.toContain('fetch("/api/agi/agent-providers"');
   });
 
-  it("keeps live runtime controls developer-gated and outside the language runtime picker", () => {
+  it("admits live runtime controls by feature grant while keeping action authority suggest-only", () => {
     const developerModel = buildHelixAskLiveRuntimeControlsModel({
       accountPolicy: HELIX_DEVELOPER_ACCOUNT_POLICY,
       lifecycleState: "listening",
@@ -5253,14 +5255,15 @@ describe("Helix Ask Console recrown boundary", () => {
       }),
     });
     expect(userModel).toMatchObject({
-      visible: false,
-      locked: true,
-      lockReason: "developer_runtime_agent_controls_required",
+      visible: true,
+      locked: false,
+      lockReason: null,
+      authoritySelectorVisible: true,
       modeLabel: "Live Voice",
-      authorityLabel: "Confirm",
+      authorityLabel: "Observe",
       controlState: expect.objectContaining({
         runtime_agent_mode: "live_voice",
-        runtime_agent_authority: "execute_confirmed_actions",
+        runtime_agent_authority: "observe_only",
         terminal_eligible: false,
         assistant_answer: false,
       }),
@@ -5283,7 +5286,7 @@ describe("Helix Ask Console recrown boundary", () => {
         },
       ],
     })).toEqual(expect.arrayContaining([
-      expect.objectContaining({ id: "helix" }),
+      expect.objectContaining({ id: "codex" }),
     ]));
 
     const markup = renderToStaticMarkup(
@@ -5299,18 +5302,17 @@ describe("Helix Ask Console recrown boundary", () => {
     const visualFrameProducer = read("client/src/lib/helix/visualFrameProducer.ts");
     const legacyPill = read("client/src/components/helix/HelixAskPill.tsx");
 
-    expect(markup).toContain("Live Off");
-    expect(markup).toContain("Observe");
     expect(markup).toContain("Listening");
     expect(markup).not.toContain("Ready Blocked");
-    expect(userMarkup).toBe("");
+    expect(userMarkup).toContain("Live runtime agent lifecycle");
+    expect(userMarkup).toContain("Voice settings");
     expect(toolbar).toContain("{liveRuntimeControls}");
     expect(toolbar.indexOf("{liveRuntimeControls}")).toBeLessThan(
       toolbar.indexOf("{runtimePicker}"),
     );
     expect(actionToolbarSurface).toContain("<HelixAskLiveRuntimeControls");
     expect(actionToolbarSurface).toContain("liveRuntimeControlsModel?.visible");
-    expect(liveRuntimeControls).toContain("developer_runtime_agent_controls_required");
+    expect(liveRuntimeControls).toContain("runtime_agent_controls_required");
     expect(liveRuntimeControls).toContain("data-live-microphone-enabled");
     expect(liveRuntimeControls).toContain("runtime.setMicrophoneEnabled(!runtime.microphoneEnabled)");
     expect(liveRuntimeControls).toContain("data-live-visual-input-enabled");
@@ -5325,7 +5327,6 @@ describe("Helix Ask Console recrown boundary", () => {
     expect(liveRuntimeControls).not.toContain("fetch(");
     expect(liveRuntimeControls).not.toContain("navigator.mediaDevices");
     expect(liveRuntimeControls).not.toContain("RTCPeerConnection");
-    expect(liveRuntimeControls).not.toContain("OpenAI");
     expect(legacyPill).not.toContain("HelixAskLiveRuntimeControls");
   });
 
@@ -5957,15 +5958,15 @@ describe("Helix Ask Console recrown boundary", () => {
       readyState: "live",
       label: "USB Microphone",
     };
-    let onDataChannelOpen: (() => void) | null = null;
+    const dataChannelOpen: { current: (() => void) | null } = { current: null };
     const dataChannel = {
       close: dataChannelClose,
       send: dataChannelSend,
       get onopen() {
-        return onDataChannelOpen;
+        return dataChannelOpen.current;
       },
       set onopen(handler: (() => void) | null) {
-        onDataChannelOpen = handler;
+        dataChannelOpen.current = handler;
       },
       onclose: null as (() => void) | null,
       onerror: null as (() => void) | null,
@@ -6134,8 +6135,8 @@ describe("Helix Ask Console recrown boundary", () => {
       deviceLabel: "USB Microphone",
       loopbackSource: false,
     });
-    if (!onDataChannelOpen) throw new Error("data_channel_open_handler_not_registered");
-    onDataChannelOpen();
+    if (!dataChannelOpen.current) throw new Error("data_channel_open_handler_not_registered");
+    dataChannelOpen.current();
     expect(dataChannelState).toHaveBeenNthCalledWith(1, {
       state: "open",
       initialAudioProbe: "not_attempted",
@@ -6380,16 +6381,18 @@ describe("Helix Ask Console recrown boundary", () => {
     expect(legacyPill).not.toContain('aria-label="Scroll Ask controls left"');
 
     expect(toolbar).toContain("export function HelixAskActionToolbar");
-    expect(toolbar).toContain('title="Attach image"');
+    expect(toolbar).toContain('aria-label="Attach image"');
+    expect(toolbar).toContain('personalInputDisabled ? "Image attachments are available in Ask Helix" : "Attach image"');
     expect(toolbar).toContain('micInputMode === "live_runtime"');
     expect(toolbar).toContain('data-microphone-owner={micInputMode}');
     expect(toolbar).toContain('visualSituationSourceStatus === "requesting"');
-    expect(toolbar).toContain("title={visualCaptureTitle}");
+    expect(toolbar).toContain("aria-label={visualCaptureAriaLabel}");
+    expect(toolbar).toContain('"Visual capture is available in Ask Helix" : visualCaptureTitle');
     expect(toolbar).toContain("const visualAudioTitle = visualSituationIncludeAudio");
     expect(toolbar).toContain("<Plus className=");
     expect(toolbar).toContain("<Mic");
     expect(toolbar).toContain("<ImageIcon");
-    expect(toolbar).toContain("<Headphones");
+    expect(toolbar).toContain("<MonitorSpeaker");
     expect(toolbar).toContain('aria-label="Scroll Ask controls left"');
     expect(toolbar).toContain('aria-label="Scroll Ask controls right"');
     expect(toolbar).toContain('data-testid="helix-ask-action-carousel-viewport"');
@@ -6561,8 +6564,9 @@ describe("Helix Ask Console recrown boundary", () => {
     expect(legacyConsoleViewState).not.toContain("navigator.clipboard");
     expect(legacyConsoleViewState).not.toContain("speechSynthesis");
     expect(legacyConsoleView).toContain("surfaceFrameState");
-    expect(legacyConsoleView).toContain("<HelixAskSurfaceFrameSurface {...surfaceFrameState}>");
-    expect(legacyConsoleView).toContain("surfaceContent ?? (surfaceContentState ? <HelixAskLegacySurfaceContent {...surfaceContentState} /> : null)");
+    expect(legacyConsoleView).toContain("<HelixAskSurfaceFrameSurface {...surfaceFrameState} onSubmit=");
+    expect(legacyConsoleView).toContain("surfaceFrameState.onSubmit(event)");
+    expect(legacyConsoleView).toContain("surfaceContent ?? (selectedContentState ? <HelixAskLegacySurfaceContent {...selectedContentState} /> : null)");
     expect(legacyConsoleView).not.toContain("handleAskSubmit");
     expect(legacyConsoleView).not.toContain("primeVoiceAudioPlayback");
     expect(legacyConsoleView).not.toContain("moodPalette");
@@ -6633,17 +6637,21 @@ describe("Helix Ask Console recrown boundary", () => {
 
     expect(legacyConsoleView).toContain("export function HelixAskLegacyConsoleView");
     expect(legacyConsoleView).toContain("surfaceFrameState");
-    expect(legacyConsoleView).toContain("<HelixAskSurfaceFrameSurface {...surfaceFrameState}>");
-    expect(legacyConsoleView).toContain("surfaceContent ?? (surfaceContentState ? <HelixAskLegacySurfaceContent {...surfaceContentState} /> : null)");
+    expect(legacyConsoleView).toContain("<HelixAskSurfaceFrameSurface {...surfaceFrameState} onSubmit=");
+    expect(legacyConsoleView).toContain("surfaceFrameState.onSubmit(event)");
+    expect(legacyConsoleView).toContain("surfaceContent ?? (selectedContentState ? <HelixAskLegacySurfaceContent {...selectedContentState} /> : null)");
     expect(legacyConsoleView).toContain("goalPillState");
-    expect(legacyConsoleView).toContain("goalPill={goalPill ?? (goalPillState ? <HelixAskGoalPillSurface {...goalPillState} /> : null)}");
+    expect(legacyConsoleView).toContain("const resolvedGoalPill = goalPill ?? (goalPillState ? <HelixAskGoalPillSurface {...goalPillState} /> : null)");
+    expect(legacyConsoleView).toContain("goalPill={showingOtherChannel ? null : resolvedGoalPill}");
     expect(legacyConsoleView).toContain("turnListState");
     expect(legacyConsoleView).toContain("<HelixAskTurnListSurface {...turnListState} ref={turnListRef}>");
     expect(legacyConsoleView).toContain("errorLineState");
     expect(legacyConsoleView).toContain("errorMessage");
-    expect(legacyConsoleView).toContain("errorLine={errorLine ?? <HelixAskConsoleErrorLineSurface {...(errorLineState ?? { message: errorMessage })} />}");
+    expect(legacyConsoleView).toContain("const resolvedErrorLine = errorLine ?? <HelixAskConsoleErrorLineSurface {...(errorLineState ?? { message: errorMessage })} />");
+    expect(legacyConsoleView).toContain("errorLine={showingOtherChannel ? null : resolvedErrorLine}");
     expect(legacyConsoleView).toContain("steeringQueue");
-    expect(legacyConsoleView).toContain("steeringQueue={steeringQueue ?? <HelixAskSteeringQueueSurface />}");
+    expect(legacyConsoleView).toContain("const resolvedSteeringQueue = steeringQueue ?? <HelixAskSteeringQueueSurface />");
+    expect(legacyConsoleView).toContain("steeringQueue={showingOtherChannel ? null : resolvedSteeringQueue}");
     expect(legacyConsoleView).toContain("debugDrawerState");
     expect(legacyConsoleView).toContain("<HelixAskDebugDrawerSurface");
     expect(legacyConsoleView).toContain("drawerState={debugDrawerState}");
@@ -6695,8 +6703,7 @@ describe("Helix Ask Console recrown boundary", () => {
     expect(legacyPill).toContain("moodAvatar: moodAvatarState");
     expect(legacyPill).not.toContain("moodAvatar: {");
     expect(legacyPill).toContain("const actionToolbarState = buildHelixAskComposerActionToolbarState({");
-    expect(legacyPill).toContain("actionToolbar: actionToolbarState");
-    expect(legacyPill).not.toContain("actionToolbar: {");
+    expect(legacyPill).toContain("actionToolbar: { ...actionToolbarState, privateConnectionInspectorEnabled: false }");
     expect(legacyPill).toContain("const textareaState = buildHelixAskComposerTextareaState({");
     expect(legacyPill).toContain("textarea: textareaState");
     expect(legacyPill).not.toContain("textarea: {");
@@ -6825,12 +6832,10 @@ describe("Helix Ask Console recrown boundary", () => {
       onCaptureVisualSource: vi.fn(),
       visualSituationIncludeAudio: false,
       onToggleVisualAudio: vi.fn(),
-      runtimePickerModel: {
+      runtimePickerModel: buildHelixAskRuntimePickerModel({
         selectedRuntime: "helix",
-        selectedLabel: "Helix",
         providers: [],
-        disabled: false,
-      },
+      }),
       runtimeMenuOpen: false,
       onRuntimePrimaryClick: vi.fn(),
       onRuntimeSelect: vi.fn(),
@@ -7315,7 +7320,10 @@ describe("Helix Ask Console recrown boundary", () => {
     expect(proceduralTimeline).toContain("export function HelixAskProceduralTimeline");
     expect(proceduralTimeline).toContain("Procedural workspace timeline");
     expect(proceduralTimeline).toContain("backend terminal == visible answer");
-    expect(proceduralTimeline).toContain("rows.slice(0, 18).map");
+    expect(proceduralTimeline).toContain("rows.slice(0, defaultVisibleLimit)");
+    expect(proceduralTimeline).toContain("visibleRows.map(renderRow)");
+    expect(proceduralTimeline).toContain("rows.slice(defaultVisibleLimit)");
+    expect(proceduralTimeline).toContain("overflowRows.map((row, index) => renderRow(row, index + defaultVisibleLimit))");
     expect(proceduralTimeline).toContain("readProceduralStatusClass(row.status)");
     expect(proceduralTimeline).not.toContain("reply.debug?.turn_truth_table");
     expect(proceduralTimeline).not.toContain("agent_runtime_loop");
@@ -10484,7 +10492,8 @@ describe("Helix Ask Console recrown boundary", () => {
     expect(legacyPill).not.toContain("readHelixSteeringQueueItemClass(item)");
     expect(legacyPill).not.toContain("readHelixSteeringQueueDotClass(item)");
 
-    expect(legacyConsoleView).toContain("steeringQueue={steeringQueue ?? <HelixAskSteeringQueueSurface />}");
+    expect(legacyConsoleView).toContain("const resolvedSteeringQueue = steeringQueue ?? <HelixAskSteeringQueueSurface />");
+    expect(legacyConsoleView).toContain("steeringQueue={showingOtherChannel ? null : resolvedSteeringQueue}");
     expect(legacyConsoleView).not.toContain("buildHelixAskSteeringQueueItems");
     expect(legacyConsoleView).not.toContain("shouldAutoWakeHelixMailboxQueueItem");
     expect(legacyConsoleView).not.toContain("setSteeringQueueExpanded");

@@ -1,4 +1,4 @@
-import type { HelixAskRouteMetadata } from "@/lib/agi/api";
+import type { HelixAskRouteMetadata } from "@/lib/helix/ask-prompt-launch";
 import { isHelixAskPastedTextResumeRecallPrompt } from "@/lib/helix/ask-attachment-prompt-policy";
 import { buildHelixAskPastedTextResumeRecallRouteMetadata } from "./HelixAskBackendEntrypointPolicy";
 

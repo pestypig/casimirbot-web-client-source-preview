@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { nativeHostedResultCatalogSchema, nativeHostedResultPreviewSchema, nativeHostedResultShareReceiptSchema,
+  nativeHostedResultGptLiveReceiptSchema,
   type NativeHostedResultCatalog, type NativeHostedResultPreview } from "@shared/helix-native-hosted-room-results";
 import { NATIVE_HOSTED_ROOM_BASE_PATH } from "@shared/helix-native-hosted-room-mission";
 import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/accountCapabilityPolicy";
@@ -9,12 +10,14 @@ export function NativeHostedRoomResultsPanel({ roomId, authority, disabled = fal
 }) {
   const [catalog, setCatalog] = useState<NativeHostedResultCatalog | null>(null);
   const [preview, setPreview] = useState<NativeHostedResultPreview | null>(null);
+  const [shared, setShared] = useState<{ preview: NativeHostedResultPreview;
+    disclosureRef: string } | null>(null);
   const [busy, setBusy] = useState(false), [message, setMessage] = useState<string | null>(null);
   const generation = useRef(0), pending = useRef<AbortController | null>(null);
   useEffect(() => {
     const clear = () => {
       generation.current++; pending.current?.abort(); pending.current = null;
-      setCatalog(null); setPreview(null); setBusy(false); setMessage(null);
+      setCatalog(null); setPreview(null); setShared(null); setBusy(false); setMessage(null);
     };
     clear(); window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, clear);
     return () => { generation.current++; pending.current?.abort(); window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, clear); };
@@ -24,7 +27,7 @@ export function NativeHostedRoomResultsPanel({ roomId, authority, disabled = fal
     const reviewed = catalog, epoch = ++generation.current;
     const controller = new AbortController(); pending.current = controller;
     const timeout = setTimeout(() => controller.abort(), 20000);
-    setBusy(true); setPreview(null); setMessage(null); setCatalog(null);
+    setBusy(true); setPreview(null); setShared(null); setMessage(null); setCatalog(null);
     try {
       const response = await fetch(`${NATIVE_HOSTED_ROOM_BASE_PATH}/results/${selected ? "review" : "list"}`, {
         method: "POST", credentials: "same-origin", cache: "no-store", signal: controller.signal,
@@ -65,7 +68,7 @@ export function NativeHostedRoomResultsPanel({ roomId, authority, disabled = fal
     const reviewed = preview, epoch = ++generation.current;
     const controller = new AbortController(); pending.current = controller;
     const timeout = setTimeout(() => controller.abort(), 20000);
-    setBusy(true); setPreview(null); setCatalog(null); setMessage(null);
+    setBusy(true); setPreview(null); setShared(null); setCatalog(null); setMessage(null);
     try {
       const response = await fetch(`${NATIVE_HOSTED_ROOM_BASE_PATH}/results/share`, {
         method: "POST", credentials: "same-origin", cache: "no-store", signal: controller.signal,
@@ -83,6 +86,8 @@ export function NativeHostedRoomResultsPanel({ roomId, authority, disabled = fal
           receipt.disclosure.result_sha256 !== reviewed.result.result_sha256 || receipt.disclosure.task_status !== reviewed.result.task_status) {
         throw new Error("share_changed");
       }
+      if (reviewed.result.origin === "broker_reconciled_command_report")
+        setShared({ preview: reviewed, disclosureRef: receipt.disclosure.disclosure_ref });
       setMessage("Report stored by the room service. Members can load it under Owner-approved reports. Use the room service's owner controls to request an explanation.");
     } catch {
       if (epoch === generation.current) setMessage("Sharing was not confirmed. The report may already be stored. Refresh and review the same report before an explicit retry.");
@@ -91,25 +96,72 @@ export function NativeHostedRoomResultsPanel({ roomId, authority, disabled = fal
       if (epoch === generation.current) { pending.current = null; setBusy(false); }
     }
   };
+  const present = async () => {
+    if (disabled || busy || pending.current || !shared) return;
+    const selected = shared, epoch = ++generation.current;
+    const controller = new AbortController(); pending.current = controller;
+    const timeout = setTimeout(() => controller.abort(), 20000);
+    setBusy(true); setMessage(null);
+    try {
+      const response = await fetch(`${NATIVE_HOSTED_ROOM_BASE_PATH}/results/present`, {
+        method: "POST", credentials: "same-origin", cache: "no-store", signal: controller.signal,
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ room_id: roomId, selection_ref: selected.preview.selection_ref,
+          selection_revision: selected.preview.selection_revision,
+          steering_event_ref: selected.preview.result.steering_event_ref,
+          result_ref: selected.preview.result.result_ref,
+          result_sha256: selected.preview.result.result_sha256,
+          disclosure_ref: selected.disclosureRef, send_to_gpt_live: true }),
+      });
+      const raw = await response.json();
+      if (epoch !== generation.current) return;
+      if (!response.ok || controller.signal.aborted) throw new Error("presentation_unconfirmed");
+      const receipt = nativeHostedResultGptLiveReceiptSchema.parse(raw);
+      if (receipt.authority !== authority || receipt.room_id !== roomId ||
+          receipt.selection_ref !== selected.preview.selection_ref ||
+          receipt.selection_revision !== selected.preview.selection_revision ||
+          JSON.stringify(receipt.result) !== JSON.stringify(selected.preview.result) ||
+          receipt.disclosure_ref !== selected.disclosureRef) throw new Error("presentation_changed");
+      setMessage(receipt.delivery_status === "provider_acknowledged"
+        ? "GPT Live acknowledged this report as context. No reply or speech was requested."
+        : receipt.delivery_status === "queued" || receipt.delivery_status === "already_queued"
+          ? "Report queued for GPT Live; provider receipt is not yet confirmed. No reply or speech was requested."
+          : `GPT Live delivery was not confirmed (${receipt.delivery_status}). The report remains shared with the room.`);
+    } catch {
+      if (epoch === generation.current) setMessage("GPT Live delivery could not be confirmed. The report remains shared with the room; refresh before trying again.");
+    } finally {
+      clearTimeout(timeout);
+      if (epoch === generation.current) { pending.current = null; setBusy(false); }
+    }
+  };
   return <section aria-label="Private hosted task reports" className="mt-3 border-t border-white/20 pt-3">
     <p>Private task reports</p>
     <p>Review a task's report on this device. Opening it does not share it with the room.</p>
-    <button type="button" disabled={disabled || busy} onClick={() => void run()}>Refresh private reports</button>
+    <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-results-panel.refresh-private-reports" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={disabled || busy} onClick={() => void run()}>Refresh private reports</button>
     {message ? <p role="status">{message}</p> : null}
     {catalog ? <>
       {!catalog.results.length ? <p>No currently accessible task reports.</p> : null}
       {catalog.results.map((result, index) => <div key={result.result_ref}>
-        <span>Report {index + 1} · task reported {result.task_status} · {result.created_at}</span>{" "}
-        <button type="button" disabled={busy || disabled} onClick={() => void run(result)}>Review report {index + 1}</button>
+        <span>Report {index + 1} · {result.origin === "broker_reconciled_command_report"
+          ? "broker-reconciled Minecraft commands" : `task reported ${result.task_status}`} · {result.created_at}</span>{" "}
+        <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-results-panel.review-report" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || disabled} onClick={() => void run(result)}>Review report {index + 1}</button>
       </div>)}
       {catalog.has_more ? <p>Showing the 20 most recent reports.</p> : null}
     </> : null}
     {preview ? <article aria-label="Private task report preview">
-      <p>Private report · task reported {preview.result.task_status}</p>
-      <p>This is a task report, not verified effects or permission to change the mission.</p>
+      <p>Private report · {preview.result.origin === "broker_reconciled_command_report"
+        ? `broker-reconciled Minecraft commands · ${preview.result.task_status}`
+        : `task reported ${preview.result.task_status}`}</p>
+      <p>{preview.result.origin === "broker_reconciled_command_report"
+        ? "The local broker matched these command requests to connector observations. Connector summaries remain untrusted, and this report does not prove the requested build is correct or grant another action."
+        : "This is a task report, not verified effects or permission to change the mission."}</p>
       <pre className="whitespace-pre-wrap break-words">{preview.result_text}</pre>
       <p>Sharing sends this exact report to {authority} for current room members to read.</p>
-      <button type="button" disabled={busy || disabled} onClick={() => void share()}>Share report</button>
+      <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-results-panel.share-report" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || disabled} onClick={() => void share()}>Share report</button>
     </article> : null}
+    {shared ? <div>
+      <p>The broker-reconciled report is shared with room members. Sending it to GPT Live is a separate owner action and does not request speech.</p>
+      <button data-helix-control-id="helix.ask.shared_live_room.native-hosted-room-results-panel.send-shared-command-report-to-gpt-live" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || disabled} onClick={() => void present()}>Send shared command report to GPT Live</button>
+    </div> : null}
   </section>;
 }

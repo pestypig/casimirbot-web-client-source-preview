@@ -20,7 +20,7 @@ export function SolarMagneticBundleStorage({payload,onReopen}:{
     if(busy||save&&!payload)return;
     const selected=++epoch.current,controller=new AbortController();request.current=controller;
     const current=()=>selected===epoch.current&&!controller.signal.aborted;
-    setBusy(true);setMessage('Checking signed-in developer account…');
+    setBusy(true);setMessage('Checking signed-in account…');
     try{
       const selectedId=id;
       if(!save&&!/^solar-magnetic-bundle:[a-f0-9]{64}$/.test(selectedId))
@@ -29,8 +29,7 @@ export function SolarMagneticBundleStorage({payload,onReopen}:{
       if(!accountResponse.ok)throw new Error('Account status unavailable');
       const account=await accountResponse.json(),profileId=account.session?.profile?.profile_id;
       if(!current())return;
-      if(!profileId||account.account_policy?.account_type!=='developer')
-        throw new Error('A signed-in developer account is required');
+      if(!profileId)throw new Error('A signed-in account is required');
       const bundle=save?await prepareSolarMagneticComparisonBundle(payload!):null;
       if(!current())return;
       const expectedId=bundle?.bundleId??selectedId;
@@ -56,7 +55,7 @@ export function SolarMagneticBundleStorage({payload,onReopen}:{
     finally{if(current())setBusy(false);}
   }
   return <div className="space-y-2 border-t border-slate-700 pt-2" aria-label="Profile magnetic bundle storage">
-    <p className="text-slate-400">Optional developer-profile retention. Saving does not grant MCP access or scientific admission.</p>
+    <p className="text-slate-400">Optional profile retention. Saving does not grant MCP access or scientific admission.</p>
     <button type="button" disabled={busy||!payload} onClick={()=>void operate(true)} className="rounded border border-cyan-600 px-2 py-1 disabled:opacity-50">Save comparison to profile</button>
     <label className="block">Retained bundle ID
       <input aria-label="Retained magnetic bundle ID" value={id} onChange={event=>setId(event.target.value)} className="mt-1 w-full rounded border border-slate-600 bg-slate-900 p-1" placeholder="solar-magnetic-bundle:…" />

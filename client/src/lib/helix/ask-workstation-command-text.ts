@@ -15,7 +15,7 @@ export type WorkstationPanelSummary<PanelId extends string = string> = {
 
 export type WorkstationPanelResolverConfig<PanelId extends string = string> = {
   panels: readonly WorkstationPanelSummary<PanelId>[];
-  hasPanel: (panelId: PanelId) => boolean;
+  hasPanel: (panelId: WorkstationResolvedPanelId<PanelId>) => boolean;
   aliases?: readonly WorkstationPanelAlias<PanelId>[];
 };
 
@@ -35,6 +35,10 @@ export const HELIX_WORKSTATION_PANEL_ALIASES = [
   { id: "agi-essence-console", aliases: ["essence console", "legacy essence console"] },
 ] as const satisfies readonly WorkstationPanelAlias[];
 
+export type WorkstationResolvedPanelId<PanelId extends string = string> =
+  | PanelId
+  | (typeof HELIX_WORKSTATION_PANEL_ALIASES)[number]["id"];
+
 export function isNhm2ViewerAlias(value: string): boolean {
   const normalized = normalizePanelQuery(value);
   return NHM2_VIEWER_ALIASES.some((alias) => normalized.includes(alias));
@@ -43,12 +47,12 @@ export function isNhm2ViewerAlias(value: string): boolean {
 export function resolvePanelIdFromText<PanelId extends string = string>(
   value: string,
   config: WorkstationPanelResolverConfig<PanelId>,
-): PanelId | null {
+): WorkstationResolvedPanelId<PanelId> | null {
   const normalized = normalizePanelQuery(value);
   if (!normalized) return null;
   const aliases =
     config.aliases ??
-    (HELIX_WORKSTATION_PANEL_ALIASES as readonly WorkstationPanelAlias<PanelId>[]);
+    HELIX_WORKSTATION_PANEL_ALIASES;
   for (const entry of aliases) {
     if (!config.hasPanel(entry.id)) continue;
     if (entry.aliases.some((alias) => normalized.includes(alias))) {
@@ -89,7 +93,7 @@ export function resolvePanelIdFromPath<PanelId extends string = string>(
 export function parseOpenPanelCommand<PanelId extends string = string>(
   value: string,
   config: WorkstationPanelResolverConfig<PanelId>,
-): PanelId | null {
+): WorkstationResolvedPanelId<PanelId> | null {
   const match = value.trim().match(/^(?:\/open|open|show|launch)\s+(.+)/i);
   if (!match) return null;
   const raw = match[1].replace(/^(the|panel|window)\s+/i, "").trim();

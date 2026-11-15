@@ -506,19 +506,14 @@ const RAW_HELIX_PANELS: HelixPanelRef[] = [
   },
   {
     id: "helix-noise-gens",
-    title: "Noise Gens",
+    title: "Noise Gen · Local music",
     icon: Waves,
     loader: lazyPanel(() => import("@/pages/helix-noise-gens")),
     defaultSize: { w: 1100, h: 720 },
     defaultPosition: { x: 180, y: 140 },
     pinned: true,
     mobileReady: true,
-    endpoints: [
-      "GET /api/noise-gens/originals",
-      "GET /api/noise-gens/generations",
-      "GET /api/noise-gens/moods"
-    ],
-    keywords: ["noise gen", "noisegens", "cover", "render plan", "stems", "atoms", "moods"]
+    keywords: ["noise gen", "noisegens", "local music", "synth texture", "stems", "ACE-Step", "Demucs"]
   },
   {
     id: "constraint-pack-policy",

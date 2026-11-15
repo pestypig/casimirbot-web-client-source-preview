@@ -11,6 +11,15 @@ import {
 import InstalledServicesPanel from "../InstalledServicesPanel";
 import type { HelixBillingEntitlement } from
   "@shared/helix-billing-entitlement";
+import { cacheAccountCapabilityPolicy, HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from
+  "@/lib/workstation/accountCapabilityPolicy";
+import { HELIX_USER_ACCOUNT_POLICY } from "@shared/helix-account-session";
+
+const nativeStepUpMock = () => {
+  const stepUp = window.casimirDesktop?.openAuth0StepUp;
+  if (!stepUp) throw new Error("Expected the native step-up fixture to be installed");
+  return vi.mocked(stepUp);
+};
 
 const testState = vi.hoisted(() => ({
   runtime: {
@@ -39,6 +48,7 @@ vi.mock("@/components/workstation/BrokerageConnectionsCard", () => ({
 
 const projection = buildHelixInstalledAccountServices({
   profileRef: "profile:developer",
+  accountType: "developer",
   providerCredentialBrokerReady: true,
   now: new Date("2026-08-27T12:00:00.000Z"),
 });
@@ -177,6 +187,72 @@ const billingStatus: HelixBillingEntitlement = {
 };
 
 describe("InstalledServicesPanel", () => {
+  it("clears old account observations and ignores delayed reads after profile replacement", async () => {
+    render(<InstalledServicesPanel />);
+    await screen.findByText(/Native status verified/i);
+    fireEvent.click(screen.getByRole("tab", { name: "Billing" }));
+    await screen.findByText("$13.00");
+    const originalFetch = vi.mocked(fetch).getMockImplementation()!;
+    let release!: () => void;
+    const pending = new Promise<void>(resolve => { release = resolve; });
+    let replaced = false;
+    vi.mocked(fetch).mockImplementation(async (...args) => {
+      if (replaced) return new Promise<Response>(() => {});
+      await pending;
+      return originalFetch(...args);
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Refresh/i }));
+    replaced = true;
+    act(() => cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY, "profile:second"));
+    expect(screen.queryByText(/Native status verified/i)).toBeNull();
+    expect(screen.queryByText("$13.00")).toBeNull();
+    await act(async () => release());
+    expect(screen.queryByText(/Native status verified/i)).toBeNull();
+    const deviceCard = screen.getByText("Device registration").closest("article");
+    expect(deviceCard).toHaveTextContent("unavailable");
+    fireEvent.click(screen.getByRole("tab", { name: "Billing" }));
+    expect(screen.queryByText("$13.00")).toBeNull();
+  });
+
+  it.each(["profile replacement", "unmount"])("does not open a delayed MFA request after %s", async boundary => {
+    let release!: (value: Response) => void;
+    const pending = new Promise<Response>(resolve => { release = resolve; });
+    const originalFetch = vi.mocked(fetch).getMockImplementation()!;
+    vi.mocked(fetch).mockImplementation(async (input, init) =>
+      String(input).endsWith("/step-up/start") ? pending : originalFetch(input, init));
+    const { unmount } = render(<InstalledServicesPanel />);
+    await screen.findByText(/Native status verified/i);
+    fireEvent.click(screen.getByRole("tab", { name: "Device & Security" }));
+    fireEvent.click(await screen.findByRole("button", { name: /Register this device with MFA/i }));
+    if (boundary === "unmount") unmount();
+    else act(() => cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY, "profile:second"));
+    await act(async () => release(new Response(JSON.stringify(stepUpStart), { status: 200 })));
+    expect(window.casimirDesktop!.openAuth0StepUp).not.toHaveBeenCalled();
+  });
+
+  it.each(["profile replacement", "unmount"])("does not cancel another account's pending request after a native failure and %s", async boundary => {
+    let reject!: (error: Error) => void;
+    nativeStepUpMock().mockImplementation(() =>
+      new Promise((_resolve, no) => { reject = no; }));
+    const { unmount } = render(<InstalledServicesPanel />);
+    await screen.findByText(/Native status verified/i);
+    fireEvent.click(screen.getByRole("tab", { name: "Device & Security" }));
+    fireEvent.click(await screen.findByRole("button", { name: /Register this device with MFA/i }));
+    await waitFor(() => expect(reject).toBeDefined());
+    if (boundary === "unmount") unmount();
+    else act(() => cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY, "profile:second"));
+    await act(async () => reject(new Error("Synthetic stale native failure")));
+    expect(vi.mocked(fetch).mock.calls.some(([url]) => String(url).endsWith("/step-up/cancel"))).toBe(false);
+  });
+
+  it("preserves the selected tab on an account notification without an identity change", async () => {
+    render(<InstalledServicesPanel />);
+    await screen.findByText(/Native status verified/i);
+    fireEvent.click(screen.getByRole("tab", { name: "Billing" }));
+    act(() => window.dispatchEvent(new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT)));
+    expect(screen.getByRole("tab", { name: "Billing" })).toHaveAttribute("aria-selected", "true");
+  });
+
   it.each(["authentication_clock_skew", "authentication_stale"])(
     "shows actionable recovery without granting authority for %s",
     async (error) => {
@@ -205,6 +281,7 @@ describe("InstalledServicesPanel", () => {
     },
   );
   beforeEach(() => {
+    cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY, "profile:developer");
     testState.runtime.surface = "desktop_native";
     testState.runtime.nativeHandshake = "ready";
     testState.openPanel.mockReset();
@@ -264,6 +341,119 @@ describe("InstalledServicesPanel", () => {
     expect(screen.getByText("Installed node supervisor")).toBeTruthy();
     expect(screen.getByText(/Multiple authenticated Codex clients can attach/i))
       .toBeTruthy();
+  });
+
+  it("keeps granted ordinary owners in the installed-service UI without developer promotion", async () => {
+    const userProjection = buildHelixInstalledAccountServices({
+      profileRef: "profile:ordinary-owner",
+      accountType: "user",
+      providerCredentialBrokerReady: true,
+      now: new Date("2026-08-27T12:00:00.000Z"),
+    });
+    vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL) => ({
+      ok: true,
+      json: async () => {
+        const url = String(input);
+        if (url.endsWith("/api/account/installed-services")) return userProjection;
+        if (url.endsWith("/api/account/security/status")) return {
+          ...securityStatus,
+          profile_ref: userProjection.profile_ref,
+        };
+        if (url.endsWith("/api/account/billing-entitlement")) return {
+          ...billingStatus,
+          profile_ref: userProjection.profile_ref,
+        };
+        return supervisorStatus;
+      },
+    }) as Response);
+
+    render(<InstalledServicesPanel />);
+    expect(await screen.findByText(/Native status verified/i)).toBeTruthy();
+    fireEvent.click(screen.getByRole("tab", { name: "Connections" }));
+    expect(screen.getByText("Codex app")).toBeTruthy();
+    fireEvent.click(screen.getByRole("tab", { name: "Device & Security" }));
+    expect(screen.getByRole("button", {
+      name: /Register this device with MFA/i,
+    })).toBeEnabled();
+    expect(userProjection.account_type).toBe("user");
+    expect(userProjection.raw_credential_included).toBe(false);
+  });
+
+  it("routes an ordinary owner to existing personal key custody without enabling broker enrollment", async () => {
+    const userProjection = buildHelixInstalledAccountServices({
+      profileRef: "profile:ordinary-owner",
+      accountType: "user",
+      providerCredentialBrokerReady: true,
+      now: new Date("2026-08-27T12:00:00.000Z"),
+    });
+    vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL) => ({
+      ok: true,
+      json: async () => String(input).endsWith("/api/account/installed-services")
+        ? userProjection
+        : String(input).endsWith("/api/account/security/status")
+          ? securityStatus
+          : String(input).endsWith("/api/account/billing-entitlement")
+            ? billingStatus
+            : supervisorStatus,
+    }) as Response);
+    const liveConnection = vi.fn(async () => ({
+      ok: true, code: "saved", state: { configured: false, source: "none" },
+    }));
+    Object.defineProperty(window, "casimirDesktop", {
+      configurable: true,
+      value: { ...window.casimirDesktop, liveConnection },
+    });
+
+    render(<InstalledServicesPanel />);
+    await screen.findByText(/Native status verified/i);
+    fireEvent.click(screen.getByRole("tab", { name: "Connections" }));
+    expect(screen.getAllByRole("button", { name: /Enrollment waits for SPB-6/i }))
+      .toHaveLength(2);
+    const personalKeys = screen.getByRole("button", { name: "Manage personal keys" });
+    expect(personalKeys).toHaveAttribute("data-helix-guidance-target", "personal-ai-keys");
+    fireEvent.click(personalKeys);
+
+    const dialog = screen.getByRole("dialog", { name: "Personal AI keys" });
+    expect(dialog).toBeInTheDocument();
+    expect((screen.getByLabelText("OpenAI API key") as HTMLInputElement).type).toBe("password");
+    expect((screen.getByLabelText("Gemini API key") as HTMLInputElement).type).toBe("password");
+    await waitFor(() => expect(liveConnection).toHaveBeenCalledWith({ action: "inspect" }));
+    expect(liveConnection).toHaveBeenCalledWith({ action: "gemini_inspect" });
+    expect(liveConnection).not.toHaveBeenCalledWith(expect.objectContaining({ action: "save" }));
+    act(() => window.dispatchEvent(new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT)));
+    expect(screen.queryByRole("dialog", { name: "Personal AI keys" })).toBeNull();
+  });
+
+  it("uses the current device security status in the overview for an ordinary owner", async () => {
+    vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL) => ({
+      ok: true,
+      json: async () => String(input).endsWith("/api/account/security/status")
+        ? {
+          ...securityStatus,
+          profile_ref: "profile:ordinary-owner",
+          current_device: {
+            ...securityStatus.current_device,
+            status: "active",
+            registered_at: "2026-08-27T12:00:00.000Z",
+          },
+        }
+        : String(input).endsWith("/api/account/installed-services")
+          ? buildHelixInstalledAccountServices({
+            profileRef: "profile:ordinary-owner",
+            accountType: "user",
+            providerCredentialBrokerReady: true,
+            now: new Date("2026-08-27T12:00:00.000Z"),
+          })
+          : String(input).endsWith("/api/account/billing-entitlement")
+            ? billingStatus
+            : supervisorStatus,
+    }) as Response);
+
+    render(<InstalledServicesPanel />);
+    const deviceCard = (await screen.findByText("Device registration")).closest("article");
+    expect(deviceCard).toHaveTextContent("active");
+    expect(deviceCard).toHaveTextContent("separate from a Codex client grant");
+    expect(deviceCard).not.toHaveTextContent("local only");
   });
 
   it("opens the public panel signed out and routes account-backed status to sign-in", async () => {
@@ -387,7 +577,7 @@ describe("InstalledServicesPanel", () => {
   });
 
   it("invalidates the intent when the owner cancels native MFA confirmation", async () => {
-    vi.mocked(window.casimirDesktop!.openAuth0StepUp).mockResolvedValue({
+    nativeStepUpMock().mockResolvedValue({
       opened: false,
       cancelled: true,
     });
@@ -408,7 +598,7 @@ describe("InstalledServicesPanel", () => {
   });
 
   it("invalidates the intent and explains a missing native callback route", async () => {
-    vi.mocked(window.casimirDesktop!.openAuth0StepUp).mockRejectedValue(
+    nativeStepUpMock().mockRejectedValue(
       new Error("Error invoking remote method 'step-up': Error: desktop_auth0_callback_route_unavailable"),
     );
     render(<InstalledServicesPanel />);

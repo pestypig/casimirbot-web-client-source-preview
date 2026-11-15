@@ -1,0 +1,57 @@
+{
+  "observed_at": "2026-11-13T20:34:07.949838+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/GcnSourceConnection.tsx",
+      "canonical_sha256": "1cdd4a0b2ec6ef4c832e435d0c1932114c384e3e0794e7792280c123a51e8cd3",
+      "export_sha256": "57f430ce6b0b770b488a4f1f7cc74ebe05fc214868d0b78e1bfcf8a28b8a1ea0",
+      "bytes": 12138,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "809807e29ce38307617955421e93565fa4605b402b73705a84b4da4488771db7"
+    },
+    {
+      "path": "client/src/components/__tests__/gcn-source-connection.spec.tsx",
+      "canonical_sha256": "3862f1dcf5bb26d789ae7678c149ab2d35d7d6658242d278589de56e1b51dffc",
+      "export_sha256": "699cc3ed38fb558e524ea2d77fb9be6574a46c0389b3b2e7dd3eff9a3ae1c101",
+      "bytes": 3289,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "5087522a9a702b7e3a52187b30a5fd5343d03fd8693716c6a5af4ae5fad15fdd"
+    },
+    {
+      "path": "client/src/components/__tests__/gcn-source-lifecycle.spec.tsx",
+      "canonical_sha256": "ed955cfbec45be94750557563280367e0f5466d97a2778e82a56466f9867c287",
+      "export_sha256": "efa5fe061c9dae40c28d904eae05e1516711bb1f295961b38ccf2f990977ee86",
+      "bytes": 7603,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed complete GCN account component and both browser suites, shared credential/status/private lease schemas, account cache identity, relevant account route and credential/private-access service behavior. No copied provider data or third-party asset is included.",
+    "Public catalog use, personal encrypted credentials, unavailable public managed-source allowance, explicit private source qualification, optional reasoning and Discord delivery remain distinct. The private form advertises the configured finite window and 64-notice limit, without public enrollment, subscriber debit, reasoning or posting authority.",
+    "Reproduced eight failures: another-owner status was displayed; pending credential writes were not aborted on account change/unmount; refreshing preserved old approval; malformed, changed-expiry or wrong-mode private receipts were accepted; pending private activation was not aborted on account change.",
+    "Status now must match cached account identity; writes recheck it and carry the expected profile. One mutation controller prevents concurrent dispatch, preserves the 15-second timeout, and is aborted on account changes/unmount. Old finalizers cannot clear a newer request. Credential drafts still clear before submission and never enter browser storage.",
+    "Private review clears on refresh and on submission. A successful HTTP status alone cannot claim activation or Stop: the bounded receipt must contain the reviewed active mode/expiry or no active leases for Stop. An expired displayed window asks for a new status review without sending a write. Provider connection readiness remains separate.",
+    "Fifteen browser tests and nine canonical account/private-service tests pass. Server tests use in-memory PostgreSQL, synthetic encryption material, mocked ingestion/identities and loopback request handlers; they do not connect to NASA, save actual user secrets or operate a production worker."
+  ],
+  "limits": [
+    "Private unfrozen source proposal; no installation, real GCN credential, provider connection, managed allowance, paid reasoning or Discord delivery was exercised.",
+    "The UI verifies the returned lease against the displayed expiry. Operator configuration changes between review and the server write remain separate qualification: the existing request contract carries expected profile, mode, accept and policy, not an expected-expiry field.",
+    "Server route/session checks, encrypted storage, configured private eligibility, credential-revision fencing, 64-record intake, expiry and worker-authentication tests are supporting canonical evidence. Their service code and shared contracts remain separately selected dependencies, not web-preview exports in this cohort.",
+    "Native/provider custody, account initialization on the installed surface, real timeout/stop delivery and the matching deployed site require installed/live acceptance.",
+    "Star Watcher retained-source changes remain held until its other integration dependencies are reviewed. Five inherited intentional support-contact matches remain in owner publication review."
+  ]
+}

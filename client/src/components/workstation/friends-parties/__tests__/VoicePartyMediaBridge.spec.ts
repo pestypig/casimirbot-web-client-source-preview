@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { HelixVoiceParty } from "@shared/helix-friends-voice-party";
 
 const mocks = vi.hoisted(() => ({
@@ -59,6 +59,7 @@ const member = (profileId: string, role: "owner" | "participant", slot: number) 
 });
 
 describe("VoicePartyMediaBridge", () => {
+  afterEach(() => vi.unstubAllGlobals());
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -108,7 +109,7 @@ describe("VoicePartyMediaBridge", () => {
       });
     }
     let connection: FakePeerConnection | null = null;
-    vi.stubGlobal("RTCPeerConnection", vi.fn(() => {
+    vi.stubGlobal("RTCPeerConnection", vi.fn(function () {
       connection = new FakePeerConnection();
       return connection;
     }));
@@ -221,7 +222,7 @@ describe("VoicePartyMediaBridge", () => {
       ]) as unknown as RTCStatsReport);
     }
     let connection: RelayPeerConnection | null = null;
-    const peerConstructor = vi.fn((_configuration: RTCConfiguration) => {
+    const peerConstructor = vi.fn(function (_configuration: RTCConfiguration) {
       connection = new RelayPeerConnection();
       return connection;
     });
@@ -322,5 +323,63 @@ describe("VoicePartyMediaBridge", () => {
     expect(updateMedia).toHaveBeenCalledWith(party.party_id, expect.objectContaining({
       media_state: "failed",
     }));
+  });
+});
+
+describe("voice startup cancellation", () => {
+  beforeEach(() => vi.clearAllMocks());
+  afterEach(() => vi.unstubAllGlobals());
+  it("does not acquire a second microphone for overlapping starts", async () => {
+    const owner = member("profile:owner", "owner", 1);
+    const party = { party_id: "voice_party:cancel", state: "connecting",
+      members: [owner, member("profile:friend", "participant", 2)] } as HelixVoiceParty;
+    let release!: (value: MediaStream) => void;
+    const acquisition = new Promise<MediaStream>(resolve => { release = resolve; });
+    const getUserMedia = vi.fn(() => acquisition);
+    Object.defineProperty(navigator, "mediaDevices", { configurable: true, value: { getUserMedia } });
+    const bridge = createVoicePartyMediaBridge({ party, self: owner, onProjection: () => {},
+      api: { updateMedia: vi.fn(async () => party), getIceConfiguration: vi.fn(async () => ({ ice_servers: [] })) } as never });
+    const first = bridge.start();
+    await vi.waitFor(() => expect(getUserMedia).toHaveBeenCalledOnce());
+    const second = bridge.start();
+    await bridge.close();
+    const stop = vi.fn();
+    release({ getTracks: () => [{ stop }], getAudioTracks: () => [] } as unknown as MediaStream);
+    await Promise.all([first, second]);
+    expect(getUserMedia).toHaveBeenCalledOnce();
+    expect(stop).toHaveBeenCalledOnce();
+  });
+  it.each(["report", "ice", "microphone"])("does not resume after close during %s", async boundary => {
+    const owner = member("profile:owner", "owner", 1);
+    const party = { party_id: "voice_party:cancel", state: "connecting",
+      members: [owner, member("profile:friend", "participant", 2)] } as HelixVoiceParty;
+    let release!: () => void;
+    const pending = new Promise<void>(resolve => { release = resolve; });
+    const stop = vi.fn();
+    const track = { enabled: true, stop } as unknown as MediaStreamTrack;
+    const stream = { getTracks: () => [track], getAudioTracks: () => [track] } as unknown as MediaStream;
+    const getUserMedia = vi.fn(async () => { if (boundary === "microphone") await pending; return stream; });
+    Object.defineProperty(navigator, "mediaDevices", { configurable: true, value: { getUserMedia } });
+    const constructor = vi.fn(function () { throw new Error("Closed startup must not create WebRTC"); });
+    vi.stubGlobal("RTCPeerConnection", constructor);
+    const updateMedia = vi.fn(async (_id: string, value: { media_state: string }) => {
+      if (boundary === "report" && value.media_state === "connecting") await pending;
+      return party;
+    });
+    const getIceConfiguration = vi.fn(async () => { if (boundary === "ice") await pending;
+      return { ice_servers: [], ice_transport_policy: "all" }; });
+    const projections: Array<{ state: string }> = [];
+    const bridge = createVoicePartyMediaBridge({ party, self: owner,
+      api: { updateMedia, getIceConfiguration } as never, onProjection: p => projections.push(p) });
+    const starting = bridge.start();
+    await vi.waitFor(() => expect(boundary === "report" ? updateMedia : boundary === "ice" ? getIceConfiguration : getUserMedia).toHaveBeenCalledOnce());
+    await bridge.close();
+    release();
+    await starting;
+    expect(constructor).not.toHaveBeenCalled();
+    expect(getUserMedia).toHaveBeenCalledTimes(boundary === "microphone" ? 1 : 0);
+    expect(stop).toHaveBeenCalledTimes(boundary === "microphone" ? 1 : 0);
+    expect(mocks.signaling.start).not.toHaveBeenCalled();
+    expect(projections.at(-1)?.state).toBe("closed");
   });
 });

@@ -168,7 +168,7 @@ const creator: StateCreator<DocumentImageRegionState> = (set) => ({
         width: Math.max(1, Math.min(state.cropDraft.width, naturalSize.width)),
         height: Math.max(1, Math.min(state.cropDraft.height, naturalSize.height)),
       };
-      const nextSource = state.source
+      const nextSource: DocumentImageSourceState | null = state.source
         ? {
             ...state.source,
             naturalSize,

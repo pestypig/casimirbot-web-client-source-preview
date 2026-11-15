@@ -1,0 +1,90 @@
+{
+  "observed_at": "2026-11-14T04:08:11.063110+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskFinalExtras.tsx",
+      "canonical_sha256": "8a3ccea63f23dde15bfa60e408452b4d3688d14a8895b773a504130a43bc6a38",
+      "export_sha256": "e0c6eb65ef7e8d6d014db0621f819b371e0657cf2f3ffb389a14dbfa172c9b5b",
+      "previous_public_sha256": "2ffa3e90148a71adf9ee0c8e9f4df540b9c12dba7b56cf4c63c2ce54682c5fc8",
+      "bytes": 11840,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskRuntimeGoalDebugContext.ts",
+      "canonical_sha256": "beac6b0ffa793c402a793c1d6072939f0f262179012f46cfccf7eba26f7855e3",
+      "export_sha256": "5e51f6ebf47f91d4f51f889b58cf13d1ea04cf1211d5c4ba7517c27dead09c74",
+      "previous_public_sha256": "275a74b856fd781c984e7e70b9286a83a1504e21e55efca418955257bb075f32",
+      "bytes": 18659,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskRuntimePicker.tsx",
+      "canonical_sha256": "4505a6bb681036c45fd849206e56db90bd8ccc30a97f275b30bd5da89a2ce55a",
+      "export_sha256": "6bf005de89434b08a7a7357124dfbbded6eb0afb3233fc365e16e18cc092308e",
+      "previous_public_sha256": "5d0dd0be477dd2669072646d7356c5818110bcdafa64e06f1233a8f2b452a01a",
+      "bytes": 5026,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskRealtimeVisualFrameAcknowledgement.ts",
+      "canonical_sha256": "2302da63eb8afae9055e9dd2244198003bbec2c884c465d0582d527a873f6f1f",
+      "export_sha256": "25c4c1e2673eba0f7f595f19aaa2de978d7db32eab0311158e86b4d354265aae",
+      "previous_public_sha256": "ea28c32c56d41aee04b724a3cc2ce4c4cd9e3e6be92d2c728824ef05897a4005",
+      "bytes": 6565,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskReasoningMeterSurface.tsx",
+      "canonical_sha256": "e3227da82841dbc892ff4f360f9993134f44f51ef5888f9543f64d313547bcda",
+      "export_sha256": "00d9cbeb92d3ce09ccddba47a6a6a0e29b492daf5909ca3909db217a4a13dc98",
+      "previous_public_sha256": "28e7933a43ccd8a6a32bdc921fea994b2026ca2d76d9f00645deee30c50b0913",
+      "bytes": 7205,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleSupplementSurface.tsx",
+      "canonical_sha256": "0c61375141e6e0187fd64b96151abadd467e52c60342c5dc4d1f58104061cbb1",
+      "export_sha256": "2fb5c5650e5eb091380b0d60ae24b500a929133923ddc39cd0b43105e607b20a",
+      "previous_public_sha256": "865c4f024de9cc5497993541cb5aa77d31370ae5fcf08699b809a7c0052549d5",
+      "bytes": 6023,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskConsoleStatusSurfaces.tsx",
+      "canonical_sha256": "a1cd744fa5693712e60473e9edb72ba716853ea0449c366d2fc25d141c2669de",
+      "export_sha256": "240b6a1235182fb08c138910436a6ca38e674de01bafe153b62e91e57b318922",
+      "previous_public_sha256": "408aeb97dc47dbc3d9c54fe4ee7680276a831d8bb28e7dd012ca8bd62424b03f",
+      "bytes": 960,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-recrown.spec.ts",
+      "canonical_sha256": "71ed02b0a3e5dcfe4c47defb4866fb3d658dc96da2e008997517796e02fd7e49"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskRealtimeVisualFrameAcknowledgement.spec.ts",
+      "canonical_sha256": "54d6b85ec910aee5f3894c087877ac28fbcd2a65bae307317f497a91a72d549d"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskPersonalVoiceStatus.spec.tsx",
+      "canonical_sha256": "e420e7b63e362f7bd126253e0735ed976b1bd278b35a468a52d075ad3adc35b8"
+    }
+  ],
+  "classification": "presentation",
+  "source_frozen": false,
+  "published": false,
+  "review": [
+    "All seven files matched the existing public preview before editing.",
+    "Whitespace filters now return booleans without changing the accepted strings; runtime picker return annotation retains its existing on/off/experimental values.",
+    "An explicit null guard preserves the existing provider-event refusal. The existing false answer-authority fields remain unchanged.",
+    "Display ref writes tolerate a missing current array; voice-status pass-through props admit the existing null label when the microphone is off.",
+    "Existing focused tests cover status labels, picker choices, runtime-goal projections and provider event correlation. No provider/session/authority operation added."
+  ],
+  "limits": [
+    "Unfrozen source review only. Existing tests use fixtures and do not establish installed GPT Live or Minecraft behavior."
+  ]
+}

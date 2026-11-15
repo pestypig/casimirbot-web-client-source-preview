@@ -2,10 +2,201 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { ManagedWebsiteConnection } from "../ManagedWebsiteConnection";
+import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from
+  "@/lib/workstation/accountCapabilityPolicy";
 
 afterEach(() => { cleanup(); vi.useRealTimers(); delete window.casimirDesktop; });
 
 describe("installed website connection control", () => {
+  it.each(["resolve", "reject"])("ignores a private text %s after the account changes", async (outcome) => {
+    let finish!: () => void;
+    const ask = vi.fn(() => new Promise((resolve, reject) => {
+      finish = () => outcome === "resolve"
+        ? resolve({ ok: true, answer: { text: "Previous private answer", payer: "casimirbot_managed" } })
+        : reject(new Error("Previous account failure"));
+    }));
+    const connect = vi.fn(async () => ({ phase: "linked", detail: "Current account connected.",
+      managedTextAuthorized: true, allowance: { sourceKind: "developer", state: "active",
+        processorMode: "test", remainingMicros: 100_000, periodEndsAt: "2026-11-28T00:00:00.000Z" } }));
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(), managedAiDeviceLink: connect,
+      managedAiTextTurn: ask } as any;
+    render(<ManagedWebsiteConnection signedIn />);
+    fireEvent.click(await screen.findByText("Private managed-text qualification"));
+    fireEvent.change(screen.getByRole("textbox", { name: "Question" }), { target: { value: "Old account question" } });
+    fireEvent.click(screen.getByRole("button", { name: "Run private text check" }));
+    expect(ask).toHaveBeenCalledOnce();
+    fireEvent(window, new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT));
+    await waitFor(() => expect(connect).toHaveBeenCalledTimes(2));
+    await act(async () => { finish(); });
+    expect(screen.queryByText("Previous private answer")).not.toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Question" })).toHaveValue("");
+    expect(connect).toHaveBeenCalledTimes(2);
+    expect(ask).toHaveBeenCalledOnce();
+  });
+
+  it("rechecks the new account while an older connection check is pending", async () => {
+    let finish!: (value: unknown) => void;
+    const connect = vi.fn().mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }))
+      .mockResolvedValue({ phase: "unlinked", detail: "New account needs connection." });
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(), managedAiDeviceLink: connect };
+    render(<ManagedWebsiteConnection signedIn />);
+    expect(connect).toHaveBeenCalledTimes(1);
+    fireEvent(window, new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT));
+    await act(async () => { finish({ phase: "linked", detail: "Old account connected." }); });
+    expect(connect).toHaveBeenCalledTimes(2);
+    expect(await screen.findByText("New account needs connection.")).toBeInTheDocument();
+    expect(screen.queryByText("Old account connected.")).not.toBeInTheDocument();
+    expect(screen.queryByText("Connected")).not.toBeInTheDocument();
+    expect(connect.mock.calls.every(call => call[0] === "check")).toBe(true);
+  });
+
+  it("does not recheck a connection for a private answer completed after unmount", async () => {
+    let finish!: (value: unknown) => void;
+    const ask = vi.fn(() => new Promise(resolve => { finish = resolve; }));
+    const connect = vi.fn(async () => ({ phase: "linked", detail: "Account connected.",
+      managedTextAuthorized: true, allowance: { sourceKind: "developer", state: "active",
+        processorMode: "test", remainingMicros: 100_000, periodEndsAt: "2026-11-28T00:00:00.000Z" } }));
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(), managedAiDeviceLink: connect,
+      managedAiTextTurn: ask } as any;
+    const view = render(<ManagedWebsiteConnection signedIn />);
+    fireEvent.click(await screen.findByText("Private managed-text qualification"));
+    fireEvent.change(screen.getByRole("textbox", { name: "Question" }), { target: { value: "Question" } });
+    fireEvent.click(screen.getByRole("button", { name: "Run private text check" }));
+    view.unmount();
+    await act(async () => { finish({ ok: true, answer: { text: "Late answer", payer: "casimirbot_managed" } }); });
+    expect(connect).toHaveBeenCalledOnce();
+    expect(ask).toHaveBeenCalledOnce();
+  });
+
+  it("offers the fixed Responses check only after the signed owner status enables it", async () => {
+    const probe = vi.fn(async () => ({ ok: true, answer: {
+      answerMatchesProbe: true, measuredProviderMicrosUsd: 9,
+    } }));
+    const status = vi.fn(async () => ({ ok: true, status: {
+      state: "active", textCallsEnabled: true, agentProbeEnabled: false,
+      currency: "USD", capMinor: 500, remainingMinor: 0,
+      includedProviderRemainingMicrosUsd: 800_000,
+      periodEndsAt: "2026-11-28T00:00:00.000Z",
+    } }));
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(),
+      managedAiDeviceLink: vi.fn(async () => ({ phase: "linked",
+        detail: "Website Owner connected.", managedTextAuthorized: true })),
+      cappedMembershipStatus: status,
+      cappedMembershipAgentProbe: probe };
+    render(<ManagedWebsiteConnection signedIn />);
+    await waitFor(() => expect(status).toHaveBeenCalledOnce());
+    expect(screen.queryByText("Private managed Responses billing check"))
+      .not.toBeInTheDocument();
+    status.mockResolvedValue({ ok: true, status: {
+      state: "active", textCallsEnabled: true, agentProbeEnabled: true,
+      currency: "USD", capMinor: 500, remainingMinor: 0,
+      includedProviderRemainingMicrosUsd: 800_000,
+      periodEndsAt: "2026-11-28T00:00:00.000Z",
+    } });
+    fireEvent(window, new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT));
+    fireEvent.click(await screen.findByText("Private managed Responses billing check"));
+    const run = screen.getByRole("button", {
+      name: "Run one installed Responses check" });
+    expect(run).toBeDisabled();
+    fireEvent.click(screen.getByRole("checkbox", {
+      name: /I approve one bounded Responses sandbox call/u }));
+    fireEvent.click(run);
+    expect(await screen.findByText(/settled with a provider usage receipt/u))
+      .toBeInTheDocument();
+    expect(probe).toHaveBeenCalledOnce();
+    expect(run).toBeDisabled();
+  });
+
+  it("offers the capped sandbox text action only after a funded owner status", async () => {
+    const ask = vi.fn(async () => ({ ok: true, answer: {
+      text: "Capped answer.", remainingMinor: 0,
+    } }));
+    const status = vi.fn(async () => ({ ok: true, status: {
+      state: "active", textCallsEnabled: true, currency: "USD",
+      capMinor: 500, remainingMinor: 0,
+      includedProviderRemainingMicrosUsd: 800_000,
+      periodEndsAt: "2026-11-28T00:00:00.000Z",
+    } }));
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(),
+      managedAiDeviceLink: vi.fn(async () => ({ phase: "linked",
+        detail: "Website account connected. No single current funded text allowance was confirmed. Review your subscriptions on the website.",
+        managedTextAuthorized: true })),
+      cappedMembershipStatus: status,
+      cappedMembershipTextTurn: ask };
+    render(<ManagedWebsiteConnection signedIn />);
+    fireEvent.click(await screen.findByText("Private capped-membership text check"));
+    expect(screen.getByText("Website account connected. Active capped Stripe sandbox period confirmed below."))
+      .toBeInTheDocument();
+    expect(screen.queryByText(/No single current funded text allowance was confirmed/))
+      .not.toBeInTheDocument();
+    expect(screen.getByText(/Included provider cost left: \$0\.8000/))
+      .toBeInTheDocument();
+    fireEvent.change(screen.getByRole("textbox", { name: "Question" }),
+      { target: { value: "A bounded question" } });
+    fireEvent.click(screen.getByRole("button", {
+      name: "Run private capped-text check" }));
+    expect(await screen.findByText("Capped answer.")).toBeInTheDocument();
+    expect(ask).toHaveBeenCalledOnce();
+    expect(ask).toHaveBeenCalledWith("A bounded question");
+  });
+
+  it("does not expose the capped action for an inactive sandbox period", async () => {
+    const ask = vi.fn();
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(),
+      managedAiDeviceLink: vi.fn(async () => ({ phase: "linked",
+        detail: "Website Owner connected.", managedTextAuthorized: true })),
+      cappedMembershipStatus: vi.fn(async () => ({ ok: true, status: {
+        state: "inactive", textCallsEnabled: false,
+      } })), cappedMembershipTextTurn: ask };
+    render(<ManagedWebsiteConnection signedIn />);
+    await screen.findByText("Website Owner connected.");
+    await waitFor(() => expect(window.casimirDesktop?.cappedMembershipStatus)
+      .toHaveBeenCalledOnce());
+    expect(screen.queryByText("Private capped-membership text check"))
+      .not.toBeInTheDocument();
+    expect(ask).not.toHaveBeenCalled();
+  });
+
+  it("does not display an answer after the signed-in account changes", async () => {
+    let finish!: (value: unknown) => void;
+    const ask = vi.fn(() => new Promise(resolve => { finish = resolve; }));
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(),
+      managedAiDeviceLink: vi.fn(async () => ({ phase: "linked",
+        detail: "Website Owner connected.", managedTextAuthorized: true })),
+      cappedMembershipStatus: vi.fn(async () => ({ ok: true, status: {
+        state: "active", textCallsEnabled: true, currency: "USD",
+        capMinor: 500, remainingMinor: 0,
+        includedProviderRemainingMicrosUsd: 800_000,
+        periodEndsAt: "2026-11-28T00:00:00.000Z",
+      } })), cappedMembershipTextTurn: ask };
+    render(<ManagedWebsiteConnection signedIn />);
+    fireEvent.click(await screen.findByText("Private capped-membership text check"));
+    fireEvent.change(screen.getByRole("textbox", { name: "Question" }),
+      { target: { value: "A bounded question" } });
+    fireEvent.click(screen.getByRole("button", {
+      name: "Run private capped-text check" }));
+    expect(ask).toHaveBeenCalledOnce();
+    fireEvent(window, new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT));
+    await act(async () => { finish({ ok: true, answer: {
+      text: "Previous account answer.", remainingMinor: 0,
+    } }); });
+    expect(screen.queryByText("Previous account answer.")).not.toBeInTheDocument();
+  });
+
+  it("rechecks a transient unavailable identity when the owner returns to the app", async () => {
+    const connect = vi.fn()
+      .mockResolvedValueOnce({ phase: "unavailable", detail: "Sign in to this harness profile first." })
+      .mockResolvedValue({ phase: "linked", detail: "Website account connected." });
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(), managedAiDeviceLink: connect };
+    render(<ManagedWebsiteConnection signedIn />);
+    await screen.findByText("Sign in to this harness profile first.");
+    fireEvent.focus(window);
+    await screen.findByText("Website account connected.");
+    expect(connect).toHaveBeenNthCalledWith(2, "inspect");
+    expect(screen.getByText("Connected")).toBeInTheDocument();
+  });
+
   it("recovers a locally claimed grant when the native website check stalls", async () => {
     vi.useFakeTimers();
     const connect = vi.fn((action: string) => action === "check"

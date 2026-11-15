@@ -28,13 +28,13 @@ export function SolarResearchPackageStorage({packageJson,onReopen,contextRevisio
     if(busy)return;
     const selected=++epoch.current,controller=new AbortController();request.current=controller;
     const current=()=>selected===epoch.current&&!controller.signal.aborted;
-    setBusy(true);setCatalog(null);setMessage('Checking signed-in developer account…');
+    setBusy(true);setCatalog(null);setMessage('Checking signed-in account…');
     try {
       const response=await fetch('/api/account/session',{signal:controller.signal});
       if(!response.ok)throw new Error('Account status unavailable');
       const account=await response.json(),profileId=account.session?.profile?.profile_id;
       if(!current())return;
-      if(!profileId||account.account_policy?.account_type!=='developer')throw new Error('A signed-in developer account is required');
+      if(!profileId)throw new Error('A signed-in account is required');
       const reply=await fetch(`/api/account/solar-research/packages?${new URLSearchParams({expected_profile_id:profileId,offset:String(offset),limit:'10'})}`,{signal:controller.signal});
       const result=await reply.json();if(!current())return;
       if(!reply.ok||result.ok!==true)throw new Error(result.error??'Package catalog unavailable');
@@ -51,14 +51,14 @@ export function SolarResearchPackageStorage({packageJson,onReopen,contextRevisio
     const selected=++epoch.current,controller=new AbortController();request.current=controller;
     const current=()=>selected===epoch.current&&!controller.signal.aborted;
     const selectedId=id,selectedPackage=packageJson;
-    setBusy(true);setMessage('Checking signed-in developer account…');
+    setBusy(true);setMessage('Checking signed-in account…');
     try {
       if(!save&&!/^solar-package:[a-f0-9]{64}$/.test(selectedId))throw new Error('An exact retained package ID is required');
       const accountResponse=await fetch('/api/account/session',{signal:controller.signal});
       if(!accountResponse.ok)throw new Error('Account status unavailable');
       const account=await accountResponse.json(),profileId=account.session?.profile?.profile_id;
       if(!current())return;
-      if(!profileId||account.account_policy?.account_type!=='developer')throw new Error('A signed-in developer account is required');
+      if(!profileId)throw new Error('A signed-in account is required');
       let expectedId=selectedId,expectedIndex:string|undefined;
       if(save) {
         const verified=await verifySolarResearchEvidencePackage(selectedPackage!);
@@ -88,7 +88,7 @@ export function SolarResearchPackageStorage({packageJson,onReopen,contextRevisio
     finally {if(current())setBusy(false);}
   }
   return <section className="space-y-2 text-xs" aria-label="Profile evidence package storage">
-    <p>Profile archive access is explicit and developer-only. Account quota still applies; no MCP consent or model execution is granted.</p>
+    <p>Profile archive access is explicit and owner-bound. Account quota still applies; no MCP consent or model execution is granted.</p>
     <button type="button" disabled={busy} onClick={()=>void list()}>List retained evidence packages</button>
     {catalog&&<div aria-label="Retained evidence package catalog">
       <p>{catalog.totalPackages} owner package manifest(s); this page is verified. Ordered by exact package ID, not acquisition date. Integrity verification is not source authentication.</p>

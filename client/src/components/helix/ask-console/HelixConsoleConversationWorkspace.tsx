@@ -7,6 +7,7 @@ import { OwnerDiscordStreamActivity } from "@/components/agent-access/OwnerDisco
 import { projectSessionActivity } from "@/components/agent-access/sessionActivityProjection";
 import { useAdapterAiActivity } from "@/components/agent-access/useAdapterAiActivity";
 import { AdapterAiActivityPanel } from "./AdapterAiActivityPanel";
+import { ManagedAiTextConsole } from "./ManagedAiTextConsole";
 import { BoundTaskConsoleHistory, type BoundTaskConsoleMessage } from "./BoundTaskConsoleHistory";
 import { CodexConversationConsoleHistory } from "./CodexConversationConsoleHistory";
 import { LocalRoomConsoleHistory } from "./shared-live-room/LocalRoomConsoleChannel";
@@ -22,7 +23,9 @@ import { NativeSharedInterpreterReportsPanel } from "./shared-live-room/NativeSh
 import { SharedRoomInterpreterTurnHistory } from "./shared-live-room/SharedRoomInterpreterTurnHistory";
 import { SharedRoomTextReleaseControls } from "./shared-live-room/SharedRoomTextReleaseControls";
 import { NativeHostedRoomTextReleaseControls } from "./shared-live-room/NativeHostedRoomTextReleaseControls";
-import { readCachedAccountCapabilityPolicy } from "@/lib/workstation/accountCapabilityPolicy";
+import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, readCachedAccountCapabilityPolicy,
+  readCachedAccountProfileIdentity } from "@/lib/workstation/accountCapabilityPolicy";
+import { captureAccountOperationScope } from "@/lib/workstation/accountOperationScope";
 import { isHostedRoomTextOwnerAdmitted,
   type HostedRoomTextOwnerSnapshot } from "./shared-live-room/NativeHostedRoomTextOwnerBridge";
 import "./HelixConsoleConversationWorkspace.css";
@@ -32,11 +35,14 @@ import { helixCodexConsoleFrameSchema } from "@shared/helix-codex-mirror-frame";
 import { projectDiscordFloatActivityEvent } from
   "@shared/discord-float-activity";
 import { discordStreamEventSchema, discordStreamReceiptSchema,
-  discordStreamSourceRef, discordStreamSourceForTurn } from
+  discordPersonalSessionIdFromStreamId, discordPersonalSessionIdSchema,
+  discordPersonalStreamId, discordStreamSourceRef, discordStreamSourceForTurn } from
   "@shared/discord-stream-selection";
 import type { LocalCodexStreamGrant } from
   "@/components/agent-access/useGrantedCodexStreamActivity";
 import { DESKTOP_AUTH0_ROOM_CONTROL_PATH } from "@shared/desktop-auth0-account-link";
+import { HELIX_WORKSTATION_GUIDANCE_EVENT, coerceWorkstationGuidanceRequest } from
+  "@/lib/workstation/workstationGuidance";
 
 const displayPreferenceKey = (source: string) => `helix.conversation-display.v1:${source}`;
 type DiscordStreamState = {
@@ -52,8 +58,24 @@ type DiscordStreamState = {
 };
 type StreamResumeSelection = { mode: "all" | "selected"; sourceRefs: string[];
   approvalId: string; expiresAt: string; durationHours: 1 | 8 | 24 };
+type PersonalStreamDestination = { session_id: string; guild_id: string; channel_id: string };
 
-async function discordStreamControl(roomId: string, operation: string, request?: unknown) {
+async function performDiscordStreamControl(roomId: string, operation: string, request?: unknown) {
+  const personalSessionId = discordPersonalSessionIdFromStreamId(roomId);
+  if (personalSessionId) {
+    const kind = ({ discord_stream_inspect: "inspect", discord_stream_grant: "grant",
+      discord_stream_select: "select", discord_stream_stop: "stop",
+      discord_stream_heartbeat: "heartbeat", discord_stream_publish: "publish" } as
+      Record<string, string>)[operation];
+    if (!kind) throw new Error("discord_personal_stream_operation_invalid");
+    const result = await window.casimirDesktop?.personalDiscordStream?.({
+      session_id: personalSessionId, operation: { kind,
+        ...(request === undefined ? {} : { request }) },
+    }) as { status?: string; receipt?: { ok?: boolean; result?: unknown } } | undefined;
+    if (result?.status !== "ready" || result.receipt?.ok !== true)
+      throw new Error("discord_personal_stream_unavailable");
+    return result.receipt.result;
+  }
   const response = await fetch(DESKTOP_AUTH0_ROOM_CONTROL_PATH, {
     method: "POST", credentials: "same-origin", cache: "no-store",
     headers: { Accept: "application/json", "Content-Type": "application/json" },
@@ -88,7 +110,7 @@ function codexMirrorErrorMessage(code: string): string {
   return "Codex conversation unavailable. Check the current task pairing and Codex app installation.";
 }
 
-export type HelixConsoleChannel = "private_ask" | "bound_task" | "private_api" | "adapter_ai" | "local_room" | "hosted_room" | "local_room_agent" | "hosted_room_agent";
+export type HelixConsoleChannel = "private_ask" | "bound_task" | "private_api" | "managed_text" | "adapter_ai" | "local_room" | "hosted_room" | "local_room_agent" | "hosted_room_agent";
 export type SavedCodexChatChoice = Readonly<{ id: string; title: string }>;
 export type HelixConsoleConversationWorkspaceProps = {
   children: ReactNode;
@@ -111,19 +133,60 @@ export type HelixConsoleConversationWorkspaceProps = {
   onSelectHostedRoomView?: (view: "chat" | "mission") => void;
 };
 
+/** Account changes retire the complete source/destination view, not merely its labels. */
+export function HelixConsoleConversationWorkspace(props: HelixConsoleConversationWorkspaceProps) {
+  const [revision, setRevision] = useState(() => readCachedAccountProfileIdentity().revision);
+  useEffect(() => {
+    const update = () => setRevision(readCachedAccountProfileIdentity().revision);
+    window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, update);
+    update();
+    return () => window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, update);
+  }, []);
+  return <HelixConsoleConversationWorkspaceSession key={revision} {...props} />;
+}
+
 /** A text channel changes the actual center history; the same selection drives the pill above it. */
-export function HelixConsoleConversationWorkspace({ children, layoutVariant = "hero", selectedChannel, onSelectChannel,
+function HelixConsoleConversationWorkspaceSession({ children, layoutVariant = "hero", selectedChannel, onSelectChannel,
   privateApiAvailable, experimentalAskHelix = true, privateApiBindingConversationId, boundTaskConversationId,
   savedCodexChats = [], onSelectCodexChat, boundTaskMessages = [], boundTaskStatus,
   localRoom, hostedRoom, localRoomView = "chat",
   onSelectLocalRoomView, hostedRoomView = "chat",
   onSelectHostedRoomView }: HelixConsoleConversationWorkspaceProps) {
+  const mounted = useRef(true);
+  const accountScope = useRef(captureAccountOperationScope());
+  const isCurrentAccount = useCallback(() => mounted.current && accountScope.current(), []);
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; };
+  }, []);
+  // A late local receipt must never become a new write under the successor account.
+  const withCurrentAccount = useCallback(async <T,>(operation: () => T | Promise<T>): Promise<T> => {
+    if (!isCurrentAccount()) throw new Error("console_account_scope_changed");
+    const result = await operation();
+    if (!isCurrentAccount()) throw new Error("console_account_scope_changed");
+    return result;
+  }, [isCurrentAccount]);
+  type Desktop = NonNullable<Window["casimirDesktop"]>;
+  const scopedStreamGrants = useCallback((request: Parameters<NonNullable<Desktop["codexStreamGrants"]>>[0]) =>
+    withCurrentAccount(() => window.casimirDesktop?.codexStreamGrants?.(request)), [withCurrentAccount]);
+  const scopedPersonalStream = useCallback((request: Parameters<NonNullable<Desktop["personalDiscordStream"]>>[0]) =>
+    withCurrentAccount(() => window.casimirDesktop?.personalDiscordStream?.(request)), [withCurrentAccount]);
+  const scopedMessageCloudStatus = useCallback(() =>
+    withCurrentAccount(() => window.casimirDesktop?.getMessageCloudStatus?.()), [withCurrentAccount]);
+  const scopedShowCodexMirror = useCallback((request: Parameters<NonNullable<Desktop["showCodexMirror"]>>[0]) =>
+    withCurrentAccount(() => window.casimirDesktop?.showCodexMirror?.(request)), [withCurrentAccount]);
+  const scopedStopMessageCloud = useCallback(() => isCurrentAccount()
+    ? window.casimirDesktop?.stopMessageCloud?.() : undefined, [isCurrentAccount]);
+  const discordStreamControl = useCallback((roomId: string, operation: string, request?: unknown) =>
+    withCurrentAccount(() => performDiscordStreamControl(roomId, operation, request)), [withCurrentAccount]);
   const localRoomAvailable = Boolean(localRoom?.conversation.admitted && localRoom.room.status !== "closed");
   const hostedRoomAvailable = isHostedRoomTextOwnerAdmitted(hostedRoom ?? null);
   const developerRoomAgent = readCachedAccountCapabilityPolicy()?.account_type === "developer";
   const localRoomAgentAvailable = Boolean(developerRoomAgent && localRoomAvailable && localRoom?.room.capacity_profile === "three_human_text");
   const hostedRoomAgentAvailable = Boolean(developerRoomAgent && hostedRoomAvailable &&
     hostedRoom?.room.self_participant_id);
+  const managedTextAvailable = typeof window !== "undefined" &&
+    Boolean(window.casimirDesktop?.managedAiTextTurn);
   const hostedOwner = Boolean(hostedRoom?.room.participants?.some(person =>
     person.participant_id === hostedRoom.room.self_participant_id && person.role === "owner"));
   const presentLocalMembers = localRoomAvailable && localRoom
@@ -136,6 +199,8 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
     selectedChannel === "local_room_agent" || selectedChannel === "hosted_room_agent"
     ? selectedChannel
     : selectedChannel === "bound_task" ? "bound_task"
+    : selectedChannel === "managed_text" && managedTextAvailable
+      ? "managed_text"
     : selectedChannel === "adapter_ai" && privateApiAvailable ? "adapter_ai"
     : selectedChannel === "private_api" && privateApiAvailable ? "private_api" : "private_ask";
   const [messageCloudOpen, setMessageCloudOpen] = useState(false);
@@ -154,6 +219,11 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
   const [streamGrantTitle, setStreamGrantTitle] = useState("");
   const [streamGrantChatId, setStreamGrantChatId] = useState("");
   const [streamBusy, setStreamBusy] = useState(false);
+  const [personalDestinations, setPersonalDestinations] = useState<PersonalStreamDestination[]>([]);
+  const [selectedPersonalSessionId, setSelectedPersonalSessionId] = useState<string | null>(null);
+  const discordGuidePending = useRef(false);
+  const discordDetailsRef = useRef<HTMLDetailsElement>(null);
+  const pairingDetailsRef = useRef<HTMLDetailsElement>(null);
   const relayCursor = useRef({ roomId: "", seen: new Set<string>(), baselinePending: true,
     generation: 0, posted: 0, revision: 0, deviceRef: "" });
   const sharingEnabledRef = useRef(false);
@@ -170,15 +240,21 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
       localStorage.setItem(displayPreferenceKey("cloud_agent_dm"), apiOverlayMode); } catch { /* Optional preference storage. */ }
   }, [displayMode, apiOverlayMode]);
   const [cloudChannel, setCloudChannel] = useState<"bound_task" | "private_api">("bound_task");
-  const adapterChatIds = useMemo(() => [...new Set([
-    ...savedCodexChats.map(chat => chat.id),
-    ...streamReadGrants.map(grant => grant.helixConversationId),
-    privateApiBindingConversationId,
-  ].filter((id): id is string => Boolean(id)))],
-  [savedCodexChats, streamReadGrants, privateApiBindingConversationId]);
-  const adapterActivity = useAdapterAiActivity(adapterChatIds,
-    selected === "adapter_ai" || messageCloudOpen && cloudChannel === "private_api" && apiOverlayMode === "all");
-  const adapterPages = useMemo(() => Object.values(adapterActivity.pages), [adapterActivity.pages]);
+  const adapterDisplayActive = selected === "adapter_ai" || messageCloudOpen &&
+    cloudChannel === "private_api" && apiOverlayMode === "all";
+  const adapterChatIds = useMemo(() => {
+    const approvedSources = new Set(streamState?.selection?.source_refs ??
+      streamResumeSelection?.sourceRefs ?? []);
+    const ids = adapterDisplayActive ? [
+      ...savedCodexChats.map(chat => chat.id),
+      ...streamReadGrants.map(grant => grant.helixConversationId),
+      privateApiBindingConversationId,
+    ] : streamReadGrants.filter(grant => approvedSources.has(grant.sourceRef))
+      .map(grant => grant.helixConversationId);
+    return [...new Set(ids.filter((id): id is string => Boolean(id)))];
+  }, [adapterDisplayActive, savedCodexChats, streamReadGrants,
+    privateApiBindingConversationId, streamState?.selection?.source_refs,
+    streamResumeSelection?.sourceRefs]);
   const selectedChatsRef = useRef({ boundTaskConversationId, privateApiBindingConversationId });
   selectedChatsRef.current = { boundTaskConversationId, privateApiBindingConversationId };
   const previousChatsRef = useRef({ boundTaskConversationId, privateApiBindingConversationId });
@@ -191,19 +267,19 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
     // A native cloud belongs to one Helix chat. A session switch must not
     // silently relabel its still-visible old task or activity as the new one.
     if (messageCloudOpen) {
-      void window.casimirDesktop?.stopMessageCloud?.();
+      void scopedStopMessageCloud();
       setMessageCloudOpen(false);
     } else {
       // A missed native event can leave the old cloud open even while this
       // renderer thinks it is closed. Only retire the prior selected chat.
-      void window.casimirDesktop?.getMessageCloudStatus?.().then(state => {
+      void scopedMessageCloudStatus().then(state => {
         if (!state?.visible || !state.helixConversationId) return;
         const oldChat = state.source === "codex_mirror" || state.source === "message_codex"
           ? previous.boundTaskConversationId : previous.privateApiBindingConversationId;
         const newChat = state.source === "codex_mirror" || state.source === "message_codex"
           ? selectedChatsRef.current.boundTaskConversationId : selectedChatsRef.current.privateApiBindingConversationId;
         if (state.helixConversationId === oldChat && state.helixConversationId !== newChat)
-          void window.casimirDesktop?.stopMessageCloud?.();
+          void scopedStopMessageCloud();
       }).catch(() => {});
     }
   }, [boundTaskConversationId, privateApiBindingConversationId, messageCloudOpen]);
@@ -213,23 +289,85 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
     : selected === "bound_task" ? boundTaskConversationId : null;
   const pairing = useConversationPairing(selected === "bound_task" || selected === "private_api" ||
     selected === "adapter_ai" ? pairingChatId : null);
-  const relayRoomId = hostedRoomAvailable && hostedOwner && hostedRoom
+  const hostedRelayRoomId = hostedRoomAvailable && hostedOwner && hostedRoom
     ? hostedRoom.room.room_id : null;
+  const relayRoomId = hostedRelayRoomId ?? (selectedPersonalSessionId
+    ? discordPersonalStreamId(selectedPersonalSessionId) : null);
   useEffect(() => {
-    if (!messageCloudOpen || cloudChannel !== "private_api" || !relayRoomId) {
+    const revealDiscord = (event: Event) => {
+      const request = coerceWorkstationGuidanceRequest(
+        (event as CustomEvent<unknown>).detail);
+      if (request?.kind !== "user_attention" ||
+          request.targetId !== "discord-stream-controls") return;
+      discordGuidePending.current = true;
+      if (privateApiAvailable) onSelectChannel("private_api");
+      else {
+        const details = discordDetailsRef.current;
+        if (details) { details.open = true; discordGuidePending.current = false; }
+      }
+    };
+    window.addEventListener(HELIX_WORKSTATION_GUIDANCE_EVENT, revealDiscord);
+    return () => window.removeEventListener(HELIX_WORKSTATION_GUIDANCE_EVENT, revealDiscord);
+  }, [onSelectChannel, privateApiAvailable]);
+  useEffect(() => {
+    if (!discordGuidePending.current) return;
+    const details = discordDetailsRef.current ??
+      (selected === "private_api" ? pairingDetailsRef.current : null);
+    if (details) { details.open = true; discordGuidePending.current = false; }
+  }, [selected, privateApiAvailable, relayRoomId, personalDestinations.length]);
+  const streamActivityNeeded = Boolean(relayRoomId && (discordFloatRelayEnabled ||
+    streamResumeSelection && Date.parse(streamResumeSelection.expiresAt) > Date.now()));
+  const adapterActivity = useAdapterAiActivity(adapterChatIds,
+    adapterDisplayActive || streamActivityNeeded);
+  const adapterPages = useMemo(() => Object.values(adapterActivity.pages), [adapterActivity.pages]);
+  const currentRelayRoomId = useRef(relayRoomId);
+  currentRelayRoomId.current = relayRoomId;
+  useEffect(() => {
+    setStreamState(null);
+    setStreamResumeSelection(null);
+    setDiscordFloatRelayStatus(null);
+  }, [relayRoomId]);
+  useEffect(() => {
+    if (hostedRelayRoomId || !window.casimirDesktop?.personalDiscordStream) return;
+    let disposed = false;
+    const discover = async () => {
+      const response = await scopedPersonalStream({
+        session_id: null, operation: { kind: "list" },
+      }).catch(() => null) as { status?: string; receipt?: { ok?: boolean;
+        result?: { destinations?: PersonalStreamDestination[] } } } | null | undefined;
+      if (disposed) return;
+      const destinations = response?.status === "ready" && response.receipt?.ok === true &&
+        Array.isArray(response.receipt.result?.destinations)
+        ? response.receipt.result.destinations.filter(item =>
+          item && typeof item === "object" &&
+          discordPersonalSessionIdSchema.safeParse(item.session_id).success &&
+          /^\d{15,22}$/u.test(item.guild_id) && /^\d{15,22}$/u.test(item.channel_id))
+        : [];
+      setPersonalDestinations(destinations);
+      setSelectedPersonalSessionId(current => destinations.some(item => item.session_id === current)
+        ? current : destinations.length === 1 ? destinations[0].session_id : null);
+    };
+    void discover();
+    const timer = window.setInterval(() => void discover(), 30_000);
+    return () => { disposed = true; window.clearInterval(timer); };
+  }, [hostedRelayRoomId]);
+  useEffect(() => {
+    if (!relayRoomId) {
       lastActivityFrame.current = null;
       setStreamFrameReady(false);
     }
-  }, [messageCloudOpen, cloudChannel, relayRoomId]);
+  }, [relayRoomId]);
   const refreshDiscordStream = useCallback(async (roomId: string) => {
-    const local = await window.casimirDesktop?.codexStreamGrants?.({ operation: "list" }) as
+    const local = await scopedStreamGrants({ operation: "list" }) as
       { status?: string; grants?: LocalCodexStreamGrant[]; deviceRef?: string } | undefined;
     if (local?.status !== "ready" || !local.deviceRef || !Array.isArray(local.grants))
       throw new Error("local_codex_reader_unavailable");
-    const resume = await window.casimirDesktop?.codexStreamGrants?.({ operation: "resume-read",
+    const resume = await scopedStreamGrants({ operation: "resume-read",
       roomId }) as { status?: string; selection?: StreamResumeSelection | null } | undefined;
     if (resume?.status !== "ready") throw new Error("local_codex_resume_unavailable");
     const state = await discordStreamControl(roomId, "discord_stream_inspect") as DiscordStreamState;
+    if (roomId !== currentRelayRoomId.current)
+      throw new Error("discord_stream_destination_changed");
     setStreamReadGrants(local.grants);
     setStreamDeviceRef(local.deviceRef);
     setStreamResumeSelection(resume.selection ?? null);
@@ -248,7 +386,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
         if (disposed) return;
         // A prior domain revision cannot publish after restart. Retire it;
         // the owner's protected resume selection may start a new revision
-        // after the Float and room reopen, with a new activity baseline.
+        // after the room returns, with a new activity baseline.
         if (state.active && state.device_ref === local.deviceRef &&
             !sharingEnabledRef.current && !selectionInFlight.current) {
           await discordStreamControl(relayRoomId, "discord_stream_stop", {
@@ -265,8 +403,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
     return () => { disposed = true; window.clearInterval(timer); };
   }, [relayRoomId, refreshDiscordStream]);
   useEffect(() => {
-    if (discordFloatRelayEnabled && (!relayRoomId || !messageCloudOpen ||
-        cloudChannel !== "private_api" || apiOverlayMode !== "all")) {
+    if (discordFloatRelayEnabled && !relayRoomId) {
       relayCursor.current.generation += 1;
       sharingEnabledRef.current = false;
       setDiscordFloatRelayEnabled(false);
@@ -283,13 +420,12 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
             } catch { await new Promise(resolve => window.setTimeout(resolve, 500)); }
           }
         })();
-      setDiscordFloatRelayStatus("Sharing stopped because the Float or owner room closed.");
+      setDiscordFloatRelayStatus("Sharing stopped because the owner room or destination closed.");
     }
-  }, [discordFloatRelayEnabled, relayRoomId, messageCloudOpen, cloudChannel, apiOverlayMode]);
+  }, [discordFloatRelayEnabled, relayRoomId]);
   useEffect(() => {
     if (!discordFloatRelayEnabled || !relayRoomId || !streamState?.active ||
-        streamState.device_ref !== streamDeviceRef || !messageCloudOpen ||
-        cloudChannel !== "private_api" || apiOverlayMode !== "all") return;
+        streamState.device_ref !== streamDeviceRef) return;
     let stopped = false;
     const renew = async () => {
       try {
@@ -304,7 +440,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
             streamState.approval_expires_at &&
             Date.parse(streamState.approval_expires_at) <= Date.now()
             ? "Stream approval ended. Review the source set and duration before sharing again."
-            : "Stream connection interrupted. Approved sharing will resume if the Float and room are open.");
+            : "Stream connection interrupted. Approved sharing will resume while the owner room is open.");
         }
       }
     };
@@ -312,8 +448,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
     const timer = window.setInterval(() => void renew(), 15_000);
     return () => { stopped = true; window.clearInterval(timer); };
   }, [discordFloatRelayEnabled, relayRoomId, streamState?.active,
-    streamState?.revision, streamState?.device_ref, streamDeviceRef,
-    messageCloudOpen, cloudChannel, apiOverlayMode]);
+    streamState?.revision, streamState?.device_ref, streamDeviceRef]);
   const onActivityFrame = useCallback((frame: HelixMessageCloudFrame) => {
     if (frame.source === "session_activity") {
       lastActivityFrame.current = frame;
@@ -374,7 +509,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
     const revision = streamState?.revision ?? relayCursor.current.revision;
     const deviceRef = streamDeviceRef || relayCursor.current.deviceRef;
     if (roomId) {
-      try { await window.casimirDesktop?.codexStreamGrants?.({ operation: "resume-clear", roomId }); }
+      try { await scopedStreamGrants({ operation: "resume-clear", roomId }); }
       catch { /* Domain stop still runs; native revocation needs review. */ }
       setStreamResumeSelection(null);
     }
@@ -414,7 +549,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
           throw new Error("Select an actively paired Helix chat or leave association blank.");
         bindingId = binding.reasoning_binding_id;
       }
-      const local = await window.casimirDesktop.codexStreamGrants({ operation: "grant",
+      const local = await scopedStreamGrants({ operation: "grant",
         link: streamGrantLink.trim(), title: streamGrantTitle.trim(),
         ...(streamGrantChatId ? { helixConversationId: streamGrantChatId, bindingId } : {}) }) as
         { status?: string; code?: string; deviceRef?: string; grant?: LocalCodexStreamGrant };
@@ -436,7 +571,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
     try {
       if (discordFloatRelayEnabled && streamState?.selection?.source_refs.includes(grant.sourceRef))
         await stopDiscordStream();
-      const local = await window.casimirDesktop?.codexStreamGrants?.({ operation: "revoke",
+      const local = await scopedStreamGrants({ operation: "revoke",
         sourceRef: grant.sourceRef }) as { status?: string; deviceRef?: string } | undefined;
       if (local?.status !== "ready" || !local.deviceRef)
         throw new Error("local_revoke_unavailable");
@@ -455,8 +590,8 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
   };
   const applyDiscordStreamSelection = async (proposalId?: string,
     resumeSelection?: StreamResumeSelection) => {
-    if (!relayRoomId || !streamDeviceRef || !messageCloudOpen ||
-        cloudChannel !== "private_api" || apiOverlayMode !== "all") return;
+    if (!relayRoomId || !streamDeviceRef || !resumeSelection && (!messageCloudOpen ||
+        cloudChannel !== "private_api" || apiOverlayMode !== "all")) return;
     selectionInFlight.current = true;
     setStreamBusy(true);
     try {
@@ -501,7 +636,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
         bindingId: string; frame: ReturnType<typeof helixCodexConsoleFrameSchema.parse>;
         status: "live" }>;
       for (const grant of selectedGrants) {
-        const read = await window.casimirDesktop?.codexStreamGrants?.({ operation: "read",
+        const read = await scopedStreamGrants({ operation: "read",
           sourceRef: grant.sourceRef }) as { status?: string; frame?: unknown } | undefined;
         const parsed = helixCodexConsoleFrameSchema.safeParse(read?.frame);
         if (read?.status !== "ready" || !parsed.success ||
@@ -547,7 +682,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
       const approval = { approvalId: changed.approval_id,
         expiresAt: changed.approval_expires_at,
         durationHours: changed.approval_duration_hours as 1 | 8 | 24 };
-      const saved = await window.casimirDesktop?.codexStreamGrants?.({ operation: "resume-save",
+      const saved = await scopedStreamGrants({ operation: "resume-save",
         roomId: relayRoomId, selection: { mode, sourceRefs: sources, ...approval } }) as
         { status?: string } | undefined;
       if (saved?.status !== "ready") {
@@ -566,14 +701,13 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
       setStreamDraftDurationHours(approval.durationHours);
       setStreamResumeSelection({ mode, sourceRefs: sources, ...approval });
       setDiscordFloatRelayStatus(`Sharing new activity from ${sources.length} approved ${
-        sources.length === 1 ? "chat" : "chats"} until ${new Date(approval.expiresAt).toLocaleString()}. Existing activity was skipped. This source set resumes when the Float and room reopen.`);
+        sources.length === 1 ? "chat" : "chats"} until ${new Date(approval.expiresAt).toLocaleString()}. Existing activity was skipped. Closing Session Activity does not stop delivery while the owner room remains open.`);
     } catch (error) { setDiscordFloatRelayStatus(`Source change unavailable: ${
       error instanceof Error ? error.message : "unknown error"}.`); }
     finally { selectionInFlight.current = false; setStreamBusy(false); }
   };
   useEffect(() => {
-    if (!relayRoomId || !messageCloudOpen || cloudChannel !== "private_api" ||
-        apiOverlayMode !== "all" || !streamFrameReady || !streamResumeSelection ||
+    if (!relayRoomId || !streamFrameReady || !streamResumeSelection ||
         !streamDeviceRef || !streamState || streamState.active ||
         discordFloatRelayEnabled || streamBusy || resumeInFlight.current ||
         Date.now() < resumeRetryAt.current) return;
@@ -586,7 +720,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
     resumeRetryAt.current = Date.now() + 10_000;
     void applyDiscordStreamSelection(undefined, streamResumeSelection)
       .finally(() => { resumeInFlight.current = false; });
-  }, [relayRoomId, messageCloudOpen, cloudChannel, apiOverlayMode, streamFrameReady,
+  }, [relayRoomId, streamFrameReady,
     streamResumeSelection, streamDeviceRef, streamState, discordFloatRelayEnabled,
     streamBusy, streamReadGrants]);
   const mirrorAvailable = typeof window !== "undefined" && Boolean(window.casimirDesktop?.showCodexMirror);
@@ -617,7 +751,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
     };
     const reconcileNativeVisibility = () => {
       const revisionAtRequest = nativeRevision;
-      void window.casimirDesktop?.getMessageCloudStatus?.().then(state => {
+      void scopedMessageCloudStatus().then(state => {
         if (mounted && nativeRevision === revisionAtRequest) applyNativeState(state);
       }).catch(() => {});
     };
@@ -652,7 +786,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
       // The Cloud Agent DM activity view remains useful without Codex. Its
       // owner-granted Codex reader clears independently on binding loss.
       if (cloudChannel === "private_api") return;
-      void window.casimirDesktop?.stopMessageCloud?.();
+      void scopedStopMessageCloud();
       setMessageCloudOpen(false);
     };
     window.addEventListener(HELIX_REASONING_BINDING_UPDATED_EVENT, onBindingUpdate);
@@ -662,11 +796,11 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
     const nextChannel = targetChannel ?? (selected === "private_api" || selected === "adapter_ai"
       ? "private_api" : "bound_task");
     if (messageCloudOpen && cloudChannel === nextChannel) {
-      await window.casimirDesktop?.stopMessageCloud?.();
+      await scopedStopMessageCloud();
       setMessageCloudOpen(false);
       return;
     }
-    if (messageCloudOpen) await window.casimirDesktop?.stopMessageCloud?.();
+    if (messageCloudOpen) await scopedStopMessageCloud();
     setCloudChannel(nextChannel);
     setMessageCloudError(null);
     if (nextChannel === "private_api") {
@@ -699,11 +833,11 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
         setMessageCloudError("No current Codex task connection. Check Agent Access; an accepted pairing can be recovered by the same task through CasimirBot MCP.");
         return;
       }
-      const result = await window.casimirDesktop?.showCodexMirror?.({
+      const result = await scopedShowCodexMirror({
         bindingId: binding.reasoning_binding_id, helixConversationId: boundTaskConversationId,
       }) as { status?: string; code?: string } | undefined;
       if (selectedChatsRef.current.boundTaskConversationId !== boundTaskConversationId) {
-        await window.casimirDesktop?.stopMessageCloud?.();
+        await scopedStopMessageCloud();
         return;
       }
       if (result?.status !== "showing") throw new Error(result?.code ?? "mirror_unavailable");
@@ -715,37 +849,51 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
   };
   const renderDiscordStreamControls = () => (
                 <div className="rounded border border-amber-300/30 p-2 text-amber-50"
-                  aria-label="Discord stream">
+                  aria-label="Discord stream" data-helix-guidance-target="discord-stream-controls">
                   <p className="font-semibold">Discord stream</p>
-                  <p className="mt-1">Share new visible activity from exact read-approved chats to the Discord channel bound to this room. Local Codex Desktop reading is experimental; an unsupported version stays unavailable. After you start sharing, this approved source set resumes with new activity when the Float and room reopen. Stop sharing clears that preference.</p>
+                  <p className="mt-1">Share new visible activity from exact read-approved chats to your linked Discord channel. Local Codex Desktop reading is experimental; an unsupported version stays unavailable. Closing Session Activity hides the display but keeps an approved stream running. Stop sharing clears that preference.</p>
+                  {!hostedRelayRoomId && personalDestinations.length > 1 ?
+                    <label className="mt-2 block">Discord destination
+                      <select data-helix-control-id="helix.ask.helix-console-conversation-workspace.discord-stream-destination" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Discord stream destination"
+                        value={selectedPersonalSessionId ?? ""}
+                        disabled={streamBusy || discordFloatRelayEnabled}
+                        onChange={event => setSelectedPersonalSessionId(event.target.value || null)}
+                        className="ml-2 rounded border border-white/20 bg-slate-950 p-1">
+                        <option value="">Select channel</option>
+                        {personalDestinations.map(item =>
+                          <option key={item.session_id} value={item.session_id}>
+                            {item.guild_id} / {item.channel_id}
+                          </option>)}
+                      </select>
+                    </label> : null}
                   <p className="mt-1">Destination: {streamState?.destination.channel_id
-                    ? `channel ${streamState.destination.channel_id}` : "Bind this room to a Discord channel first"}.
+                    ? `channel ${streamState.destination.channel_id}` : "Choose a linked Discord channel first"}.
                     {streamState?.last_discord_message_id ? ` Last delivery: ${streamState.last_discord_message_id}.` : ""}</p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    <input aria-label="Exact Codex chat link" placeholder="codex://threads/<chat-id>"
+                    <input data-helix-control-id="helix.ask.helix-console-conversation-workspace.exact-codex-chat-link" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Exact Codex chat link" placeholder="codex://threads/<chat-id>"
                       value={streamGrantLink} onChange={event => setStreamGrantLink(event.target.value)}
                       className="min-w-64 flex-1 rounded border border-white/20 bg-slate-950 p-1" />
-                    <input aria-label="Chat label" placeholder="Chat label" value={streamGrantTitle}
+                    <input data-helix-control-id="helix.ask.helix-console-conversation-workspace.chat-label" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Chat label" placeholder="Chat label" value={streamGrantTitle}
                       onChange={event => setStreamGrantTitle(event.target.value)}
                       className="min-w-32 rounded border border-white/20 bg-slate-950 p-1" />
-                    <select aria-label="Associated Helix chat" value={streamGrantChatId}
+                    <select data-helix-control-id="helix.ask.helix-console-conversation-workspace.associated-helix-chat" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Associated Helix chat" value={streamGrantChatId}
                       onChange={event => setStreamGrantChatId(event.target.value)}
                       className="rounded border border-white/20 bg-slate-950 p-1">
                       <option value="">Codex activity only</option>
                       {savedCodexChats.map(chat => <option key={chat.id} value={chat.id}>{chat.title}</option>)}
                     </select>
-                    <button type="button" disabled={streamBusy || !relayRoomId || !streamGrantLink || !streamGrantTitle}
+                    <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.grant-read-access" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" disabled={streamBusy || !relayRoomId || !streamGrantLink || !streamGrantTitle}
                       onClick={() => void addDiscordStreamGrant()}
                       className="rounded border border-amber-300/40 px-2 py-1 disabled:opacity-50">Grant read access</button>
                   </div>
                   <p className="mt-1">Each read grant is local to this computer. It survives an EXE restart and ends on sign-out, device reset, or revocation. A read grant does not add its chat to an active public stream.</p>
-                  <label className="mt-2 block">Sources <select aria-label="Discord stream sources"
+                  <label className="mt-2 block">Sources <select data-helix-control-id="helix.ask.helix-console-conversation-workspace.discord-stream-sources" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Discord stream sources"
                     value={streamDraftMode} onChange={event => setStreamDraftMode(event.target.value as "all" | "selected")}
                     className="ml-2 rounded border border-white/20 bg-slate-950 p-1">
                     <option value="all">All approved chats</option>
                     <option value="selected">Selected chats</option>
                   </select></label>
-                  <label className="mt-2 block">Sharing duration <select aria-label="Discord stream duration"
+                  <label className="mt-2 block">Sharing duration <select data-helix-control-id="helix.ask.helix-console-conversation-workspace.discord-stream-duration" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Discord stream duration"
                     value={streamDraftDurationHours}
                     onChange={event => setStreamDraftDurationHours(Number(event.target.value) as 1 | 8 | 24)}
                     className="ml-2 rounded border border-white/20 bg-slate-950 p-1">
@@ -753,25 +901,26 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
                     <option value={8}>8 hours</option>
                     <option value={24}>24 hours</option>
                   </select></label>
-                  <p className="mt-1">This is the maximum time for this approved source set to resume.
-                    Closing the Float or room stops delivery; reopening it within this time resumes at new activity.
+                  <p className="mt-1">This is the maximum time for this approved source set to run.
+                    Closing Session Activity keeps delivery running while the owner room stays open.
+                    Closing the room stops delivery; reopening it within this time resumes at new activity.
                     After expiry, review and start sharing again.</p>
                   <div className="mt-1 max-h-36 overflow-auto">
                     {streamReadGrants.map(grant => <div key={grant.sourceRef} className="flex items-center gap-2 py-0.5">
-                      {streamDraftMode === "selected" ? <input type="checkbox"
+                      {streamDraftMode === "selected" ? <input data-helix-control-id="helix.ask.helix-console-conversation-workspace.input" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" type="checkbox"
                         aria-label={`Include ${grant.title}`} checked={streamDraftSources.includes(grant.sourceRef)}
                         onChange={event => setStreamDraftSources(previous => event.target.checked
                           ? [...new Set([...previous, grant.sourceRef])]
                           : previous.filter(ref => ref !== grant.sourceRef))} /> : null}
                       <span className="min-w-0 flex-1 truncate">{grant.title} · {grant.sourceRef}</span>
-                      <button type="button" disabled={streamBusy}
+                      <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.revoke-read" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" disabled={streamBusy}
                         onClick={() => void revokeDiscordStreamGrant(grant)}
                         className="text-amber-200 underline disabled:opacity-50">Revoke read</button>
                     </div>)}
                     {!streamReadGrants.length ? <p>No local chat read grants yet.</p> : null}
                   </div>
                   <div className="mt-2 flex gap-2">
-                    <button type="button" disabled={streamBusy || !relayRoomId || !messageCloudOpen ||
+                    <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.void-apply-discord-stream-selection" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" disabled={streamBusy || !relayRoomId || !messageCloudOpen ||
                       cloudChannel !== "private_api" || apiOverlayMode !== "all" || !streamDeviceRef ||
                       !streamState?.approval_duration_options?.includes(streamDraftDurationHours) ||
                       !streamReadGrants.length || streamDraftMode === "selected" && !streamDraftSources.length}
@@ -779,7 +928,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
                       className="rounded border border-amber-300/40 px-2 py-1 disabled:opacity-50">
                       {discordFloatRelayEnabled ? "Approve source change" : "Start public sharing"}
                     </button>
-                    <button type="button" disabled={!discordFloatRelayEnabled || streamBusy}
+                    <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.stop-sharing" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" disabled={!discordFloatRelayEnabled || streamBusy}
                       onClick={() => void stopDiscordStream()}
                       className="rounded border border-white/20 px-2 py-1 disabled:opacity-50">Stop sharing</button>
                   </div>
@@ -793,7 +942,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
                   {streamState?.active && streamState.device_ref !== streamDeviceRef ?
                     <div className="mt-2 rounded border border-amber-300/30 p-2">
                       <p>Another device has this owner's active stream. It must stop before this computer starts one.</p>
-                      <button type="button" disabled={streamBusy}
+                      <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.stop-prior-device-s-stream" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" disabled={streamBusy}
                         onClick={() => void stopOtherDiscordStream()}
                         className="mt-1 rounded border border-amber-300/40 px-2 py-1 disabled:opacity-50">
                         Stop prior device's stream
@@ -802,7 +951,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
                   {streamState?.pending ? <div className="mt-2 rounded border border-cyan-300/30 p-2">
                     <p>Agent proposed {streamState.pending.proposal.mode === "all" ? "All approved chats" :
                       streamState.pending.proposal.chat_links?.join(", ")}. Expires {streamState.pending.expires_at}.</p>
-                    <button type="button" disabled={streamBusy || !messageCloudOpen}
+                    <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.approve-this-switch" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" disabled={streamBusy || !messageCloudOpen}
                       onClick={() => void applyDiscordStreamSelection(streamState.pending!.request_id)}
                       className="mt-1 rounded border border-cyan-300/50 px-2 py-1 disabled:opacity-50">
                       Approve this switch
@@ -816,67 +965,75 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
     {privateApiAvailable && selected !== "private_api" ? <div hidden aria-hidden="true">
       <ManagedConversationConsoleHistory helixConversationId={privateApiBindingConversationId}
         messageCloudOpen={messageCloudOpen && cloudChannel === "private_api"} overlayMode={apiOverlayMode}
+        streamActive={streamActivityNeeded}
         pairingSnapshot={pairing} savedCodexChats={savedCodexChats} adapterPages={adapterPages}
         streamReadGrants={streamReadGrants}
         onActivityFrame={onActivityFrame} />
     </div> : null}
     {!privateApiAvailable && relayRoomId ? <OwnerDiscordStreamActivity roomId={relayRoomId}
       open={messageCloudOpen && cloudChannel === "private_api"}
+      streamActive={streamActivityNeeded}
       grants={streamReadGrants} adapterPages={adapterPages} onActivityFrame={onActivityFrame} /> : null}
     <div className="helix-console-conversations__layout">
       <nav aria-label="Conversation channels" className="helix-console-conversations__channels rounded-xl border border-white/10 bg-slate-950/70 p-2 text-xs">
         <div className="helix-console-conversations__wide-only px-2 pt-1 text-[10px] font-semibold uppercase tracking-widest text-slate-500">Text chats</div>
-        <button type="button" aria-current={selected === "bound_task" ? "page" : undefined}
+        <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.on-select-channel-bound-task" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" aria-current={selected === "bound_task" ? "page" : undefined}
           onClick={() => onSelectChannel("bound_task")}
           className={`shrink-0 rounded-lg px-3 py-2 text-left ${selected === "bound_task" ? "border border-cyan-300/40 bg-cyan-400/10 text-cyan-50" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}>
           <span className="block font-semibold"># Message Codex</span>
         </button>
         {savedCodexChats.length > 1 && onSelectCodexChat ? <label className="shrink-0 px-2 py-1 text-[11px] text-slate-300">
           Saved Codex chats
-          <select aria-label="Saved Codex chats" className="ml-2 max-w-64 rounded border border-white/20 bg-slate-950 p-1 text-slate-100"
+          <select data-helix-control-id="helix.ask.helix-console-conversation-workspace.saved-codex-chats" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Saved Codex chats" className="ml-2 max-w-64 rounded border border-white/20 bg-slate-950 p-1 text-slate-100"
             value={boundTaskConversationId ?? ""} onChange={event => onSelectCodexChat(event.target.value)}>
             {savedCodexChats.map(chat => <option key={chat.id} value={chat.id}>
               {chat.title || "Untitled Helix chat"} · {chat.id.slice(0, 8)}
             </option>)}
           </select>
         </label> : null}
-        {experimentalAskHelix ? <button type="button" aria-current={selected === "private_ask" ? "page" : undefined}
+        {experimentalAskHelix ? <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.on-select-channel-private-ask" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" aria-current={selected === "private_ask" ? "page" : undefined}
           onClick={() => onSelectChannel("private_ask")}
           className={`shrink-0 rounded-lg px-3 py-2 text-left ${selected === "private_ask" ? "border border-cyan-300/40 bg-cyan-400/10 text-cyan-50" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}>
           <span className="block font-semibold"># Ask Helix</span>
         </button> : null}
-        {privateApiAvailable ? <button type="button" aria-current={selected === "private_api" ? "page" : undefined}
+        {privateApiAvailable ? <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.on-select-channel-private-api" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" aria-current={selected === "private_api" ? "page" : undefined}
           onClick={() => onSelectChannel("private_api")}
           className={`shrink-0 rounded-lg px-3 py-2 text-left ${selected === "private_api" ? "border border-cyan-300/40 bg-cyan-400/10 text-cyan-50" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}>
           <span className="block font-semibold"># Cloud Agent DM</span>
         </button> : null}
-        {privateApiAvailable ? <button type="button" aria-current={selected === "adapter_ai" ? "page" : undefined}
+        {managedTextAvailable ? <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.on-select-channel-managed-text" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button"
+          aria-current={selected === "managed_text" ? "page" : undefined}
+          onClick={() => onSelectChannel("managed_text")}
+          className={`shrink-0 rounded-lg px-3 py-2 text-left ${selected === "managed_text" ? "border border-emerald-300/40 bg-emerald-400/10 text-emerald-50" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}>
+          <span className="block font-semibold"># Managed AI text</span>
+        </button> : null}
+        {privateApiAvailable ? <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.on-select-channel-adapter-ai" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" aria-current={selected === "adapter_ai" ? "page" : undefined}
           onClick={() => onSelectChannel("adapter_ai")}
           className={`shrink-0 rounded-lg px-3 py-2 text-left ${selected === "adapter_ai" ? "border border-cyan-300/40 bg-cyan-400/10 text-cyan-50" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}>
           <span className="block font-semibold"># Adapter AI</span>
         </button> : null}
         {(localRoomAvailable && localRoom || selected === "local_room") ? <><div className="helix-console-conversations__wide-only px-2 pt-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500">Rooms</div>
-          <button type="button" aria-current={selected === "local_room" ? "page" : undefined}
+          <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.on-select-channel-local-room" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" aria-current={selected === "local_room" ? "page" : undefined}
             disabled={!localRoomAvailable}
             onClick={() => onSelectChannel("local_room")}
             className={`shrink-0 rounded-lg px-3 py-2 text-left ${selected === "local_room" ? "border border-cyan-300/40 bg-cyan-400/10 text-cyan-50" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}>
             <span className="block font-semibold"># Party Chat · {localRoomAvailable && localRoom ? localRoom.room.title : "Room unavailable"}</span>
           </button></> : null}
         {localRoomAgentAvailable && localRoom ?
-          <button type="button" aria-current={selected === "local_room_agent" ? "page" : undefined}
+          <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.on-select-channel-local-room-agent" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" aria-current={selected === "local_room_agent" ? "page" : undefined}
             onClick={() => onSelectChannel("local_room_agent")}
             className={`shrink-0 rounded-lg px-3 py-2 text-left ${selected === "local_room_agent" ? "border border-fuchsia-300/40 bg-fuchsia-400/10 text-fuchsia-50" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}>
             <span className="block font-semibold"># Room Agent · {localRoom.room.title}</span>
           </button> : null}
         {(hostedRoomAvailable && hostedRoom || selected === "hosted_room") ? <><div className="helix-console-conversations__wide-only px-2 pt-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500">Hosted rooms</div>
-          <button type="button" aria-current={selected === "hosted_room" ? "page" : undefined}
+          <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.on-select-channel-hosted-room" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" aria-current={selected === "hosted_room" ? "page" : undefined}
             disabled={!hostedRoomAvailable}
             onClick={() => onSelectChannel("hosted_room")}
             className={`shrink-0 rounded-lg px-3 py-2 text-left ${selected === "hosted_room" ? "border border-cyan-300/40 bg-cyan-400/10 text-cyan-50" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}>
             <span className="block font-semibold"># Party Chat · {hostedRoomAvailable && hostedRoom ? hostedRoom.room.title : "Hosted room unavailable"}</span>
           </button></> : null}
         {hostedRoomAgentAvailable && hostedRoom ?
-          <button type="button" aria-current={selected === "hosted_room_agent" ? "page" : undefined}
+          <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.on-select-channel-hosted-room-agent" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" aria-current={selected === "hosted_room_agent" ? "page" : undefined}
             onClick={() => onSelectChannel("hosted_room_agent")}
             className={`shrink-0 rounded-lg px-3 py-2 text-left ${selected === "hosted_room_agent" ? "border border-fuchsia-300/40 bg-fuchsia-400/10 text-fuchsia-50" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}>
             <span className="block font-semibold"># Room Agent · {hostedRoom.room.title}</span>
@@ -886,6 +1043,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
         <header className="helix-console-conversations__header border-b border-white/10 pb-2">
           <div className="flex items-start justify-between gap-2">
           {selected !== "bound_task" && selected !== "private_api" ? <h2 className="text-sm font-semibold text-cyan-50">{selected === "adapter_ai" ? "Adapter AI · recorded activity"
+            : selected === "managed_text" ? "Managed AI text"
             : selected === "local_room_agent" || selected === "hosted_room_agent"
             ? `Room Agent · ${selected === "local_room_agent" ? localRoom?.room.title ?? "Room unavailable" : hostedRoom?.room.title ?? "Room unavailable"}`
             : selected === "local_room" && localRoomAvailable && localRoomView === "mission"
@@ -905,7 +1063,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
               </span> : null}
             </div>}
           <div className="flex min-w-0 flex-wrap justify-end gap-2">
-          {(privateApiAvailable || relayRoomId) && nativeMessageCloud ? <button type="button"
+          {(privateApiAvailable || relayRoomId) && nativeMessageCloud ? <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.set-api-overlay-mode-all-void-toggle-message-cloud-private-api" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button"
             aria-pressed={messageCloudOpen && cloudChannel === "private_api"}
             aria-label={messageCloudOpen && cloudChannel === "private_api" ? "Hide floating activity" : "Float activity"}
             title={privateApiAvailable ? "Show Cloud Agent DM, owner-visible Codex chats, and verified Adapter AI runs"
@@ -915,7 +1073,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
             <Cloud aria-hidden="true" className="h-3.5 w-3.5" />
             {messageCloudOpen && cloudChannel === "private_api" ? "Hide activity" : "Float activity"}
           </button> : null}
-          {selected === "bound_task" && nativeMessageCloud ? <button type="button"
+          {selected === "bound_task" && nativeMessageCloud ? <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.void-toggle-message-cloud" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button"
             aria-pressed={messageCloudOpen && cloudChannel === selected}
             aria-label={messageCloudOpen
               && cloudChannel === selected
@@ -931,18 +1089,18 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
           </button> : null}
           </div>
           </div>
-          {selected === "bound_task" || selected === "private_api" ? <details className="mt-1 text-[11px] text-slate-400">
+          {selected === "bound_task" || selected === "private_api" ? <details ref={pairingDetailsRef} className="mt-1 text-[11px] text-slate-400">
             <summary className="cursor-pointer">Pairing & display settings</summary>
             <div className="mt-2 space-y-2 break-all">
               <p>Helix chat: {pairingChatId ?? "not selected"}</p>
               <p>Pairing: {pairing.pairingId ?? "unavailable"} · Binding: {pairing.bindingId ?? "unavailable"}</p>
-              {selected === "bound_task" ? <label className="block">Display <select className="ml-2 bg-slate-950"
+              {selected === "bound_task" ? <label className="block">Display <select data-helix-control-id="helix.ask.helix-console-conversation-workspace.select" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" className="ml-2 bg-slate-950"
                 value={displayMode === "all" ? "conversation" : displayMode} onChange={event => { setDisplayMode(event.target.value as "conversation" | "reports");
-                  void window.casimirDesktop?.stopMessageCloud?.(); setMessageCloudOpen(false); }}>
+                  void scopedStopMessageCloud(); setMessageCloudOpen(false); }}>
                 <option value="conversation">Visible conversation (preferred)</option>
                 <option value="reports">Task reports</option>
               </select></label> : <>
-                <label className="block">Overlay display <select className="ml-2 bg-slate-950" value={apiOverlayMode}
+                <label className="block">Overlay display <select data-helix-control-id="helix.ask.helix-console-conversation-workspace.select.2" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" className="ml-2 bg-slate-950" value={apiOverlayMode}
                   onChange={event => setApiOverlayMode(event.target.value as "all" | "conversation" | "reports")}>
                   <option value="all">All available activity (default)</option>
                   <option value="conversation">Visible conversation (preferred)</option>
@@ -954,8 +1112,8 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
               <p>Only user-visible messages and updates; no hidden reasoning.</p>
             </div>
           </details> : null}
-          {!privateApiAvailable && hostedOwner && relayRoomId ?
-            <details className="mt-1 text-[11px] text-slate-300">
+          {!privateApiAvailable && (relayRoomId || personalDestinations.length > 0) ?
+            <details ref={discordDetailsRef} className="mt-1 text-[11px] text-slate-300">
               <summary className="cursor-pointer">Discord stream</summary>
               <div className="mt-2">{renderDiscordStreamControls()}</div>
             </details> : null}
@@ -966,12 +1124,14 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
           {selected === "bound_task" && (pairing.status === "revoked" || pairing.status === "superseded") ?
             <p role="status" className="mt-1 text-[11px] text-amber-200">This chat's prior Codex pairing is {pairing.status}. Select its current approved connection or review a new invitation in Agent Access.</p> : null}
           {selected === "bound_task" && pairing.status === "unavailable" && savedCodexChats.length > 1 ?
-            <p role="status" className="mt-1 text-[11px] text-amber-200">This saved chat has no verified task connection right now. If its pairing is still accepted, ask that exact task to recover through MCP. If its setup tool is missing, refresh that task's CasimirBot Source catalog before retrying.</p> : null}
+            <p role="status" className="mt-1 text-[11px] text-amber-200">This saved chat has no verified task connection right now. If its pairing is still accepted, ask that exact task to recover through MCP. If the task has no CasimirBot setup tool, check which MCP route it uses: Personal Codex access in Account &amp; Sessions or its matching browser Source. A failed Source refresh is a connection error; it does not require a new pairing.</p> : null}
           {(selected === "bound_task" || selected === "private_api") && messageCloudError ? <p role="status" className="mt-1 text-[11px] text-amber-200">{messageCloudError}</p> : null}
           <p className="mt-1 text-[11px] text-slate-400">{selected === "local_room_agent" || selected === "hosted_room_agent"
             ? "Shared room AI turns. Share an exact Party Chat message with the interpreter before the host runs it; task and program actions require separate review."
             : selected === "adapter_ai"
             ? "Read-only Responses-worker checkpoints by adapter run. A selected choice does not mean Minecraft moved; execution requires a separate native receipt."
+            : selected === "managed_text"
+            ? "Bounded CasimirBot-funded questions. This is separate from your own-key Cloud Agent DM and personal MCP connection."
             : selected === "private_api"
             ? "Talk with your cloud agent here. When it needs your paired Codex task, it can request a bounded MCP handoff; pickup and results appear in this conversation."
             : selected === "bound_task"
@@ -987,12 +1147,13 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
             className="mt-2 flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.03] px-2 py-1.5 text-[11px]">
             <Volume2 aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-slate-400" />
             <span className="font-medium text-slate-200">Voice channel</span>
-            {localRoom.room.capacity_profile === "two_person_voice" ? <button type="button"
+            {localRoom.room.capacity_profile === "two_person_voice" ? <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.open-voice-controls" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button"
               className="ml-auto text-cyan-200 underline decoration-cyan-300/30 hover:text-white"
               onClick={() => window.dispatchEvent(new CustomEvent(HELIX_SHARED_LIVE_ROOM_OPEN_DIALOG_EVENT,
                 { cancelable: true, detail: { roomId: localRoom.room.room_id, refresh: true } }))}>
               Open voice controls
-            </button> : <span className="ml-auto text-slate-400">Unavailable in this text room</span>}
+            </button> : <span className="ml-auto text-slate-400">{localRoom.room.capacity_profile === "three_person_voice"
+              ? "Group voice bridge pending" : "Unavailable in this text room"}</span>}
           </div> : null}
           {selected === "hosted_room" && hostedRoomAvailable && hostedRoom ? <p className="mt-1 truncate text-[11px] text-slate-400"
             aria-label="Hosted room membership">{hostedRoom.room.participants.length} {hostedRoom.room.participants.length === 1 ? "member" : "members"} · {hostedRoom.room.participants.map(person => person.display_name).join(", ")}</p> : null}
@@ -1004,18 +1165,18 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
                 members={hostedRoom.room.participants} />
             </div> : null}
           {selected === "local_room" && localRoomAvailable && onSelectLocalRoomView ? <nav aria-label="Selected room views" className="mt-2 flex gap-2 text-[11px]">
-            <button type="button" aria-current={localRoomView === "chat" ? "page" : undefined}
+            <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.chat" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" aria-current={localRoomView === "chat" ? "page" : undefined}
               onClick={() => onSelectLocalRoomView("chat")}
               className={`rounded-md px-2 py-1 ${localRoomView === "chat" ? "bg-cyan-400/15 text-cyan-50" : "text-slate-400 hover:text-white"}`}>Chat</button>
-            <button type="button" aria-current={localRoomView === "mission" ? "page" : undefined}
+            <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.mission" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" aria-current={localRoomView === "mission" ? "page" : undefined}
               onClick={() => onSelectLocalRoomView("mission")}
               className={`rounded-md px-2 py-1 ${localRoomView === "mission" ? "bg-emerald-400/15 text-emerald-50" : "text-slate-400 hover:text-white"}`}>Mission</button>
           </nav> : null}
           {selected === "hosted_room" && hostedRoomAvailable && onSelectHostedRoomView ? <nav aria-label="Selected hosted room views" className="mt-2 flex gap-2 text-[11px]">
-            <button type="button" aria-current={hostedRoomView === "chat" ? "page" : undefined}
+            <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.chat.2" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" aria-current={hostedRoomView === "chat" ? "page" : undefined}
               onClick={() => onSelectHostedRoomView("chat")}
               className={`rounded-md px-2 py-1 ${hostedRoomView === "chat" ? "bg-cyan-400/15 text-cyan-50" : "text-slate-400 hover:text-white"}`}>Chat</button>
-            <button type="button" aria-current={hostedRoomView === "mission" ? "page" : undefined}
+            <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.mission.2" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" aria-current={hostedRoomView === "mission" ? "page" : undefined}
               onClick={() => onSelectHostedRoomView("mission")}
               className={`rounded-md px-2 py-1 ${hostedRoomView === "mission" ? "bg-emerald-400/15 text-emerald-50" : "text-slate-400 hover:text-white"}`}>Mission</button>
           </nav> : null}
@@ -1023,7 +1184,10 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
         <div className={`helix-console-conversations__body ${selected === "private_ask"
           ? "helix-console-conversations__body--ask" : "helix-console-conversations__body--scroll"}`}
           {...(selected !== "private_ask" ? { tabIndex: 0, role: "region",
-            "aria-label": `${selected === "adapter_ai" ? "Adapter AI" : selected === "private_api" ? "Cloud Agent DM" : selected === "bound_task" ? "Message Codex" : selected === "local_room_agent" || selected === "hosted_room_agent" ? "Room Agent" : "Party Chat"} conversation content` } : {})}>
+            "aria-label": `${selected === "adapter_ai" ? "Adapter AI" : selected === "managed_text" ? "Managed AI text" : selected === "private_api" ? "Cloud Agent DM" : selected === "bound_task" ? "Message Codex" : selected === "local_room_agent" || selected === "hosted_room_agent" ? "Room Agent" : "Party Chat"} conversation content` } : {})}>
+        {managedTextAvailable ? <div hidden={selected !== "managed_text"}>
+          <ManagedAiTextConsole active={selected === "managed_text"} />
+        </div> : null}
         {(selected === "bound_task" || messageCloudOpen && cloudChannel === "bound_task" && !nativeCodexMirror) ?
           <div hidden={selected !== "bound_task"}>
             {nativeCodexMirror ? <>
@@ -1066,7 +1230,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
                   disabled={hostedRoom.room.status === "closed"} /> : null}
                 <NativeSharedInterpreterReportsPanel roomId={hostedRoom.room.room_id}
                   authority={hostedRoom.authority} disabled={hostedRoom.room.status === "closed"} />
-                {hostedOwner && onSelectHostedRoomView ? <button type="button"
+                {hostedOwner && onSelectHostedRoomView ? <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.select-or-inspect-the-codex-task-in-mission" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button"
                   onClick={() => { onSelectHostedRoomView("mission"); onSelectChannel("hosted_room"); }}
                   className="text-xs text-cyan-100 underline decoration-cyan-300/30">
                   Select or inspect the Codex task in Mission
@@ -1081,12 +1245,14 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
             ? localRoomView === "mission" ? <LocalRoomConsoleMission snapshot={localRoom} />
               : <LocalRoomConsoleHistory snapshot={localRoom} />
             : <UnavailableRoomHistory onReturn={() => onSelectChannel("private_ask")} />
+          : selected === "managed_text" ? null
           : selected === "adapter_ai" ? <AdapterAiActivityPanel pages={adapterPages}
               chatTitles={savedCodexChats} requestedChatIds={adapterChatIds}
               readFailures={adapterActivity.failures} />
           : selected === "private_api" ? <ManagedConversationConsoleHistory
               helixConversationId={privateApiBindingConversationId}
               messageCloudOpen={messageCloudOpen && cloudChannel === "private_api"} overlayMode={apiOverlayMode}
+              streamActive={streamActivityNeeded}
               pairingSnapshot={pairing} savedCodexChats={savedCodexChats} adapterPages={adapterPages}
               streamReadGrants={streamReadGrants}
               onActivityFrame={onActivityFrame} />
@@ -1100,7 +1266,7 @@ export function HelixConsoleConversationWorkspace({ children, layoutVariant = "h
 function UnavailableRoomHistory({ onReturn }: { onReturn: () => void }) {
   return <div className="py-4 text-xs" role="status">
     <p className="text-amber-100">Room history is hidden until this account's membership and text access are confirmed.</p>
-    <button type="button" onClick={onReturn} className="mt-3 text-cyan-100 underline decoration-cyan-300/30">
+    <button data-helix-control-id="helix.ask.helix-console-conversation-workspace.return-to-ask-helix" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" onClick={onReturn} className="mt-3 text-cyan-100 underline decoration-cyan-300/30">
       Return to Ask Helix
     </button>
   </div>;

@@ -1,0 +1,64 @@
+{
+  "observed_at": "2026-11-13T15:36:17.780050+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/agent-access/OwnerDiscordStreamActivity.tsx",
+      "canonical_sha256": "a10dc36d7dec959654db33e9ad59254abf697cc2fb82d00cafd77eb4ed77af4b",
+      "export_sha256": "a10dc36d7dec959654db33e9ad59254abf697cc2fb82d00cafd77eb4ed77af4b",
+      "previous_proposal_sha256": "87f9948a1c6410e6296d86b5ebe62c522bc1dd5d92e10472cefa1b8285569c71",
+      "bytes": 1901,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/useGrantedCodexStreamActivity.ts",
+      "canonical_sha256": "1add41cd13bc0457db4c2799951f863c42eb5c912cffdeecca278950f3e9fa30",
+      "export_sha256": "1add41cd13bc0457db4c2799951f863c42eb5c912cffdeecca278950f3e9fa30",
+      "previous_proposal_sha256": "4111675ec518f60a94a35cc8569a06b8dafeab4e462b9a3e207d63559dcb71a2",
+      "bytes": 2329,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/sessionActivityProjection.ts",
+      "canonical_sha256": "a8b39f9704758e574d4b7b4f97229030c17f614f63398c19d8dcd8ebc5776eb6",
+      "export_sha256": "a8b39f9704758e574d4b7b4f97229030c17f614f63398c19d8dcd8ebc5776eb6",
+      "previous_proposal_sha256": "d74846af7d1e37efeb56881e6ed384a8133995451dea740fddbb9e341998157b",
+      "bytes": 17236,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/OwnerDiscordStreamActivity.spec.tsx",
+      "canonical_sha256": "fdad016bfef1c99c0f3bc2f6cd39eab7f6204fc17da3ce961705cabc4960fcf7",
+      "export_sha256": "fdad016bfef1c99c0f3bc2f6cd39eab7f6204fc17da3ce961705cabc4960fcf7",
+      "previous_proposal_sha256": null,
+      "bytes": 1248,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/sessionActivityProjection.spec.ts",
+      "canonical_sha256": "fdee81a476d7e94632cf0bd736451813cd6bc8f2f7f33cd1905db819ba283395",
+      "export_sha256": "fdee81a476d7e94632cf0bd736451813cd6bc8f2f7f33cd1905db819ba283395",
+      "previous_proposal_sha256": "350621278bcea948d258d1ca111d332281db334aa5cb423ed09e2882263e243b",
+      "bytes": 28455,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Read three production modules and two tests in full. First-party React projection and mocked activity fixtures; no live grants, profile state, credentials, assets or private history copied.",
+    "An approved stream keeps its collector enabled while the Float is hidden. Displaying a Float is separate from collecting activity. Source reads are sequential and account/device/exact-read-grant authorization remains with the native host.",
+    "Native frames must parse and match the requested source reference. Failed reads are omitted rather than replayed from cache. Disabled or disposed collectors do not commit late results.",
+    "Session projection rejects terminal pairings and mismatched exact task IDs. Verified native reads can remain visible when a separate registration badge is unavailable; reconnecting frames retain their explicit status.",
+    "Adapter and Responses records require matching chat, binding, epoch and run with sanitized profile visibility. Records remain attributed observations, not proof of a live worker or performed movement. Saved chat names are discovery hints, not authority.",
+    "Tests cover projection attribution, task mismatch, revoked pairing, epoch isolation and background collector activation. The collector is mocked by the owner-component test; native polling behavior is not independently qualified by this suite.",
+    "No canonical edits in this cohort. Line-ending normalization is the only export transformation."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal, not a package or deployment.",
+    "Shared contracts, the native reader, type-only saved-activity definitions and server test normalizer remain separate dependencies.",
+    "Mock source tests do not prove installed background delivery, live source authorization, Discord receipt or game behavior."
+  ]
+}

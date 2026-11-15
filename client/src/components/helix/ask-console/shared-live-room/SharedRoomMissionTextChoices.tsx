@@ -117,7 +117,7 @@ export function SharedRoomMissionTextChoices({ room, messages, admitted }: {
   return <section aria-label="Room mission message choices" className="mt-3 rounded-lg border border-cyan-300/20 p-2">
     <p className="text-cyan-100">Your messages · room mission</p>
     <p className="mt-1 text-slate-400">Room chat stays human-only. Select one of your messages only if you want the owner to review it for the paired Codex task. The owner must separately approve and send it.</p>
-    <button type="button" disabled={busy} onClick={() => void show()}
+    <button data-helix-control-id="helix.ask.shared_live_room.shared-room-mission-text-choices.void-show" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} onClick={() => void show()}
       className="mt-2 rounded border border-white/20 px-2 py-1 disabled:opacity-40">{open ? "Refresh mission choices" : "Review mission choices"}</button>
     {open ? <ul className="mt-2 space-y-2">{own.map(message => {
       const matching = selections.filter(row => row.message_id === message.message_id && row.state !== "revoked");
@@ -131,21 +131,21 @@ export function SharedRoomMissionTextChoices({ room, messages, admitted }: {
           receipt?.state === "approved" ? "Owner approved; a separate send is still required" :
           receipt?.state === "selected" ? "Awaiting owner review for the current mission" :
             currentMission ? "Room members only for the current mission" : "No current room mission selected"}</p>
-        {receipt ? <button type="button" disabled={busy} onClick={() => void change(message, "revoke", receipt)}
+        {receipt ? <button data-helix-control-id="helix.ask.shared_live_room.shared-room-mission-text-choices.revoke-mission-selection" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} onClick={() => void change(message, "revoke", receipt)}
           className="mt-1 rounded border border-amber-300/30 px-2 py-1 disabled:opacity-40">Revoke mission selection</button>
-          : currentMission ? <button type="button" disabled={busy} onClick={() => setReviewId(message.message_id)}
+          : currentMission ? <button data-helix-control-id="helix.ask.shared_live_room.shared-room-mission-text-choices.review-selection" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} onClick={() => setReviewId(message.message_id)}
             className="mt-1 rounded border border-cyan-300/30 px-2 py-1 disabled:opacity-40">Review selection</button>
           : null}
         {earlier.map(prior => <p key={prior.selection_id} className="mt-1 text-amber-100">
           Earlier mission selection is {prior.state}; it is not approval for the current task.
-          <button type="button" disabled={busy} onClick={() => void change(message, "revoke", prior)}
+          <button data-helix-control-id="helix.ask.shared_live_room.shared-room-mission-text-choices.revoke-earlier-selection" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} onClick={() => void change(message, "revoke", prior)}
             className="ml-2 rounded border border-amber-300/30 px-2 py-1 disabled:opacity-40">Revoke earlier selection</button>
         </p>)}
         {reviewId === message.message_id && !receipt && currentMission ? <div className="mt-2 rounded border border-cyan-300/30 p-2">
           <p>This exact message may be shown to the room owner for the current mission. Selecting does not queue a Codex instruction or grant gameplay authority.</p>
-          <button type="button" disabled={busy} onClick={() => void change(message, "select")}
+          <button data-helix-control-id="helix.ask.shared_live_room.shared-room-mission-text-choices.select-this-message-for-owner-review" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} onClick={() => void change(message, "select")}
             className="mt-2 rounded border border-cyan-300/30 px-2 py-1 disabled:opacity-40">Select this message for owner review</button>
-          <button type="button" disabled={busy} onClick={() => setReviewId(null)} className="ml-2 text-slate-300">Cancel</button>
+          <button data-helix-control-id="helix.ask.shared_live_room.shared-room-mission-text-choices.cancel" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} onClick={() => setReviewId(null)} className="ml-2 text-slate-300">Cancel</button>
         </div> : null}
       </li>;
     })}</ul> : null}

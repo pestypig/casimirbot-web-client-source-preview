@@ -36,3 +36,11 @@ it('shows bounded HEK-declared references as unverified navigation, not evidence
   expect(screen.getByText(/destinations, content and revisions not verified/)).toBeTruthy();
   expect(screen.queryByRole('link',{name:/Reference 2/})).toBeNull();
 });
+
+it('names a typed HEK movie without treating the link as verified media',()=>{
+  render(<SolarEventEvidenceInspector event={{id:'ivo://helio-informatics.org/FL_one',event_type:'FL',
+    references:[{name:'SDO Movie',type:'movie',url:'https://sdowww.lmsal.com/movie.mp4'}]}}
+    frame={null} observation={null} />);
+  expect(screen.getByRole('link',{name:/SDO Movie \(movie\)/})).toBeTruthy();
+  expect(screen.getByText(/destinations, content and revisions not verified/)).toBeTruthy();
+});

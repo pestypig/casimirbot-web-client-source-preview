@@ -45,6 +45,23 @@ it("does nothing on mount, reviews exact metadata and renders report text as ine
   expect(f.fetcher).toHaveBeenCalledTimes(2);
 });
 
+it("identifies broker-reconciled command evidence without claiming build correctness", async () => {
+  const f = fixture();
+  const verifiedSummary = { ...summary,
+    origin: "broker_reconciled_command_report" as const };
+  f.fetcher.mockResolvedValueOnce(json({ ...catalog,
+    results: [verifiedSummary] }));
+  refresh();
+  await screen.findByText(/broker-reconciled Minecraft commands/);
+  f.fetcher.mockResolvedValueOnce(json({ ...preview,
+    result: verifiedSummary }));
+  review();
+  await screen.findByText(/local broker matched these command requests/);
+  expect(screen.getByText(/does not prove the requested build is correct/))
+    .toBeTruthy();
+  expect(screen.getByRole("button", { name: "Share report" })).toBeEnabled();
+});
+
 it.each(["room", "authority", "selection", "result", "text", "authority_flag", "extra_field"])("rejects a changed %s preview without showing its text", async kind => {
   const f = fixture(); refresh(); await screen.findByRole("button", { name: "Review report 1" });
   const changed = structuredClone(preview);
@@ -110,6 +127,34 @@ it("shares only after an explicit click and sends the exact reviewed selector wi
   expect(screen.queryByRole("button", { name: "Share report" })).toBeNull();
   expect(screen.queryByText(reportText)).toBeNull();
   expect(screen.getByText(/Members can load it under Owner-approved reports/)).toBeTruthy();
+});
+
+it("offers a separate explicit GPT Live send only for a shared broker report", async () => {
+  const f = fixture();
+  const brokerSummary = { ...summary, origin: "broker_reconciled_command_report" as const };
+  f.fetcher.mockResolvedValueOnce(json({ ...catalog, results: [brokerSummary] }));
+  refresh(); await screen.findByRole("button", { name: "Review report 1" });
+  f.fetcher.mockResolvedValueOnce(json({ ...preview, result: brokerSummary }));
+  review(); await screen.findByText(reportText);
+  expect(screen.queryByRole("button", { name: "Send shared command report to GPT Live" })).toBeNull();
+  f.fetcher.mockResolvedValueOnce(json({ ...sharedReceipt, result: brokerSummary }));
+  share(); await screen.findByRole("button", { name: "Send shared command report to GPT Live" });
+  expect(f.fetcher).toHaveBeenCalledTimes(3);
+  f.fetcher.mockResolvedValueOnce(json({ schema: "helix.native_hosted_command_report_gpt_live.v1",
+    ...context, result: brokerSummary, disclosure_ref: sharedReceipt.disclosure.disclosure_ref,
+    delivery_status: "provider_acknowledged", provider_item_acknowledged: true,
+    model_response_requested: false, speech_requested: false,
+    assistant_answer: false, raw_content_included: false }));
+  fireEvent.click(screen.getByRole("button", { name: "Send shared command report to GPT Live" }));
+  await screen.findByText(/GPT Live acknowledged this report as context/);
+  expect(f.fetcher.mock.calls[3][0]).toMatch(/\/results\/present$/);
+  expect(JSON.parse(String(f.fetcher.mock.calls[3][1]?.body))).toEqual({
+    room_id: roomId, selection_ref: context.selection_ref, selection_revision: 1,
+    steering_event_ref: brokerSummary.steering_event_ref,
+    result_ref: brokerSummary.result_ref, result_sha256: brokerSummary.result_sha256,
+    disclosure_ref: sharedReceipt.disclosure.disclosure_ref, send_to_gpt_live: true,
+  });
+  expect(screen.getByText(/No reply or speech was requested/)).toBeTruthy();
 });
 
 it.each(["room", "authority", "selection", "result", "hash", "status", "answer", "transport"])("treats %s sharing acknowledgement as unconfirmed without retry", async kind => {

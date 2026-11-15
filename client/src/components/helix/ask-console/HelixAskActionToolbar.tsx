@@ -5,11 +5,12 @@ import React, {
 } from "react";
 import {
   Camera,
+  Captions,
   ChevronLeft,
   ChevronRight,
-  Headphones,
   Image as ImageIcon,
   Mic,
+  MonitorSpeaker,
   MonitorUp,
   Plus,
   RotateCcw,
@@ -147,11 +148,11 @@ export function HelixAskActionToolbar({
         ? "Disable Live Voice microphone"
         : "Enable Live Voice microphone"
       : micEnabled
-        ? "Disable microphone"
-        : "Enable microphone";
+        ? "Stop speech transcription"
+        : "Start speech transcription";
   const visualAudioTitle = visualSituationIncludeAudio
-    ? "Disable tab audio for visual capture"
-    : "Enable tab audio for visual capture";
+    ? "Exclude tab or system audio from screen capture"
+    : "Include tab or system audio in screen capture";
   const visualSourceLabel = visualSourceKind === "camera" ? "Camera" : "Screen";
   const nextVisualSourceLabel =
     visualSourceKind === "camera" ? "screen" : "camera";
@@ -236,9 +237,11 @@ export function HelixAskActionToolbar({
               onClick={onToggleMic}
               disabled={micDisabled || (personalInputDisabled && !micEnabled)}
             >
-              <Mic
-                className={`h-4 w-4 ${micEnabled || voiceTranscribing ? "animate-pulse" : ""}`}
-              />
+              {micInputMode === "live_runtime" ? (
+                <Mic className={`h-4 w-4 ${micEnabled ? "animate-pulse" : ""}`} />
+              ) : (
+                <Captions className={`h-4 w-4 ${voiceTranscribing ? "animate-pulse" : ""}`} />
+              )}
             </button>
           ) : null}
           {showRetryVoiceSample ? (
@@ -308,7 +311,7 @@ export function HelixAskActionToolbar({
                   onClick={onToggleVisualAudio}
                   disabled={visualAudioToggleDisabled || (personalInputDisabled && !visualSituationIncludeAudio)}
                 >
-                  <Headphones
+                  <MonitorSpeaker
                     className={`h-4 w-4 ${
                       visualSituationIncludeAudio &&
                       displayAudioStatus !== "error"

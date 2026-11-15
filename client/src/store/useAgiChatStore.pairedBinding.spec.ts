@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, expect, it } from "vitest";
-import { AGI_CHAT_STORAGE_KEY, useAgiChatStore } from "./useAgiChatStore";
+import { getCurrentAgiChatStorageKey, useAgiChatStore } from "./useAgiChatStore";
 
 beforeEach(() => {
   localStorage.clear();
@@ -17,7 +17,7 @@ it("O4/O5 removes only the unavailable pairing from persisted chat projections",
   store.rememberReasoningTaskBinding(other);
   store.forgetPairedReasoningTaskBinding("chat:one", "pairing:one");
   expect(useAgiChatStore.getState().reasoningTaskBindings).toEqual({ "chat:two": other });
-  expect(JSON.parse(localStorage.getItem(AGI_CHAT_STORAGE_KEY)!).state.reasoningTaskBindings)
+  expect(JSON.parse(localStorage.getItem(getCurrentAgiChatStorageKey())!).state.reasoningTaskBindings)
     .toEqual({ "chat:two": other });
   store.forgetPairedReasoningTaskBinding("chat:one", "pairing:one");
   expect(useAgiChatStore.getState().reasoningTaskBindings).toEqual({ "chat:two": other });

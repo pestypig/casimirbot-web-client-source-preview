@@ -1,0 +1,87 @@
+{
+  "observed_at": "2026-11-13T18:00:58.343369+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/account/AccountRoomPilot.tsx",
+      "canonical_sha256": "bfe0e50421e9595dcb1a5fabe96ad9f098230e460de7f74fa567021af115a59d",
+      "export_sha256": "bfe0e50421e9595dcb1a5fabe96ad9f098230e460de7f74fa567021af115a59d",
+      "bytes": 8497,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "fb4865e9aa472a77fda7b9b11a00400d608c1c97d8051b0474bd37093c385104"
+    },
+    {
+      "path": "client/src/components/account/DiscordTaskConnections.tsx",
+      "canonical_sha256": "dbfadf545ad2cbff06b5fd268a0d754b38dd0cb035d2fd231cf084eaafbbd7f4",
+      "export_sha256": "dbfadf545ad2cbff06b5fd268a0d754b38dd0cb035d2fd231cf084eaafbbd7f4",
+      "bytes": 3627,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/DiscordTaskConfigurationView.tsx",
+      "canonical_sha256": "f3225a29d4c00483f86eb843f03fc34ff59e9039d918c2d260cfb12f32c3b4f1",
+      "export_sha256": "f3225a29d4c00483f86eb843f03fc34ff59e9039d918c2d260cfb12f32c3b4f1",
+      "bytes": 4465,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/MinecraftPlayerSharingQueue.tsx",
+      "canonical_sha256": "ecca59be05f2ee1bdc05c41da9e1587025447dc09fb56e4827377e99aa4d529c",
+      "export_sha256": "ecca59be05f2ee1bdc05c41da9e1587025447dc09fb56e4827377e99aa4d529c",
+      "bytes": 6746,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/PersonalTotpEnrollment.tsx",
+      "canonical_sha256": "3d2c555593ceb622c3107b2b272a4aa6321e110b37153a48e52ce6eea4004b62",
+      "export_sha256": "3d2c555593ceb622c3107b2b272a4aa6321e110b37153a48e52ce6eea4004b62",
+      "bytes": 15943,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/__tests__/DiscordTaskConnections.spec.tsx",
+      "canonical_sha256": "a9545c585dd8216614b7ee70e5ab81a6e3df297bf78021c20acca594d5765c77",
+      "export_sha256": "a9545c585dd8216614b7ee70e5ab81a6e3df297bf78021c20acca594d5765c77",
+      "bytes": 5825,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/__tests__/MinecraftPlayerSharingQueue.spec.tsx",
+      "canonical_sha256": "914ea45280f52aefbc728499891dc420fee790379a90b071a655d06c90c1f3d3",
+      "export_sha256": "d4655be3467b70d939695f7a69921f81392d1b002aec166c4ea8222d144a338a",
+      "bytes": 3752,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/__tests__/PersonalTotpEnrollment.spec.tsx",
+      "canonical_sha256": "c63600ca4f459eb05447a1b480ace9ea0a16f804da9670cb88b7f414a764a4b9",
+      "export_sha256": "c63600ca4f459eb05447a1b480ace9ea0a16f804da9670cb88b7f414a764a4b9",
+      "bytes": 5453,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Read all five first-party modules and three test suites. The room pilot adds a validated local room-navigation link and mounts a read-only player-sharing queue only for the opened room with observed owner presence. Existing room create/open/close and owner heartbeat operations remain explicit and separate from voice/AI.",
+    "Saved Discord configuration requires the current website profile/session, excludes native-cookie borrowing, parses a strict bounded shared schema and rejects foreign owner or extra secret fields. Refresh/account invalidation clears old observations; request generation and abort cleanup suppress stale results. Management links are fixed by the shared contract; deployment flags are not installation, consent, permission or funding evidence.",
+    "Minecraft requests are read only after an explicit click. Only active Fabric bindings and opaque actor/release references are displayed; activation_available must be false. No approval or model/action endpoint is invoked by this queue. Availability errors stay distinct from an empty request list.",
+    "Authenticator UI uses same-origin uncached endpoints, in-memory provisioning/recovery state, explicit six-digit confirmation and saved-code acknowledgment. Private endpoints gate visibility. QR rendering uses the existing qrcode.react dependency; no vendor source is copied. Code expiry, provider origin, profile binding, replay rejection and actual factor enforcement remain backend responsibilities and separate acceptance work.",
+    "Normalized one test source label to Fixture world Fabric sensor. Other fixtures use explicit synthetic account, actor, intent and recovery-code values. No production changes during this review. Shared Discord schema/fixture and room-navigation helper were inspected as dependencies but are not exported by this web cohort."
+  ],
+  "limits": [
+    "Private unfrozen source proposal only; no publication, account operation, invitation, room membership change, authenticator enrollment or code redemption performed.",
+    "Seventeen mocked tests cover Discord configuration, queue reads and basic enrollment/recovery UI. They do not prove installed ordinary-account acceptance, backend authentication, paid execution or live Minecraft/GPT Live handoff.",
+    "AccountRoomPilot invitation/queue integration is compiled and read but has no dedicated integration test in this cohort. Shared contracts resolve from canonical source; account portal and billing additions remain held.",
+    "Existing queue/TOTP state behavior across direct prop replacement, outstanding mutation/unmount navigation, provisioning expiry and room heartbeat/account switching require broader lifecycle/installed qualification. Source review is not security certification."
+  ]
+}

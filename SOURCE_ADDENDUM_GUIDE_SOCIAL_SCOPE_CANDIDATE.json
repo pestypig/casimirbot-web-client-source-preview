@@ -1,0 +1,75 @@
+{
+  "observed_at": "2026-11-13T19:24:30.397730+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/workstation/guide/CasimirGuideOverlay.tsx",
+      "canonical_sha256": "40d4e30ffcf1f02254fab5c79dbaab58bae46a7d9015490b7700de1afb3c4e6e",
+      "export_sha256": "d0540db91d1e3841c4afeb4f348105ca9b60d5e2acbbd5ac9055889a17570ed3",
+      "bytes": 41206,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "e288bee983a5559ffd92cda73de8ccb7dee79c1befb7dd986da1832c86e87b0b"
+    },
+    {
+      "path": "client/src/components/workstation/guide/__tests__/CasimirGuideOverlay.spec.tsx",
+      "canonical_sha256": "a580e2a9656788ec96ea6963cf9ef857cc66d7cc4dfbcae1123d61715ba292a5",
+      "export_sha256": "4ddf02f3c90d82cc306bf44361539560a2045919895fb8463caf4783b6cbe4f8",
+      "bytes": 24985,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "5d20ce411cd17c584e16d5a91ea0a567e3c6a48005a4b1f2d8f48e301755ceed"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/workstation/accountOperationScope.ts",
+      "canonical_sha256": "126c3c774a9d5ac67ae2b2fb577465fca36ccfea4f9b33c915420afec33d8b90",
+      "export_sha256": "13a5c8dab5137d5d0cd5ad70910dc75828634ac59f4405354ee93f7be21c7faf",
+      "bytes": 602,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/launchPanelPolicy.ts",
+      "canonical_sha256": "eef8c5979bc8022339ead1858ca6a85d4f02d9dbc21805973c253c54816920e2",
+      "export_sha256": "31a133985d639b7610eb2f782846ccbfe97f87c69c7f27beadcbc55336f64db0",
+      "bytes": 2013,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/experimentalLaunchPanels.ts",
+      "canonical_sha256": "7535f86bbb9b869fd83321c76393e7d57409db4fb8e4f5c7cace137f203e8c10",
+      "export_sha256": "1e5ceb2c7ae8c58a30bc8ca164cb35d5c65ba7a5fd6df7686b780da600a08444",
+      "bytes": 2202,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/desktop/panelRegistry.ts",
+      "canonical_sha256": "786a4489913bf88e0ed2c5fd65c9b315945c4b2bb24d5fe459292acc926ddc2a",
+      "export_sha256": "d96cb12c7bb8dbb41cca2c512725ad5bd44c10c16c1d26426c25b2d292b382b1",
+      "bytes": 16377,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed the guide account-policy and search delta against the existing public source: signed-out fallback, explicit panel policy, named launch hiding and experimental visibility remain separate. Ordinary signed-in Friends and Device Check destinations are admitted; explicitly locked search destinations are omitted.",
+    "The social refresh depended only on Friends access state and open state, so two profiles with identical permissions retained the old party summary and accepted its delayed response. Reproduced all three account-boundary regressions on original production source after resetting mock queues between tests.",
+    "Observe cached profile identity and revision on account events. Clear social data when starting the new refresh and reject late successes and errors through the existing account-operation scope guard. Revision distinguishes an A to B to A round trip.",
+    "Full guide suite covers search/admission, passive room/environment/mission summaries, keyboard/focus behavior and social endpoint failures. Those projected observations are not room, game, model or terminal authority."
+  ],
+  "limits": [
+    "Private unfrozen source proposal; no installed EXE or public site has this new fix yet.",
+    "Mocked guide tests and selected-entry compilation do not establish real cross-tab login, room continuity, provider access or full application compilation.",
+    "The account scope follows observed cache identity/revision; server-side authentication remains authoritative. Other room/mission/environment projection lifecycles are not qualified by the social-summary fix.",
+    "Path-bar typed-route admission, solar storage presentation, Doc Viewer policy and remaining application dependencies continue as separate review work.",
+    "Five inherited intentional support-contact matches remain in the final owner publication review."
+  ]
+}

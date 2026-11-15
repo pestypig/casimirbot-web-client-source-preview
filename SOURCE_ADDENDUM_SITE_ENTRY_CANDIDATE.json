@@ -1,0 +1,62 @@
+{
+  "observed_at": "2026-11-13T17:38:14.069260+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/site/site-connect.tsx",
+      "canonical_sha256": "0519bf0492b8596ba22c66299eae3899c7c9157d2b166f213bfdd927272ba108",
+      "export_sha256": "786202292e0aba3e7d45383a878396bd1c3270243e40b6136f31dab0f5b1a460",
+      "bytes": 9217,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "5cd41ee5a842ae7a819f7683f8727a9a01aeb26d647178cce6469194208e8ee3"
+    },
+    {
+      "path": "client/src/pages/download.tsx",
+      "canonical_sha256": "05bc4d4b4320e78e4240ad2000e439013cd22057fc16751ba2d591c0f0170361",
+      "export_sha256": "05bc4d4b4320e78e4240ad2000e439013cd22057fc16751ba2d591c0f0170361",
+      "bytes": 11123,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "e9ed0d1461f1019c50a5cf1b14169ff2529f391a8c01af10340781dab1d8c8ef"
+    },
+    {
+      "path": "client/src/pages/__tests__/site-connect.spec.tsx",
+      "canonical_sha256": "70db49f06aa079b95a10aabb995a3ff23b0c0702101d1790c6bd2fa053ec8187",
+      "export_sha256": "70db49f06aa079b95a10aabb995a3ff23b0c0702101d1790c6bd2fa053ec8187",
+      "bytes": 7565,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "fddd26c1e225496ab952e8871f49b0f973e1c43a769fe2a7ab49d5ec136acd2d"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/auth/GoogleSignInButton.tsx",
+      "canonical_sha256": "c85599adacc3fb56589bcd8bbcb4311483db9a6795c76b2197a6d9abd224382d",
+      "export_sha256": "c85599adacc3fb56589bcd8bbcb4311483db9a6795c76b2197a6d9abd224382d",
+      "bytes": 5507,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/pages/__tests__/download.spec.tsx",
+      "canonical_sha256": "0eec736de3f65aa1829deb4caf430883514c659f57b9952ccbf1186661f760a0",
+      "export_sha256": "030611d8b66b066c3efa60de95533e5511009c6eb63567ba4e48fac7dde40440",
+      "bytes": 3094,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Read complete device connection and download pages, both test suites and unchanged Google sign-in component. Selected first-party source and synthetic HTTP/credential fixtures only; no live account data or third-party assets.",
+    "Device connection now offers independently selected text and voice installation permission. Both default false and require server availability. Approval does not start a model run, microphone, paid session, room consent, agent pairing or game action.",
+    "Corrected three stale exact-body expectations and added three independent voice/text consent combinations, including clearing voice after selection. All calls are mocked and unexpected endpoints throw.",
+    "Download page adds the getting-started guide and supported public-source overview links. Native callers still use the in-app updater and suppress public installer lookup; schema and server approval remain separate dependencies.",
+    "The unchanged Google sign-in component remains separately dependent on Google Identity Services and server credential validation. These tests mock that component and do not qualify live authentication."
+  ],
+  "limits": [
+    "Private unfrozen source candidate only; no publication, sign-in, paid request or native restart.",
+    "Agent Access page remains held with its unreviewed 1805-line SetupContractInbox dependency. Account portal and private enrollment/billing components remain separate open review.",
+    "Canonical shared contracts and omitted client helpers remain separate dependencies; this preview is not a standalone app.",
+    "Mocked tests do not qualify deployed paid voice, installed updates or the attended Minecraft/GPT Live handoff."
+  ]
+}

@@ -236,7 +236,7 @@ export const buildMissionGuideProjection = (input: {
     (event.classification === "critical" || event.classification === "action" || Boolean(event.failReason)),
   ) ?? null;
   const objective = [...(input.snapshot.objectives ?? [])]
-    .filter((item) => item.status !== "resolved")
+    .filter((item): item is typeof item & { status: "open" | "in_progress" | "blocked" } => item.status !== "resolved")
     .sort((left, right) => {
       const rank = { blocked: 0, in_progress: 1, open: 2 } as const;
       return rank[left.status] - rank[right.status] || Date.parse(right.updatedAt) - Date.parse(left.updatedAt);

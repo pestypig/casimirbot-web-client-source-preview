@@ -1,5 +1,5 @@
 import type { HelixAccountCapabilityPolicy } from "@shared/helix-account-session";
-import { HELIX_USER_ACCOUNT_POLICY } from "@shared/helix-account-session";
+import { HELIX_SIGNED_OUT_ACCOUNT_POLICY } from "@shared/helix-account-session";
 
 export const HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT =
   "helix-account-capability-policy-changed";
@@ -172,7 +172,7 @@ export function clearCachedAccountCapabilityPolicy(): void {
 }
 
 export async function fetchAccountCapabilityPolicy(): Promise<HelixAccountCapabilityPolicy> {
-  if (typeof fetch !== "function") return HELIX_USER_ACCOUNT_POLICY;
+  if (typeof fetch !== "function") return HELIX_SIGNED_OUT_ACCOUNT_POLICY;
   if (accountPolicyRequest) return accountPolicyRequest;
   const generation = accountPolicyGeneration;
   const request = (async () => {
@@ -180,15 +180,15 @@ export async function fetchAccountCapabilityPolicy(): Promise<HelixAccountCapabi
       credentials: "include",
       cache: "no-store",
     });
-    if (!response.ok) return cachedPolicy ?? HELIX_USER_ACCOUNT_POLICY;
+    if (!response.ok) return cachedPolicy ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY;
     const payload = await response.json();
     if (generation !== accountPolicyGeneration) {
-      return cachedPolicy ?? HELIX_USER_ACCOUNT_POLICY;
+      return cachedPolicy ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY;
     }
     const policy =
       payload?.account_policy ??
       payload?.session?.account_policy ??
-      HELIX_USER_ACCOUNT_POLICY;
+      HELIX_SIGNED_OUT_ACCOUNT_POLICY;
     cacheAccountCapabilityPolicy(policy, payload?.session?.profile?.profile_id ?? null);
     return policy;
   })();

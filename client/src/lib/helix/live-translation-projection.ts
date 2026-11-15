@@ -203,6 +203,7 @@ export type HelixLiveTranslationInlineUnitState = {
   goalBindingId: string | null;
   sessionDebugPhase?: string | null;
   sessionObservationStatus?: string | null;
+  sessionControlKey?: string | null;
   sourceBindingKey?: string | null;
   latestSourceBindingKey?: string | null;
   sourceIdentityKey?: string | null;

@@ -128,7 +128,7 @@ import {
   type DocsPrintPdfSourceKind,
 } from "@shared/docs-print-pdf";
 import {
-  HELIX_USER_ACCOUNT_POLICY,
+  HELIX_SIGNED_OUT_ACCOUNT_POLICY,
   type HelixAccountCapabilityPolicy,
 } from "@shared/helix-account-session";
 import {
@@ -658,6 +658,10 @@ export function DocViewerPanel() {
       docClass: null,
       bundleKind: "private-research-extraction",
       canonical: false,
+      retrievalStatus: "supporting",
+      topicId: null,
+      authorityRank: null,
+      supersededBy: null,
       sidecars: activeResearchDocument.sidecar_refs.map((sidecar) => sidecar.artifact_ref),
       toolHints: { source: "research_library", private: true },
       title: activeResearchDocument.title,
@@ -911,10 +915,10 @@ export function DocViewerPanel() {
   );
   const canExportPrintPdf = Boolean(
     activeDocumentContentReady &&
-    (accountPolicy ?? HELIX_USER_ACCOUNT_POLICY).feature_flags.includes(
+    (accountPolicy ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY).feature_flags.includes(
       DOCS_PRINT_PDF_FEATURE_FLAG,
     ) &&
-    !(accountPolicy ?? HELIX_USER_ACCOUNT_POLICY).locked_features.includes(
+    !(accountPolicy ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY).locked_features.includes(
       DOCS_PRINT_PDF_FEATURE_FLAG,
     ),
   );
@@ -3902,7 +3906,7 @@ function getDocBadges(entry: DocManifestEntry, t: Translate): DocBadge[] {
     badges.push({ label: t("docsViewer.taxonomy.runtimeWhitepaper"), tone: "amber" });
   }
   const docClass = normalizeDocTaxonomyFilter(entry.docClass);
-  if (docClass !== "all" && docClass !== "uncategorized") {
+  if (docClass !== "uncategorized") {
     badges.push({
       label: t(docTaxonomyLabelMessages[docClass]),
       tone: docClass === "canonical-research" ? "cyan" : docClass === "current-development" ? "emerald" : docClass === "synthetic-research" ? "amber" : "slate",

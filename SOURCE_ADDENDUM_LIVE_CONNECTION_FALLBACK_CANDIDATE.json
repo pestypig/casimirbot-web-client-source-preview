@@ -1,0 +1,36 @@
+{
+  "observed_at": "2026-11-14T04:02:27.943619+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/components/agent-access/LiveConnectionSettings.tsx",
+      "canonical_sha256": "6550cd11ec1798193bb562aef67e11f5b7dfba3a78d740253fc3d86e4b3e87f8",
+      "export_sha256": "6550cd11ec1798193bb562aef67e11f5b7dfba3a78d740253fc3d86e4b3e87f8",
+      "previous_public_sha256": "dc2eace20c8be5ee1e4285aab4e27311eb4a7e3f56f193599202911c676b4302",
+      "bytes": 13177,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/LiveConnectionSettings.spec.tsx",
+      "canonical_sha256": "bac105e94674d657b883f269aef798024a37db71adaaa17071e18e51fda8beaf",
+      "export_sha256": "907c06a5db024a338f0ac0a732e94d0f2eb2404a4dddcd1e52c0a68e15edc769",
+      "previous_public_sha256": "a9375237180f5b6acff14e40c44d3946dc516b1407742e2e97da9c55def6d374",
+      "bytes": 6628,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [],
+  "classification": "presentation",
+  "source_frozen": false,
+  "published": false,
+  "review": [
+    "Both files matched the existing public preview before this change.",
+    "The panel handles a subset of the shared native protocol. Its known messages remain unchanged; an unhandled result receives fixed recovery copy.",
+    "Own-property lookup rejects inherited property names; raw result details are not displayed. Inspection still performs no model call.",
+    "Three new mounted regressions fail before the production edit and pass afterward; existing account-change and key-isolation checks remain covered."
+  ],
+  "limits": [
+    "Source-only review; no real credential, model request, room session, installed acceptance or publication."
+  ]
+}

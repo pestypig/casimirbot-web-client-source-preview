@@ -1,0 +1,150 @@
+{
+  "observed_at": "2026-11-13T21:39:57.900956+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLiveRuntimeControls.tsx",
+      "canonical_sha256": "e7c920bb4476a4c5a561537850384f967de0d211c5f49acd0407a03e426f07ef",
+      "export_sha256": "64cb1ab0c3ff290248cb8e975525253ce9eff480f8e46fd025d1aaed800444cd",
+      "bytes": 34463,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "cdc43973cf9f3bf18fc22b98adf57dc85fd3415d982731553bd10bb015f0e4bc"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLiveRuntimeTransportController.ts",
+      "canonical_sha256": "5af3e563f64b27d3b1135fff75c69ef3a0a8b51eee65b546852c019a7e29989f",
+      "export_sha256": "5af3e563f64b27d3b1135fff75c69ef3a0a8b51eee65b546852c019a7e29989f",
+      "bytes": 40971,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "6e3b88371c599d01eb631e1b143a738c2a2974f31a96a5824f0ea9abad21bd9f"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/useHelixAskLiveRuntimeSession.ts",
+      "canonical_sha256": "778a9aa83b6609e4d40964ed08ea7b1fafe46deb557e297fab658579b41f4f5d",
+      "export_sha256": "778a9aa83b6609e4d40964ed08ea7b1fafe46deb557e297fab658579b41f4f5d",
+      "bytes": 41421,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "e5d3ff0b343a18347539d214eada29cb8e1bb102c6e61a840095c77e764f454c"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomsAccessControl.tsx",
+      "canonical_sha256": "c78aa2e8e009bfc42bac979d2bb290e19906ca3c2ddfb9f1cbc732fa02057934",
+      "export_sha256": "c78aa2e8e009bfc42bac979d2bb290e19906ca3c2ddfb9f1cbc732fa02057934",
+      "bytes": 5846,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomsAccessControl.spec.tsx",
+      "canonical_sha256": "f9126f7f84a9352905218c4238d79b3ca41efc990add62ddc6e4c226b96c71de",
+      "export_sha256": "f9126f7f84a9352905218c4238d79b3ca41efc990add62ddc6e4c226b96c71de",
+      "bytes": 4325,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomsAccessControl.lifecycle.spec.tsx",
+      "canonical_sha256": "1f37316fad83649df22b49129b7c7c031e422896637be958e53c02dc07085b54",
+      "export_sha256": "1f37316fad83649df22b49129b7c7c031e422896637be958e53c02dc07085b54",
+      "bytes": 5843,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeControls.visual-source.spec.tsx",
+      "canonical_sha256": "1b5d34b962f3c47ef4d169470c389a580c3f82222a9b7dd1451ca5fa91925327",
+      "export_sha256": "a958fe8826682a09f149bcc7032f3b18b70d62bf28d67ee4a7464f834358298e",
+      "bytes": 10699,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "ff95611f9d80d55bba76200e8a09f66a521c067d647192f25f6d347ec0be0869"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.cancellation.spec.ts",
+      "canonical_sha256": "22fefefb0603ec479852abaa7cf587dd1508a2b4d9ba46fbc6dc5bc5623e23d2",
+      "export_sha256": "22fefefb0603ec479852abaa7cf587dd1508a2b4d9ba46fbc6dc5bc5623e23d2",
+      "bytes": 4801,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/useHelixAskLiveRuntimeSession.visual-consent.spec.tsx",
+      "canonical_sha256": "a04c340162699af1e631a88d3f4bafaadaa6777db79e172a56ed433e694855a6",
+      "export_sha256": "a04c340162699af1e631a88d3f4bafaadaa6777db79e172a56ed433e694855a6",
+      "bytes": 13217,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "ea92dd2900313255a56714e22abe6ec9190325285be5429aca989e884ef86e80"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.local-playback.spec.ts",
+      "canonical_sha256": "0411985db5781da4022d520acc3f926d52775de4e690e46b826e898616aca2d6",
+      "export_sha256": "0411985db5781da4022d520acc3f926d52775de4e690e46b826e898616aca2d6",
+      "bytes": 3353,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.failure-stage.spec.ts",
+      "canonical_sha256": "aed4be046d9995af7fb94c4037dce2ae75da2a7b2e3172d0cbac48c10e5daf6d",
+      "export_sha256": "aed4be046d9995af7fb94c4037dce2ae75da2a7b2e3172d0cbac48c10e5daf6d",
+      "bytes": 2555,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.media-restore.spec.ts",
+      "canonical_sha256": "20afe8bcf2dfb559c96392b525a223a4556e93de0bc9fb8fc02f11ed31297179",
+      "export_sha256": "20afe8bcf2dfb559c96392b525a223a4556e93de0bc9fb8fc02f11ed31297179",
+      "bytes": 3086,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.visual-frame.spec.ts",
+      "canonical_sha256": "ad8c3a1d2d5ed4567c9c586a8be0c24d09d6ad752014fe682e6ec7877321c47b",
+      "export_sha256": "ad8c3a1d2d5ed4567c9c586a8be0c24d09d6ad752014fe682e6ec7877321c47b",
+      "bytes": 9950,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/audio-focus.ts",
+      "canonical_sha256": "8455a7f4d266fe717a96d148d32d333c29a6f54144b51b8d9080d03cab383ef8",
+      "export_sha256": "825b5063ec39d0d4137e56b048ee85edb37850f47a74ebd25e5b6fdc7ee39605",
+      "bytes": 2242,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountOperationScope.ts",
+      "canonical_sha256": "126c3c774a9d5ac67ae2b2fb577465fca36ccfea4f9b33c915420afec33d8b90",
+      "export_sha256": "13a5c8dab5137d5d0cd5ad70910dc75828634ac59f4405354ee93f7be21c7faf",
+      "bytes": 602,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Live controls expose Observe/Suggest through the runtime account feature policy, clamp other requested authorities to Observe, withhold unresolved-policy visual capture, expose explicit local playback mute, and add a Shared Live Rooms opt-in switch. Program-action and room consent grants remain separate.",
+    "Local playback mute changes the local audio element only. Provider output remains available to the separately admitted Discord bridge. Audio-focus loss still mutes playback; focus restoration respects the local mute setting. The hook reapplies mute to a replacement controller on explicit renewal while microphone and visual sharing start disabled.",
+    "Runtime fix 34 binds Rooms status reads and opt-in results to account identity/revision, request generation and mounted state. Account change clears the old view, mutation supersedes older status reads, and focus does not compete with a pending mutation. Four prior failing cases are covered by its retained baseline.",
+    "Runtime fix 35 retires pending session start on Stop/unmount, cleans up a late admitted exact session, rejects duplicate pending starts, and isolates attempt-owned controller/handler cleanup. Provider callbacks ignore retired attempts. Route/account changes cancel an in-flight request as well as an active call.",
+    "Transport startup has its own generation guard around microphone acquisition, offer/description awaits and SDP exchange. Stop retires pending work; late microphone tracks are stopped before WebRTC is created. Late events and failures cannot affect a successor transport. Three previously failing runtime cases were observed across the hook and controller baselines.",
+    "Reviewed candidate deltas and surrounding policy, renewal, start/stop, provider callbacks and media-resource handlers. New Rooms component/suites, local-playback and cancellation suites were read. Three unchanged transport suites and unchanged audio-focus/account helpers retain exact public/indexed parity. No provider credentials, real transcripts, profiles, media recordings or third-party implementation are exported.",
+    "The older visual-consent test double lacked the new setLocalPlaybackMuted method and failed all four existing tests. Its fixture now implements that method; restored visual-consent checks and new renewal/cancellation checks run against the real hook. That fixture failure is not counted as a runtime defect."
+  ],
+  "limits": [
+    "Unfrozen unpublished source-only proposal. Runtime fixes 34 and 35 are not installed; a matching numbered build/domain and signed ordinary-account acceptance remain required.",
+    "Tests use mocked provider/server/native/media boundaries. Playback checks establish local routing and focus behavior, not actual Discord sound. No real microphone, model run, room change, Minecraft action or attended GPT Live handoff occurred.",
+    "Late server-session cleanup is best effort and remains exact-session/account authorized. Ignoring a retired opt-in response cannot undo a server mutation already accepted before the account changed.",
+    "The Rooms status payload retains its existing typed transport contract; malformed payloads, every account/session interleaving and all provider/network failure modes are not qualified by this suite.",
+    "Full app, real provider consent, expiry/revocation timing, browser permission prompts and installed native handling remain separate acceptance. Source compilation does not replace those checks or certify program effects.",
+    "The Live provider-event/worker implementation and larger Console integration remain later source cohorts. Canonical shared contracts, domain and native dependencies are not copied automatically. Five intentional support-contact matches elsewhere remain in final publication review."
+  ]
+}

@@ -924,6 +924,7 @@ describe("HelixAskPill mic-first surface contract", () => {
           id: "assistant-2",
           role: "assistant",
           content: "Because the older generated wake prompt encoded tool names in visible prose.",
+          helixAsk: { backend_ask_entrypoint_observed: true },
           at: "2026-06-10T15:03:20.000Z",
           traceId: "ask:manual-debug",
         },
@@ -1011,8 +1012,9 @@ describe("HelixAskPill mic-first surface contract", () => {
     expect(legacyComposerSurfaceSource).toContain("<HelixAskComposerActionToolbarSurface {...actionToolbar}");
     expect(toolbarSource).toContain("const visualAudioTitle = visualSituationIncludeAudio");
     expect(toolbarSource).toContain('aria-label={visualAudioTitle}');
-    expect(toolbarSource).toContain('title={visualAudioTitle}');
-    expect(toolbarSource).toContain("<Headphones");
+    expect(toolbarSource).toContain('aria-label={visualAudioTitle}');
+    expect(toolbarSource).toContain('"Capture audio is available in Ask Helix" : visualAudioTitle');
+    expect(toolbarSource).toContain("<MonitorSpeaker");
     expect(source).not.toContain("Visual capture only");
     expect(source).toContain("handleVisualSituationAudioPreferenceToggle");
   });
@@ -1049,11 +1051,15 @@ describe("HelixAskPill mic-first surface contract", () => {
     expect(legacyComposerStateSource).toContain("export function buildHelixAskLegacyComposerState");
     expect(legacyComposerStateSource).toContain("actionToolbar");
     expect(actionToolbarSurfaceSource).toContain("<HelixAskActionToolbar");
-    expect(toolbarSource).toContain('title="Attach image"');
-    expect(toolbarSource).toContain('title={micTitle}');
+    expect(toolbarSource).toContain('aria-label="Attach image"');
+    expect(toolbarSource).toContain('"Image attachments are available in Ask Helix" : "Attach image"');
+    expect(toolbarSource).toContain('aria-label={micTitle}');
+    expect(toolbarSource).toContain('"Ask microphone is available in Ask Helix" : micTitle');
     expect(toolbarSource).toContain("const visualCaptureTitle = visualSituationSourceStatus");
-    expect(toolbarSource).toContain("title={visualCaptureTitle}");
-    expect(toolbarSource).toContain('title={visualAudioTitle}');
+    expect(toolbarSource).toContain("aria-label={visualCaptureAriaLabel}");
+    expect(toolbarSource).toContain('"Visual capture is available in Ask Helix" : visualCaptureTitle');
+    expect(toolbarSource).toContain('aria-label={visualAudioTitle}');
+    expect(toolbarSource).toContain('"Capture audio is available in Ask Helix" : visualAudioTitle');
     expect(actionToolbarSurfaceSource).toContain("<HelixAskComposerSubmitButton");
     expect(composerSource).toContain("title={viewModel.submitTitle}");
   });
@@ -1120,8 +1126,8 @@ describe("HelixAskPill mic-first surface contract", () => {
     expect(source).not.toContain(">act<");
     expect(source).not.toContain(">verify<");
     const toolbarSource = fs.readFileSync(askConsoleActionToolbarPath, "utf8");
-    expect(toolbarSource).toContain("Enable microphone");
-    expect(toolbarSource).toContain("Disable microphone");
+    expect(toolbarSource).toContain("Start speech transcription");
+    expect(toolbarSource).toContain("Stop speech transcription");
     expect(source).not.toContain("Voice Monitor");
     expect(source).not.toContain("Helix Timeline");
     expect(source).not.toContain("<span>Input level</span>");
@@ -1177,10 +1183,10 @@ describe("HelixAskPill mic-first surface contract", () => {
     expect(source).not.toContain("<HelixAskComposerActionToolbarSurface");
     expect(legacyComposerSurfaceSource).toContain("<HelixAskComposerActionToolbarSurface {...actionToolbar}");
     expect(toolbarSource).toContain('className="relative min-w-0 flex-1"');
-    expect(toolbarSource).toContain("snap-x snap-mandatory");
+    expect(toolbarSource).toContain("overflow-x-auto scroll-smooth");
     expect(toolbarSource).toContain("[scrollbar-width:none]");
     expect(toolbarSource).toContain("Scroll Ask controls right");
-    expect(source).not.toContain("<HelixAskComposerTextarea");
+    expect(source).not.toMatch(/<HelixAskComposerTextarea(?:Surface)?[\s/>]/);
     expect(legacyComposerSurfaceSource).toContain("<HelixAskComposerTextareaSurface {...textarea} ref={textareaRef} />");
     expect(source).toContain("composerViewModel.textareaClassName");
     expect(composerSource).toContain('aria-label="Ask Helix"');
@@ -1334,9 +1340,9 @@ describe("HelixAskPill mic-first surface contract", () => {
 
   it("threads the selected runtime only through backend Ask turn payloads", () => {
     const source = fs.readFileSync(pillPath, "utf8");
-    expect(source).toContain("agentRuntime: selectedAgentRuntime");
-    expect(source.indexOf("agentRuntime: selectedAgentRuntime")).toBeLessThan(source.indexOf("runAskTurnStream(askTurnPayload"));
-    expect(source.indexOf("agentRuntime: selectedAgentRuntime")).toBeLessThan(source.indexOf("runAskTurn(askTurnPayload"));
+    expect(source).toContain("agentRuntime: resolveHelixAskSubmitRuntime({");
+    expect(source.indexOf("agentRuntime: resolveHelixAskSubmitRuntime({")).toBeLessThan(source.indexOf("runAskTurnStream(askTurnPayload"));
+    expect(source.indexOf("agentRuntime: resolveHelixAskSubmitRuntime({")).toBeLessThan(source.indexOf("runAskTurn(askTurnPayload"));
     expect(source).toContain("backendAskCallPath = \"askLocal\"");
   });
 
@@ -1966,10 +1972,10 @@ describe("HelixAskPill mic-first surface contract", () => {
     expect(source).toContain("shouldPreserveAuthoritativeTerminalOverEvidenceGate");
     expect(source).toContain("preserveAuthoritativeTerminal");
     expect(source).toMatch(/evidenceGateDecision\.blocked && !preserveAuthoritativeTerminal/);
-    expect(source).toContain('args.dispatchPolicy === "workspace_only"');
-    expect(source).toContain('args.routeReasonCode === "dispatch:act"');
-    expect(source).toContain('args.dispatchPolicy === "direct_answer_only"');
-    expect(source).toContain('args.routeReasonCode === "conversation:simple"');
+    expect(fs.readFileSync(path.resolve(process.cwd(), 'client/src/components/helix/ask-console/HelixAskVoiceAutoSpeakDebug.ts'), 'utf8')).toContain('args.dispatchPolicy === "workspace_only"');
+    expect(fs.readFileSync(path.resolve(process.cwd(), 'client/src/components/helix/ask-console/HelixAskVoiceAutoSpeakDebug.ts'), 'utf8')).toContain('args.routeReasonCode === "dispatch:act"');
+    expect(fs.readFileSync(path.resolve(process.cwd(), 'client/src/components/helix/ask-console/HelixAskVoiceAutoSpeakDebug.ts'), 'utf8')).toContain('args.dispatchPolicy === "direct_answer_only"');
+    expect(fs.readFileSync(path.resolve(process.cwd(), 'client/src/components/helix/ask-console/HelixAskVoiceAutoSpeakDebug.ts'), 'utf8')).toContain('args.routeReasonCode === "conversation:simple"');
     expect(source).toContain("runtimeObservationsForTerminal");
     expect(source).toContain("runtimeSummaryRecord?.observations");
   });
@@ -2445,10 +2451,10 @@ describe("HelixAskPill mic-first surface contract", () => {
     expect(turnStreamPanelSource).toContain("data-final-answer-text={isFinalRow ? finalAnswerRawText : undefined}");
     expect(turnStreamPanelSource).toContain("data-visible-terminal-source={isFinalRow ? finalAnswerSourceLabel : undefined}");
     expect(turnStreamPanelSource).toContain("data-backend-terminal-answer={isFinalRow ? backendTerminalAnswer ?? \"\" : undefined}");
-    expect(source).toContain("ui_debug_parity_harness");
+    expect(fs.readFileSync(path.resolve(process.cwd(), "client/src/lib/agi/debugExport.ts"), "utf8")).toContain("ui_debug_parity_harness");
     expect(source).toContain("__HELIX_LAST_UNIFIED_DEBUG_COPY__");
     expect(source).toContain("__HELIX_LAST_UNIFIED_DEBUG_COPY_FALLBACK__");
-    expect(source).toContain("clipboard_debug_copy_required_for_prompt_submission: false");
+    expect(fs.readFileSync(path.resolve(process.cwd(), "client/src/lib/agi/debugExport.ts"), "utf8")).toContain("clipboard_debug_copy_required_for_prompt_submission: false");
     expect(turnStreamPanelSource).toContain("<HelixAskTurnControls");
     expect(turnControlsSource).toContain("relative z-20 mt-2 flex max-w-fit items-center gap-1");
     expect(source).toContain("debugDrawerState={debugExportDrawer}");
@@ -2743,12 +2749,14 @@ describe("HelixAskPill mic-first surface contract", () => {
     expect(turnControlsSource).toContain('title="Copy response"');
     expect(turnControlsSource).toContain('title="Unified Debug Copy"');
     expect(source).toContain("buildReplyScopedDebugExportFromRenderedButton");
-    expect(source).toContain("selectedDebugTurnId: renderedMatchesReply ? activeTurnId : null");
-    expect(source).toContain("const backendTurnScopeTrusted = isHelixAskLegacyRenderedButtonBackendTurnScopeTrusted({");
-    expect(source).toContain("const replyResolvedTurnIdTrusted =");
-    expect(source).toContain("!isBackendAskTurnDebugExportEligibleTurnId(replyResolvedTurnId) || Boolean(rendered.activeTurnId)");
-    expect(source).toContain('selectedDebugSource: "rendered_reply_dom"');
-    expect(source).toContain(
+    const renderedDebugSource = fs.readFileSync(path.resolve(process.cwd(),
+      "client/src/components/helix/ask-console/HelixAskRenderedReplyDebugExport.ts"), "utf8");
+    expect(renderedDebugSource).toContain("selectedDebugTurnId: renderedMatchesReply ? activeTurnId : null");
+    expect(renderedDebugSource).toContain("const backendTurnScopeTrusted = isHelixAskLegacyRenderedButtonBackendTurnScopeTrusted({");
+    expect(renderedDebugSource).toContain("const replyResolvedTurnIdTrusted =");
+    expect(renderedDebugSource).toContain("!isHelixAskLegacyBackendDebugExportEligibleTurnId(replyResolvedTurnId) || Boolean(rendered.activeTurnId)");
+    expect(renderedDebugSource).toContain('selectedDebugSource: "rendered_reply_dom"');
+    expect(renderedDebugSource).toContain(
       "debug_export_ref: includeReplyDebug ? replyRecord.debug_export_ref ?? replyDebugRecord?.debug_export_ref ?? null : null",
     );
     expect(source.indexOf("buildReplyScopedDebugExportFromRenderedButton")).toBeLessThan(
@@ -2815,7 +2823,10 @@ describe("HelixAskPill mic-first surface contract", () => {
     expect(source).toContain('source_event_type === "public_commentary"');
     expect(transcriptSource).toContain('stream_event: "turn_transcript_event"');
     expect(source).toContain("appendSyntheticLiveEvent(tracedLiveEvent)");
-    expect(source).toContain("console_stream_ingress_debug");
+    expect(activeStreamSource).toContain('schema: "helix.ask.console_stream_ingress_debug.v1"');
+    expect(source).toContain("streamIngress: helixAskConsoleStreamIngressDebugRef.current");
+    expect(source).toContain("console_assembly_debug: consoleAssemblyDebugForReply");
+    expect(consoleDiagnosticsSource).toContain("streamIngress: input.streamIngress");
     expect(source).toContain("rawStreamPacketCount");
     expect(source).toContain("acceptedLiveEventCount");
     expect(source).toContain("replayedTranscriptEventCount");
@@ -2823,7 +2834,7 @@ describe("HelixAskPill mic-first surface contract", () => {
     expect(source).toContain("includeTerminalRows");
     expect(source).toContain("replayHelixAskTurnTranscriptEventsToConsole");
     expect(source).toContain("attachHelixAskClientTraceToLiveEvent");
-    expect(source).toContain("backend_turn_id");
+    expect(activeStreamSource).toContain("backend_turn_id");
     expect(transcriptSource).toContain("record.turn_id ?? record.turnId ?? record.active_turn_id");
     expect(source).toContain("targetTurnId");
     expect(source).toContain("resolveHelixAskReplyCanonicalKey(reply) !== targetTurnId");
@@ -2935,7 +2946,7 @@ describe("HelixAskPill mic-first surface contract", () => {
     expect(chatProjectionSource).toContain(".sort((left, right) => {");
     expect(replyLifecycleSource).toContain("return left.orderMs - right.orderMs;");
     expect(replyLifecycleSource).toContain("reply.createdAtMs");
-    expect(chatProjectionSource).toContain('final_answer_source: "durable_chat_session"');
+    expect(chatProjectionSource).toContain('final_answer_source: observedFinalAnswerSource ?? "durable_chat_session"');
   });
 
   it("marks poisoned or contract-invalid terminal answers as hard theater failures", () => {
@@ -3539,12 +3550,12 @@ describe("HelixAskPill mic-first surface contract", () => {
       allowed: true,
       reason: "agent_step_decision_backed",
       selected_capabilities: expect.arrayContaining([
-        "scientific-calculator.open_panel",
-        "scientific-calculator.focus_panel",
+        "scientific_calculator.open_panel",
+        "scientific_calculator.focus_panel",
       ]),
       envelope_action_keys: expect.arrayContaining([
-        "scientific-calculator.open_panel",
-        "scientific-calculator.focus_panel",
+        "scientific_calculator.open_panel",
+        "scientific_calculator.focus_panel",
       ]),
       assistant_answer: false,
       raw_content_included: false,
@@ -3588,8 +3599,8 @@ describe("HelixAskPill mic-first surface contract", () => {
     expect(result.audit).toMatchObject({
       allowed: true,
       reason: "agent_step_decision_backed",
-      selected_capabilities: expect.arrayContaining(["docs-viewer.open_doc"]),
-      envelope_action_keys: expect.arrayContaining(["docs-viewer.open_doc"]),
+      selected_capabilities: expect.arrayContaining(["docs_viewer.open_doc"]),
+      envelope_action_keys: expect.arrayContaining(["docs_viewer.open_doc"]),
       assistant_answer: false,
       raw_content_included: false,
     });
@@ -3635,8 +3646,8 @@ describe("HelixAskPill mic-first surface contract", () => {
     expect(result.audit).toMatchObject({
       allowed: true,
       reason: "agent_step_decision_backed",
-      selected_capabilities: expect.arrayContaining(["scientific-calculator.show_gateway_solve"]),
-      envelope_action_keys: expect.arrayContaining(["scientific-calculator.show_gateway_solve"]),
+      selected_capabilities: expect.arrayContaining(["scientific_calculator.show_gateway_solve"]),
+      envelope_action_keys: expect.arrayContaining(["scientific_calculator.show_gateway_solve"]),
       assistant_answer: false,
       raw_content_included: false,
     });
@@ -3681,7 +3692,7 @@ describe("HelixAskPill mic-first surface contract", () => {
       allowed: false,
       reason: "agent_step_decision_missing_for_action_envelope",
       selected_capabilities: [],
-      envelope_action_keys: expect.arrayContaining(["scientific-calculator.show_gateway_solve"]),
+      envelope_action_keys: expect.arrayContaining(["scientific_calculator.show_gateway_solve"]),
       assistant_answer: false,
       raw_content_included: false,
     });
@@ -4344,6 +4355,16 @@ describe("HelixAskPill mic helper behavior", () => {
     });
 
     expect(intents).toEqual([]);
+  });
+
+  it.each([
+    "split right", "split row", "split down", "split column",
+    "/split right", "/split row", "/split down", "/split column",
+    "don't split right", "If I ask later, split right", "I split right yesterday",
+    '"split right"', "The screen says split right",
+    "Explain split right without changing panels", "Should I split right?",
+  ])("does not dispatch unsupported split commands: %s", (text) => {
+    expect(parseWorkstationActionCommand(text)).toBeNull();
   });
 
   it("parses close-this-panel phrasing into close_active_panel action", () => {

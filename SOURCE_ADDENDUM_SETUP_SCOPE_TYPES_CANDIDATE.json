@@ -1,0 +1,78 @@
+{
+  "observed_at": "2026-11-13T23:04:59.830200+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/agent-access/SetupContractInbox.tsx",
+      "canonical_sha256": "26821ffe60f20233df989e7bd423dbb93763ba61cf47704ae2fcbc529ccb9b79",
+      "export_sha256": "5ce48534c7ec8bd3e8b419b3aa5f877d4008f128641820184746597af66f0014",
+      "bytes": 110962,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "e51309e62062d8df9717fa556f00d5cea21c68d84881ab4ebebefe9f10a3b28b"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeDiscordTaskTranscriptOfferPanel.tsx",
+      "canonical_sha256": "a8e789b2a01e2a966efb8351f03779f1759c5d23ee82d029f9f5d688a5bc7ff0",
+      "export_sha256": "eb9ed4dd0834e201f92c17cdd51f69fc1ae34f9b313dde7006f065c3dae73f73",
+      "bytes": 12046,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "106c47a3f372ddb809818cc9cd7054222ca809064ab0c95eb403aa7502d5821a"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskSubmitBackendEntrypointOptions.ts",
+      "canonical_sha256": "036d5e70dcfcef8f778cbb53c6410a4bdc5b296bb071110d9ce0a65e7536f9ae",
+      "export_sha256": "036d5e70dcfcef8f778cbb53c6410a4bdc5b296bb071110d9ce0a65e7536f9ae",
+      "bytes": 5078,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "63e87643260171a9263d6b4a465a7638a87eafb616ee40c42707316f8acfa993"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/SetupContractInbox.spec.tsx",
+      "canonical_sha256": "36c60f7546d14d34958edb2385a86081c47f88537104d5fb8132dc34cdb24b54",
+      "export_sha256": "a2c1f25293f359deec9343d66a485d6e3d6270e2686b5aba35c197b802cc9378",
+      "bytes": 98042,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "bb29deb62c8597189ac1172ff8cf1a15727b0f5875dad5c38738975ba1dbfc82"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskSubmitHandoffParity.spec.ts",
+      "canonical_sha256": "10ad69c229010c48f7910b96e8b5d506e2137f24d16c4dfe54b6870236286d84",
+      "export_sha256": "10ad69c229010c48f7910b96e8b5d506e2137f24d16c4dfe54b6870236286d84",
+      "previous_proposal_sha256": "226da43970e5ed884357a249f74909063ad791136325541451c05d90d747bd94",
+      "bytes": 4689,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeDiscordTaskTranscriptOfferPanel.spec.tsx",
+      "canonical_sha256": "a2f612024efbf61e749cbe7a6550954a8b73ea0ba028e706e75bc92c4b16134e",
+      "export_sha256": "4a3acedb0d1caa0dcf128493b3ef36305b9a1ee797da889a1c8cd9b25a6adfbf",
+      "bytes": 10022,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskBackendEntrypointPolicy.spec.ts",
+      "canonical_sha256": "e0c588def68e214301396d5d6450bba973fa2d99e382376cc2e87237e4ec8565",
+      "export_sha256": "e0c588def68e214301396d5d6450bba973fa2d99e382376cc2e87237e4ec8565",
+      "bytes": 23294,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed the exact four-file delta against previously reviewed source and the shared discriminated setup-scope contract. The hosted Fabric source predicate is unchanged at runtime; its return type explicitly narrows to shared_room.",
+    "Room-authority lookup checks property presence before reading the optional value, retaining the existing hosted fallback. No room, source, approval revision, expiry or owner-control checks are removed.",
+    "Native transcript offer captures the candidate already checked by its review guard before the async callback. It preserves exact room/account, invitation and attachment expiry checks; it grants no extra transcript access.",
+    "Backend submission imports its existing route metadata type from the module that exports it. No dispatch behavior changes.",
+    "The setup test mock declares the fetch parameters inspected by its negative assertion. No additional test was needed for these type-narrowing changes; existing setup, offer and routing suites cover the relevant behavior.",
+    "Correcting the route metadata import exposed readonly-array and undeclared-field mismatches in the parity fixture. It now uses satisfies HelixAskRouteMetadata with the existing typed Realtime grounded-feedback binding; synthetic top-level handoff fields are replaced by the actual binding shape. Both payload binding names are asserted, including provenance and non-authoritative flags. No production metadata contract was widened."
+  ],
+  "limits": [
+    "Type correctness repair, not a newly qualified capability or installed authority change. Remaining unrelated type diagnostics retain their own disposition.",
+    "Tests use mocked HTTP/native operations. They do not stage an actual source, offer, approval or game action.",
+    "Unfrozen unpublished source proposal. Existing raw shader/data exclusions and generated document-metadata hold remain."
+  ]
+}

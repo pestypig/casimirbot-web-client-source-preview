@@ -1,3 +1,4 @@
+import { captureAccountOperationScope } from "@/lib/workstation/accountOperationScope";
 import { panelRegistry } from "@/lib/desktop/panelRegistry";
 import { findBestDocForTopic, findRandomPaperForTopic } from "@/lib/docs/paperReadCommand";
 import { launchHelixAskPrompt } from "@/lib/helix/ask-prompt-launch";
@@ -53,7 +54,10 @@ type ObservableResearchWorkflowArgs = {
   max_matches: number;
 };
 
-function normalizePanels(preferredPanels: string[] | undefined): string[] {
+function normalizePanels(
+  preferredPanels: string[] | undefined,
+  canUsePanel: (panelId: string) => boolean,
+): string[] {
   const fromPayload = Array.isArray(preferredPanels)
     ? preferredPanels
         .map((id) => (typeof id === "string" ? id.trim() : ""))
@@ -61,7 +65,7 @@ function normalizePanels(preferredPanels: string[] | undefined): string[] {
     : [];
   if (fromPayload.length > 0) return fromPayload;
   return panelRegistry
-    .filter((panel) => panel.workstationCapabilities?.v1_job_ready)
+    .filter((panel) => panel.workstationCapabilities?.v1_job_ready && canUsePanel(panel.id))
     .map((panel) => panel.id);
 }
 
@@ -74,6 +78,7 @@ function chooseActionId(panelId: string): string | null {
 }
 
 function emitJobLiveEvent(args: {
+  isAccountCurrent: () => boolean;
   contextId: string;
   traceId: string;
   kind: "job_started" | "job_step_receipt" | "job_completed";
@@ -86,6 +91,7 @@ function emitJobLiveEvent(args: {
   artifact?: Record<string, unknown> | null;
   tool?: string;
 }): void {
+  if (!args.isAccountCurrent()) return;
   const tsIso = new Date().toISOString();
   emitHelixAskLiveEvent({
     contextId: args.contextId,
@@ -257,6 +263,8 @@ async function runObservableResearchWorkflow(args: {
   objective: string;
   workflowArgs: ObservableResearchWorkflowArgs;
   executionContext: HelixPanelActionExecutionContext;
+  canUsePanel: (panelId: string) => boolean;
+  isAccountCurrent: () => boolean;
 }): Promise<WorkstationJobStepReceipt[]> {
   const receipts: WorkstationJobStepReceipt[] = [];
 
@@ -267,6 +275,7 @@ async function runObservableResearchWorkflow(args: {
     };
     receipts.push(fullReceipt);
     emitJobLiveEvent({
+      isAccountCurrent: args.isAccountCurrent,
       contextId: args.contextId,
       traceId: args.traceId,
       kind: "job_step_receipt",
@@ -283,16 +292,30 @@ async function runObservableResearchWorkflow(args: {
   const nowIso = () => new Date().toISOString();
 
   const panelStartMs = Date.now();
-  args.executionContext.openPanel("docs-viewer");
-  args.executionContext.focusPanel("docs-viewer");
-  args.executionContext.openPanel("workstation-notes");
-  args.executionContext.focusPanel("workstation-notes");
-  args.executionContext.openPanel("workstation-clipboard-history");
-  args.executionContext.focusPanel("workstation-clipboard-history");
-  args.executionContext.openPanel("workstation-workflow-timeline");
-  args.executionContext.focusPanel("workstation-workflow-timeline");
-  args.executionContext.openPanel("agi-essence-console");
-  args.executionContext.focusPanel("agi-essence-console");
+  const requiredPanels = ["docs-viewer", "workstation-notes"];
+  const unavailableRequiredPanels = requiredPanels.filter((panelId) => !args.canUsePanel(panelId));
+  if (unavailableRequiredPanels.length > 0) {
+    pushReceipt({
+      panel_id: "workstation-notes",
+      action_id: "open_note_panel",
+      ok: false,
+      started_at: nowIso(),
+      duration_ms: Math.max(0, Date.now() - panelStartMs),
+      message: `Required panel unavailable: ${unavailableRequiredPanels.join(", ")}`,
+      artifact: { unavailable_panels: unavailableRequiredPanels },
+    });
+    return receipts;
+  }
+  const availablePanels = [
+    ...requiredPanels,
+    "workstation-clipboard-history",
+    "workstation-workflow-timeline",
+    "agi-essence-console",
+  ].filter(args.canUsePanel);
+  for (const panelId of availablePanels) {
+    args.executionContext.openPanel(panelId);
+    args.executionContext.focusPanel(panelId);
+  }
   emitHelixWorkstationProceduralStep({
     traceId: args.traceId,
     step: "open_note_panel",
@@ -305,8 +328,12 @@ async function runObservableResearchWorkflow(args: {
     ok: true,
     started_at: nowIso(),
     duration_ms: Math.max(0, Date.now() - panelStartMs),
-    message: "Opened docs, notes, clipboard history, and timeline panels.",
-    artifact: { topic: args.workflowArgs.topic, note_title: args.workflowArgs.note_title },
+    message: `Requested ${availablePanels.join(", ")} panels to open.`,
+    artifact: {
+      topic: args.workflowArgs.topic,
+      note_title: args.workflowArgs.note_title,
+      requested_panels: availablePanels,
+    },
   });
 
   const candidatePaths = Array.from(
@@ -328,6 +355,19 @@ async function runObservableResearchWorkflow(args: {
   for (const path of candidatePaths) {
     const startedAtMs = Date.now();
     const markdown = await fetchLocalDoc(path);
+    const unavailableDuringRead = requiredPanels.filter((panelId) => !args.canUsePanel(panelId));
+    if (unavailableDuringRead.length > 0) {
+      pushReceipt({
+        panel_id: "docs-viewer",
+        action_id: "find_topic_sections",
+        ok: false,
+        started_at: nowIso(),
+        duration_ms: Math.max(0, Date.now() - startedAtMs),
+        message: `Required panel unavailable: ${unavailableDuringRead.join(", ")}`,
+        artifact: { unavailable_panels: unavailableDuringRead },
+      });
+      return receipts;
+    }
     if (!markdown) {
       pushReceipt({
         panel_id: "docs-viewer",
@@ -364,6 +404,19 @@ async function runObservableResearchWorkflow(args: {
           citation_id: snippet.citation.id,
         },
       });
+      const unavailableAfterCopy = requiredPanels.filter((panelId) => !args.canUsePanel(panelId));
+      if (unavailableAfterCopy.length > 0) {
+        pushReceipt({
+          panel_id: "docs-viewer",
+          action_id: "copy_section_to_note",
+          ok: false,
+          started_at: nowIso(),
+          duration_ms: Math.max(0, Date.now() - startedAtMs),
+          message: `Required panel unavailable: ${unavailableAfterCopy.join(", ")}`,
+          artifact: { unavailable_panels: unavailableAfterCopy },
+        });
+        return receipts;
+      }
       if (copyOk) {
         recordClipboardReceipt({
           direction: "paste",
@@ -396,6 +449,20 @@ async function runObservableResearchWorkflow(args: {
       if (collectedSnippets.length >= args.workflowArgs.max_matches) break;
     }
     if (collectedSnippets.length >= args.workflowArgs.max_matches) break;
+  }
+
+  const unavailableAfterRead = requiredPanels.filter((panelId) => !args.canUsePanel(panelId));
+  if (unavailableAfterRead.length > 0) {
+    pushReceipt({
+      panel_id: "workstation-notes",
+      action_id: "save_note",
+      ok: false,
+      started_at: nowIso(),
+      duration_ms: 0,
+      message: `Required panel unavailable: ${unavailableAfterRead.join(", ")}`,
+      artifact: { unavailable_panels: unavailableAfterRead },
+    });
+    return receipts;
   }
 
   const noteId = `note:${args.jobId}`;
@@ -482,23 +549,26 @@ async function runObservableResearchWorkflow(args: {
     noteBody,
   ].join("\n");
 
+  const comparePanelId = args.canUsePanel("agi-essence-console")
+    ? "agi-essence-console"
+    : "workstation-notes";
   emitHelixWorkstationProceduralStep({
     traceId: args.traceId,
     step: "attach_note_to_chat",
-    panelId: "agi-essence-console",
+    panelId: comparePanelId,
     topic: noteId,
   });
   emitHelixWorkstationProceduralStep({
     traceId: args.traceId,
     step: "compare_topics_start",
-    panelId: "agi-essence-console",
+    panelId: comparePanelId,
     topic: args.workflowArgs.topic,
   });
 
   launchHelixAskPrompt({
     question: comparePrompt,
     autoSubmit: true,
-    panelId: "agi-essence-console",
+    panelId: comparePanelId,
     bypassWorkstationDispatch: true,
     forceReasoningDispatch: true,
     suppressWorkstationPayloadActions: true,
@@ -518,12 +588,12 @@ async function runObservableResearchWorkflow(args: {
   });
 
   pushReceipt({
-    panel_id: "agi-essence-console",
+    panel_id: comparePanelId,
     action_id: "launch_compare_reasoning",
     ok: true,
     started_at: nowIso(),
     duration_ms: 0,
-    message: "Attached temporary note context and dispatched compare/explain reasoning.",
+    message: "Attached temporary note context and requested compare/explain reasoning; the answer is still pending.",
     artifact: {
       topic: args.workflowArgs.topic,
       note_id: noteId,
@@ -541,7 +611,10 @@ export async function runWorkstationJob(args: {
   contextId: string;
   payload: WorkstationJobPayload;
   executionContext: HelixPanelActionExecutionContext;
+  canUsePanel: (panelId: string) => boolean;
 }): Promise<WorkstationJobExecutionResult> {
+  const isAccountCurrent = captureAccountOperationScope();
+  const canUsePanel = (panelId: string) => isAccountCurrent() && args.canUsePanel(panelId);
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
   const jobId = args.payload.job_id?.trim() || `job:${crypto.randomUUID()}`;
@@ -550,13 +623,14 @@ export async function runWorkstationJob(args: {
   const traceId = /^workstation-action:/i.test(jobId) ? jobId : `workstation-job:${jobId}`;
 
   emitJobLiveEvent({
+    isAccountCurrent,
     contextId: args.contextId,
     traceId,
     kind: "job_started",
     content: `Started job "${title}". Objective: ${objective}`,
   });
 
-  const panelIds = normalizePanels(args.payload.preferred_panels);
+  const panelIds = normalizePanels(args.payload.preferred_panels, canUsePanel);
   const maxStepsRaw = Number(args.payload.max_steps ?? 4);
   const maxSteps = Number.isFinite(maxStepsRaw) ? Math.max(1, Math.min(12, Math.floor(maxStepsRaw))) : 4;
   let receipts: WorkstationJobStepReceipt[] = [];
@@ -573,6 +647,8 @@ export async function runWorkstationJob(args: {
       objective,
       workflowArgs,
       executionContext: args.executionContext,
+      canUsePanel,
+      isAccountCurrent,
     });
   } else {
     receipts = [];
@@ -582,13 +658,15 @@ export async function runWorkstationJob(args: {
       const actionId = chooseActionId(panelId);
       if (!actionId) continue;
       const stepStartMs = Date.now();
-      const result = executeHelixPanelAction(
-        {
-          panel_id: panelId,
-          action_id: actionId,
-        },
-        args.executionContext,
-      );
+      const result = !canUsePanel(panelId)
+        ? { ok: false, message: `Panel unavailable: ${panelId}`, artifact: null }
+        : executeHelixPanelAction(
+            {
+              panel_id: panelId,
+              action_id: actionId,
+            },
+            args.executionContext,
+          );
       const durationMs = Math.max(0, Date.now() - stepStartMs);
       const receipt: WorkstationJobStepReceipt = {
         step: receipts.length + 1,
@@ -603,6 +681,7 @@ export async function runWorkstationJob(args: {
       receipts.push(receipt);
 
       emitJobLiveEvent({
+        isAccountCurrent,
         contextId: args.contextId,
         traceId,
         kind: "job_step_receipt",
@@ -618,13 +697,14 @@ export async function runWorkstationJob(args: {
   }
 
   const completedAt = new Date().toISOString();
-  const ok = receipts.length > 0 && receipts.every((receipt) => receipt.ok);
+  const ok = isAccountCurrent() && receipts.length > 0 && receipts.every((receipt) => receipt.ok);
   emitJobLiveEvent({
+    isAccountCurrent,
     contextId: args.contextId,
     traceId,
     kind: "job_completed",
     ok,
-    content: `Completed job "${title}" with ${receipts.length} step(s). Status: ${ok ? "ok" : "partial/fail"}.`,
+    content: `Finished job steps for "${title}" with ${receipts.length} receipt(s). Status: ${ok ? "ok" : "partial/fail"}.`,
   });
 
   return {

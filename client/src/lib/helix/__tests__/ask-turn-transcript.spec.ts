@@ -937,7 +937,6 @@ describe("Helix Ask turn transcript projection", () => {
             terminal_eligible: false,
             assistant_answer: false,
             raw_content_included: false,
-            reentry_required: true,
           },
           {
             schema: "helix.live_translation.projection_receipt.v1",
@@ -1890,7 +1889,7 @@ describe("Helix Ask turn transcript projection", () => {
       status: "pending",
       text: expect.stringContaining("readiness partial"),
     });
-    expect(buildHelixRuntimeAskLiveEvents(reply).find((event) => event.meta.stepId === "lane_goal_dispatch_readiness")).toMatchObject({
+    expect(buildHelixRuntimeAskLiveEvents(reply).find((event) => event.meta?.stepId === "lane_goal_dispatch_readiness")).toMatchObject({
       meta: expect.objectContaining({
         readinessState: "partial",
         sourceIdentityKey:
@@ -2623,7 +2622,7 @@ describe("Helix Ask turn transcript projection", () => {
     );
     expect(combined).toContain("Terminal: Terminal selected: agent_provider_terminal_candidate.");
     const events = buildHelixRuntimeAskLiveEvents(reply);
-    expect(events.find((event) => event.meta.stepId === "lane_session")).toMatchObject({
+    expect(events.find((event) => event.meta?.stepId === "lane_session")).toMatchObject({
       meta: expect.objectContaining({
         sessionControlKey:
           "lane-session-timeline::document_markdown:docs/research/nhm2.md::fnv1a32:session-doc::docs_chunk::es-US::es",
@@ -2639,7 +2638,7 @@ describe("Helix Ask turn transcript projection", () => {
         event_source: "capability_lane_turn_timeline",
       }),
     });
-    expect(events.find((event) => event.meta.stepId === "lane_mail_loop")).toMatchObject({
+    expect(events.find((event) => event.meta?.stepId === "lane_mail_loop")).toMatchObject({
       text: expect.stringContaining("Lane mail loop: live_translation created."),
       meta: expect.objectContaining({
         stage: "observation",
@@ -2818,7 +2817,7 @@ describe("Helix Ask turn transcript projection", () => {
     expect(combined).toContain("Lane State: Lane state: helix_terminal_authority is terminal_selected.");
 
     const events = buildHelixRuntimeAskLiveEvents(reply);
-    expect(events.find((event) => event.meta.stateLabel === "observed_pending_reentry")).toMatchObject({
+    expect(events.find((event) => event.meta?.stateLabel === "observed_pending_reentry")).toMatchObject({
       meta: expect.objectContaining({
         event_source: "capability_lane_timeline_summary.console_state_rows",
         source_event_type: "lane_console_state",
@@ -3229,7 +3228,7 @@ describe("Helix Ask turn transcript projection", () => {
       },
     });
 
-    expect(events.find((event) => event.meta.source_event_type === "lane_backend_selected")).toMatchObject({
+    expect(events.find((event) => event.meta?.source_event_type === "lane_backend_selected")).toMatchObject({
       meta: expect.objectContaining({
         source_event_type: "lane_backend_selected",
         lane: "live_translation",
@@ -3711,7 +3710,7 @@ describe("Helix Ask turn transcript projection", () => {
       role: "system",
       status: "pending",
     });
-    expect(events.find((event) => event.meta.stepId === "lane_goal_binding")).toMatchObject({
+    expect(events.find((event) => event.meta?.stepId === "lane_goal_binding")).toMatchObject({
       meta: expect.objectContaining({
         sourceId: "docs:nhm2",
         sourceHash: "sha256:nhm2-goal",
@@ -3764,7 +3763,7 @@ describe("Helix Ask turn transcript projection", () => {
       status: "pending",
       text: expect.stringContaining("Goal dispatch plan: live_translation; target ask_wake"),
     });
-    expect(events.find((event) => event.meta.stepId === "lane_goal_dispatch_plan")).toMatchObject({
+    expect(events.find((event) => event.meta?.stepId === "lane_goal_dispatch_plan")).toMatchObject({
       meta: expect.objectContaining({
         sessionControlKey:
           "lane-session-translate-docs::docs:nhm2::sha256:nhm2-goal::docs_chunk::es-US::es",
@@ -3783,7 +3782,7 @@ describe("Helix Ask turn transcript projection", () => {
       status: "pending",
       text: expect.stringContaining("Goal dispatch admission: live_translation; target ask_wake"),
     });
-    expect(events.find((event) => event.meta.stepId === "lane_goal_dispatch_admission")).toMatchObject({
+    expect(events.find((event) => event.meta?.stepId === "lane_goal_dispatch_admission")).toMatchObject({
       meta: expect.objectContaining({
         sessionControlKey:
           "lane-session-translate-docs::docs:nhm2::sha256:nhm2-goal::docs_chunk::es-US::es",
@@ -3802,7 +3801,7 @@ describe("Helix Ask turn transcript projection", () => {
       status: "pending",
       text: expect.stringContaining("Goal dispatch readiness: readiness ready; plans 1"),
     });
-    expect(events.find((event) => event.meta.stepId === "lane_goal_dispatch_readiness")).toMatchObject({
+    expect(events.find((event) => event.meta?.stepId === "lane_goal_dispatch_readiness")).toMatchObject({
       meta: expect.objectContaining({
         readinessState: "ready",
         sessionControlKey:
@@ -4077,7 +4076,7 @@ describe("Helix Ask turn transcript projection", () => {
     });
     expect(rows.some((row) => row.label === "Goal Lane")).toBe(false);
     const events = buildHelixRuntimeAskLiveEvents(reply);
-    expect(events.find((event) => event.meta.stepId === "lane_session")).toMatchObject({
+    expect(events.find((event) => event.meta?.stepId === "lane_session")).toMatchObject({
       meta: expect.objectContaining({
         lane: "live_translation",
         capabilityId: "live_translation",
@@ -4228,8 +4227,8 @@ describe("Helix Ask turn transcript projection", () => {
 
     const events = buildHelixRuntimeAskLiveEvents(reply);
     expect(events.find((event) =>
-      event.meta.stepId === "lane_session" &&
-      event.meta.event_source === "capability_lane_session_results"
+      event.meta?.stepId === "lane_session" &&
+      event.meta?.event_source === "capability_lane_session_results"
     )).toMatchObject({
       meta: expect.objectContaining({
         lane: "live_translation",
@@ -4242,8 +4241,8 @@ describe("Helix Ask turn transcript projection", () => {
       }),
     });
     expect(events.find((event) =>
-      event.meta.stepId === "lane_session" &&
-      event.meta.event_source === "capability_lane_session_debug_summaries"
+      event.meta?.stepId === "lane_session" &&
+      event.meta?.event_source === "capability_lane_session_debug_summaries"
     )).toMatchObject({
       meta: expect.objectContaining({
         laneSessionId: "lane-session-standalone",
@@ -4344,7 +4343,7 @@ describe("Helix Ask turn transcript projection", () => {
       },
     });
 
-    expect(events.find((event) => event.meta.stepId === "lane_goal_dispatch_plan")).toMatchObject({
+    expect(events.find((event) => event.meta?.stepId === "lane_goal_dispatch_plan")).toMatchObject({
       meta: expect.objectContaining({
         lane: "live_translation",
         laneSessionId: "lane-session-live-event",
@@ -4355,7 +4354,7 @@ describe("Helix Ask turn transcript projection", () => {
         rawContentIncluded: false,
       }),
     });
-    expect(events.find((event) => event.meta.stepId === "lane_goal_dispatch_admission")).toMatchObject({
+    expect(events.find((event) => event.meta?.stepId === "lane_goal_dispatch_admission")).toMatchObject({
       meta: expect.objectContaining({
         lane: "live_translation",
         laneSessionId: "lane-session-live-event",
@@ -4366,7 +4365,7 @@ describe("Helix Ask turn transcript projection", () => {
         rawContentIncluded: false,
       }),
     });
-    expect(events.find((event) => event.meta.stepId === "lane_goal_dispatch_readiness")).toMatchObject({
+    expect(events.find((event) => event.meta?.stepId === "lane_goal_dispatch_readiness")).toMatchObject({
       meta: expect.objectContaining({
         lane: "live_translation",
         laneSessionId: "lane-session-live-event",
@@ -4638,7 +4637,7 @@ describe("Helix Ask turn transcript projection", () => {
     expect(mailSummary).toContain("evidence-only");
 
     const events = buildHelixRuntimeAskLiveEvents(reply);
-    expect(events.find((event) => event.meta.stepId === "lane_mail_loop")).toMatchObject({
+    expect(events.find((event) => event.meta?.stepId === "lane_mail_loop")).toMatchObject({
       meta: expect.objectContaining({
         lane: "live_translation",
         capabilityId: "live_translation.translate_text",

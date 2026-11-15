@@ -13,6 +13,9 @@ import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/account
 import { createRoomTextDraftStore } from "./RoomTextDraftStore";
 import { LocalRoomTextOwnerBridge, type LocalRoomTextOwnerSnapshot } from "./LocalRoomTextOwnerBridge";
 import { NativeRoomConnectionPanel, type DiscordVoiceRenewalPending } from "./NativeRoomConnectionPanel";
+import { clearPendingExactRoomReviewNavigation,
+  consumePendingExactRoomReviewNavigation, requestExactRoomReviewNavigation } from
+  "@/lib/workstation/exactRoomReviewNavigation";
 import type { HostedRoomTextOwnerSnapshot } from "./NativeHostedRoomTextOwnerBridge";
 
 export const HELIX_HOSTED_ROOM_OPEN_DIALOG_EVENT = "helix:hosted-room-open-dialog";
@@ -31,6 +34,7 @@ export type HelixAskSharedLiveRoomControlsProps = {
   onSelectRoomMission?: () => void;
   onHostedRoomTextOwnerChange?: (snapshot: HostedRoomTextOwnerSnapshot | null) => void;
   onDiscordVoiceRenewalRequest?: (request: DiscordVoiceRenewalPending | null) => void;
+  onMuteLocalGptLive?: () => void;
   onSelectHostedRoomChannel?: () => void;
   onSelectHostedRoomMission?: () => void;
 };
@@ -49,6 +53,7 @@ export function HelixAskSharedLiveRoomControls({
   onSelectRoomMission,
   onHostedRoomTextOwnerChange,
   onDiscordVoiceRenewalRequest,
+  onMuteLocalGptLive,
   onSelectHostedRoomChannel,
   onSelectHostedRoomMission,
 }: HelixAskSharedLiveRoomControlsProps) {
@@ -64,7 +69,8 @@ export function HelixAskSharedLiveRoomControls({
   const navigationRead = useRef<AbortController | null>(null);
   useEffect(() => () => navigationRead.current?.abort(), []);
   useEffect(() => {
-    const changed = () => { roomDraftStore.clearAll(); navigationRead.current?.abort(); setDialogOpen(false); setNavigationRoomId(null); };
+    const changed = () => { roomDraftStore.clearAll(); navigationRead.current?.abort();
+      clearPendingExactRoomReviewNavigation(); setDialogOpen(false); setNavigationRoomId(null); };
     window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, changed);
     return () => window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, changed);
   }, []);
@@ -151,6 +157,11 @@ export function HelixAskSharedLiveRoomControls({
   }, [room?.room_id, room?.status, controller.openRoom]);
 
   useEffect(() => {
+    const review = consumePendingExactRoomReviewNavigation();
+    if (review) requestExactRoomReviewNavigation(review);
+  }, []);
+
+  useEffect(() => {
     onActiveRoomChange?.(room?.status === "closed" ? null : room?.room_id ?? null);
     return () => onActiveRoomChange?.(null);
   }, [onActiveRoomChange, room?.room_id, room?.status]);
@@ -225,6 +236,7 @@ export function HelixAskSharedLiveRoomControls({
         portalTarget={nativeRoomPortalTarget}
         onHostedRoomTextOwnerChange={onHostedRoomTextOwnerChange}
         onDiscordVoiceRenewalRequest={onDiscordVoiceRenewalRequest}
+        onMuteLocalGptLive={onMuteLocalGptLive}
         onOpenRoomConsole={onSelectHostedRoomChannel ? () => {
           closeDialog(); onSelectHostedRoomChannel();
         } : undefined}

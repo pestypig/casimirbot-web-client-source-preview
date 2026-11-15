@@ -9,7 +9,7 @@ export type InterfaceMessageMeta<Id extends string = string> = {
   context: string;
   placeholders?: Record<string, InterfaceMessagePlaceholderType>;
   glossaryTerms?: string[];
-  screenshotSurface?: "account-session" | "settings" | "workstation";
+  screenshotSurface?: "account-session" | "settings" | "workstation" | "mobile-start";
   maxLengthHint?: number;
 };
 

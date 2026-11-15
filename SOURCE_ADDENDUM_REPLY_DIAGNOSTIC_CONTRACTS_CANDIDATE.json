@@ -1,0 +1,65 @@
+{
+  "observed_at": "2026-11-14T01:49:45.745666+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/HelixAskPill.tsx",
+      "canonical_sha256": "10b26e4520ff0360ddb67f886ad6ce8153cc90c97a0151718d2a21ba0044b41f",
+      "export_sha256": "10b26e4520ff0360ddb67f886ad6ce8153cc90c97a0151718d2a21ba0044b41f",
+      "bytes": 1048058,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "9d7aa4a22cec9f552789898110677d40987794238763fcac2dea8ae7af6b73b5"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyConsoleInventory.ts",
+      "canonical_sha256": "d62e770013d1fd941320fcd59c0d1943e010a251182440d0474c04957ade03b1",
+      "export_sha256": "d62e770013d1fd941320fcd59c0d1943e010a251182440d0474c04957ade03b1",
+      "bytes": 83435,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "e72f7d7599f4348e62f14294efc0ef3a9a7237eec99ebd1add68074835a9c927"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-recrown.spec.ts",
+      "canonical_sha256": "c7a598b6497b5ad235f982dfb82b854b2cb18c668a5c2230595988bb9f1789f5",
+      "export_sha256": "da7b63264e3632b523f21b2c10dae32da428ba186502092b335a1e109201e4d5",
+      "bytes": 524824,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-diagnostics.spec.ts",
+      "canonical_sha256": "9763f7fd8e9dc42172fe8dcb7708d9752207877191295bdb5badc88a3cb60c3a",
+      "export_sha256": "9763f7fd8e9dc42172fe8dcb7708d9752207877191295bdb5badc88a3cb60c3a",
+      "bytes": 69362,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Reply diagnostics type contracts",
+    "capability": "Passive reply diagnostics and action summary metadata",
+    "lifecycle_stage": "Diagnostic projection",
+    "reaction_timescale": "Reply inspection",
+    "authority_owner": "Existing record validation and action authority checks",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with declarations matching existing diagnostic reads",
+    "required_evidence": "Emitted JavaScript parity; existing diagnostics/console suites; scoped compiler",
+    "explicit_non_goals": "No physics calculation, certificate, dispatch, game, provider or installed acceptance changes",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "The reply type now declares the optional equation_attempt_debug and equation_extraction_attempt values already read by diagnostic exports. They remain unknown until the existing readAgentLoopAuditRecord validator accepts them; no calculation or physical claim changes.",
+    "The first action used by diagnostic projection is explicitly typed as an optional record. Existing string checks still determine whether panel_id or action_id are reported. This adds no field, action dispatch or authority.",
+    "The runtime console is required to emit byte-identical JavaScript before and after these declaration edits. No runtime fix number is claimed for this slice.",
+    "Legacy console inventory positions were recomputed for the two added declaration lines. Existing diagnostic and console suites are selected unchanged."
+  ],
+  "limits": [
+    "Unfrozen, unpublished and uninstalled. Type and local diagnostic checks do not establish installed behavior or physics/certificate integrity.",
+    "Export tests load the updated inventory; console runtime emission parity is checked separately. Broad runtime dependencies remain canonical.",
+    "Other compiler diagnostics and source holds remain."
+  ]
+}

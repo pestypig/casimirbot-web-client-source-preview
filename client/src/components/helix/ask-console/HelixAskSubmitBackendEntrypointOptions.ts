@@ -1,4 +1,6 @@
-import type { HelixAskRouteMetadata } from "./HelixAskRequestEnvelope";
+import type { HelixAgentRuntimeId } from "@shared/helix-agent-runtime";
+import { hasPhysicsGlyphAskConnection } from "@/lib/workstation/physicsGlyphAskContext";
+import type { HelixAskRouteMetadata } from "@/lib/helix/ask-prompt-launch";
 import {
   buildHelixAskHardBackendEntrypointRouteMetadata,
   buildHelixAskPastedTextResumeRecallRouteMetadata,
@@ -21,6 +23,20 @@ export type HelixAskSubmitBackendEntrypointRoutePlan = {
   useBackendAskTurnEntrypoint: boolean;
 };
 
+export const hasHelixAskRealtimeBackendHandoff = (
+  options?: HelixAskSubmitBackendEntrypointRunOptions | null,
+): boolean =>
+  options?.requiresBackendAskEntrypoint === true &&
+  options.routeMetadata?.source === "realtime_stage_play" &&
+  options.routeMetadata.invocationKind === "stage_play_realtime_transcript_handoff";
+
+export function resolveHelixAskSubmitRuntime(args: {
+  selectedRuntime: HelixAgentRuntimeId;
+  serverAdmittedRuntimeAgentProvider?: HelixAgentRuntimeId;
+}): HelixAgentRuntimeId {
+  return args.serverAdmittedRuntimeAgentProvider ?? args.selectedRuntime;
+}
+
 export function buildHelixAskSubmitBackendEntrypointRoutePlan(args: {
   question: string;
   baseRunOptions?: HelixAskSubmitBackendEntrypointRunOptions;
@@ -30,13 +46,19 @@ export function buildHelixAskSubmitBackendEntrypointRoutePlan(args: {
   backendOwnedPastedTextResumeRecall?: boolean;
 }): HelixAskSubmitBackendEntrypointRoutePlan {
   const backendOwnedPastedTextResumeRecall = args.backendOwnedPastedTextResumeRecall === true;
+  // The backend must validate this handoff. Client hard-tool classification
+  // must not replace its source, transcript hash or room authority metadata.
+  const realtimeStagePlayHandoff = hasHelixAskRealtimeBackendHandoff(args.baseRunOptions);
   const conceptualToolExplanationWithoutExecution =
+    !realtimeStagePlayHandoff &&
     isConceptualToolExplanationWithoutExecution(args.question);
   const hardBackendEntrypointRequired =
-    !conceptualToolExplanationWithoutExecution &&
-    (args.baseRunOptions?.requiresBackendAskEntrypoint === true ||
-      requiresHelixAskBackendEntrypoint(args.question));
-  const hardRouteMetadata = hardBackendEntrypointRequired
+    hasPhysicsGlyphAskConnection() ||
+    realtimeStagePlayHandoff ||
+    (!conceptualToolExplanationWithoutExecution &&
+      (args.baseRunOptions?.requiresBackendAskEntrypoint === true ||
+        requiresHelixAskBackendEntrypoint(args.question)));
+  const hardRouteMetadata = hardBackendEntrypointRequired && !realtimeStagePlayHandoff
     ? buildHelixAskHardBackendEntrypointRouteMetadata({
         question: args.question,
         base: args.baseRunOptions?.routeMetadata,
@@ -44,7 +66,9 @@ export function buildHelixAskSubmitBackendEntrypointRoutePlan(args: {
         threadId: args.threadId,
       })
     : null;
-  const routeMetadata = backendOwnedPastedTextResumeRecall
+  const routeMetadata = realtimeStagePlayHandoff
+    ? args.baseRunOptions?.routeMetadata
+    : backendOwnedPastedTextResumeRecall
     ? buildHelixAskPastedTextResumeRecallRouteMetadata({
         base: args.baseRunOptions?.routeMetadata,
         turnId: args.turnId,
@@ -75,6 +99,9 @@ export function mergeHelixAskSubmitBackendEntrypointRunOptions<
   turnId: string;
   threadId: string;
 }): TOptions | undefined {
+  if (hasHelixAskRealtimeBackendHandoff(args.baseRunOptions)) {
+    return args.baseRunOptions;
+  }
   if (isConceptualToolExplanationWithoutExecution(args.question)) {
     if (!args.baseRunOptions) return undefined;
     const { requiresBackendAskEntrypoint, forceReasoningDispatch, routeMetadata, ...rest } = args.baseRunOptions;

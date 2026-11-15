@@ -23,6 +23,7 @@ function jsonFile(value:unknown){
 
 it('defaults to a clearly illustrative globe with no claimed current map',()=>{
   render(<SolarMagneticGlobe/>);
+  expect(screen.getByText(/Carrington \+x aligned with the 3D sphere/)).toBeTruthy();
   expect(screen.getByText(/Illustrative axial dipole lines/)).toBeTruthy();
   expect(screen.getByText(/No global radial-field map or PFSS solution loaded/)).toBeTruthy();
   expect(screen.getByText(/WebGL is unavailable/)).toBeTruthy();
@@ -91,6 +92,7 @@ it('replays only a view recipe bound to the exact loaded map',async()=>{
     scientificAdmission:false,quantitativeJoinAllowed:false});
   fireEvent.change(screen.getByLabelText('Import magnetic view recipe'),{target:{files:[jsonFile(recipe)]}});
   await waitFor(()=>expect(screen.getByText(new RegExp(`Replayed display settings ${recipe.recipeId}`))).toBeTruthy());
+  expect(screen.getByText(/legacy 180°-offset view replay/)).toBeTruthy();
   expect((screen.getByLabelText('Illustrative axial dipole lines (not current data)') as HTMLInputElement).checked).toBe(true);
   expect((screen.getByLabelText('Map-derived l=1 dipole approximation (not observed lines or PFSS)') as HTMLInputElement).checked).toBe(false);
   const {recipeId:_,...recipeBody}=recipe;
@@ -135,10 +137,12 @@ it('keeps measured HMI LOS points distinct from PFSS lines and binds their diagn
   expect(screen.getByText(/full-map radial projection RMS 20.0 G/)).toBeTruthy();
   expect((screen.getByLabelText('Measured HMI LOS comparison markers (not field lines)') as HTMLInputElement).checked).toBe(true);
   expect(screen.getByText(/HMI quality flag is nonzero/)).toBeTruthy();
-  await waitFor(()=>expect(screen.getByText(/View ID:/).textContent).toMatch(/solar-magnetic-view:/));
-  const originalView=screen.getByText(/View ID:/).textContent;
+  const localViewId=()=>screen.getAllByText(/View ID:/)
+    .find(element=>element.textContent?.includes('solar-magnetic-view:'))?.textContent;
+  await waitFor(()=>expect(localViewId()).toMatch(/solar-magnetic-view:/));
+  const originalView=localViewId();
   fireEvent.click(screen.getByLabelText('radial l=1 approximation'));
-  await waitFor(()=>expect(screen.getByText(/View ID:/).textContent).not.toBe(originalView));
+  await waitFor(()=>expect(localViewId()).not.toBe(originalView));
   expect((screen.getByLabelText('radial l=1 approximation') as HTMLInputElement).checked).toBe(true);
   const {diagnosticId:_,...body}=diagnostic;
   const altered=await prepareSolarMagneticLosDiagnostic({...body,mapSourceProductId:'different-map'});
@@ -242,3 +246,32 @@ it.runIf(existsSync(localBundlePath))('replays the actual local GONG/PFSS/HMI bu
   expect(screen.getByText(/not an independently measured global solar moment/)).toBeTruthy();
   expect(screen.getByText(/Display-only research preview/)).toBeTruthy();
 },15_000);
+
+it('keeps an archive lookup alive when a separate globe display control changes',async()=>{
+  let finish!:(value:unknown)=>void;
+  const pending=new Promise(resolve=>{finish=resolve;});
+  let catalogSignal:AbortSignal|undefined,requestedDate='';
+  const fetcher=vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>{
+    const url=String(input);
+    if(url.includes('/rob-pfss/catalog?')){
+      requestedDate=new URL(url,'https://example.org').searchParams.get('dateUtc')!;
+      catalogSignal=init?.signal as AbortSignal;return pending;
+    }
+    return {ok:true,status:200,json:async()=>({ok:true,request:null})};
+  });
+  vi.stubGlobal('fetch',fetcher);
+  try{
+    render(<SolarMagneticGlobe/>);
+    fireEvent.click(screen.getByRole('button',{name:'Find models'}));
+    await waitFor(()=>expect(catalogSignal).toBeDefined());
+    fireEvent.click(screen.getByLabelText('Illustrative axial dipole lines (not current data)'));
+    expect(catalogSignal!.aborted).toBe(false);
+    finish({ok:true,status:200,json:async()=>({schemaVersion:'solar-rob-pfss-catalog/2',
+      dateUtc:requestedDate,checkedAtUtc:'2026-09-21T15:04:00.000Z',
+      catalogUrl:'https://example.org/list.txt',status:'no_product_at_path',catalogSha256:null,
+      catalogBytes:null,entries:[],truncated:false,
+      cadenceClaim:'irregular_publication_observed_from_catalog_only',
+      sourceIdentityAuthenticated:false,scientificAdmission:false})});
+    await screen.findByText(/No model for this UTC date was listed/);
+  }finally{vi.unstubAllGlobals();}
+});

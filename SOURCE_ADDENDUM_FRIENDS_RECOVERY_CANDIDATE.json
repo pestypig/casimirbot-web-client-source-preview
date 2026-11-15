@@ -1,0 +1,76 @@
+{
+  "schema": "casimirbot.friends_recovery_source_addendum.v1",
+  "observed_at": "2026-11-15T08:28:04.613743+00:00",
+  "status": "private_working_copy_not_published",
+  "canonical_base_commit": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "canonical_frozen_source_commit": null,
+  "files": [
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendStreamsApi.ts",
+      "previous_export_sha256": "ce8fc3d34e19d74792fa701a13192607a7c57c8d4f7a1a15d6b5b22693c0faff",
+      "canonical_sha256": "2e1af742886bf8969bc7669fb845c06090b22c1e82bde92fe8cb47414db59702",
+      "export_sha256": "2e1af742886bf8969bc7669fb845c06090b22c1e82bde92fe8cb47414db59702"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendStreamsPanel.tsx",
+      "previous_export_sha256": "26b46708bd9f4f497aabe61991f7fa0a46e69e434e27ce6213c78fe340a901e0",
+      "canonical_sha256": "04df38e83fe15f1d9feae0f6acfee2e829a41309205b7cb1c2c6e42a297ab9a6",
+      "export_sha256": "04df38e83fe15f1d9feae0f6acfee2e829a41309205b7cb1c2c6e42a297ab9a6"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendsPartiesPanel.tsx",
+      "previous_export_sha256": "ed11005f3be011486dfd8f22af65db7624c47283350a65fe5a3f0088e9c59925",
+      "canonical_sha256": "18f44be511cadb89788d9930b8bda0fe296123fcacc35139cfe714070e34ae96",
+      "export_sha256": "18f44be511cadb89788d9930b8bda0fe296123fcacc35139cfe714070e34ae96"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendsConnectionRecovery.tsx",
+      "previous_export_sha256": "bba31b9551561d3761623580688c94d5becb34dd3886cc89c2ddba1401f78132",
+      "canonical_sha256": "3b01b88213ef843b8144bbc640bf84c8f9a9785ffc9c454849ed5aa4769eef65",
+      "export_sha256": "3b01b88213ef843b8144bbc640bf84c8f9a9785ffc9c454849ed5aa4769eef65"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/FriendStreamsApi.spec.ts",
+      "previous_export_sha256": "5c5719e2aab9a0e7475ec58a73edb01688d819186275478b235342fd676feaf8",
+      "canonical_sha256": "abf06cb50c412b5e78a93892c4d35c909fb985449d6e480d1b8b114ef1568390",
+      "export_sha256": "abf06cb50c412b5e78a93892c4d35c909fb985449d6e480d1b8b114ef1568390"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/FriendStreamsPanel.spec.tsx",
+      "previous_export_sha256": "07a336c149b9a203483bf7c489278f286627243c6450727e0c7f07dc0b1e5ebc",
+      "canonical_sha256": "4b0220c4e0e9c4d8a2de58fdfa95f8f85d236b4173f9a575e7b90466a07f659e",
+      "export_sha256": "4b0220c4e0e9c4d8a2de58fdfa95f8f85d236b4173f9a575e7b90466a07f659e"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/FriendsPartiesPanel.spec.tsx",
+      "previous_export_sha256": "8df8d8a4d7992bb4f4ad699ef5c295907fa6addf229a28e52fcf67099cf159b8",
+      "canonical_sha256": "38141749bc241eb59ece99d8fc6444444a0f0ea0454b0b2f8bab8cefcb0cb496",
+      "export_sha256": "9216be17558b76529a1b80f943bb4b8534fe6198ada44fa9ba256e3dee29ad16"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/FriendsConnectionRecovery.spec.tsx",
+      "previous_export_sha256": "6c04675d2664ec3f19718ab1fde7e198d1cd32b7502d7f67c8945c2705cf0d8a",
+      "canonical_sha256": "0d8a803803332dd54f8f42abdc02c30fb3ea73d3391daec9f7c942bc30b4b8aa",
+      "export_sha256": "0d8a803803332dd54f8f42abdc02c30fb3ea73d3391daec9f7c942bc30b4b8aa"
+    }
+  ],
+  "review": [
+    "Retain typed Friends connection errors for explicit recovery; clear stale friend/stream cards when access expires.",
+    "Reconnection refreshes read-only state and available sources; it does not start publishing, follow, pair, or authorize a room.",
+    "Provide Check connection while waiting for an account handoff; owner still performs sign-in.",
+    "All changed exports were already selected; no additional private dependency or account fixture is exported."
+  ],
+  "validation": {
+    "focused_suite_passed": 30,
+    "final_recovery_component_passed": 6,
+    "unique_test_cases": 31,
+    "failed": 0
+  },
+  "packaged_in_r384": false,
+  "installed": false,
+  "published": false,
+  "limits": [
+    "Local source and unit evidence; replacement package and installed acceptance pending.",
+    "Browser callback delivery itself is unchanged; the read-only fallback handles a missed notification."
+  ]
+}

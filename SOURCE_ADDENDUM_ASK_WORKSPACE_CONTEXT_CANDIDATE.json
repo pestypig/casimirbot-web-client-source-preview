@@ -1,0 +1,75 @@
+{
+  "observed_at": "2026-11-14T01:35:43.392150+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/lib/agi/api.ts",
+      "canonical_sha256": "44cf2785adbd839c2387e3fae6b9896ff481576e8cddb0e8fb56a89c6c58f19c",
+      "export_sha256": "6a1fd449776ca1f0e94b93b0eefdda29c272b727e62db81e4b3f1e9a5b06e629",
+      "bytes": 146332,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "16228b566d3798e6353872788d6f5c1e9c7b88f58a3c8593cce8c1c0b0cfee3b"
+    },
+    {
+      "path": "client/src/components/helix/HelixAskPill.tsx",
+      "canonical_sha256": "9cf55427f29b0f8475191a1ade1e036b2c2f346db8ea58b2ad0f94716ba5a622",
+      "export_sha256": "9cf55427f29b0f8475191a1ade1e036b2c2f346db8ea58b2ad0f94716ba5a622",
+      "bytes": 1047773,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "4db853b550aade76eeb7c6552eaac1afd1e12ce43bdcd7ff621a1b7124d8f6ba"
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/api.workspace-context.spec.ts",
+      "canonical_sha256": "eca6fa9a2317cd9f655a449d347830365ab00b91952e4f065b4aa129b73c0978",
+      "export_sha256": "eca6fa9a2317cd9f655a449d347830365ab00b91952e4f065b4aa129b73c0978",
+      "bytes": 3318,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/agi/__tests__/api.physics-scenario-context.spec.ts",
+      "canonical_sha256": "04b6b1585c5bb8749a0917f6ea2dce5141f6a69e541e9fa7adb441e7486e8cad",
+      "export_sha256": "04b6b1585c5bb8749a0917f6ea2dce5141f6a69e541e9fa7adb441e7486e8cad",
+      "bytes": 3127,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-recrown.spec.ts",
+      "canonical_sha256": "c7a598b6497b5ad235f982dfb82b854b2cb18c668a5c2230595988bb9f1789f5",
+      "export_sha256": "da7b63264e3632b523f21b2c10dae32da428ba186502092b335a1e109201e4d5",
+      "bytes": 524824,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Explicit chat context request transport",
+    "capability": "Workspace context supplied to Ask",
+    "lifecycle_stage": "Request serialization",
+    "reaction_timescale": "Explicit question submission",
+    "authority_owner": "Existing caller context selection and server checks",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with context preserved at transport boundary",
+    "required_evidence": "Before/after request body tests; existing request-context and console tests; scoped compiler",
+    "explicit_non_goals": "No new context discovery, provider call, imported-message execution, room grant or installed acceptance",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "Runtime fix 52 adds the explicit workspaceContextSnapshot option already supplied by the chat UI to askLocal and serializes record-shaped context as workspace_context_snapshot. The existing turn, queued job and allowed missing-job-endpoint compatibility paths all use the same body.",
+    "Three regression cases fail before the patch because the snapshot is absent. The tests mock all HTTP requests, verify endpoints and call counts, preserve the question and passive context flags, and assert no action/tool fields are added. Omitted and array-shaped context remain omitted.",
+    "No context is discovered or attached automatically in this legacy wrapper. The main chat continues to omit its snapshot for an isolated turn. Server request parsing already accepts workspace_context_snapshot; no server contract or authorization is changed.",
+    "The main chat request mode is annotated with its existing AskLocalMode API contract to prevent literal widening. This type-only change preserves emitted JavaScript and source line positions.",
+    "Existing eight request-boundary scenario-context checks and the console recrown suite are unchanged. Their mocked evidence does not qualify a Physics Glyph artifact, game handoff or live provider.",
+    "The initial payload annotation passed the new transport tests but broke an existing source-shape assertion. Moving the type annotation to the request mode preserves that assertion and the emitted runtime. Initial failed test receipts are retained."
+  ],
+  "limits": [
+    "Unfrozen, unpublished, uninstalled. HTTP request serialization tests do not prove real server import, provider use, Friends stream delivery or GPT Live game continuity.",
+    "Export tests load the changed API module; broad console checks use canonical dependencies. Pill annotation emission parity is checked separately.",
+    "Other compiler diagnostics and the existing source holds remain."
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "observed_at": "2026-11-13T18:25:50.850125+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/workstation/AccountSessionPanel.tsx",
+      "canonical_sha256": "cf52f2f58846ec978c686ab5ab172c7b250f55f3d924bf16737c6d999faacc19",
+      "export_sha256": "42807995fd4ae181efce91e0958ad12db2dbb8d3a92461d51b35d9ef1c299767",
+      "bytes": 79460,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "e3ccd780bdf9ddf30d5a19d3b7449e1fdb97e5fbf906022cb65c1b71d2e3aad8"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/AccountLocalHostedEntry.spec.tsx",
+      "canonical_sha256": "3c2804c9dddb6fbf8da69610562eb44fe5ab2229ae3f211bab44aa5da874bcfb",
+      "export_sha256": "ebd0772eefc65345324ae824156059a628579689654715766edd7131de311b14",
+      "bytes": 12283,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "70b248a6f48559c666c3b93e61d9cc01f956d2af7981e18d6fd5b9cd0000e4ab"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/AccountSessionPanel.i18n.spec.tsx",
+      "canonical_sha256": "ad6c1a026466478edaa4faf73476094afdceeca6fd65e1a8a5542e37c8f6d09a",
+      "export_sha256": "aaa621d7c1f09d59506c0393115948519730160f41aaf8225096ff27b9b8003f",
+      "bytes": 17018,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "39e1458997c4ddd4f4ae3d02ea0ad7023dd4525108f205eec08911271cd0bd12"
+    },
+    {
+      "path": "client/src/lib/i18n/messages/catalogMetadata.ts",
+      "canonical_sha256": "e736c3164b240c84a9f4667df5b8dbd73cd7998585c827fff2591d5a484de8d8",
+      "export_sha256": "093df9c13017517943514624ca638cd36cda506b17abfc5ae8140f35bc9b691c",
+      "bytes": 361,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "5f4847f618d0291a8b46b4a56d30e0b37f32cd3245dacb774993418b2494176d"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/i18n/__tests__/interfaceCatalog.spec.ts",
+      "canonical_sha256": "0cbe6515439c4b234a92bfabfe3b2bdaefd9284d33f72ac5ba601c0d89a1b888",
+      "export_sha256": "0cbe6515439c4b234a92bfabfe3b2bdaefd9284d33f72ac5ba601c0d89a1b888",
+      "bytes": 5024,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed AccountSessionPanel changed hunks, surrounding account reads/mutations and presentation, both complete account suites, compact catalog metadata and the unchanged catalog integrity suite.",
+    "The installed panel presents shared Auth0 sign-in before a separate password profile, shows provider email verification without local password verification, makes local hosted entry feature/lock scoped, and treats unfinished launch visibility separately from room authority.",
+    "Account refreshes use a generation guard after each asynchronous stage. Explicit mutation/manual refresh supersedes an older read; background ancillary reads no longer retain the account read lock. Session replacement clears old ancillary projections, unmount invalidates observations, and signed-out archive lookup has no default profile.",
+    "Confirmed sign-out and profile deletion clear the visible account, prior ancillary observations and displayed credential drafts before a follow-up read. A failed follow-up read cannot leave the old profile visible. This does not cancel an issued mutation or claim complete mutation lifecycle isolation.",
+    "Three new regressions cover blocked ancillary reads during sign-out, superseded account responses, and failed follow-up status reads. Existing loading test now starts a second refresh after initial account resolution, preserving its intended check that refresh does not disable account actions.",
+    "Catalog metadata now agrees with actual current keys: 5813 source/English, 5796 German and Arabic; all other counts remain unchanged. Existing integrity tests verify all counts, placeholders and source membership. Catalog contents remain separate review inputs."
+  ],
+  "limits": [
+    "Private unfrozen source proposal; no publication or real account action.",
+    "Twenty-eight mocked tests across three suites qualify the selected UI and catalog integrity, not native Auth0, credentials, local hosted funding or installed account replacement.",
+    "The refresh generation covers observations, not every outstanding account mutation. Ingress/token/reset/export callback isolation and external account event lifecycle remain separate acceptance concerns.",
+    "Captain Keyes task access, account policy, source catalog and other omitted dependencies retain separate review status. Local-hosted, brokerage and Google components are mocked in some suites.",
+    "InstalledServicesPanel and AgentAccessPanel remain under review. Existing support contact remains in the final owner publication review."
+  ]
+}

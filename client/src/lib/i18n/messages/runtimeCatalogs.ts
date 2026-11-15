@@ -1,4 +1,4 @@
-import type { InterfaceLanguageCode } from "@shared/interface-language-codes";
+import type { SharedInterfaceLanguageCode as InterfaceLanguageCode } from "@shared/interface-language-codes";
 import { enMessages } from "@/lib/i18n/messages/en";
 import type { InterfaceMessageCatalog, InterfaceTargetCatalog } from "@/lib/i18n/messages/types";
 

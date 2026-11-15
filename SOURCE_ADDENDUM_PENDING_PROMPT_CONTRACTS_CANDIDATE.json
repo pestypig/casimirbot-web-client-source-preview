@@ -1,0 +1,63 @@
+{
+  "observed_at": "2026-11-14T02:37:28.233951+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskMinimalRuntimeShell.tsx",
+      "canonical_sha256": "d9e66df143e083fc46d517e3cd30a6f2d68a3c87e739a1ae8b214b5f9c7cdea5",
+      "export_sha256": "d9e66df143e083fc46d517e3cd30a6f2d68a3c87e739a1ae8b214b5f9c7cdea5",
+      "bytes": 50905,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "7dd00d1985dbc1a5c4469cc930a520e3562e8637dc632b77992251adb9fa4fb1"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskQueuedTurn.ts",
+      "canonical_sha256": "a18eda9fe59c2809b32aa9e87b76c5ed30ece9e90d7b0745689e3f3a56c3bbfe",
+      "export_sha256": "a18eda9fe59c2809b32aa9e87b76c5ed30ece9e90d7b0745689e3f3a56c3bbfe",
+      "bytes": 2275,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "ef4014b83bee3652c320f52633635f34ba57a3b98b5cae438e27a411205133a1"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-recrown.spec.ts",
+      "canonical_sha256": "c7a598b6497b5ad235f982dfb82b854b2cb18c668a5c2230595988bb9f1789f5",
+      "export_sha256": "da7b63264e3632b523f21b2c10dae32da428ba186502092b335a1e109201e4d5",
+      "scope": "Existing public-parity suite used for validation; no new export."
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskWorkflowQteBridge.spec.ts",
+      "canonical_sha256": "2acf8d18fc10724cf917ec94263f108df7c4d11569bdcd6745f0ece38b01b5d0",
+      "export_sha256": "ab41de858c8ad295875210341da2b9e09b98ece1dd64bcceba23cb043cc7b323",
+      "scope": "Existing public-parity suite used for validation; no new export."
+    }
+  ],
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Pending prompt and selected binding contracts",
+    "capability": "Existing minimal Ask queued prompt and binding selection",
+    "lifecycle_stage": "Queued prompt and authenticated binding lookup",
+    "reaction_timescale": "Existing submit lifecycle",
+    "authority_owner": "Existing authenticated exact-chat binding service",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with aligned TypeScript declarations",
+    "required_evidence": "Existing queued-turn and workflow tests, emitted-output comparison, scoped compiler",
+    "explicit_non_goals": "No grant, pairing, source admission, action or backend changes",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "Queued minimal-runtime prompts normalize absent workflow metadata from null to undefined, matching PendingHelixAskPrompt and the existing storage parser. Present workflow metadata is retained.",
+    "The exact-session binding filter gains an explicit non-null type predicate; conditions, server re-inspection and order remain unchanged.",
+    "Queued-turn route metadata imports its existing type from its defining prompt-launch module. This is a type-only import with no runtime dependency change.",
+    "Existing queue and workflow suites remain validation-only public-parity tests. No new regression or installed behavior is claimed for these declaration/absence-normalization corrections."
+  ],
+  "limits": [
+    "Unfrozen, unpublished, uninstalled source qualification. No live prompt, model call, pairing or game operation.",
+    "Existing tests exercise the queued-turn helper and workflow bridge; they do not mount the minimal runtime shell or establish live binding lookup."
+  ]
+}

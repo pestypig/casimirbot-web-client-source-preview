@@ -97,7 +97,7 @@ export function buildDocEquationContextAskPrompt(artifact: DocEquationContextArt
 
 export function buildDocEquationContextLiveEventPayload(
   artifact: DocEquationContextArtifactV1,
-  contextId = HELIX_ASK_CONTEXT_ID.desktop,
+  contextId: string = HELIX_ASK_CONTEXT_ID.desktop,
 ): HelixAskLiveEventBusPayload {
   return {
     contextId,

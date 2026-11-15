@@ -1,0 +1,135 @@
+{
+  "observed_at": "2026-11-13T19:54:52.350087+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/SolarTimePlayer.tsx",
+      "canonical_sha256": "a2183c6930b94acb7a74d5d0b99ff0913635fccb117a9210bbf6fc4b2228aab1",
+      "export_sha256": "0538f44edf47c0873c8921275ca5f700c4fefce39de4c4f89b75d91d6eaaeb5c",
+      "bytes": 57238,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/SolarTimePlayer.account.spec.tsx",
+      "canonical_sha256": "bf4f166c2eefb01b468b036efd3071357ee9f09ebbe4892785bef2d942286e60",
+      "export_sha256": "3aa184a86d6d0720d08b7dc9b738ecdc18fdb81bb873fcec477a5accb4299cac",
+      "bytes": 4097,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/SolarTimePlayer.identity.spec.tsx",
+      "canonical_sha256": "561eddb3d2ea5f82efa37446f5a78fb1c4d2f74df26d3593590c7553cc4314cd",
+      "export_sha256": "5fd76005e8b84a3fe0f43e36c1c787fc45f06b795ae98b022a520024c96b06f7",
+      "bytes": 10290,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/SolarObservationRaster.tsx",
+      "canonical_sha256": "373ae68b9a42ebed16cd1628e6abd239f979b836392219b58ea5a2683f6e486d",
+      "export_sha256": "373ae68b9a42ebed16cd1628e6abd239f979b836392219b58ea5a2683f6e486d",
+      "bytes": 1085,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "ec79ec6b896938ee7d6641c7bf10c4b267bf9feb6862ad51fbbeb4d4a796015e"
+    },
+    {
+      "path": "client/src/lib/solar-aia193-display.ts",
+      "canonical_sha256": "146910f28fbb5045a7db0c4702b35cd8c91638ee98ba8ed7777df602cd0411f0",
+      "export_sha256": "146910f28fbb5045a7db0c4702b35cd8c91638ee98ba8ed7777df602cd0411f0",
+      "bytes": 1341,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/solar-earth-view-pose.ts",
+      "canonical_sha256": "a5714a660faf9165a7e44a741e8324b8cc32c096ce349e5a8fd476701b99d8e5",
+      "export_sha256": "a5714a660faf9165a7e44a741e8324b8cc32c096ce349e5a8fd476701b99d8e5",
+      "bytes": 1049,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/solar-source-fetch.ts",
+      "canonical_sha256": "10d8ebfc10498a842628aa5cb466c2bc53e3f5f10c4210f903698d0ec326e66b",
+      "export_sha256": "10d8ebfc10498a842628aa5cb466c2bc53e3f5f10c4210f903698d0ec326e66b",
+      "bytes": 1966,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/solar-time-buffer.ts",
+      "canonical_sha256": "6fd02fe9d54e8e2e5b48f0d87933af639fc1287a5d805ade64d9ce91d171ff55",
+      "export_sha256": "6fd02fe9d54e8e2e5b48f0d87933af639fc1287a5d805ade64d9ce91d171ff55",
+      "bytes": 1159,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/solar-time-buffer.spec.ts",
+      "canonical_sha256": "3cf06a48e5a40c5ac54daf337185524975c4cec6d386248a36f50d237362964e",
+      "export_sha256": "3cf06a48e5a40c5ac54daf337185524975c4cec6d386248a36f50d237362964e",
+      "bytes": 1679,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "tests/solar-time-player-source-fetch.spec.ts",
+      "canonical_sha256": "8331ca49f7c8f78b6e6ae836589554ab81ab12b0bdaaf67c5d5aa33562a576b0",
+      "export_sha256": "8331ca49f7c8f78b6e6ae836589554ab81ab12b0bdaaf67c5d5aa33562a576b0",
+      "bytes": 2897,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/__tests__/solar-observation-raster.spec.tsx",
+      "canonical_sha256": "40c001fe3bb3ac4de8fc23b63763d83d88608b24860e70a27b353f5111385f28",
+      "export_sha256": "40c001fe3bb3ac4de8fc23b63763d83d88608b24860e70a27b353f5111385f28",
+      "bytes": 2278,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/solar-observation-replay.ts",
+      "canonical_sha256": "ae50f42301ebc78e6025d32ae4ec75766b90f9b527ddb349e39fc5240b437447",
+      "export_sha256": "ae50f42301ebc78e6025d32ae4ec75766b90f9b527ddb349e39fc5240b437447",
+      "bytes": 965,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/solar-observation-replay.spec.ts",
+      "canonical_sha256": "55ddcd6881d8e15eb3b47267f94ac3028e801f28a570d539556adb8e0dfb9876",
+      "export_sha256": "55ddcd6881d8e15eb3b47267f94ac3028e801f28a570d539556adb8e0dfb9876",
+      "bytes": 5960,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed the full sampled time-player, raster, source-lock retry, buffer scheduling, display palette and observer-frame pose helpers. Time selection is bounded and labels requested playhead, image observation, model time, GONG candidate and unresolved slots separately. Display transitions do not establish measured intermediate fields.",
+    "One explicit Prepare range action admits bounded acquisition and optional owner retention. Source lock contention retries the same request with an abortable bounded wait; storage blocks stop ahead-of-playhead buffering and remain distinct from missing observations.",
+    "Reproduced and repaired cross-account checkpoint persistence: a profile/revision change remounts the selected playback mode and invokes its cleanup while keeping the mode choice. Same-profile policy refresh does not erase selection. Four before-fix UI regressions failed; five account-boundary checks now pass.",
+    "Reproduced and repaired retained-pair joins: an independently valid archive or receipt cannot substitute for the exact selected owner, manifest ID, archive/frame, model receipt/catalog or parent model/hash/time/map epoch. Thirteen adversarial cases failed before repair, including observable rendering of mismatched source data and source requests for mismatched checkpoints.",
+    "Source schemas and cryptographic archive replay remain unchanged. Tests construct synthetic display archives through the real serializer and replay verifier; the source FITS hash is a declaration in the browser, not authenticated science evidence.",
+    "Raster keeps its FITS-row flip and existing square-root grayscale default. Optional AIA palettes and quaternion observer poses are display-only transforms. Their inclusion does not validate model/image physical registration or acquire new source bytes."
+  ],
+  "limits": [
+    "Private unfrozen source proposal. The running R380 package does not contain either new time-player repair. No public push, sign-in, model inference, source acquisition, Minecraft operation or EXE restart occurred.",
+    "SolarMagneticGlobe, SolarRobPfssBrowser and SolarDailyMoviePlayer remain separately held dependency reviews. The sampled player tests mock the globe and daily renderer; this review does not qualify actual WebGL rendering, daily movie playback or memory limits.",
+    "Shared scientific contracts/replay and public comparison JS remain canonical inputs for focused tests; omitted dependencies are explicitly listed by selected-entry compilation. This source preview is not a standalone complete platform build.",
+    "The existing raster archive test reads a separately hashed local fixture and verifies display bytes. Fixture bytes and local runtime artifacts are not exported. This is not independent source authentication or physical validation.",
+    "Client identity checks supplement existing server account and source validation; they do not grant authorization. Live account concurrency and matching installed/domain acceptance remain open.",
+    "Five inherited intentional support-contact matches remain in the final owner publication review."
+  ]
+}

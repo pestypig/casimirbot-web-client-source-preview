@@ -102,7 +102,7 @@ export function SharedLiveRoomMissionPanel({ room, onMissionChanged, onOpenTaskP
   return <section aria-label="Room mission" className="rounded-xl border border-cyan-300/20 bg-cyan-400/[0.04] p-3 text-xs">
     <div className="flex items-center justify-between gap-3">
       <h3 className="font-semibold text-cyan-100">Room mission task</h3>
-      <button type="button" disabled={busy} onClick={() => void refresh()} className="rounded border border-white/20 px-2 py-1">Refresh room task</button>
+      <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-mission-panel.refresh-room-task" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} onClick={() => void refresh()} className="rounded border border-white/20 px-2 py-1">Refresh room task</button>
     </div>
     <p className="mt-2 text-slate-300">Select your paired Codex task for room instructions. Selection does not start AI work or grant program actions.</p>
     {mission ? <div className="mt-3 space-y-2">
@@ -115,7 +115,7 @@ export function SharedLiveRoomMissionPanel({ room, onMissionChanged, onOpenTaskP
         key={`${mission.mission_id}:${mission.mission_revision}:${mission.binding_epoch}`}
         room={room} mission={mission} messages={roomMessages} /> : null}
       {mission.status === "active" ? <>
-        <button type="button" disabled={busy} className="rounded border border-white/20 px-3 py-2 disabled:opacity-50"
+        <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-mission-panel.load-retained-handoff-status" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} className="rounded border border-white/20 px-3 py-2 disabled:opacity-50"
           onClick={() => void run(async signal => {
             setActivity(null); setTaskReports(null);
             const activity = await readRoomMissionDispatchActivity(mission, signal);
@@ -140,7 +140,7 @@ export function SharedLiveRoomMissionPanel({ room, onMissionChanged, onOpenTaskP
                 : null}
             </p>;
           }) : <p>No retained handoffs for this mission revision.</p>}
-          <button type="button" disabled={busy} className="rounded border border-white/20 px-2 py-1"
+          <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-mission-panel.check-verified-task-reports" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} className="rounded border border-white/20 px-2 py-1"
             onClick={() => void run(async signal => {
               setTaskReports(null);
               const catalog = await readOwnerRoomResults(mission.room_id, signal);
@@ -152,7 +152,7 @@ export function SharedLiveRoomMissionPanel({ room, onMissionChanged, onOpenTaskP
           <p>Task reports are private owner receipts. A handoff acknowledgement is not a decision or room answer.</p>
         </div> : null}
       </> : null}
-      {mission.status === "active" ? <button type="button" disabled={busy}
+      {mission.status === "active" ? <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-mission-panel.revoke-room-mission" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy}
         className="rounded border border-amber-300/30 px-3 py-2"
         onClick={() => void run(async signal => {
           const next = await revokeRoomMission(mission, requestId(`revoke:${mission.room_id}:${mission.mission_revision}`), signal);
@@ -162,10 +162,10 @@ export function SharedLiveRoomMissionPanel({ room, onMissionChanged, onOpenTaskP
     {candidate && !alreadySelected ? <div className="mt-3 space-y-2">
       <p className="break-all">Currently paired chat: {candidate.helix_conversation_id}</p>
       <p>Binding revision {candidate.binding_epoch}. To choose a different task, pair it in AI app connection setup, then refresh here.</p>
-      <button type="button" className="rounded border border-white/20 px-3 py-2" onClick={onOpenTaskPairing ?? openTaskPairingSetup}>Open Agent Access for task pairing</button>
-      <label className="flex gap-2"><input type="checkbox" checked={reviewedTask} disabled={busy}
+      <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-mission-panel.open-agent-access-for-task-pairing" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" className="rounded border border-white/20 px-3 py-2" onClick={onOpenTaskPairing ?? openTaskPairingSetup}>Open Agent Access for task pairing</button>
+      <label className="flex gap-2"><input data-helix-control-id="helix.ask.shared_live_room.shared-live-room-mission-panel.input" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" type="checkbox" checked={reviewedTask} disabled={busy}
         onChange={event => setReviewedTask(event.target.checked)} />Use this paired task for this room.</label>
-      <button type="button" disabled={busy || !reviewedTask || room.status === "closed"}
+      <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-mission-panel.select-room-task" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || !reviewedTask || room.status === "closed"}
         className="rounded border border-cyan-300/30 px-3 py-2 disabled:opacity-50"
         onClick={() => void run(async signal => {
           const revision = mission?.mission_revision ?? null;
@@ -176,13 +176,13 @@ export function SharedLiveRoomMissionPanel({ room, onMissionChanged, onOpenTaskP
     </div> : null}
     {currentCatalog?.candidate_unavailable ? <div className="mt-3 space-y-2">
       <p>No current paired task is ready. Review the AI app connection and pair the intended task, then refresh.</p>
-      <button type="button" className="rounded border border-white/20 px-3 py-2" onClick={onOpenTaskPairing ?? openTaskPairingSetup}>Open Agent Access for task pairing</button>
+      <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-mission-panel.open-agent-access-for-task-pairing.2" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" className="rounded border border-white/20 px-3 py-2" onClick={onOpenTaskPairing ?? openTaskPairingSetup}>Open Agent Access for task pairing</button>
     </div> : null}
     {mission?.status === "active" ? <div className="mt-4 space-y-3">
       <p>After room speech is captured, refresh and choose one instruction. Only speech still available in this browser and authorized by the server is listed.</p>
       {options.length ? <>
         <label className="block">Captured room instruction
-          <select aria-label="Captured room instruction" value={handoffId} disabled={busy}
+          <select data-helix-control-id="helix.ask.shared_live_room.shared-live-room-mission-panel.captured-room-instruction" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" aria-label="Captured room instruction" value={handoffId} disabled={busy}
             className="mt-1 block w-full rounded border border-white/20 bg-slate-950 p-2"
             onChange={event => setHandoffId(event.target.value)}>
             <option value="">Choose captured speech…</option>
@@ -193,9 +193,9 @@ export function SharedLiveRoomMissionPanel({ room, onMissionChanged, onOpenTaskP
         </label>
         {selected ? <>
           <p className="whitespace-pre-wrap rounded border border-white/10 p-2">{speaker(selected.speaker_participant_id)}: {selected.local.text}</p>
-          <label className="flex items-start gap-2"><input type="checkbox" disabled={busy || handoffRecorded} checked={approved}
+          <label className="flex items-start gap-2"><input data-helix-control-id="helix.ask.shared_live_room.shared-live-room-mission-panel.input.2" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" type="checkbox" disabled={busy || handoffRecorded} checked={approved}
             onChange={event => setApproved(event.target.checked)} />Send this exact instruction to the selected Codex task. It may use that task's model allowance; program permissions still apply.</label>
-          <button type="button" disabled={busy || !approved || handoffRecorded || room.status === "closed"}
+          <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-mission-panel.send-reviewed-instruction" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || !approved || handoffRecorded || room.status === "closed"}
             className="rounded border border-cyan-300/30 px-3 py-2 disabled:opacity-50"
             onClick={() => void run(async signal => {
               const event = await dispatchRoomMissionHandoff(mission, selected.local, selected.speaker_participant_id, signal);
@@ -207,7 +207,7 @@ export function SharedLiveRoomMissionPanel({ room, onMissionChanged, onOpenTaskP
             })}>Send reviewed instruction</button>
           {recordedEvent && recordedEvent.reasoning_binding_id === mission.reasoning_binding_id &&
             recordedEvent.binding_epoch === mission.binding_epoch ?
-            <button type="button" disabled={busy} className="ml-2 rounded border border-white/20 px-3 py-2 disabled:opacity-50"
+            <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-mission-panel.check-task-pickup" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy} className="ml-2 rounded border border-white/20 px-3 py-2 disabled:opacity-50"
               onClick={() => void run(async signal => {
                 const event = await readRoomMissionHandoffStatus(mission, recordedEvent, signal);
                 if (!signal.aborted) { setRecordedEvent(event); setMessage(deliveryMessage(event.delivery_state)); }

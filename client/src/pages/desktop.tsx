@@ -1,4 +1,5 @@
-﻿import { useCallback, useEffect, useMemo, useRef } from "react";
+﻿import { captureAccountOperationScope } from "@/lib/workstation/accountOperationScope";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   panelRegistry,
   getPanelDef,
@@ -8,6 +9,7 @@ import { useDesktopStore } from "@/store/useDesktopStore";
 import { DesktopWindow } from "@/components/desktop/DesktopWindow";
 import { DesktopTaskbar } from "@/components/desktop/DesktopTaskbar";
 import { HelixWorkstationShell } from "@/components/workstation/HelixWorkstationShell";
+import { ConnectionHealthProvider } from "@/components/agent-access/ConnectionHealthPanel";
 import { Dialog } from "@/components/ui/dialog";
 import { HelixSettingsDialogContent } from "@/components/HelixSettingsDialogContent";
 import SplashCursor from "@/components/SplashCursor";
@@ -48,6 +50,7 @@ import {
 } from "@/lib/workstation/workstationActionContract";
 import { executeWorkstationActionWithLedger } from "@/lib/workstation/workstationActionExecutor";
 import { runWorkstationJob } from "@/lib/workstation/jobExecutor";
+import { isAccountPanelAccessible } from "@/lib/workstation/launchPanelPolicy";
 import { emitHelixWorkstationProceduralStep } from "@/lib/workstation/proceduralPlaybackContract";
 import { startWorkstationClipboardCapture } from "@/lib/workstation/workstationClipboard";
 import { startWorkstationTimelineCapture } from "@/lib/workstation/workstationTimelineCapture";
@@ -71,14 +74,14 @@ import {
 } from "@/lib/workstation/workstationDeepLink";
 import { parseWorkstationLinkMetaFromUrl } from "@shared/workstation-link-meta";
 import { useProfileStorageSync } from "@/lib/workstation/profileStorageSync";
+import { usePersonalMcpSavedResume } from "@/hooks/usePersonalMcpSavedResume";
 import {
   HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
   fetchAccountCapabilityPolicy,
   readCachedAccountCapabilityPolicy,
 } from "@/lib/workstation/accountCapabilityPolicy";
 import {
-  HELIX_USER_ACCOUNT_POLICY,
-  resolveHelixAccountPanelAccess,
+  HELIX_SIGNED_OUT_ACCOUNT_POLICY,
   type HelixAccountCapabilityPolicy,
 } from "@shared/helix-account-session";
 
@@ -163,6 +166,7 @@ export default function DesktopPage({
   layoutVariant?: "desktop" | "mobile";
 }) {
   useProfileStorageSync();
+  usePersonalMcpSavedResume();
   useNarratorHoverFocusInspector();
   const { windows, registerFromManifest, open } = useDesktopStore();
   const workstationMode = useWorkstationLayoutStore((state) => state.mode);
@@ -202,7 +206,7 @@ export default function DesktopPage({
   const environmentAppliedRef = useRef(false);
   const autoOpenSuppressRef = useRef<Set<string> | null>(null);
   const accountPolicyRef = useRef<HelixAccountCapabilityPolicy>(
-    readCachedAccountCapabilityPolicy() ?? HELIX_USER_ACCOUNT_POLICY,
+    readCachedAccountCapabilityPolicy() ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY,
   );
   const { mood } = useLumaMoodTheme({ randomize: true, listenToBus: true });
   const orientation = layoutVariant === "mobile" ? "mobile" : "desktop";
@@ -241,10 +245,7 @@ export default function DesktopPage({
     // Device Check is a read-only launch surface for every account. Its
     // developer-only native controls are gated inside the panel and host IPC.
     if (panelId === "device-check") return true;
-    return (
-      resolveHelixAccountPanelAccess(accountPolicyRef.current, panelId)
-        .state === "available"
-    );
+    return isAccountPanelAccessible(panelId, accountPolicyRef.current);
   }, []);
 
   const filterPanelsForAccount = useCallback(
@@ -322,7 +323,7 @@ export default function DesktopPage({
     const applyPolicy = (
       policy: HelixAccountCapabilityPolicy | null | undefined,
     ) => {
-      accountPolicyRef.current = policy ?? HELIX_USER_ACCOUNT_POLICY;
+      accountPolicyRef.current = policy ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY;
       // Policy is held in a ref, so changing it does not itself notify layout
       // subscribers. Re-project the current view through the new access policy.
       syncWorkstationUrlRef.current?.();
@@ -346,7 +347,7 @@ export default function DesktopPage({
       .catch(() => {
         if (!canceled)
           applyPolicy(
-            readCachedAccountCapabilityPolicy() ?? HELIX_USER_ACCOUNT_POLICY,
+            readCachedAccountCapabilityPolicy() ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY,
           );
       });
     return () => {
@@ -831,59 +832,69 @@ export default function DesktopPage({
             });
             return;
           }
-          case "run_job":
-            publish({
-              ok: true,
-              message: "Delegated to workstation job executor.",
-            });
+          case "run_job": {
+            const isJobAccountCurrent = captureAccountOperationScope();
             const payloadWithJobId = action.payload.job_id
               ? action.payload
               : { ...action.payload, job_id: traceId };
-            void runWorkstationJob({
-              contextId: HELIX_ASK_CONTEXT_ID.desktop,
-              payload: payloadWithJobId,
-              executionContext: {
-                openPanel: (panelId, groupId) => {
-                  if (groupId && workstationEnabled) {
-                    store.openPanelInGroup(groupId, panelId);
-                    return;
-                  }
-                  openPanelUniversal(panelId);
-                },
-                focusPanel: (panelId, groupId) => {
-                  if (groupId && workstationEnabled) {
-                    store.setActivePanel(groupId, panelId);
-                    store.focusGroup(groupId);
-                    return;
-                  }
-                  if (workstationEnabled) {
-                    const hit = Object.values(store.groups).find((group) =>
-                      group.panelIds.includes(panelId),
-                    );
-                    if (hit) {
-                      store.setActivePanel(hit.id, panelId);
-                      store.focusGroup(hit.id);
+            try {
+              const result = await runWorkstationJob({
+                contextId: HELIX_ASK_CONTEXT_ID.desktop,
+                payload: payloadWithJobId,
+                canUsePanel: canOpenPanelForAccount,
+                executionContext: {
+                  openPanel: (panelId, groupId) => {
+                    if (groupId && workstationEnabled) {
+                      store.openPanelInGroup(groupId, panelId);
                       return;
                     }
-                  }
-                  openPanelUniversal(panelId);
-                },
-                closePanel: (panelId, groupId) => {
-                  if (!workstationEnabled) return;
-                  if (groupId) {
-                    store.closePanelFromGroup(groupId, panelId);
-                    return;
-                  }
-                  Object.values(store.groups).forEach((group) => {
-                    if (group.panelIds.includes(panelId)) {
-                      store.closePanelFromGroup(group.id, panelId);
+                    openPanelUniversal(panelId);
+                  },
+                  focusPanel: (panelId, groupId) => {
+                    if (groupId && workstationEnabled) {
+                      store.setActivePanel(groupId, panelId);
+                      store.focusGroup(groupId);
+                      return;
                     }
-                  });
+                    if (workstationEnabled) {
+                      const hit = Object.values(store.groups).find((group) =>
+                        group.panelIds.includes(panelId),
+                      );
+                      if (hit) {
+                        store.setActivePanel(hit.id, panelId);
+                        store.focusGroup(hit.id);
+                        return;
+                      }
+                    }
+                    openPanelUniversal(panelId);
+                  },
+                  closePanel: (panelId, groupId) => {
+                    if (!workstationEnabled) return;
+                    if (groupId) {
+                      store.closePanelFromGroup(groupId, panelId);
+                      return;
+                    }
+                    Object.values(store.groups).forEach((group) => {
+                      if (group.panelIds.includes(panelId)) {
+                        store.closePanelFromGroup(group.id, panelId);
+                      }
+                    });
+                  },
+                  openSettings: (tab) => openSettings(tab ?? "preferences"),
                 },
-                openSettings: (tab) => openSettings(tab ?? "preferences"),
-              },
-            });
+              });
+              if (!isJobAccountCurrent()) return;
+              publish({
+                ok: result.ok,
+                message: `Job ${result.job_id} ${result.ok ? "steps completed" : "steps failed or partially completed"}.`,
+                artifact: { job_id: result.job_id, step_receipts: result.step_receipts },
+              });
+            } catch (error) {
+              if (!isJobAccountCurrent()) return;
+              publish({ ok: false, message: error instanceof Error ? error.message : "Job failed." });
+            }
             return;
+          }
           case "toggle_mobile_drawer":
             publish({
               ok: false,
@@ -915,6 +926,7 @@ export default function DesktopPage({
     };
   }, [
     applyWorkstationViewState,
+    canOpenPanelForAccount,
     openPanelUniversal,
     openSettings,
     workstationEnabled,
@@ -999,7 +1011,7 @@ export default function DesktopPage({
         })
         .catch(() => {
           accountPolicyRef.current =
-            readCachedAccountCapabilityPolicy() ?? HELIX_USER_ACCOUNT_POLICY;
+            readCachedAccountCapabilityPolicy() ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY;
         });
       if (canceled) return;
       if (
@@ -1183,6 +1195,7 @@ export default function DesktopPage({
     [openPanelUniversal],
   );
   return (
+    <ConnectionHealthProvider>
     <Dialog open={settingsOpen} onOpenChange={handleSettingsOpenChange}>
       <RoomServiceEntry />
       {userSettings.enableSplashCursor && <SplashCursor />}
@@ -1266,5 +1279,6 @@ export default function DesktopPage({
         onClose={() => handleSettingsOpenChange(false)}
       />
     </Dialog>
+    </ConnectionHealthProvider>
   );
 }

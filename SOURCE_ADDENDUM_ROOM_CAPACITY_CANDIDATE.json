@@ -1,0 +1,102 @@
+{
+  "observed_at": "2026-11-13T16:01:28.519565+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomSetupPanel.tsx",
+      "canonical_sha256": "c1cbc92d854533681ece778ad77c0ea2f9d4d0cf14f88addfd58eade548f3d80",
+      "export_sha256": "c1cbc92d854533681ece778ad77c0ea2f9d4d0cf14f88addfd58eade548f3d80",
+      "previous_proposal_sha256": "a60dde9d886bcb7979a72aea73f94d47866f75547ee9d962c93b2d112a014341",
+      "bytes": 7037,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomParticipantsPanel.tsx",
+      "canonical_sha256": "02608732016d3d89c43255573aa7904cfb3e202d10fdee80bc809aade36486d6",
+      "export_sha256": "02608732016d3d89c43255573aa7904cfb3e202d10fdee80bc809aade36486d6",
+      "previous_proposal_sha256": "5514c4206672c3185071c4545f2afa548eaa22a0fc64edfead00189ae7d46bb2",
+      "bytes": 6234,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomRuntimePanel.tsx",
+      "canonical_sha256": "5422a2cadb5143e931f53ea28d4c839035329ce450f3752f0fe76f66d38bee45",
+      "export_sha256": "5422a2cadb5143e931f53ea28d4c839035329ce450f3752f0fe76f66d38bee45",
+      "previous_proposal_sha256": "840183808eadf411ebdc50eb196621c327d9e55199b0bf249337365bfd074fab",
+      "bytes": 5772,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomActivePanel.tsx",
+      "canonical_sha256": "016f99d956d25b4e0261164770269fb875966986bf0a72777df145a710480bda",
+      "export_sha256": "016f99d956d25b4e0261164770269fb875966986bf0a72777df145a710480bda",
+      "previous_proposal_sha256": "2d0ed53d1471f39dcd84548e5b18e51ebb106db95dc19f811c603b0c12ecbcb6",
+      "bytes": 16560,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomDialog.tsx",
+      "canonical_sha256": "75190cdaf155dfce54a085154334f014a2b828f08a2c19210ef1f2e1e1fdb81b",
+      "export_sha256": "75190cdaf155dfce54a085154334f014a2b828f08a2c19210ef1f2e1e1fdb81b",
+      "previous_proposal_sha256": "3b0f84afeef3a4215914488b93033f1ce38d0aa0c669b05d77794f748145ad82",
+      "bytes": 11170,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomSetupPanel.capacity.spec.tsx",
+      "canonical_sha256": "c674102ebb923ed8f47736ed495fe36ec8658bc037770489a63c87290b9ef2f5",
+      "export_sha256": "c674102ebb923ed8f47736ed495fe36ec8658bc037770489a63c87290b9ef2f5",
+      "previous_proposal_sha256": "60f97a8759358eeb56153e7cdc40ddd2f3546a43509cac54bbf0c0d11d965033",
+      "bytes": 2280,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomParticipantsPanel.capacity.spec.tsx",
+      "canonical_sha256": "19f5a425fe44094ef99665f401d9b9e74977cec83033c52f7fae3c5bfe38ec38",
+      "export_sha256": "19f5a425fe44094ef99665f401d9b9e74977cec83033c52f7fae3c5bfe38ec38",
+      "previous_proposal_sha256": "17fd472e1d7488559a2b73a46d417373fd6e71610013c5736b861961a945020a",
+      "bytes": 2995,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomDialog.spec.tsx",
+      "canonical_sha256": "cb00a726dde1c22b29f063c9a5ad8fdac10a5546bb4a34a2f4a0ca3ff98fe4de",
+      "export_sha256": "cb00a726dde1c22b29f063c9a5ad8fdac10a5546bb4a34a2f4a0ca3ff98fe4de",
+      "previous_proposal_sha256": "0a85c1748e7510663b1d6f1880a106947626da305beb8ee615f7c92893f5e002",
+      "bytes": 17308,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/RoomTextDraftStore.ts",
+      "canonical_sha256": "62a06afb64e7002c4b4ce3afab09f9134c617c1c80ca42b1f0824156bd33d397",
+      "export_sha256": "ef38316f572e4949d6bc75c3d44db637dbe0b2fb840ba2321586eb59a7b6608b"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomRuntimePanel.spec.tsx",
+      "canonical_sha256": "24a2d9f29fdfd3e2d3ab269a227c7c6debeb21d72dd79633bb1875fa8919059a",
+      "export_sha256": "24a2d9f29fdfd3e2d3ab269a227c7c6debeb21d72dd79633bb1875fa8919059a",
+      "previous_proposal_sha256": "24a2d9f29fdfd3e2d3ab269a227c7c6debeb21d72dd79633bb1875fa8919059a",
+      "bytes": 1643,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Read all five complete panels and four test files. First-party React/TypeScript, mock controllers and synthetic room/member/transcript fixtures. No credentials, real media, runtime profiles, third-party assets or private history exported.",
+    "Room creation defaults to two-person voice. Additional three-person profiles remain developer evaluation and explicitly label the missing group voice bridge. UI choice does not replace backend admission.",
+    "Participant counts exclude departed members for available seats; owner invite controls disable at capacity or closed state. Speaker linking, source bindings, capabilities and brokerage controls remain separate dependencies.",
+    "Runtime view distinguishes local device activity, host-owned transport, selected model and unverified billing. Three-person voice cannot connect through the unsupported local group bridge.",
+    "Active room view separates member text, private Ask, Cloud Agent DM, mission review and permissions. Owner closure differs from guest departure; switching rooms does not close or revoke the previous room.",
+    "Dialog portals above the Ask surface; exact-environment navigation only reveals the matching settings element and never activates grants. Native hosted service and local room paths remain distinct.",
+    "No canonical source changes. Export transformation is CRLF to LF only. Runtime presentation test and draft store already match the public source and are recorded as unchanged reviewed dependencies."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal, not a runnable full client or release qualification.",
+    "Controllers, shared schemas, media bridge, server membership/consent/runtime authority and omitted child panels are separate dependencies.",
+    "Tests mock controllers and several child controls. They do not establish native group voice, real consent, billing, hosted membership, live streams or Minecraft continuity."
+  ]
+}

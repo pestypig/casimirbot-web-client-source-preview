@@ -1,0 +1,71 @@
+{
+  "observed_at": "2026-11-13T23:37:04.866591+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/HelixAskPill.tsx",
+      "canonical_sha256": "6776d639d2c864d04c65f430121afa366d12a95ebd1b98106ba1f362013ad744",
+      "export_sha256": "46793e87555d60dd9c11df10deb64e364a91eee2f5bec4108d5e4cc76a0114ef",
+      "bytes": 1048344,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "cf57017b7ff34c91b02cd1c7bc923ec99a22b525cd9338272042ac8b745f9110"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskVoiceCaptureDiagnosticsState.ts",
+      "canonical_sha256": "8f9cd0062c091ca23b41d6574a213d213e5af8349f39cfdca12d6930db3f8ec2",
+      "export_sha256": "8f9cd0062c091ca23b41d6574a213d213e5af8349f39cfdca12d6930db3f8ec2",
+      "bytes": 5395,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "546792071e915890a256ef15b9573ad7be99f40b16ccb0d180e0a15c249f4587"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskVoicePlaybackToolController.ts",
+      "canonical_sha256": "0ada9b20b7ada8b632d569aa42f2835c5d5a9adc437c1d149df468d9b4ee47ee",
+      "export_sha256": "0ada9b20b7ada8b632d569aa42f2835c5d5a9adc437c1d149df468d9b4ee47ee",
+      "bytes": 14249,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "479c0ce711ec645f5fe8ed03bfba8033ba57ccef8f5bddd382b1fb4a0ad8bba4"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyConsoleInventory.ts",
+      "canonical_sha256": "545c720ef0eb7fd7414a1b1a316b092694d8b7d836507852a123075f306692c5",
+      "export_sha256": "441bab01cd13b7cca43c181af00bd9bb8bbbb31272177384b7a4b21933478f98",
+      "bytes": 83435,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "ad3f949447988e2fd3a91525507c500e30f0b7128619a262876ebfe01c5f8149"
+    },
+    {
+      "path": "client/src/components/helix/__tests__/confirmed-voice-destination.spec.ts",
+      "canonical_sha256": "602a0cdb8ac520735d8c2dedf155d20cf1372ca5dd6548f5cb23fb54b7c3bdcb",
+      "export_sha256": "602a0cdb8ac520735d8c2dedf155d20cf1372ca5dd6548f5cb23fb54b7c3bdcb",
+      "bytes": 4604,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-recrown.spec.ts",
+      "canonical_sha256": "c7a598b6497b5ad235f982dfb82b854b2cb18c668a5c2230595988bb9f1789f5",
+      "export_sha256": "da7b63264e3632b523f21b2c10dae32da428ba186502092b335a1e109201e4d5",
+      "bytes": 524824,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed exact changes against four saved SHA-256 snapshots, the complete confirmation callback, playback receipt callback and existing voice input status projection.",
+    "The confirmation callback set unsupported idle input state after either accepted chat handoff or unavailable chat. Status projection returned null in both cases. Runtime fix 44 returns to listening on accepted offer and displays error for an unavailable selected destination. The existing early return prevents fallback to Ask Helix or another chat.",
+    "The regression executes the actual source callback with explicit mock dependencies, checks the rendered-status projection, and verifies microphone-off, wrong-candidate and explicitly selected Ask Helix branches. It does not mount the full console or establish native delivery.",
+    "Reasoning source/status types are bound locally as well as re-exported. Playback receipt input uses the existing runtime type, including unknown; chunk headers derive from speakVoice, including stream. Timeline authority/source use the existing intent unions.",
+    "The diagnostic builder accepts partial pending-confirmation input and retains its existing complete output normalization, including needsConfirmation=true. No authority is inferred from diagnostics.",
+    "Audio retains its playsinline and webkit-playsinline attributes; removed an assignment to a nonstandard HTMLAudioElement property. Updated source-location inventory.",
+    "Binding the missing reasoning-source import exposed the existing action-receipt timeline value reasoning. The timeline display source union now explicitly includes that existing value; reasoning-attempt and authority source unions remain unchanged."
+  ],
+  "limits": [
+    "Source-only, uninstalled and unpublished. No microphone, provider, account approval, native delivery or game action was invoked.",
+    "Full production rebuild, installed Friends/voice handoff and other type diagnostics remain open. Existing shader/data/metadata holds remain."
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "observed_at": "2026-11-13T21:11:27.417228+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/civilization/CivilizationDiplomacyOverlay.tsx",
+      "canonical_sha256": "de4d7426272290153c591923e37b65b8dd040783c1803c5ce5dbec137ccd9edc",
+      "export_sha256": "d6d536bfbdc4a4514fb31e82119ede4f01dc98ad9ddaa74ec5e2608e3e4d2ec3",
+      "bytes": 102159,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "653447e9db1290a70de53c0747f02dc2d50c1966ef3a012cd38974f300d9223f"
+    },
+    {
+      "path": "client/src/components/civilization/CivilizationDiplomaticMoveLedger.tsx",
+      "canonical_sha256": "c7d34559e7230f88ebde9de4df1903680cceac0b04c0b2931a31ada34e1cb1c0",
+      "export_sha256": "c7d34559e7230f88ebde9de4df1903680cceac0b04c0b2931a31ada34e1cb1c0",
+      "bytes": 11333,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/civilization/CivilizationEconomicHistory.tsx",
+      "canonical_sha256": "695f48e9979c757df8ce792aa143ddbecf506f39f96ff0488303e9d1b3a2ed49",
+      "export_sha256": "695f48e9979c757df8ce792aa143ddbecf506f39f96ff0488303e9d1b3a2ed49",
+      "bytes": 14238,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/civilization/CivilizationWageAssessment.tsx",
+      "canonical_sha256": "06cc57d7baf6e12675f70ec2faddc097520bec6b993ed9ad5c915102d4eb3259",
+      "export_sha256": "06cc57d7baf6e12675f70ec2faddc097520bec6b993ed9ad5c915102d4eb3259",
+      "bytes": 10829,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/civilization/CivilizationDiplomaticMoveLedger.spec.tsx",
+      "canonical_sha256": "2c4f93d405a0396f0890e8be5df3b2143ad0cb5d612ac78be728c723a8098af8",
+      "export_sha256": "2c4f93d405a0396f0890e8be5df3b2143ad0cb5d612ac78be728c723a8098af8",
+      "bytes": 2819,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/civilization/CivilizationEconomicHistory.spec.tsx",
+      "canonical_sha256": "38fbfc04d75e61103c5579bc26c7a07c1fe66454416b39e08f38b28f11533ded",
+      "export_sha256": "38fbfc04d75e61103c5579bc26c7a07c1fe66454416b39e08f38b28f11533ded",
+      "bytes": 4716,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/civilization/CivilizationWageAssessment.spec.tsx",
+      "canonical_sha256": "33714e971a4ce5230f13ff382d7a86ccdcb5fb2e3fff30901a4110d5c15efec2",
+      "export_sha256": "33714e971a4ce5230f13ff382d7a86ccdcb5fb2e3fff30901a4110d5c15efec2",
+      "bytes": 6202,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/civilization/CivilizationReceiptSelection.spec.tsx",
+      "canonical_sha256": "96d8a0a3157ee262a05a2203871764d4887c6b29684f7fc57cfceaf5ea471616",
+      "export_sha256": "96d8a0a3157ee262a05a2203871764d4887c6b29684f7fc57cfceaf5ea471616",
+      "bytes": 2155,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/civilization-wage-receipt.ts",
+      "canonical_sha256": "432d9a55a8b5a2466090051c07e8ec8e0670b26ba83d909e25d13017d4f225de",
+      "export_sha256": "432d9a55a8b5a2466090051c07e8ec8e0670b26ba83d909e25d13017d4f225de",
+      "bytes": 1620,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/civilization/CivilizationDiplomacyOverlay.spec.tsx",
+      "canonical_sha256": "c614cb8fa80d768b21d38d52afc154720ec5469dfbb208b90948018f8063fea0",
+      "export_sha256": "c614cb8fa80d768b21d38d52afc154720ec5469dfbb208b90948018f8063fea0",
+      "bytes": 2094,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "The existing diplomacy overlay adds dated-move and economic-history panels. The normalized parent delta is two imports and two child mounts. The three new panels and their focused suites were read; source-backed claims, candidates, hypotheses, independent actor choices and unknown coverage remain explicitly separate.",
+    "The move ledger labels event/publication/review dates, actor authority limits, candidate status, possible sequences and alternative explanations. Same-day display order does not establish an exchange. Downloads preserve the displayed receipt; source URLs use the shared HTTPS contract.",
+    "Economic history is fetched when opened. Annual context is explicitly not a half-year measurement. Country/metric coverage, source vintages, unknown values and current-policy dates are shown separately; market context is optional and unconnected by this read.",
+    "Runtime fix 31 rejects schema-valid receipts for another country, issue, page, year range, reasoning mode or cutoff. The parsed request must match the receipt before display/download. The economic fixture now answers actual requested parameters and freezes its date.",
+    "Wage assessment requires an explicitly loaded hypothetical example or bounded versioned input file and an explicit calculation click. It separates household/hiring accounting from conditional response scenarios and states that hashes do not validate sources or causal models.",
+    "Runtime fix 32 checks the complete normalized submitted pack, calculation identity/country/currency and both canonical SHA-256 hashes before displaying a wage receipt. Three prior failures accepted different inputs under the same ID, an incorrect input hash or modified calculation content. Existing generation/abort guards still reject late results after country changes.",
+    "Twenty-one browser checks execute the canonical panel group with synthetic inputs, mocked HTTP, offline provider stubs and real WebCrypto. Local server readers supply authored fixture receipts; their datasets and server code are not copied into this web cohort. No financial advice, political-currentness, economic causal conclusion or numerical solver certification is implied."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal. Runtime fixes 31 and 32 are not installed. Full signed-release and domain acceptance remain separate.",
+    "The browser hash check establishes content consistency and selection identity, not trusted source authentication, correct economic arithmetic or validated causal response estimates. No economic operator or certificate semantics changed.",
+    "Shared economic/ledger contracts, algorithms, local services and retained source datasets remain canonical dependencies outside this selected web export. Source URLs and dated test fixture claims were not reverified against live publishers in this code review.",
+    "Real provider availability, complete parent map behavior, every lifecycle/selection interleaving and installed browser WebCrypto support remain separate acceptance work. Tests do not run brokerage tools, funded inference or environment actions.",
+    "The historical evidence panels remain pilot scope. Five intentional support-contact matches elsewhere in the candidate remain in owner publication review."
+  ]
+}

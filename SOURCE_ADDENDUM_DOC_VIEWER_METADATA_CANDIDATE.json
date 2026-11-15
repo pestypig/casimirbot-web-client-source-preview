@@ -1,0 +1,51 @@
+{
+  "observed_at": "2026-11-14T02:11:32.375856+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/DocViewerPanel.tsx",
+      "canonical_sha256": "ece561b7bf568739b4b6b19ae92ff27ddbd75eef3dc51a882b7bff48fa671507",
+      "export_sha256": "51232cc4f3040dd22adb4ab8799a6791f0a941478127579deaf0f01efe5a49cb",
+      "bytes": 216832,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "e047597e0386bc232065275a1220c93530479505eb76a876a04b905d5a4dffca"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/components/__tests__/doc-viewer-taxonomy-ui.spec.tsx",
+      "canonical_sha256": "37deffce60cbf5aaf17698ac4a22e059f7cbd3c81232e7d27aea1caa088e28df",
+      "export_sha256": "37deffce60cbf5aaf17698ac4a22e059f7cbd3c81232e7d27aea1caa088e28df",
+      "scope": "Existing public-parity test used for validation only; no new export or index admission."
+    },
+    {
+      "path": "client/src/components/__tests__/doc-viewer-math-copy.spec.ts",
+      "canonical_sha256": "6d097f1838506e1327f7844f1626656fdd09e8e129aec0b3cd33e21a9e8c823e",
+      "export_sha256": "6d097f1838506e1327f7844f1626656fdd09e8e129aec0b3cd33e21a9e8c823e",
+      "scope": "Existing public-parity test used for validation only; no new export or index admission."
+    }
+  ],
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Document viewer display-entry contract",
+    "capability": "Private research display metadata and category badges",
+    "current_maturity": "implemented",
+    "target_maturity": "implemented with complete display metadata",
+    "required_evidence": "Existing document viewer tests and scoped compiler",
+    "explicit_non_goals": "No private-document publication, retrieval grant, calculation, physical proof or scientific classification changes",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "The synthetic private-research display entry supplies supporting retrievalStatus and null topicId, authorityRank and supersededBy, matching ordinary non-primary manifest defaults. It remains canonical:false and separate from DOC_MANIFEST; these fields are local display metadata and create no retrieval grant.",
+    "The badge renderer removes comparison with all because normalizeDocTaxonomyFilter only returns the four named categories or uncategorized. The category mapping and generated scientific metadata are unchanged.",
+    "Existing taxonomy/private-research/translation and math-copy UI suites are canonical/public-preview byte-parity inputs. They are used unchanged for validation, not added to the selected-source index. These tests exercise rendering and interaction, not physical calculation or certificate integrity."
+  ],
+  "limits": [
+    "Unfrozen, unpublished and uninstalled. No actual private document is loaded, exported or added to the public manifest.",
+    "Export validation loads the selected DocViewerPanel and uses canonical dependencies. Generated metadata remains held at older preview bytes; this does not establish full preview application parity."
+  ]
+}

@@ -71,8 +71,11 @@ export function DownloadPageView({
             <ArrowLeft />
             Back to CasimirBot
           </Button>
-          <div className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-cyan-200">
-            {isNative ? "Desktop runtime" : surface === "pwa" ? "Installed web app" : "Web"}
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            {!isNative ? <a href="/getting-started" className="text-sm text-cyan-200 underline underline-offset-4 hover:text-white">How to get started</a> : null}
+            <div className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-cyan-200">
+              {isNative ? "Desktop runtime" : surface === "pwa" ? "Installed web app" : "Web"}
+            </div>
           </div>
         </nav>
 
@@ -190,6 +193,11 @@ export function DownloadPageView({
             )}
           </div>
         </section>
+        {!isNative ? (
+          <footer className="border-t border-white/10 py-5 text-sm leading-6 text-slate-400">
+            Explore the <a href="https://github.com/pestypig/casimirbot-platform-overview#open-source-and-the-private-platform-repository" className="text-cyan-200 underline underline-offset-4 hover:text-white">open-source repositories</a> for reviewed components, licenses, and source inventories.
+          </footer>
+        ) : null}
       </div>
     </main>
   );

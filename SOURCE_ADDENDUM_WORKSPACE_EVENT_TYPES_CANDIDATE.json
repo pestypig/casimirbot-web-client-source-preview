@@ -1,0 +1,78 @@
+{
+  "observed_at": "2026-11-13T23:46:15.867685+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/__tests__/helix-ask-voice-playback-tool-controller.spec.ts",
+      "canonical_sha256": "2c659799889c635dd3e3bc771dfc66effc507a3f31e2bd011df304dab26532a3",
+      "export_sha256": "2c659799889c635dd3e3bc771dfc66effc507a3f31e2bd011df304dab26532a3",
+      "bytes": 13926,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "31d4a0c15d591156e0c1bb2efbb5e0ceb47f2b562fc2480f2b33123f087496f1"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskVoicePlaybackToolController.ts",
+      "canonical_sha256": "83b148aab8a15b952ed5e4689d01d571b70dcfed7d7313a96bee8b6d903b04d4",
+      "export_sha256": "83b148aab8a15b952ed5e4689d01d571b70dcfed7d7313a96bee8b6d903b04d4",
+      "bytes": 14321,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "0ada9b20b7ada8b632d569aa42f2835c5d5a9adc437c1d149df468d9b4ee47ee"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/FriendsPartiesPanel.spec.tsx",
+      "canonical_sha256": "c620122fe5f54e26d3152634948216fe8773f3d76b609b8037662887adfa43ed",
+      "export_sha256": "8df8d8a4d7992bb4f4ad699ef5c295907fa6addf229a28e52fcf67099cf159b8",
+      "bytes": 9943,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "ec51bcb1c612d62a31f3f7aa5094101841c3b3f2c7d11730d79966f026607896"
+    },
+    {
+      "path": "client/src/lib/helix/__tests__/ask-turn-transcript.spec.ts",
+      "canonical_sha256": "1106cb2ce5b22e6b42584a71ceb9a4ceb3c878fcdb13196238e8d78eae45af7c",
+      "export_sha256": "55d22013e71d4a827c75c86cb68f02299cefa98bd218e04bd129c6ee06207148",
+      "bytes": 254050,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "d3cbe89f4d4552b1e6db88640d90188aa196e0bc680e2974fd04cf1cd58082bc"
+    },
+    {
+      "path": "client/src/lib/helix/ask-turn-transcript.ts",
+      "canonical_sha256": "6b467e7e130d862bb17e10cada7d1a3e5dcccb3400b813fb24fa86a9b84a3663",
+      "export_sha256": "6b467e7e130d862bb17e10cada7d1a3e5dcccb3400b813fb24fa86a9b84a3663",
+      "bytes": 249378,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "c0c4c77a41b32bce674b9c3bc9f1c60bd5536e4fb8a26580367692adc218e52e"
+    },
+    {
+      "path": "client/src/lib/workstation/processGraph/processGraphReducer.ts",
+      "canonical_sha256": "6e06a01aa57b22064c83dbea52f07cf5ad5a64c3b999eb0e92c96ac5fac05e5e",
+      "export_sha256": "6e06a01aa57b22064c83dbea52f07cf5ad5a64c3b999eb0e92c96ac5fac05e5e",
+      "bytes": 18903,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "e4b99747e73e3f9a14db9ac6ef5e1cd95578d2d85ad4a9180e51fd8fe05bcfbf"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/workstation/processGraph/__tests__/processGraphReducer.spec.ts",
+      "canonical_sha256": "63eb2d5eed0dbdac336adcee21ee074bd0ea9dab64f73fe06e094e10fd3efd78",
+      "export_sha256": "f8acedc0b0195a32ea8623feb2faab9274a15e47395bb21aad4d3d28ccfbd792",
+      "bytes": 2918,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed the four original diffs and two fixture follow-up diffs against saved hashes. The process graph reducer test remains unchanged from the public preview.",
+    "Process graph event families retain the same startsWith checks through an explicit generic type predicate. Panel, tool, operation and job payloads narrow to existing variants. Graph status, artifacts, edges, trace cleanup and timeline behavior are unchanged.",
+    "The capability-lane debug branch now declares the same Record<string,unknown>[] collection already used by the function return and other branches. Its heterogeneous translated, session, mail, goal and terminal event rows remain intact.",
+    "The playback controller imports the existing VoicePlaybackMetrics type; no receipt semantics change. Friends role queries remove an unsupported exact option; accessible-name matching stays exact for the existing string names.",
+    "Existing deterministic suites cover Friends search/request/accept/decline/room entry, transcript rows, playback receipts, and graph reduction/capture/context/persistence/projection/snapshots. No live accounts, chats or provider calls are involved.",
+    "Two formerly unindexed test files revealed fixture diagnostics when included in typechecking. Transcript tests remove one duplicate identical property and use optional metadata reads while retaining exact expected matches. Playback tests now supply the actual metrics/diagnostic shape and supported direct-element path; they still assert attribution, posting and non-terminal authority."
+  ],
+  "limits": [
+    "Unfrozen source review, not a production build or installed acceptance.",
+    "Other transcript terminal-row compatibility errors and broader type diagnostics remain open. Existing shader/data/metadata and contact-review holds remain."
+  ]
+}

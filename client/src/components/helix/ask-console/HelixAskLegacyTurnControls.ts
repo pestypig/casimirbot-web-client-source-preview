@@ -27,7 +27,7 @@ type HelixAskLegacyReplyEnvelopeSection = {
 };
 
 type HelixAskLegacyReplyForControls = {
-  id?: string;
+  id?: string | null;
   content?: unknown;
   question?: unknown;
   text?: unknown;
@@ -459,7 +459,7 @@ export function extractHelixAskLegacyClickedTurnDebugScopeFromAncestor(
 ): HelixAskLegacyClickedTurnDebugScope | null {
   if (!sourceElement) return null;
   let node: HTMLElement | null = sourceElement;
-  for (let depth = 0; node && depth < 10; depth += 1, node = node.parentElement) {
+  for (let depth = 0; node && depth < 10; depth += 1, node = node?.parentElement ?? null) {
     const questionNode = node.querySelector<HTMLElement>('[data-stream-row-source="question"], [data-testid="helix-ask-latest-question"]');
     const finalNode = node.querySelector<HTMLElement>('[data-stream-row-source="final"], [data-testid="helix-ask-latest-final-answer"]');
     const renderedQuestion = cleanHelixRenderedQuestionText(questionNode?.innerText || questionNode?.textContent || "");
@@ -831,8 +831,8 @@ export function debugPayloadMatchesHelixAskLegacyRenderedReply(
   return candidates.some((candidate) => candidate === expectedQuestion);
 }
 
-export function isHelixAskLegacyBackendDebugExportEligibleTurnId(turnId: string): boolean {
-  const trimmed = turnId.trim();
+export function isHelixAskLegacyBackendDebugExportEligibleTurnId(turnId: string | null | undefined): boolean {
+  const trimmed = turnId?.trim() ?? "";
   return Boolean(trimmed && (trimmed.startsWith("ask:") || /(?:^|:)ask:[^:]+/i.test(trimmed)));
 }
 

@@ -1,9 +1,14 @@
+import { useExperimentalLaunchPanels, writeExperimentalLaunchPanels, EXPERIMENTAL_LAUNCH_PANEL_IDS } from "@/lib/workstation/experimentalLaunchPanels";
+import { panelRegistry } from "@/lib/desktop/panelRegistry";
 import React from "react";
 import { Archive, ChevronDown, Database, FlaskConical, KeyRound, Languages, Link2, LogIn, LogOut, RefreshCw, ShieldCheck, UserCircle } from "lucide-react";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { Auth0SignInButton } from "@/components/auth/Auth0SignInButton";
 import { LocalHostedSubscription } from "@/components/agent-access/LocalHostedSubscription";
 import { ManagedWebsiteConnection } from "./ManagedWebsiteConnection";
+import { DiscordTaskConnections } from "@/components/account/DiscordTaskConnections";
+import { CaptainKeyesTaskAccess } from "@/components/agent-access/CaptainKeyesTaskAccess";
+import { PersonalMcpDeviceRegistration } from "./PersonalMcpDeviceRegistration";
 import { LocalDeveloperAccess } from "./LocalDeveloperAccess";
 import { useHelixStartSettings } from "@/hooks/useHelixStartSettings";
 import { readExperimentalAskHelix, writeExperimentalAskHelix } from "@/lib/workstation/experimentalAskHelix";
@@ -17,7 +22,7 @@ import { useInterfaceText, type InterfaceTextResolver } from "@/lib/i18n/interfa
 import type { InterfaceMessageId } from "@/lib/i18n/messages/types";
 import { useWorkspaceMemoryRegistryStore } from "@/store/useWorkspaceMemoryRegistryStore";
 import {
-  HELIX_USER_ACCOUNT_POLICY,
+  HELIX_SIGNED_OUT_ACCOUNT_POLICY,
   type HelixAccountLinkedAccount,
   type HelixAccountSessionStatus,
 } from "@shared/helix-account-session";
@@ -102,7 +107,7 @@ const emptyStatus: HelixAccountSessionStatus = {
   schema: "helix.account_session_status.v1",
   ok: false,
   session: null,
-  account_policy: HELIX_USER_ACCOUNT_POLICY,
+  account_policy: HELIX_SIGNED_OUT_ACCOUNT_POLICY,
   linked_accounts: [],
   profile_ingress_tokens: [],
   profile_ingress_usage: {
@@ -263,11 +268,13 @@ async function fetchCategorizationJobs(): Promise<CategorizationJobView[]> {
 
 export default function AccountSessionPanel() {
   const [status, setStatus] = React.useState<HelixAccountSessionStatus>(emptyStatus);
+  const [sessionResolved, setSessionResolved] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const refreshInFlight = React.useRef(false);
-  const fallbackProfileId = "DatDamPig";
+  const refreshGeneration = React.useRef(0);
+  const observedSessionId = React.useRef<string | null>(null);
   const [accountEmail, setAccountEmail] = React.useState("");
   const [accountDisplayName, setAccountDisplayName] = React.useState("");
   const [accountPassword, setAccountPassword] = React.useState("");
@@ -285,7 +292,7 @@ export default function AccountSessionPanel() {
   const [categorizationJobs, setCategorizationJobs] = React.useState<CategorizationJobView[]>([]);
   const [postulateReceipts, setPostulateReceipts] = React.useState<ClaimablePostulateReceipt[]>([]);
   const [claimingPostulateId, setClaimingPostulateId] = React.useState<string | null>(null);
-  const [experimentalRoomsBusy, setExperimentalRoomsBusy] = React.useState(false);
+  const experimentalLaunchPanels = useExperimentalLaunchPanels();
   const [experimentalAskHelix, setExperimentalAskHelix] = React.useState(readExperimentalAskHelix);
   const { userSettings, updateSettings } = useHelixStartSettings();
   const memoryRegistrySnapshot = useWorkspaceMemoryRegistryStore((state) =>
@@ -298,37 +305,76 @@ export default function AccountSessionPanel() {
   const interfaceText = useInterfaceText(interfaceLanguage.code);
   const t = interfaceText.t;
 
-  const refresh = React.useCallback(async () => {
-    if (refreshInFlight.current) return;
+  const refresh = React.useCallback(async (force = false) => {
+    if (refreshInFlight.current && !force) return;
+    const generation = ++refreshGeneration.current;
     refreshInFlight.current = true;
     setRefreshing(true);
+    setError(null);
     try {
-      const [nextStatus, nextDiscordSessions, nextCategorizationJobs] = await Promise.all([
-        fetchStatus(),
-        fetchDiscordSessions(),
-        fetchCategorizationJobs(),
-      ]);
+      const nextStatus = await fetchStatus();
+      if (generation !== refreshGeneration.current) return;
+      const nextSessionId = nextStatus.session?.session_id ?? null;
+      if (nextSessionId !== observedSessionId.current) {
+        setDiscordSessions([]);
+        setCategorizationJobs([]);
+        setProfileArchives([]);
+      }
+      observedSessionId.current = nextSessionId;
       setStatus(nextStatus);
+      setSessionResolved(true);
       setPostulateReceipts(readClaimablePostulateReceipts());
       cacheAccountCapabilityPolicy(
         nextStatus.account_policy ?? nextStatus.session?.account_policy ?? null,
         nextStatus.session?.profile.profile_id ?? null,
       );
-      setDiscordSessions(nextDiscordSessions);
-      setCategorizationJobs(nextCategorizationJobs);
-      setProfileArchives(await fetchProfileArchives(nextStatus.session?.profile.profile_id ?? fallbackProfileId));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load account session.");
-    } finally {
+      // Slow ancillary observations must not block the next account refresh.
       refreshInFlight.current = false;
       setRefreshing(false);
+      const [nextDiscordSessions, nextCategorizationJobs] = await Promise.all([
+        fetchDiscordSessions(),
+        fetchCategorizationJobs(),
+      ]);
+      if (generation !== refreshGeneration.current) return;
+      const nextArchives = await fetchProfileArchives(nextStatus.session?.profile.profile_id ?? "");
+      if (generation !== refreshGeneration.current) return;
+      setDiscordSessions(nextDiscordSessions);
+      setCategorizationJobs(nextCategorizationJobs);
+      setProfileArchives(nextArchives);
+    } catch (err) {
+      if (generation === refreshGeneration.current)
+        setError(err instanceof Error ? err.message : "Failed to load account session.");
+    } finally {
+      if (generation === refreshGeneration.current) {
+        refreshInFlight.current = false;
+        setRefreshing(false);
+      }
     }
+  }, []);
+
+  const refreshAfterAccountChange = React.useCallback(() => refresh(true), [refresh]);
+  const clearAccountView = React.useCallback(() => {
+    refreshGeneration.current++;
+    refreshInFlight.current = false;
+    observedSessionId.current = null;
+    setStatus(emptyStatus);
+    setDiscordSessions([]);
+    setCategorizationJobs([]);
+    setProfileArchives([]);
+    setNewTokenValue(null);
+    setAccountActionToken(null);
+    setAccountPassword("");
+    setResetToken("");
   }, []);
 
   React.useEffect(() => {
     refresh();
     const timer = window.setInterval(refresh, ACCOUNT_SESSION_POLL_INTERVAL_MS);
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearInterval(timer);
+      refreshGeneration.current++;
+      refreshInFlight.current = false;
+    };
   }, [refresh]);
 
   React.useEffect(() => {
@@ -373,7 +419,7 @@ export default function AccountSessionPanel() {
       );
       setAccountPassword("");
       setShowPasswordResetHint(false);
-      await refresh();
+      await refresh(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to open profile.");
     } finally {
@@ -390,7 +436,7 @@ export default function AccountSessionPanel() {
       const body = await response.json();
       if (!response.ok) throw new Error(body?.message ?? `verify ${response.status}`);
       setAccountActionToken(body.token_value ?? null);
-      await refresh();
+      await refresh(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to request email verification.");
     } finally {
@@ -411,7 +457,7 @@ export default function AccountSessionPanel() {
       if (!response.ok) throw new Error(body?.message ?? `verify ${response.status}`);
       setResetToken("");
       setAccountActionToken(null);
-      await refresh();
+      await refresh(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to verify email.");
     } finally {
@@ -457,7 +503,7 @@ export default function AccountSessionPanel() {
       setAccountActionToken(null);
       setShowPasswordResetHint(false);
       setAccountRecoveryMessage("Password reset complete. Sign in with the new password.");
-      await refresh();
+      await refresh(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to reset password.");
     } finally {
@@ -473,14 +519,15 @@ export default function AccountSessionPanel() {
         method: "POST",
       });
       if (!response.ok) throw new Error(`sign-out ${response.status}`);
-      cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY, null);
-      await refresh();
+      cacheAccountCapabilityPolicy(HELIX_SIGNED_OUT_ACCOUNT_POLICY, null);
+      clearAccountView();
+      await refresh(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to sign out.");
     } finally {
       setLoading(false);
     }
-  }, [refresh]);
+  }, [clearAccountView, refresh]);
 
   const exportProfileStorage = React.useCallback(async () => {
     setLoading(true);
@@ -510,7 +557,7 @@ export default function AccountSessionPanel() {
       const response = await fetch("/api/account/profile-storage/snapshot", { method: "DELETE" });
       const body = await response.json();
       if (!response.ok) throw new Error(body?.message ?? `delete storage ${response.status}`);
-      await refresh();
+      await refresh(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete saved profile data.");
     } finally {
@@ -525,14 +572,15 @@ export default function AccountSessionPanel() {
       const response = await fetch("/api/account/profile", { method: "DELETE" });
       const body = await response.json();
       if (!response.ok) throw new Error(body?.message ?? `delete profile ${response.status}`);
-      cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY, null);
-      await refresh();
+      cacheAccountCapabilityPolicy(HELIX_SIGNED_OUT_ACCOUNT_POLICY, null);
+      clearAccountView();
+      await refresh(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete profile.");
     } finally {
       setLoading(false);
     }
-  }, [refresh]);
+  }, [clearAccountView, refresh]);
 
   const createIngressToken = React.useCallback(async () => {
     setLoading(true);
@@ -550,7 +598,7 @@ export default function AccountSessionPanel() {
       const body = await response.json();
       if (!response.ok) throw new Error(body?.message ?? `profile-ingress ${response.status}`);
       setNewTokenValue(body.token_value ?? null);
-      await refresh();
+      await refresh(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create profile ingress token.");
     } finally {
@@ -568,7 +616,7 @@ export default function AccountSessionPanel() {
         });
         const body = await response.json();
         if (!response.ok) throw new Error(body?.message ?? `revoke ${response.status}`);
-        await refresh();
+        await refresh(true);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to revoke profile ingress token.");
       } finally {
@@ -589,7 +637,7 @@ export default function AccountSessionPanel() {
           receiptId: receipt.receiptId,
         });
         setPostulateReceipts(readClaimablePostulateReceipts());
-        await refresh();
+        await refresh(true);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to claim postulate receipt.");
       } finally {
@@ -602,51 +650,21 @@ export default function AccountSessionPanel() {
 
   const session = status.session;
   const usage = status.usage;
-  const sharedRoomsExperiment = status.experimental_features?.shared_realtime_rooms;
-  const sharedRoomsEnabled = sharedRoomsExperiment?.enabled ??
-    Boolean(
-      status.account_policy?.feature_flags?.includes("shared_realtime_rooms") &&
-      !status.account_policy?.locked_features?.includes("shared_realtime_rooms"),
-    );
-  const sharedRoomsAvailable = sharedRoomsExperiment?.available ??
-    status.account_policy?.account_type === "developer";
-  const sharedRoomsDeveloperIncluded =
-    status.account_policy?.account_type === "developer";
   const profileConnectionsEnabled = Boolean(
     session &&
-    (status.account_policy ?? HELIX_USER_ACCOUNT_POLICY).feature_flags.includes(
+    (status.account_policy ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY).feature_flags.includes(
       "profile_connections",
     ) &&
-    !(status.account_policy ?? HELIX_USER_ACCOUNT_POLICY).locked_features.includes(
+    !(status.account_policy ?? HELIX_SIGNED_OUT_ACCOUNT_POLICY).locked_features.includes(
       "profile_connections",
     ),
   );
+  const localHostedBudgetEnabled = Boolean(
+    session &&
+    status.account_policy?.feature_flags.includes("local_hosted_budget") &&
+    !status.account_policy.locked_features.includes("local_hosted_budget"),
+  );
 
-  const setSharedRoomsExperiment = React.useCallback(async (enabled: boolean) => {
-    setExperimentalRoomsBusy(true);
-    setError(null);
-    try {
-      const response = await fetch("/api/account/session/experimental-rooms", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ enabled }),
-      });
-      const body = await response.json();
-      if (!response.ok || !body?.status) {
-        throw new Error(body?.message ?? `experimental rooms ${response.status}`);
-      }
-      const nextStatus = body.status as HelixAccountSessionStatus;
-      setStatus(nextStatus);
-      cacheAccountCapabilityPolicy(
-        nextStatus.account_policy ?? nextStatus.session?.account_policy ?? null,
-        nextStatus.session?.profile.profile_id ?? null,
-      );
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update Shared Live Rooms.");
-    } finally {
-      setExperimentalRoomsBusy(false);
-    }
-  }, []);
 
   React.useEffect(() => {
     setProfileAttachConsentGranted(isProfileStorageAttachConsentGranted(session?.profile.profile_id));
@@ -675,6 +693,15 @@ export default function AccountSessionPanel() {
     setProfileAttachConsentGranted(false);
   }, [session?.profile.profile_id]);
 
+  if (!sessionResolved) {
+    return (
+      <div className="flex h-full min-h-0 w-full items-center justify-center bg-slate-950 text-slate-300"
+        role="status" aria-live="polite">
+        {error ?? t("account.action.loading")}
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-slate-950 text-slate-100">
       <header className="border-b border-white/10 px-4 py-3">
@@ -690,7 +717,7 @@ export default function AccountSessionPanel() {
           </div>
           <button data-helix-interaction-kind="observe" data-helix-authority-state="client_local" data-helix-control-id="workstation.panel.account-session.account-session-panel.refresh"
             type="button"
-            onClick={refresh}
+            onClick={() => void refresh(true)}
             aria-busy={refreshing}
             aria-label={refreshing ? t("account.action.loading") : t("account.action.refresh")}
             className="inline-flex h-9 w-[92px] shrink-0 items-center justify-center gap-2 rounded border border-white/10 bg-white/5 px-3 text-xs text-slate-200 hover:bg-white/10"
@@ -733,8 +760,10 @@ export default function AccountSessionPanel() {
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-4">
-        <LocalDeveloperAccess key={`developer:${status.session?.profile.profile_id ?? "signed-out"}`}
-          signedIn={Boolean(status.session)} onChanged={() => { void refresh(); }} />
+        {session ? <LocalDeveloperAccess
+          key={`developer:${status.session?.profile.profile_id ?? "signed-out"}`}
+          signedIn={true} canBootstrapIssuer={session.profile.account_type === "developer"}
+          onChanged={() => { void refresh(true); }} /> : null}
         <ManagedWebsiteConnection key={status.session?.profile.profile_id ?? "signed-out"}
           signedIn={Boolean(status.session)} />
         <div className="grid gap-3 lg:grid-cols-[minmax(260px,360px)_1fr]">
@@ -748,12 +777,13 @@ export default function AccountSessionPanel() {
                 <p className="font-medium text-white">{session.profile.display_name}</p>
                 <p className="break-all text-xs text-slate-400">{session.profile.profile_id}</p>
                 {session.profile.email ? <p className="break-all text-xs text-slate-500">{session.profile.email}</p> : null}
-                {session.profile.auth_mode === "password_account" ? (
+                {(session.profile.auth_mode === "password_account" ||
+                  (session.profile.auth_mode === "web_auth" && session.profile.email)) ? (
                   <div className="rounded border border-white/10 bg-slate-950/60 p-2 text-xs">
                     <div className="font-medium text-slate-200">
                       {session.profile.email_verified_at ? t("account.profile.emailVerified") : t("account.profile.emailNotVerified")}
                     </div>
-                    {!session.profile.email_verified_at ? (
+                    {session.profile.auth_mode === "password_account" && !session.profile.email_verified_at ? (
                       <button data-helix-interaction-kind="act" data-helix-authority-state="client_local" data-helix-control-id="workstation.panel.account-session.account-session-panel.request-email-verification"
                         type="button"
                         onClick={requestEmailVerification}
@@ -802,6 +832,13 @@ export default function AccountSessionPanel() {
                 className="mt-3 space-y-3"
                 data-helix-guidance-target="account-session-sign-in"
               >
+                <div className="rounded border border-cyan-400/20 bg-cyan-500/10 p-3">
+                  <p className="mb-2 text-xs text-slate-300">
+                    Use the same Auth0 identity here, on the website, and with your MCP client to keep one profile.
+                    The email/password option below creates a separate profile and does not link automatically.
+                  </p>
+                  <Auth0SignInButton />
+                </div>
                 <div className="rounded border border-cyan-400/20 bg-cyan-500/10 p-3">
                   <div className="mb-2 flex items-center gap-2 text-xs font-medium text-cyan-100">
                     <LogIn className="h-3.5 w-3.5" />
@@ -924,20 +961,12 @@ export default function AccountSessionPanel() {
                     </div>
                   </div>
                 </div>
-                <div className="border-t border-white/10 pt-3">
-                  <p className="mb-2 text-xs text-slate-400">
-                    Use the same Auth0 identity as your authorized MCP client to
-                    open the exact profile-owned rooms without exposing its
-                    bearer token to the page or agent.
-                  </p>
-                  <Auth0SignInButton />
-                </div>
                 {(typeof window === "undefined" || !window.casimirDesktop?.openAuth0ProfileSignIn) ? (
                   <div className="border-t border-white/10 pt-3">
                     <p className="mb-2 text-xs text-slate-400">
                       {t("account.signIn.googleProfileNote")}
                     </p>
-                    <GoogleSignInButton redirectTarget={null} onSignedIn={refresh} />
+                    <GoogleSignInButton redirectTarget={null} onSignedIn={refreshAfterAccountChange} />
                   </div>
                 ) : null}
               </div>
@@ -974,6 +1003,15 @@ export default function AccountSessionPanel() {
           </div>
         </div>
 
+        <DiscordTaskConnections profileRef={session?.profile.auth_mode !== "guest" ? session?.profile.profile_id ?? null : null}
+          accountSessionRef={session?.session_id ?? null} />
+        <CaptainKeyesTaskAccess />
+
+        {session && status.account_policy?.account_type === "user" &&
+          session.profile.auth_mode === "web_auth" &&
+          session.profile.provider === "external_oauth" ?
+          <PersonalMcpDeviceRegistration sessionId={session.session_id} /> : null}
+
         <section className="mt-3 rounded-lg border border-white/10 bg-black/20 p-3">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
             <Link2 className="h-3.5 w-3.5" />
@@ -999,7 +1037,7 @@ export default function AccountSessionPanel() {
         </section>
 
         {profileConnectionsEnabled ? <BrokerageConnectionsCard /> : null}
-        {session && status.account_policy?.account_type === "developer" &&
+        {session && localHostedBudgetEnabled &&
           (Boolean(window.casimirDesktop) || ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname)) ?
           <LocalHostedSubscription key={`${session.profile.profile_id}:${session.session_id}`} /> : null}
 
@@ -1436,10 +1474,23 @@ export default function AccountSessionPanel() {
           <div className="mt-3 rounded-lg border border-white/10 bg-black/20 p-3">
             <label className="mb-4 flex cursor-pointer items-start justify-between gap-4 border-b border-white/10 pb-4">
               <span>
+                <span className="block text-sm font-medium text-white">Unfinished launch panels</span>
+                <span className="mt-1 block text-xs leading-5 text-slate-400">Show unfinished experimental panels in launch menus. Off by default. These panels are still in development and may be incomplete. This preference is saved on this device.</span>
+              </span>
+              <input data-helix-control-id="workstation.panel.account-session.account-session-panel.show-unfinished-launch-panels" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" type="checkbox" aria-label="Show unfinished launch panels"
+                checked={experimentalLaunchPanels}
+                onChange={event => writeExperimentalLaunchPanels(event.currentTarget.checked)}
+                className="mt-1 h-4 w-4 shrink-0 accent-fuchsia-400" />
+            </label>
+            <p className="mb-4 text-xs leading-5 text-slate-400">
+              {EXPERIMENTAL_LAUNCH_PANEL_IDS.map(id => panelRegistry.find(panel => panel.id === id)?.title ?? id).join(", ")}
+            </p>
+            <label className="mb-4 flex cursor-pointer items-start justify-between gap-4 border-b border-white/10 pb-4">
+              <span>
                 <span className="block text-sm font-medium text-white">Ask Helix chat</span>
                 <span className="mt-1 block text-xs leading-5 text-slate-400">Show the experimental local interpreter chat in Helix Console. Message Codex and Cloud Agent DM remain available when this is off.</span>
               </span>
-              <input type="checkbox" aria-label="Show experimental Ask Helix chat"
+              <input data-helix-control-id="workstation.panel.account-session.account-session-panel.show-experimental-ask-helix-chat" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" type="checkbox" aria-label="Show experimental Ask Helix chat"
                 checked={experimentalAskHelix}
                 onChange={event => {
                   const enabled = event.currentTarget.checked;
@@ -1448,70 +1499,6 @@ export default function AccountSessionPanel() {
                 }}
                 className="mt-1 h-4 w-4 shrink-0 accent-fuchsia-400" />
             </label>
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <div className="text-sm font-medium text-white">Shared Live Rooms</div>
-                <p className="mt-1 text-xs leading-5 text-slate-400">
-                  Join a two-person GPT Live room. Without a signed-in profile, this server creates
-                  a temporary Xbox-style guest name and session instead.
-                </p>
-              </div>
-              <button data-helix-interaction-kind="navigate" data-helix-authority-state="client_local" data-helix-control-id="workstation.panel.account-session.account-session-panel.shared-live-rooms"
-                type="button"
-                role="switch"
-                aria-checked={sharedRoomsEnabled}
-                aria-label="Shared Live Rooms"
-                disabled={
-                  experimentalRoomsBusy ||
-                  sharedRoomsDeveloperIncluded ||
-                  !sharedRoomsAvailable
-                }
-                onClick={() => void setSharedRoomsExperiment(!sharedRoomsEnabled)}
-                className={`relative h-6 w-11 shrink-0 rounded-full border transition ${
-                  sharedRoomsEnabled
-                    ? "border-emerald-300/50 bg-emerald-400/30"
-                    : "border-white/20 bg-slate-800"
-                } disabled:cursor-not-allowed disabled:opacity-60`}
-              >
-                <span
-                  className={`absolute top-[3px] h-4 w-4 rounded-full bg-white transition ${
-                    sharedRoomsEnabled ? "left-[23px]" : "left-[3px]"
-                  }`}
-                />
-              </button>
-            </div>
-            <div className="mt-3 text-xs">
-              {!sharedRoomsAvailable ? (
-                <p className="text-amber-200">
-                  This deployment has not enabled public Shared Live Rooms testing.
-                </p>
-              ) : sharedRoomsDeveloperIncluded ? (
-                <p className="text-emerald-200">Included with developer access.</p>
-              ) : sharedRoomsEnabled && session?.profile.auth_mode === "guest" ? (
-                <div className="space-y-1">
-                  <p className="text-emerald-200">
-                    You appear as <span className="font-semibold">{session.profile.display_name}</span>.
-                  </p>
-                  <p className="text-slate-500">
-                    {sharedRoomsExperiment?.guest_hosting_allowed
-                      ? "This guest can create or join a room."
-                      : "This guest can join a one-time room invitation."}
-                    {sharedRoomsExperiment?.session_expires_at
-                      ? ` Session expires ${new Date(sharedRoomsExperiment.session_expires_at).toLocaleString()}.`
-                      : ""}
-                  </p>
-                </div>
-              ) : sharedRoomsEnabled ? (
-                <p className="text-emerald-200">Enabled for this account session.</p>
-              ) : (
-                <p className="text-slate-500">
-                  Off. Enabling this does not grant developer panels or permissions.
-                </p>
-              )}
-              {experimentalRoomsBusy ? (
-                <p className="mt-2 text-fuchsia-200">Updating Shared Live Rooms…</p>
-              ) : null}
-            </div>
           </div>
         </details>
 

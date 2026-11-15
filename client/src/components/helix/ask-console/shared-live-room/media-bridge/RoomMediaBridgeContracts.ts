@@ -21,7 +21,8 @@ export type SharedLiveRoomMediaBridgeFailure =
   | "remote_audio_playback_blocked"
   | "peer_connection_failed"
   | "signaling_failed"
-  | "provider_input_replace_failed";
+  | "provider_input_replace_failed"
+  | "group_voice_media_unavailable";
 
 export type SharedLiveRoomMediaBridgeProjection = {
   state: SharedLiveRoomMediaBridgeState;

@@ -187,6 +187,7 @@ export default function WorkstationNotesPanel() {
   const notes = useWorkstationNotesStore((state) => state.notes);
   const order = useWorkstationNotesStore((state) => state.order);
   const activeNoteId = useWorkstationNotesStore((state) => state.active_note_id);
+  const storageScopeKey = useWorkstationNotesStore((state) => state.storage_scope_key);
   const createManualNote = useWorkstationNotesStore((state) => state.createManualNote);
   const setActiveNote = useWorkstationNotesStore((state) => state.setActiveNote);
   const updateBody = useWorkstationNotesStore((state) => state.updateNoteBody);
@@ -229,10 +230,10 @@ export default function WorkstationNotesPanel() {
 
   React.useEffect(() => {
     if (!activeNote || activeNote.body.trim()) return;
-    const draftBody = readDraft(`workstation-notes:${activeNote.id}:body`);
+    const draftBody = readDraft(`${storageScopeKey}:${activeNote.id}:body`);
     if (!draftBody.trim()) return;
     updateBody(activeNote.id, draftBody);
-  }, [activeNote, readDraft, updateBody]);
+  }, [activeNote, readDraft, storageScopeKey, updateBody]);
 
   React.useEffect(() => {
     if (viewMode !== "list" || !activeNoteId) return;
@@ -277,7 +278,7 @@ export default function WorkstationNotesPanel() {
     (snapshot?: WorkstationNoteSessionSaveSnapshot) => {
       if (snapshot) {
         rememberDraft(
-          `workstation-notes:${snapshot.note_id}:document`,
+          `${storageScopeKey}:${snapshot.note_id}:document`,
           JSON.stringify(snapshot),
         );
       }
@@ -290,7 +291,7 @@ export default function WorkstationNotesPanel() {
         saveStateTimeoutRef.current = null;
       }, 450);
     },
-    [rememberDraft],
+    [rememberDraft, storageScopeKey],
   );
 
   const handleSelectNote = React.useCallback(
@@ -319,7 +320,7 @@ export default function WorkstationNotesPanel() {
     (title: string) => {
       if (!activeNote) return;
       renameNote(activeNote.id, title);
-      rememberDraft(`workstation-notes:${activeNote.id}:title`, title);
+      rememberDraft(`${storageScopeKey}:${activeNote.id}:title`, title);
       markAutosave({
         note_id: activeNote.id,
         title,
@@ -327,24 +328,27 @@ export default function WorkstationNotesPanel() {
         saved_at: new Date().toISOString(),
       });
     },
-    [activeNote, markAutosave, rememberDraft, renameNote],
+    [activeNote, markAutosave, rememberDraft, renameNote, storageScopeKey],
   );
 
   const persistEditorHtml = React.useCallback(() => {
     if (!activeNote || !editorRef.current) return;
+    const current = useWorkstationNotesStore.getState();
+    // A queued editor frame must not read a replacement note or account's DOM.
+    if (current.storage_scope_key !== storageScopeKey || current.active_note_id !== activeNote.id) return;
     const html = sanitizeRichNoteHtml(editorRef.current.innerHTML);
     if (html !== editorRef.current.innerHTML) {
       editorRef.current.innerHTML = html;
     }
     updateBody(activeNote.id, html);
-    rememberDraft(`workstation-notes:${activeNote.id}:body`, html);
+    rememberDraft(`${storageScopeKey}:${activeNote.id}:body`, html);
     markAutosave({
       note_id: activeNote.id,
       title: activeNote.title,
       body: html,
       saved_at: new Date().toISOString(),
     });
-  }, [activeNote, markAutosave, rememberDraft, updateBody]);
+  }, [activeNote, markAutosave, rememberDraft, storageScopeKey, updateBody]);
 
   const scheduleEditorSave = React.useCallback(() => {
     if (pendingEditorSaveFrameRef.current !== null) {

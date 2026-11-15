@@ -1,0 +1,112 @@
+{
+  "observed_at": "2026-11-13T22:33:34.146210+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/RoomReviewScope.tsx",
+      "canonical_sha256": "d9117e85479c13dd0315c08a3f8047b0cea37147aad61f8af0bd551cf9cae6cf",
+      "export_sha256": "d9117e85479c13dd0315c08a3f8047b0cea37147aad61f8af0bd551cf9cae6cf",
+      "bytes": 1816,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/DiscordRoomSpeakerLinkPanel.tsx",
+      "canonical_sha256": "edad4a0ac5ff6aaa48955c922206bfa076be72e6b3b050d1c5dcc34591f175d5",
+      "export_sha256": "28ebab23c280845ce401dc0225cd9f0de1c34d6338dc119366d3129962a243f3",
+      "bytes": 9646,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeHostedDiscordSpeakerReview.tsx",
+      "canonical_sha256": "177b1afd3ede643b412d37e74e5773f5619ac181dc9ebbfe73f09e063c69ad01",
+      "export_sha256": "f98d4b7b814971627901ce4bf96ece02a6a48bb9bf0ce9919aab82e01109fea1",
+      "bytes": 8476,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeMinecraftPlayerSharingQueue.tsx",
+      "canonical_sha256": "2b1291aa726e028793976b4e4d0bc7f43a6cc18e29a089517b34648be449044c",
+      "export_sha256": "cd6412b10b3e5e8e25d874edd3c470cf86a8c49209b52c0fca1bcc909f8e7e1e",
+      "bytes": 7191,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeDiscordTaskTranscriptOfferPanel.tsx",
+      "canonical_sha256": "efde1330daf5102c121297e28b116767c91d8b18d07a9212091d8b146588c75e",
+      "export_sha256": "106c47a3f372ddb809818cc9cd7054222ca809064ab0c95eb403aa7502d5821a",
+      "bytes": 12021,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/RoomReviewScope.spec.tsx",
+      "canonical_sha256": "bcc8fba4d375369e2d1fec48bfb7cfac267f4f852bc8319969199b1609fe91da",
+      "export_sha256": "bcc8fba4d375369e2d1fec48bfb7cfac267f4f852bc8319969199b1609fe91da",
+      "bytes": 6401,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/DiscordRoomSpeakerLinkPanel.spec.tsx",
+      "canonical_sha256": "603c507989a83fbe0864be34a71fa6206aca46ea633783257a021f2ed385a7da",
+      "export_sha256": "603c507989a83fbe0864be34a71fa6206aca46ea633783257a021f2ed385a7da",
+      "bytes": 3200,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeHostedDiscordSpeakerReview.spec.tsx",
+      "canonical_sha256": "b678f5ce6e7a0a8e916a634bb8a2a301fecc77b9b9889cf86da7ce4cf584618f",
+      "export_sha256": "b678f5ce6e7a0a8e916a634bb8a2a301fecc77b9b9889cf86da7ce4cf584618f",
+      "bytes": 2934,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeMinecraftPlayerSharingQueue.spec.tsx",
+      "canonical_sha256": "02f4a12dc8bbfdc1d93a9e93a0a8f9b7619d1cf2955aee4448539beea29c7a3d",
+      "export_sha256": "02f4a12dc8bbfdc1d93a9e93a0a8f9b7619d1cf2955aee4448539beea29c7a3d",
+      "bytes": 4035,
+      "transformation": "identity",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeDiscordTaskTranscriptOfferPanel.spec.tsx",
+      "canonical_sha256": "a2f612024efbf61e749cbe7a6550954a8b73ea0ba028e706e75bc92c4b16134e",
+      "export_sha256": "4a3acedb0d1caa0dcf128493b3ef36305b9a1ee797da889a1c8cd9b25a6adfbf",
+      "bytes": 10022,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Read the four complete coordination panels and their suites, the new shared RoomReviewScope boundary and regression suite, and their parent call sites. No imported media or model weights are included.",
+    "Speaker linking stages a private one-use claim and separately requires owner review of the exact participant/Discord identity. It does not grant Minecraft control or speaker transcription consent. Native and website routes retain their existing independent service validation.",
+    "The Minecraft queue reads the exact room Fabric source and pending player release requests. It displays attributed actor references rather than raw player UUIDs and has no activation or approval action. Each player still approves their own release separately.",
+    "Transcript offers require the owner-selected task and current finite invitation; each speaker separately opts in. Source fix 39 binds review to the exact task/attachment/invitation/account identity and rechecks expiry at submission. Changed task, pairing or selection invalidates the checkbox.",
+    "Source fix 40 adds one shared boundary that remounts review state on account, room or owner-role changes and guards asynchronous native/HTTP/clipboard operations before and after completion. Late reads cannot issue a follow-up under the successor context; late private codes are discarded. Unmount retires work without making a new remote revocation request.",
+    "Eight original room/account regressions failed before fix 40. The combined 27 checks cover late reads across room/account/unmount, valid-format late private claim codes, normal stage/review/revoke, read-only player queue behavior and the exact-offer review cases from fix 39."
+  ],
+  "limits": [
+    "Unpublished unfrozen source proposal. Fixes 39/40 and earlier post-R380 changes remain uninstalled.",
+    "All native/HTTP operations in tests are mocked; no real speaker code, new identity approval, consent, transcript pickup, model request or game action occurred.",
+    "A request already accepted by a service is not undone by client retirement. Native/service identity, expiry, one-use claim enforcement and exact participant consent remain authoritative and require installed checks.",
+    "Existing identity fixtures use historical timestamps and do not establish real expiry enforcement. Offer expiry is separately tested by moving the mocked clock at submission.",
+    "The player queue is an observation surface, not evidence that player consent or an adapter result exists. Full two-profile Friends and attended GPT Live/Minecraft acceptance remain open.",
+    "Export tests load five selected production modules with canonical unselected/shared dependencies. Five intentional contact matches elsewhere remain in final public review."
+  ],
+  "r382_recovery_followup": {
+    "observed_at": "2026-11-14T19:46:54.151777+00:00",
+    "published": false,
+    "scope": "Allowlisted room/source read failures identify specific recovery actions; arbitrary remote error text stays hidden. No new dependency or authority.",
+    "validation": "Canonical 184 focused checks; exact LF-normalized export parity verified. Installed delivery and matching domain revision remain open."
+  }
+}

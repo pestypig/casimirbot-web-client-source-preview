@@ -1,0 +1,27 @@
+{
+  "observed_at": "2026-11-14T04:57:22.264839+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/components/workstation/situation-graph/SituationGraphEdgeLayer.tsx",
+      "canonical_sha256": "9c8b952135d7cf673ef56dee0504a1d2e4a6169a3f58f448bb2a9a4109a2f58a",
+      "export_sha256": "9c8b952135d7cf673ef56dee0504a1d2e4a6169a3f58f448bb2a9a4109a2f58a",
+      "previous_public_sha256": "ef6620ebeab36e71ab0c17ce17dd0a04ff42b290a8b2f1f18bdf54ba561bf121",
+      "bytes": 2029,
+      "transformation": "identity"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [],
+  "classification": "presentation",
+  "source_frozen": false,
+  "published": false,
+  "review": [
+    "Added labels for both already-declared graph lanes: receipt and monitor_signal.",
+    "Receipt uses the existing output slate palette; monitor signal uses the existing context cyan palette.",
+    "Only label and styling maps changed. No source subscription, context attachment, command, execution, consent or monitor scheduling behavior changed."
+  ],
+  "limits": [
+    "Display rendering does not verify delivery, graph execution or live room acceptance."
+  ]
+}

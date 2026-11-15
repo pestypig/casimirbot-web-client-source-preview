@@ -59,7 +59,7 @@ describe("HelixAskActionToolbar visual source controls", () => {
     expect(screenSelector).toHaveTextContent("Screen");
     expect(screenSelector.querySelector("svg.lucide-monitor-up")).not.toBeNull();
     expect(screenSelector.querySelector("svg.lucide-camera")).toBeNull();
-    expect(screen.getByRole("button", { name: "Enable tab audio for visual capture" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Include tab or system audio in screen capture" })).toBeEnabled();
 
     fireEvent.click(screenSelector);
     expect(onToggleVisualSourceKind).toHaveBeenCalledTimes(1);
@@ -80,7 +80,7 @@ describe("HelixAskActionToolbar visual source controls", () => {
     expect(cameraSelector).toHaveTextContent("Camera");
     expect(cameraSelector.querySelector("svg.lucide-camera")).not.toBeNull();
     expect(cameraSelector.querySelector("svg.lucide-monitor-up")).toBeNull();
-    expect(screen.queryByRole("button", { name: /tab audio for visual capture/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /tab or system audio in screen capture/i })).toBeNull();
     expect(screen.getByRole("button", { name: "Start camera sharing" })).toBeEnabled();
   });
 

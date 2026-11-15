@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   HELIX_DEVELOPER_ACCOUNT_POLICY,
+  HELIX_SIGNED_OUT_ACCOUNT_POLICY,
   HELIX_USER_ACCOUNT_POLICY,
 } from "@shared/helix-account-session";
 import { HelixAskSlashCommandMenu } from "@/components/helix/ask-console/HelixAskSlashCommandMenu";
@@ -25,6 +26,11 @@ import {
 afterEach(() => cleanup());
 
 describe("Helix Ask slash command menu", () => {
+  it("uses signed-out capability discovery while policy is unresolved", () => {
+    expect(buildHelixAskSlashCommandMenuItems({ accountPolicy: null }))
+      .toEqual(buildHelixAskSlashCommandMenuItems({ accountPolicy: HELIX_SIGNED_OUT_ACCOUNT_POLICY }));
+  });
+
   it("builds account-scoped command items without exposing developer-only commands to user accounts", () => {
     const userItems = buildHelixAskSlashCommandMenuItems({
       accountPolicy: HELIX_USER_ACCOUNT_POLICY,
@@ -110,9 +116,7 @@ describe("Helix Ask slash command menu", () => {
   it("keeps the postulate scaffold visible when cached policy has the public board but not the new capability", () => {
     const stalePolicy = {
       ...HELIX_USER_ACCOUNT_POLICY,
-      allowed_workstation_capabilities: HELIX_USER_ACCOUNT_POLICY.allowed_workstation_capabilities.filter(
-        (capability) => capability !== "postulate.submit_proposal",
-      ),
+      allowed_workstation_capabilities: ["workstation.open_panel"],
     };
 
     const items = buildHelixAskSlashCommandMenuItems({
@@ -126,24 +130,55 @@ describe("Helix Ask slash command menu", () => {
     });
   });
 
-  it("keeps the postulate scaffold visible when live policy has not caught up to canonical public panels", () => {
+  it("does not override a live policy that excludes the fallback panel", () => {
     const livePolicyWithoutPostulate = {
       ...HELIX_USER_ACCOUNT_POLICY,
-      allowed_panels: HELIX_USER_ACCOUNT_POLICY.allowed_panels.filter((panelId) => panelId !== "postulate-board"),
-      allowed_workstation_capabilities: HELIX_USER_ACCOUNT_POLICY.allowed_workstation_capabilities.filter(
-        (capability) => capability !== "postulate.submit_proposal",
-      ),
+      allowed_panels: [],
+      allowed_workstation_capabilities: ["workstation.open_panel"],
     };
 
     const items = buildHelixAskSlashCommandMenuItems({
       accountPolicy: livePolicyWithoutPostulate,
       runtime: { id: "codex", label: "Codex Workstation Mode" },
+      includeLocked: true,
     });
 
     expect(items.find((item) => item.command === "/postulate")).toMatchObject({
-      accessState: "available",
+      accessState: "locked",
+      accessReason: "capability_outside_account_policy",
       fallbackPanelId: "postulate-board",
     });
+    expect(buildHelixAskSlashCommandMenuItems({ accountPolicy: livePolicyWithoutPostulate })
+      .some((item) => item.command === "/postulate")).toBe(false);
+  });
+
+  it("does not turn an explicit capability lock into a panel fallback", () => {
+    const policy = {
+      ...HELIX_USER_ACCOUNT_POLICY,
+      locked_workstation_capabilities: ["postulate.submit_proposal"],
+    };
+    const items = buildHelixAskSlashCommandMenuItems({ accountPolicy: policy, includeLocked: true });
+    expect(items.find((item) => item.command === "/postulate")).toMatchObject({
+      accessState: "locked",
+      accessReason: "capability_locked_by_account_policy",
+    });
+    expect(buildHelixAskSlashCommandMenuItems({ accountPolicy: policy })
+      .some((item) => item.command === "/postulate")).toBe(false);
+  });
+
+  it("respects an explicit hidden-panel exception even with a stale capability list", () => {
+    const policy = {
+      ...HELIX_USER_ACCOUNT_POLICY,
+      locked_panels: [...HELIX_USER_ACCOUNT_POLICY.locked_panels, "postulate-board"],
+      allowed_workstation_capabilities: ["workstation.open_panel"],
+    };
+    const items = buildHelixAskSlashCommandMenuItems({ accountPolicy: policy, includeLocked: true });
+    expect(items.find((item) => item.command === "/postulate")).toMatchObject({
+      accessState: "locked",
+      accessReason: "capability_outside_account_policy",
+    });
+    expect(buildHelixAskSlashCommandMenuItems({ accountPolicy: policy })
+      .some((item) => item.command === "/postulate")).toBe(false);
   });
 
   it("filters commands and tracks keyboard navigation without executing tools", () => {
@@ -157,7 +192,7 @@ describe("Helix Ask slash command menu", () => {
       items,
       selectedIndex: 0,
     });
-    expect(state.items.length).toBeGreaterThan(1);
+    expect(state.items.length).toBeGreaterThan(0);
     expect(state.selectedItem?.command).toBe("/calculator");
     expect(
       resolveHelixAskSlashCommandMenuKey({

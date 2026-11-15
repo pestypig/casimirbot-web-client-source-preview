@@ -1,0 +1,49 @@
+{
+  "observed_at": "2026-11-14T05:52:56.203781+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/components/panels/MoralGraphPanel.tsx",
+      "canonical_sha256": "5e18ec02d2787ab887e8ce354bb17a6c61ebe1a27d871cf1d1090cd3501c8852",
+      "export_sha256": "5e18ec02d2787ab887e8ce354bb17a6c61ebe1a27d871cf1d1090cd3501c8852",
+      "previous_public_sha256": "347485603a0f116e41d51f0123214f113f5330d99055ddc76341de00d86c8c4f",
+      "bytes": 96494,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/components/panels/moral-graph/MoralGraphBiomeMap.tsx",
+      "canonical_sha256": "686b2788a7414bc63555327e262e9beb27c9f7f8bfd991319e6af008e698090f",
+      "export_sha256": "686b2788a7414bc63555327e262e9beb27c9f7f8bfd991319e6af008e698090f",
+      "previous_public_sha256": "e0c0fc7f10e55ba42f2e2a34358a03cffcc9a2faa9eb8592a29bc5dba88c75a4",
+      "bytes": 13950,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/components/__tests__/moral-graph-biome-map.spec.tsx",
+      "canonical_sha256": "3342b28ce56492fa327d80363b4c6ef5c61a693021244beb874c7482b8c52e15",
+      "export_sha256": "3342b28ce56492fa327d80363b4c6ef5c61a693021244beb874c7482b8c52e15",
+      "previous_public_sha256": "5ab442d7d78d87e8713fdd443b095319392d3b719abbbd5e8bd0ef67ca225140",
+      "bytes": 9488,
+      "transformation": "identity"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/components/__tests__/moral-graph-panel.spec.tsx",
+      "canonical_sha256": "6ec6c89f078f802cd1b114114f4030db590a54f905226f0559bd8e3e24d34a39"
+    }
+  ],
+  "classification": "presentation",
+  "source_frozen": false,
+  "published": false,
+  "review": [
+    "Filter missing selected nodes with an inferred predicate that preserves the full biome view-model type. For find results, defined objects are retained and undefined is excluded as before.",
+    "Use the existing panel missing-procedure message for hover cards when proceduralExpression is absent; translators receive a string.",
+    "No graph construction, moral result, physics, approval or execution policy changes."
+  ],
+  "limits": [
+    "UI fixtures do not establish installed rendering, admitted actions or scientific/physical proof."
+  ],
+  "web_candidate_count": 497
+}

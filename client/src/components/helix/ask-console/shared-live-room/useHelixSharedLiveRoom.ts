@@ -64,7 +64,7 @@ export type HelixSharedLiveRoomController = {
   frameUpload: HelixSharedLiveRoomFrameUploadState;
   mediaBridge: SharedLiveRoomMediaBridgeProjection;
   clearError(): void;
-  createRoom(title?: string, capacityProfile?: "two_person_voice" | "three_human_text"): Promise<boolean>;
+  createRoom(title?: string, capacityProfile?: "two_person_voice" | "three_person_voice" | "three_human_text"): Promise<boolean>;
   joinRoom(inviteCode: string): Promise<boolean>;
   openRoom(roomId: string, signal?: AbortSignal): Promise<boolean>;
   createInvite(): Promise<boolean>;
@@ -198,7 +198,7 @@ export function useHelixSharedLiveRoom(
   });
 
   const createRoom = useCallback(async (title?: string,
-    capacityProfile?: "two_person_voice" | "three_human_text"): Promise<boolean> => {
+    capacityProfile?: "two_person_voice" | "three_person_voice" | "three_human_text"): Promise<boolean> => {
     const nextRoom = await runRoomAction("create", () => api.createRoom(title, capacityProfile));
     if (!nextRoom) return false;
     resetVisualIngress();
@@ -322,6 +322,7 @@ export function useHelixSharedLiveRoom(
   }, [activeRoomId, api, applyRoom, runRoomAction]);
 
   useEffect(() => {
+    if (!activeRoomId) return;
     if (!shouldRenewSharedLiveRoomFloor({
       activeRoomId,
       runtimeState: room?.runtime.state ?? null,
@@ -332,13 +333,23 @@ export function useHelixSharedLiveRoom(
       selfRole: selfParticipant?.role ?? null,
       peerAudioConnected: mediaBridge.projection.peer_audio_connected,
     })) return;
+    let disposed = false;
+    let pending = false;
     const renew = (): void => {
+      if (disposed || pending) return;
+      pending = true;
       void api.takeFloor(activeRoomId)
-        .then(applyRoom)
-        .catch(() => undefined);
+        .then((nextRoom) => {
+          if (!disposed && nextRoom.room_id === activeRoomId) applyRoom(nextRoom);
+        })
+        .catch(() => undefined)
+        .finally(() => { pending = false; });
     };
     const interval = window.setInterval(renew, 3_000);
-    return () => window.clearInterval(interval);
+    return () => {
+      disposed = true;
+      window.clearInterval(interval);
+    };
   }, [
     activeRoomId,
     api,

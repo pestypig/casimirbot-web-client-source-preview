@@ -57,14 +57,14 @@ const registryMeta = (overrides: Record<string, unknown> = {}) => ({
   hasObservation: true,
   selectedBackendProvider: null,
   freshnessStatus: "unknown",
-  terminalAuthorityStatus: "not_terminal_authority",
+  terminalAuthorityStatus: "not_terminal_authority" as const,
   sourceId: "document_markdown:docs/research/nhm2.md",
   sourceKind: null,
   accountLocale: null,
   projectionTarget: "docs_chunk",
   targetLanguage: "es",
   cancelRequested: false,
-  contextRole: "tool_evidence",
+  contextRole: "tool_evidence" as const,
   ...overrides,
 });
 
@@ -301,6 +301,24 @@ describe("document live translation projection registry", () => {
       assistantAnswer: false,
       rawContentIncluded: false,
     });
+  });
+
+  it.each([
+    undefined,
+    {},
+    { source_event_type: null, lane: "live_translation" },
+    { source_event_type: "lane_session", lane: "live_translation", sourceId: 42, docPath: {} },
+    { source_event_type: "lane_mail_loop", lane: "live_translation", sourceId: "document_markdown:docs/research/nhm2.md", sourceIdentityKey: 42 },
+  ])("preserves the current snapshot and stays quiet for unusable event metadata %#", (meta) => {
+    const input = { docPath: "docs/research/nhm2.md", locale: "es", sourceIdentityKey: "test-document-identity", units: [unit("u0001")] };
+    const current = ingestDocumentLiveTranslationProjection({ ...input, payload: projectedPayload("Texto conservado.", 100, { source_identity_key: input.sourceIdentityKey }) });
+    const listener = vi.fn(); const unsubscribe = subscribeDocumentLiveTranslationProjectionRegistry(listener);
+    try {
+      const result = ingestDocumentLiveTranslationProjectionFromAskLiveEvent({
+        ...input, eventPayload: { contextId: "helix-ask:desktop", entry: { id: "test-invalid-metadata", text: "Unusable event", meta } },
+      });
+      expect(result).toBe(current); expect(listener).not.toHaveBeenCalled();
+    } finally { unsubscribe(); }
   });
 
   it("keeps direct governed lane projections separated by projection target", () => {
@@ -965,6 +983,20 @@ describe("document live translation projection registry", () => {
       translations: {},
       laneSessions: {
         "lane-session-blocked": {
+          lifecycleAction: null,
+          lifecycleReason: null,
+          sessionDebugPhase: null,
+          sessionObservationStatus: null,
+          permissionProfile: null,
+          selectedBackendProvider: null,
+          latestChunkId: null,
+          latestChunkIndex: null,
+          latestDedupeKey: null,
+          latestSourceEventId: null,
+          latestSourceEventMs: null,
+          latestObservedAtMs: null,
+          latestFreshnessStatus: null,
+          terminalAuthorityStatus: "not_terminal_authority",
           laneSessionId: "lane-session-blocked",
           laneId: "live_translation",
           sessionStatus: "blocked",
@@ -1023,6 +1055,20 @@ describe("document live translation projection registry", () => {
       translations: {},
       laneSessions: {
         "lane-session-running": {
+          lifecycleAction: null,
+          lifecycleReason: null,
+          sessionDebugPhase: null,
+          sessionObservationStatus: null,
+          permissionProfile: null,
+          selectedBackendProvider: null,
+          latestChunkId: null,
+          latestChunkIndex: null,
+          latestDedupeKey: null,
+          latestSourceEventId: null,
+          latestSourceEventMs: null,
+          latestObservedAtMs: null,
+          latestFreshnessStatus: null,
+          terminalAuthorityStatus: "not_terminal_authority",
           laneSessionId: "lane-session-running",
           laneId: "live_translation",
           sessionStatus: "running",
@@ -1077,6 +1123,20 @@ describe("document live translation projection registry", () => {
       translations: {},
       laneSessions: {
         "lane-session-paused": {
+          lifecycleAction: null,
+          lifecycleReason: null,
+          sessionDebugPhase: null,
+          sessionObservationStatus: null,
+          permissionProfile: null,
+          selectedBackendProvider: null,
+          latestChunkId: null,
+          latestChunkIndex: null,
+          latestDedupeKey: null,
+          latestSourceEventId: null,
+          latestSourceEventMs: null,
+          latestObservedAtMs: null,
+          latestFreshnessStatus: null,
+          terminalAuthorityStatus: "not_terminal_authority",
           laneSessionId: "lane-session-paused",
           laneId: "live_translation",
           sessionStatus: "paused",
@@ -1127,6 +1187,20 @@ describe("document live translation projection registry", () => {
       translations: {},
       laneSessions: {
         "lane-session-stopped": {
+          lifecycleAction: null,
+          lifecycleReason: null,
+          sessionDebugPhase: null,
+          sessionObservationStatus: null,
+          permissionProfile: null,
+          selectedBackendProvider: null,
+          latestChunkId: null,
+          latestChunkIndex: null,
+          latestDedupeKey: null,
+          latestSourceEventId: null,
+          latestSourceEventMs: null,
+          latestObservedAtMs: null,
+          latestFreshnessStatus: null,
+          terminalAuthorityStatus: "not_terminal_authority",
           laneSessionId: "lane-session-stopped",
           laneId: "live_translation",
           sessionStatus: "stopped",
@@ -2260,14 +2334,9 @@ describe("document live translation projection registry", () => {
       serverProjectionKey: "server-projection-key-live-event",
       observationRef: "obs:live-event",
       receiptRef: "receipt:live-event",
-      laneSessionId: "lane-session-live-event",
-      observationLaneSessionId: "lane-session-live-event-observation",
-      goalBindingId: "goal-binding-live-event",
       sourceIdentityKey: "document_markdown:docs/research/nhm2.md::source-text-live-event::docs::docs_chunk::es-US",
       latestSourceIdentityKey:
         "document_markdown:docs/research/nhm2.md::source-text-live-event::docs::docs_chunk::es-US",
-      latestEventId: "lane-session-live-event:observation_recorded:300",
-      hasObservation: true,
       projectionStatus: "projected",
       ...registryMeta({
         dedupeKey: "document_markdown:docs/research/nhm2.md:u0001:es",
@@ -2365,12 +2434,6 @@ describe("document live translation projection registry", () => {
       serverProjectionKey: "server-projection-key-canonical-receipt",
       observationRef: "obs:canonical-live-event",
       receiptRef: "receipt:canonical-live-event",
-      laneSessionId: null,
-      observationLaneSessionId: null,
-      goalBindingId: null,
-      latestEventId: null,
-      hasObservation: true,
-      selectedBackendProvider: "live_translation.local_runtime",
       projectionStatus: "projected",
       ...registryMeta({
         chunkIndex: 2,
@@ -4093,7 +4156,7 @@ describe("document live translation projection registry", () => {
     expect(readDocumentLiveTranslationProjectionSnapshot(activeInput)).toEqual(projectionSnapshot);
   });
 
-  it("ignores live-event projections for a different target language than the active locale", () => {
+  it("ignores non-document-chunk projections for a different target language than the active locale", () => {
     const snapshot = ingestDocumentLiveTranslationProjectionFromAskLiveEvent({
       docPath: "docs/research/nhm2.md",
       locale: "es",
@@ -4107,7 +4170,7 @@ describe("document live translation projection registry", () => {
             source_event_type: "ui_translation_projection",
             lane: "live_translation",
             sourceId: "document_markdown:docs/research/nhm2.md",
-            latestProjectionTarget: "docs_chunk",
+            latestProjectionTarget: "docs_hover",
             latestChunkId: "u0001",
             latestDedupeKey: "document_markdown:docs/research/nhm2.md:u0001:fr",
             latestObservedAtMs: 500,

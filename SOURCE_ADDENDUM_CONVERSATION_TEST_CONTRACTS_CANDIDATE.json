@@ -1,0 +1,91 @@
+{
+  "observed_at": "2026-11-14T02:49:45.627315+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/lib/helix/ask-turn-transcript.ts",
+      "canonical_sha256": "1dcdc10c13872b2f4509e0877c20ea575d46b5bcb28ff85f5b55f2c2b1c28aa5",
+      "export_sha256": "1dcdc10c13872b2f4509e0877c20ea575d46b5bcb28ff85f5b55f2c2b1c28aa5",
+      "bytes": 249663,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "6b467e7e130d862bb17e10cada7d1a3e5dcccb3400b813fb24fa86a9b84a3663"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskLegacyConsoleInventory.ts",
+      "canonical_sha256": "6ea43e520ac79e93d0236cf523e6df212a247a93e191bf958222b6e9736330ad",
+      "export_sha256": "6ea43e520ac79e93d0236cf523e6df212a247a93e191bf958222b6e9736330ad",
+      "bytes": 83463,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "d6c041de49604485f60acea5c4c0f078ea154da01b37ba39db82cd85c8a6f8aa"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-console-recrown.spec.ts",
+      "canonical_sha256": "71ed02b0a3e5dcfe4c47defb4866fb3d658dc96da2e008997517796e02fd7e49",
+      "export_sha256": "71ed02b0a3e5dcfe4c47defb4866fb3d658dc96da2e008997517796e02fd7e49",
+      "bytes": 524850,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "da7b63264e3632b523f21b2c10dae32da428ba186502092b335a1e109201e4d5"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskBackendEntrypointPolicy.spec.ts",
+      "canonical_sha256": "1a684ba511890796e2055c8ddff60be4b5c740cbdf467667ff38bbd156eba9e6",
+      "export_sha256": "1a684ba511890796e2055c8ddff60be4b5c740cbdf467667ff38bbd156eba9e6",
+      "bytes": 23299,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "e0c588def68e214301396d5d6450bba973fa2d99e382376cc2e87237e4ec8565"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.cancellation.spec.ts",
+      "canonical_sha256": "1d20a3c9ecc53d4f8f797b5f976b69a9f3166ad5362cc52b2f0221eacdf6d6cf",
+      "export_sha256": "1d20a3c9ecc53d4f8f797b5f976b69a9f3166ad5362cc52b2f0221eacdf6d6cf",
+      "bytes": 4819,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "22fefefb0603ec479852abaa7cf587dd1508a2b4d9ba46fbc6dc5bc5623e23d2"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskLiveRuntimeTransportController.local-playback.spec.ts",
+      "canonical_sha256": "b53454d703a1433987872cc9f62ce956f894e4a50215630d3599460332a5ae17",
+      "export_sha256": "b53454d703a1433987872cc9f62ce956f894e4a50215630d3599460332a5ae17",
+      "bytes": 3362,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "0411985db5781da4022d520acc3f926d52775de4e690e46b826e898616aca2d6"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/lib/helix/__tests__/ask-turn-transcript.spec.ts",
+      "canonical_sha256": "1106cb2ce5b22e6b42584a71ceb9a4ceb3c878fcdb13196238e8d78eae45af7c",
+      "export_sha256": "55d22013e71d4a827c75c86cb68f02299cefa98bd218e04bd129c6ee06207148",
+      "scope": "Existing public-parity transcript validation suite; no new export."
+    }
+  ],
+  "focused_validation_test": {
+    "path": "client/src/components/__tests__/helix-ask-pill-ui.spec.tsx",
+    "canonical_sha256": "44afff626cca19ea9b845e32265153733fb67628f7d23647e5be370f0e5c9a2a",
+    "test_name": "only treats terminal answer mail transcript groups as saved console turn candidates"
+  },
+  "work_scope": {
+    "program_gate": "G8 existing release qualification",
+    "workstream": "Conversation display and GPT Live test contracts",
+    "capability": "Saved mail display and existing live transport fixtures",
+    "current_maturity": "implemented",
+    "target_maturity": "aligned declarations and typed fixtures",
+    "required_evidence": "Existing console, backend and transport suites; transcript test; emitted JavaScript equality; scoped compiler",
+    "explicit_non_goals": "No runtime changes, source admission, pairing, terminal authority, audio capture or provider calls",
+    "downstream_gate_unlocked": "None"
+  },
+  "review": [
+    "The saved-mail display classifier declares its minimal read-only row-kind input, including three legacy labels it already classifies. Current live-mail schemas, output conditions and authority are unchanged.",
+    "The inventory callback accepts the existing slice interface so it can count a valid category with no current entries; the expression and result are unchanged.",
+    "Live transport fixtures preserve offer as a literal SDP type. The data-channel test retains its callback in a mutable holder, and the toolbar fixture uses the existing runtime-picker builder.",
+    "The backend guard test now checks absence of the undeclared ask_entrypoint_required property directly, retaining the negative authority assertion instead of broadening a request contract."
+  ],
+  "limits": [
+    "Unfrozen, unpublished, uninstalled. Two production changes are type-only; emitted-code equality is checked separately.",
+    "Export validation loads the selected production helpers and changed fixture bodies, with remaining runtime dependencies and source-path assertions canonical. Mocked transport tests do not open a microphone or call a provider."
+  ]
+}

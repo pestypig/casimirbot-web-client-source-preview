@@ -70,13 +70,13 @@ export function NativeSharedInterpreterReportsPanel({ roomId, authority, disable
     <p>Owner-approved AI task reports</p>
     <p className="break-all">Room: {roomId} · {authority}</p>
     <p>These reports come from host-reviewed AI room replies and a selected task. Reading one sends no instruction and generates no new answer.</p>
-    <button type="button" disabled={busy || disabled} onClick={() => void load()}>Load shared AI task reports</button>
+    <button data-helix-control-id="helix.ask.shared_live_room.native-shared-interpreter-reports-panel.load-shared-ai-task-reports" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || disabled} onClick={() => void load()}>Load shared AI task reports</button>
     {message ? <p role="status">{message}</p> : null}
     {catalog ? <>
       {!catalog.receipt.reports.length ? <p>No current shared AI task reports.</p> : null}
       {catalog.receipt.reports.map((report, index) => <div key={report.disclosure_ref}>
         <span>Report {index + 1} · task reported {report.task_status}</span>{" "}
-        <button type="button" disabled={busy || disabled} onClick={() => void load(report)}>Open AI task report {index + 1}</button>
+        <button data-helix-control-id="helix.ask.shared_live_room.native-shared-interpreter-reports-panel.open-ai-task-report" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={busy || disabled} onClick={() => void load(report)}>Open AI task report {index + 1}</button>
       </div>)}
       {catalog.receipt.has_more ? <p>Showing the 20 most recent reports.</p> : null}
     </> : null}

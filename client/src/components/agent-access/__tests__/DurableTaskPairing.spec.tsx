@@ -805,6 +805,25 @@ it("keeps replacement review editable during polling and runs an explicit refres
   expect(fetch.mock.calls.every(([, init]) => init.method === "GET")).toBe(true);
 });
 
+it("keeps an accepted pairing when its revocation warning is cancelled", async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-09-08T12:02:00Z"));
+  const old = restoredGrant();
+  const fetch = vi.fn(async (url: string, init: RequestInit) => {
+    if (url.endsWith("reasoning-destinations")) return response(listed);
+    if (url.includes("reasoning-bindings")) return response({ ok: true, binding: restoredRuntimeBinding(old) });
+    if (init.method === "POST") throw new Error("unexpected_revocation");
+    return response({ ok: true, pairing: old, runtime_binding_active: null, execution_authority: false, answer_authority: false });
+  });
+  vi.stubGlobal("fetch", fetch);
+  await act(async () => { render(<DurableTaskPairing {...props} />); });
+  fireEvent.click(screen.getByRole("button", { name: "Revoke pairing" }));
+  expect(screen.getByRole("alert").textContent).toContain("not the control for changing only the Minecraft run");
+  fireEvent.click(screen.getByRole("button", { name: "Keep pairing" }));
+  expect(screen.queryByRole("button", { name: "Confirm revoke chat pairing" })).toBeNull();
+  expect(fetch.mock.calls.filter(([, init]) => init.method === "POST")).toHaveLength(0);
+});
+
 it("executes one explicit fixture revocation after an outstanding poll without replaying it", async () => {
   vi.useFakeTimers();
   vi.setSystemTime(new Date("2026-09-08T12:02:00Z"));
@@ -829,7 +848,13 @@ it("executes one explicit fixture revocation after an outstanding poll without r
   await act(async () => { await vi.advanceTimersByTimeAsync(5000); });
   const revoke = screen.getByRole("button", { name: "Revoke pairing" });
   expect((revoke as HTMLButtonElement).disabled).toBe(false);
-  fireEvent.click(revoke); fireEvent.click(revoke);
+  expect(revoke.getAttribute("data-helix-interaction-kind")).toBe("human_only");
+  fireEvent.click(revoke);
+  expect(screen.getByRole("alert").textContent).toContain("also disconnects this Codex chat");
+  expect(writes).toBe(0);
+  const confirm = screen.getByRole("button", { name: "Confirm revoke chat pairing" });
+  expect(confirm.getAttribute("data-helix-interaction-kind")).toBe("human_only");
+  fireEvent.click(confirm); fireEvent.click(confirm);
   expect(writes).toBe(0);
   await act(async () => { pendingRead = false; finishRead(response({ ok: true, pairing: old,
     runtime_binding_active: null, execution_authority: false, answer_authority: false })); });

@@ -1,3 +1,5 @@
+import type { InterfaceMessageId } from "./source";
+
 export { INTERFACE_MESSAGE_IDS, interfaceSourceMessages, type InterfaceMessageId } from "./source";
 export type {
   InterfaceCatalogReadiness,

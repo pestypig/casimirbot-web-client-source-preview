@@ -1,0 +1,44 @@
+{
+  "observed_at": "2026-11-14T05:44:31.796543+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/store/useDocumentImageRegionStore.ts",
+      "canonical_sha256": "26e58c4bfe219c50ad266d6aac80a1c6d5c4ddb0e7b130d9a7c690f73dee3575",
+      "export_sha256": "26e58c4bfe219c50ad266d6aac80a1c6d5c4ddb0e7b130d9a7c690f73dee3575",
+      "previous_public_sha256": "afa951159f936ab9a087e7a0aed6092ad0a9b6a99e6bd089326a668193f4fe15",
+      "bytes": 10544,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/store/useScientificEvidenceWorkflowStore.ts",
+      "canonical_sha256": "42a61fbee1eed9d752df197750f72c323bddcf33a5ce8e3d8377b782a6885557",
+      "export_sha256": "42a61fbee1eed9d752df197750f72c323bddcf33a5ce8e3d8377b782a6885557",
+      "previous_public_sha256": "49d522bec16f9529848f923ea067ae88988123ae3d3a32982eca8278548128ae",
+      "bytes": 14620,
+      "transformation": "identity"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/store/__tests__/useDocumentImageRegionStore.spec.ts",
+      "canonical_sha256": "7aab225aaff2dbea3198cba5fde11fd5ca90ca4966b76330c90d78b2cf4e029b"
+    },
+    {
+      "path": "client/src/store/useScientificEvidenceWorkflowStore.spec.ts",
+      "canonical_sha256": "e0ba6bb398633403b55b56cf34d0118ed2b4b87a9ac898c8ba9886204517887f"
+    }
+  ],
+  "classification": "evidence normalization",
+  "source_frozen": false,
+  "published": false,
+  "review": [
+    "Annotate the next image source with its existing nullable state type so coordinate-space literals retain their intended type.",
+    "Use satisfies for the merged evidence status so its normalized reference arrays remain known while the entire status still satisfies its public contract.",
+    "These are erased TypeScript changes; crop persistence, merge ranking, blockers and observation-only claim boundaries remain unchanged."
+  ],
+  "limits": [
+    "Store fixtures and source checks do not prove installed persistence, scientific proof, live stream or game acceptance."
+  ]
+}

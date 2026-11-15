@@ -10,17 +10,31 @@ import {
 const NATIVE_HANDSHAKE_TIMEOUT_MS = 2_000;
 
 type DesktopRuntimeBridge = Readonly<{
+  transcribeIsolatedDiscordSegment?: (request: {
+    receipt: Omit<import("../../components/helix/ask-console/shared-live-room/DiscordIsolatedAudioRelay").IsolatedAudioReceipt, "pcm">;
+    wav: Uint8Array;
+  }) => Promise<string>;
   localDeveloperAccess?: (action: string, argument?: string) => Promise<unknown>;
   authorizeResponsesActionChoiceOnce?: () => Promise<{
     status: "approved" | "cancelled" | "not_ready" | "unavailable";
   }>;
-  responsesActionSession?: (action: "state" | "approve" | "stop") => Promise<{
+  responsesActionSession?: (action: "state" | "approve" | "approveContract" | "stop",
+    requestId?: string) => Promise<{
     status: "active" | "inactive" | "approved" | "stopped" | "cancelled" |
       "not_ready" | "unavailable";
+    profileRef?: string; allowanceKind?: "single_choice" | "development_session" | null;
+    kind?: "single_choice" | "development_session" | null; model?: string | null;
     remainingCalls?: number; maxCalls?: number; expiresAt?: string | null;
+    contractRequestId?: string | null;
+    providerConfigured?: boolean;
+    costBudget?: { maximumMicros: number; settledMicros: number;
+      heldMicros: number; remainingMicros: number; blocked: boolean;
+      rateRevision: string } | null;
   }>;
   liveConnection?: (request: import("@shared/desktop-live-connection").LiveConnectionRequest) =>
     Promise<import("@shared/desktop-live-connection").LiveConnectionResult>;
+  solarEditorial?: (request: import("@shared/desktop-solar-editorial").SolarEditorialWorkerRequest) =>
+    Promise<import("@shared/desktop-solar-editorial").SolarEditorialWorkerView>;
   readCivilizationMapsBrowserKey?: () => Promise<unknown>;
   saveCivilizationMapsBrowserKey?: (key: string) => Promise<unknown>;
   clearCivilizationMapsBrowserKey?: () => Promise<unknown>;
@@ -28,8 +42,14 @@ type DesktopRuntimeBridge = Readonly<{
   saveCivilizationRoutesKey?: (key: string) => Promise<unknown>;
   clearCivilizationRoutesKey?: () => Promise<unknown>;
   saveSolarObservation?: (text: string) => Promise<import("@shared/solar-observation-save").SolarObservationSaveResult>;
+  saveSolarRobPfssView?: (text: string) => Promise<import("@shared/solar-observation-save").SolarObservationSaveResult>;
+  saveSolarRobImageEndpoints?: (text: string) => Promise<import("@shared/solar-observation-save").SolarObservationSaveResult>;
   getPrivateEnvironmentState?: () => Promise<unknown>;
   installPrivateEnvironmentPackage?: () => Promise<unknown>;
+  getReviewedConnectorImportState?: () => Promise<unknown>;
+  importReviewedConnectorPackage?: () => Promise<unknown>;
+  removeReviewedConnectorPackage?: () => Promise<unknown>;
+  invalidateReviewedConnectorImport?: () => Promise<unknown>;
   getPrivateEnvironmentRemovalState?: () => Promise<unknown>;
   removePrivateEnvironmentPackage?: () => Promise<unknown>;
   preparePrivateClock?: () => Promise<unknown>;
@@ -58,12 +78,22 @@ type DesktopRuntimeBridge = Readonly<{
   selectMinecraftRunProfile?: () => Promise<unknown>;
   selectMinecraftPlayerProfile?: () => Promise<unknown>;
   clearMinecraftRunProfile?: () => Promise<unknown>;
+  getMinecraftIntegratedWorld?: () => Promise<unknown>;
+  selectMinecraftIntegratedWorld?: () => Promise<unknown>;
+  clearMinecraftIntegratedWorld?: () => Promise<unknown>;
   openAuth0AccountLink?: (authorizationUrl: unknown) => Promise<unknown>;
   openAuth0ProfileSignIn?: () => Promise<unknown>;
   openRoomService?: (input: { authority: string; room_id: string }) => Promise<unknown>;
   openPublisherAccount?: () => Promise<unknown>;
   managedAiDeviceLink?: (action: "inspect" | "start" | "check" | "disconnect") => Promise<unknown>;
+  personalMcpDeviceRegistration?: (action: "inspect" | "start" | "check") => Promise<unknown>;
+  personalMcpP1Connection?: (action: "inspect" | "start" | "resume" | "completion") => Promise<unknown>;
+  onPersonalMcpP1Completion?: (listener: (state: unknown) => void) => () => void;
   managedAiTextTurn?: (prompt: string) => Promise<unknown>;
+  cappedMembershipStatus?: () => Promise<unknown>;
+  cappedMembershipTextTurn?: (prompt: string) => Promise<unknown>;
+  cappedMembershipAgentProbe?: () => Promise<unknown>;
+  cappedMembershipVoiceStart?: (request: unknown) => Promise<unknown>;
   openAuth0StepUp?: (authorizationUrl: unknown) => Promise<unknown>;
   openRobinhoodOAuth?: (authorizationUrl: unknown) => Promise<unknown>;
   getRealtimeTexturePackState?: () => Promise<unknown>;
@@ -77,6 +107,8 @@ type DesktopRuntimeBridge = Readonly<{
   showCodexMirror?: (selection: { bindingId: string; helixConversationId: string }) => Promise<unknown>;
   readCodexMirror?: (selection: { bindingId: string; helixConversationId: string; visibleLimit?: 3 | 50 }) => Promise<unknown>;
   codexStreamGrants?: (request: unknown) => Promise<unknown>;
+  setFriendPublisherActive?: (active: boolean) => Promise<unknown>;
+  personalDiscordStream?: (request: unknown) => Promise<unknown>;
   stopMessageCloud?: () => Promise<unknown>;
   getMessageCloudStatus?: () => Promise<{ visible: boolean;
     source?: "session_activity" | "cloud_agent_dm" | "message_codex" | "codex_mirror" | null;

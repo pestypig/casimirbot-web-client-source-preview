@@ -166,7 +166,7 @@ export function buildTheoryBadgeCombinationReaderPayload(args: {
     ...args.selectedBadgeIds,
   ])
     .map((badgeId: string) => badgesById.get(badgeId))
-    .filter((badge): badge is TheoryBadgeV1 => Boolean(badge) && badge.level === "claim_boundary")
+    .filter((badge): badge is TheoryBadgeV1 => badge !== undefined && badge.level === "claim_boundary")
     .map(badgeSummary);
   const traceEdges = (args.trace?.connectingEdgeIds ?? [])
     .map((edgeId: string) => edgesById.get(edgeId))

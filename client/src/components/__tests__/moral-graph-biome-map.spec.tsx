@@ -150,7 +150,7 @@ function buildGraph(): MoralGraphBiomeScaleViewModel {
   };
 }
 
-function Harness() {
+function Harness({ translateText }: { translateText?: (text: string) => string } = {}) {
   const [hoveredNode, setHoveredNode] = useState<MoralGraphNode | null>(null);
   const [selectedNodeIds, setSelectedNodeIds] = useState<string[]>([]);
   const graph = buildGraph();
@@ -161,6 +161,7 @@ function Harness() {
   });
   return (
     <MoralGraphBiomeMap
+      translateText={translateText}
       graph={graph}
       highlighted={new Set([...selectionTrace.activeNodeIds, ...selectionTrace.candidateNodeIds])}
       hasFocus={selectedNodeIds.length > 0}
@@ -197,6 +198,19 @@ describe("MoralGraphBiomeMap", () => {
     expect(screen.getByRole("button", { name: "Organism Boundary Context" }).getAttribute("data-biome")).toBe(
       "claim_boundary",
     );
+  });
+
+  it("renders a translated missing-expression message for nodes without a procedure", () => {
+    render(<Harness translateText={(text) => {
+      expect(typeof text).toBe("string");
+      return text === "No procedural expression mapped." ? "No mapped procedure" : text;
+    }} />);
+
+    fireEvent.mouseEnter(screen.getByRole("button", { name: "Boundary Before Obligation" }));
+
+    expect(screen.getByTestId("moral-graph-hover-card")).toBeTruthy();
+    expect(screen.getByText("No mapped procedure")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /execute/i })).toBeNull();
   });
 
   it("shows biome metadata in the hover card", () => {

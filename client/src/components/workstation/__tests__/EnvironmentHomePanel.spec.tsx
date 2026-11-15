@@ -3,7 +3,8 @@ import React from "react";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import EnvironmentHomePanel from "../EnvironmentHomePanel";
-import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/accountCapabilityPolicy";
+import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, cacheAccountCapabilityPolicy } from "@/lib/workstation/accountCapabilityPolicy";
+import { HELIX_DEVELOPER_ACCOUNT_POLICY, HELIX_USER_ACCOUNT_POLICY } from "@shared/helix-account-session";
 const mocks = vi.hoisted(() => ({ openPanel: vi.fn() }));
 vi.mock("@/store/useWorkstationLayoutStore", () => ({useWorkstationLayoutStore:(selector:any)=>selector({openPanelInActiveGroup:mocks.openPanel})}));
 const row = () => ({package_version_id:"connector_package_version:com.casimirbot.system.clock:1.0.0",package_id:"com.casimirbot.system.clock",
@@ -15,16 +16,46 @@ const directory = () => ({schema:"helix.environment_connector.private_directory.
   policy_expires_at:new Date(Date.now()+60000).toISOString(),packages:[row()],public_release:false});
 const state = () => ({schema:"casimirbot.private_environment_state.v1",packageId:"com.casimirbot.system.clock",version:"1.0.0-private.1",
   artifactSha256:"b".repeat(64),status:"not_installed",installAvailable:true,runtimeAvailable:false,connected:false,granted:false});
-let readState: ReturnType<typeof vi.fn>, install: ReturnType<typeof vi.fn>, fetcher: ReturnType<typeof vi.fn>;
+let readState: ReturnType<typeof vi.fn<() => Promise<unknown>>>;
+let install: ReturnType<typeof vi.fn<() => Promise<unknown>>>;
+let fetcher: ReturnType<typeof vi.fn>;
 beforeEach(() => {
   Element.prototype.scrollIntoView=vi.fn();
   mocks.openPanel.mockReset(); readState=vi.fn(async()=>state()); install=vi.fn(async()=>({...state(),status:"installed_stopped",installationRef:"install:private"}));
   window.casimirDesktop={getRuntimeSnapshot:vi.fn(),getPrivateEnvironmentState:readState,installPrivateEnvironmentPackage:install};
   fetcher=vi.fn(async()=>({ok:true,json:async()=>directory()})); vi.stubGlobal("fetch",fetcher);
 });
-afterEach(()=>{cleanup();vi.unstubAllGlobals();vi.useRealTimers();delete window.casimirDesktop;});
+afterEach(()=>{cleanup();cacheAccountCapabilityPolicy(null);vi.unstubAllGlobals();vi.useRealTimers();delete window.casimirDesktop;});
 
 describe("private Environment Home",()=>{
+  it("keeps developer guidance readable when private catalog access is denied",async()=>{
+    cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY);
+    fetcher.mockResolvedValue({ok:false,json:async()=>({})});
+    render(<EnvironmentHomePanel/>);
+    await screen.findByText(/private catalog is unavailable/);
+    fireEvent.click(screen.getByRole("button",{name:/^Environment Store/}));
+    expect(screen.getByText("Build a connector")).toBeInTheDocument();
+    expect(screen.getByRole("heading",{name:"Inspect a downloaded adapter"})).toBeInTheDocument();
+    expect(install).not.toHaveBeenCalled();
+  });
+  it("uses the separate reviewed import bridge under ordinary policy without private clock authority",async()=>{
+    cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY);
+    fetcher.mockResolvedValue({ok:false,json:async()=>({})});
+    const ready={schema:"casimirbot.reviewed_connector_import.local.v1",prototype:true,
+      packageId:"com.example.starter",version:"0.1.0",artifactSha256:"a".repeat(64),
+      reviewExpiresAt:new Date(Date.now()+60000).toISOString(),status:"not_installed",
+      installAvailable:true,removeAvailable:false,runtimeAvailable:false,connected:false,granted:false};
+    const importReviewed=vi.fn(async()=>({...ready,status:"installed_stopped",removeAvailable:true,
+      installationRef:"environment_installation:11111111-1111-4111-8111-111111111111"}));
+    window.casimirDesktop={...window.casimirDesktop!,getReviewedConnectorImportState:vi.fn(async()=>ready),
+      importReviewedConnectorPackage:importReviewed,removeReviewedConnectorPackage:vi.fn(),invalidateReviewedConnectorImport:vi.fn(async()=>({invalidated:true}))};
+    render(<EnvironmentHomePanel/>);await screen.findByText(/private catalog is unavailable/);
+    fireEvent.click(screen.getByRole("button",{name:/^Environment Store/}));
+    const control=await screen.findByRole("button",{name:"Import reviewed starter"});
+    expect(importReviewed).not.toHaveBeenCalled();fireEvent.click(control);
+    await screen.findByText("Stored for this account and device. Not connected; no runtime or program grant.");
+    expect(importReviewed).toHaveBeenCalledWith();expect(install).not.toHaveBeenCalled();
+  });
   it("orients an unsigned user without implying managed model access",async()=>{
     fetcher.mockResolvedValue({ok:false,json:async()=>({})});
     render(<EnvironmentHomePanel/>);
@@ -72,7 +103,7 @@ describe("private Environment Home",()=>{
   });
   it("opens a read-only Minecraft setup tile without calling the launch route",async()=>{
     render(<EnvironmentHomePanel/>);await screen.findByText("Not installed");
-    const selection=vi.fn(async()=>({ok:false,status:409,json:async()=>({error:"minecraft_saved_loopback_selection_required"})}));
+    const selection=vi.fn(async(_input: RequestInfo | URL, _init?: RequestInit)=>({ok:false,status:409,json:async()=>({error:"minecraft_saved_loopback_selection_required"})}));
     vi.stubGlobal("fetch",selection);
     const tile=screen.getByRole("button",{name:/Minecraft Adapter Inspect saved local setup/});
     fireEvent.click(tile);
@@ -308,6 +339,9 @@ describe("private Environment Home",()=>{
     expect(screen.queryByRole("button",{name:"Install reviewed package"})).toBeNull();
   });
   it("uses the overflow connection affordance without a key form or implicit action",async()=>{
+    // This legacy setup control is explicitly private-feature admitted. The
+    // developer guide above intentionally has no such account-mode dependency.
+    cacheAccountCapabilityPolicy(HELIX_DEVELOPER_ACCOUNT_POLICY);
     render(<EnvironmentHomePanel/>); await screen.findByText("Not installed");
     fireEvent.click(screen.getByRole("button",{name:"Options for System Clock"}));
     fireEvent.click(screen.getByRole("menuitem",{name:"Configure connection"}));

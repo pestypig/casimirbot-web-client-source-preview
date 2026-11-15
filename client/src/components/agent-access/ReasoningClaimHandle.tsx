@@ -38,7 +38,7 @@ export default function ReasoningClaimHandle({ value, id = "reasoning-claim-hand
       data-helix-control-id="workstation.panel.agent-access.agent-connection-setup.reasoning-claim-handle"
       data-helix-interaction-kind="observe" data-helix-authority-state="client_local"
       className="mt-1 w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 font-mono text-xs text-cyan-100" />
-    <button type="button" onClick={() => void copy()} disabled={state === "copying"}
+    <button data-helix-control-id="workstation.panel.agent-access.reasoning-claim-handle.void-copy" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" onClick={() => void copy()} disabled={state === "copying"}
       className="mt-2 rounded border border-white/20 px-3 py-2"
       aria-describedby={`${id}-copy-status`}>
       {state === "copying" ? "Copying invitation…" : "Copy invitation"}

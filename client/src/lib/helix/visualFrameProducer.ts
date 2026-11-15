@@ -179,7 +179,7 @@ export function isVisualFrameProducerSourceActive(sourceId: string): boolean {
   const state = useVisualSourceCaptureStore.getState().producers[sourceId];
   if (!track || !state?.stream_active) return false;
   if (state.capture_mode !== "interval") return true;
-  return state.interval_active &&
+  return state.interval_active === true &&
     state.scheduler_adoption_status !== "paused" &&
     state.scheduler_adoption_status !== "stopped" &&
     state.scheduler_adoption_status !== "error";

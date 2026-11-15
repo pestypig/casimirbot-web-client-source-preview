@@ -1,0 +1,56 @@
+{
+  "observed_at": "2026-11-13T21:47:50.406667+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskRealtimeProviderEventHandler.ts",
+      "canonical_sha256": "3f4d3eb4deb9c7ccf8df733090cb3171b2aef514abe35bb7696a94de1a988d69",
+      "export_sha256": "3f4d3eb4deb9c7ccf8df733090cb3171b2aef514abe35bb7696a94de1a988d69",
+      "bytes": 40298,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "b9f1910b9020ab38fbd1bed40e1ca31ce7b4fd7464f54e6cf6a4264767d794f8"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskRealtimeWorkerDispatch.ts",
+      "canonical_sha256": "7892d022c718d91c0eb2e5ceec75494dd5b4845b9f90eb0d7e0d399eb74dfa9d",
+      "export_sha256": "7892d022c718d91c0eb2e5ceec75494dd5b4845b9f90eb0d7e0d399eb74dfa9d",
+      "bytes": 8051,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "2888445d66471399810cd0ab379951a118197d3790ca3308bbaa3ec6c91b311b"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-realtime-provider-event-handler.spec.ts",
+      "canonical_sha256": "605ebf976e1bdd6828a78b7709d4c8b2882eb476e416264dc88947688a521c51",
+      "export_sha256": "605ebf976e1bdd6828a78b7709d4c8b2882eb476e416264dc88947688a521c51",
+      "bytes": 55748,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "f575a164ba2c0a3825a27f097201a59bdbbdf8356b925232781da260461fa764"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/__tests__/HelixAskRealtimeProviderEventHandler.test.ts",
+      "canonical_sha256": "2b305d7f96f0158993007d2936e62e4e426b37e34eda31e8aa85f5cc70acb90a",
+      "export_sha256": "2b305d7f96f0158993007d2936e62e4e426b37e34eda31e8aa85f5cc70acb90a",
+      "bytes": 5122,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "530c99ed32637b05361b82d2f51ac4b728c76b036fa808def4b12cfee881a66d"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Reviewed both runtime deltas against the public preview, full worker parser/dispatcher, provider handoff validation and dispatch/receipt surroundings, changed test fixtures/cases and relay-correlation suite. Provider item ID is submitted separately from event ID for transcript correlation.",
+    "Existing candidate adds a governed Minecraft command dispatch kind. Client requires a room handoff, explicit server admission, exactly the Minecraft command capability, worker-required action-candidate status, no goal binding and consistent action/read-only flags. Provider tool execution, workstation mutation, assistant answer and terminal authority remain forbidden.",
+    "Dispatch launches the backend Ask entrypoint with workstation payload actions suppressed. It does not execute a game action or establish owner, room, world, actor, expiry or consent authority. Those remain server/adapter checks. Ordinary action candidates continue through read-only reasoning; provider tool-call events are ignored.",
+    "Added twelve negative client cases for personal scope, missing admission, goal/session attachment, additional capability, non-action/parallel outcome, provider-tool permission, inconsistent action/read-only flags, runtime mismatch and missing tool prohibition. These checks use synthetic server replies and preserve the original runtime implementation.",
+    "Existing suite covers personal voice destinations, missing attribution, disposed handlers, local/parallel/goal/read-only paths, playback settlement, interruption, missing receipts, rejected runtime, retry and deduplication. Relay checks distinguish provider event/item IDs and correlate terminal response/playback receipts. No actual provider transcript or credentials are exported."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal. This cohort adds tests only to canonical source; it exports existing runtime changes without modifying their admission policy. No installed behavior is newly established.",
+    "Mocked server responses cannot prove real authentication, exact room/world/player authorization, consent, revocation, server validation of routed metadata, or game execution. The matching server and adapter checks and attended Minecraft/GPT Live handoff remain required.",
+    "Export tests execute the two selected exported runtime modules with canonical shared contracts and other dependencies. Selected compilation is not a standalone app build or complete typecheck. Shared-contract publication is a separately inventoried repository.",
+    "No Codex chat message, pairing change, model run, microphone access, room mutation or game action occurred. No physical viability, certificate integrity or release-readiness claim is made.",
+    "Five intentional support-contact matches elsewhere remain in final owner publication review. Larger Console integration and ordinary-account signed acceptance remain open."
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "observed_at": "2026-11-13T19:34:06.490114+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/DocViewerPanel.tsx",
+      "canonical_sha256": "e5922d2ef0923eeb4d3259b69877dbc63645c677916172978f47d09661af5598",
+      "export_sha256": "e047597e0386bc232065275a1220c93530479505eb76a876a04b905d5a4dffca",
+      "bytes": 216743,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "9ee7f5060a728daa14ec06db6c5acb8bfc95acb03426c2e88bc21c5ca085c84c"
+    },
+    {
+      "path": "client/src/components/workstation/WorkstationStorageMapPanel.tsx",
+      "canonical_sha256": "d50cf773c50383416c0a1c5691a0a6ae53c007b8ee06fb028035aa380231bb6c",
+      "export_sha256": "3ce092eabab60f4ec8960960446b1e96be6b81221f960f8bcfa8a1ade0965957",
+      "bytes": 25127,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "a68ba6c8de097f12c39b8290a90d69b5fa39b7d3a0489234ca4bb6c67f46eb82"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/WorkstationStorageMapPanel.spec.tsx",
+      "canonical_sha256": "6951a507150bedc4bc4e69c2c0a8c55834fc117db2293d15c04ea2887f675490",
+      "export_sha256": "fda2e9e963e670f0403c4c00283037ebe7ea8598b4ba2738f88d780fbb5a628e",
+      "bytes": 5538,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/__tests__/doc-viewer-taxonomy-ui.spec.tsx",
+      "canonical_sha256": "37deffce60cbf5aaf17698ac4a22e059f7cbd3c81232e7d27aea1caa088e28df",
+      "export_sha256": "37deffce60cbf5aaf17698ac4a22e059f7cbd3c81232e7d27aea1caa088e28df",
+      "bytes": 103728,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/__tests__/doc-viewer-math-copy.spec.ts",
+      "canonical_sha256": "6d097f1838506e1327f7844f1626656fdd09e8e129aec0b3cd33e21a9e8c823e",
+      "export_sha256": "6d097f1838506e1327f7844f1626656fdd09e8e129aec0b3cd33e21a9e8c823e",
+      "bytes": 56755,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/workspaceStorageScanner.ts",
+      "canonical_sha256": "24e28bd6af074fa81474e634d8614f783b982d20e06ab930748051392c6feba2",
+      "export_sha256": "c424a5fdfb5e2b92ae0f7ea4fb7831b34017c914a3303b9c125554df55a9ee02",
+      "bytes": 7750,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/workspaceStorageScanner.spec.ts",
+      "canonical_sha256": "b5992ddcb942b728a49dfbd6b47ecd2f80b9f7b6cda074971039c5cd3baefdba",
+      "export_sha256": "e2e769bfc027ef161a215bd22a17eaa0a54701b86e0e15e9cbe5321e69d32b30",
+      "bytes": 3291,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountOperationScope.ts",
+      "canonical_sha256": "126c3c774a9d5ac67ae2b2fb577465fca36ccfea4f9b33c915420afec33d8b90",
+      "export_sha256": "13a5c8dab5137d5d0cd5ad70910dc75828634ac59f4405354ee93f7be21c7faf",
+      "bytes": 602,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed the complete Doc Viewer diff (one import and two null-policy fallbacks) plus surrounding account subscription, print readiness and export handler. The fallback now consistently names the signed-out policy. Both current policies retain the PDF flag; this does not newly disable PDF export or grant server access.",
+    "Reviewed the storage presentation delta: desktop-local backend label/style, shared solar quota, temporary folder count and explicit limits on device-wide byte counts versus owner-scoped receipts and FITS hash verification. Values remain diagnostic, not proof or authority.",
+    "Reproduced five storage lifecycle failures: success immediately triggered another fetch, periodic refresh was not aborted on close, explicit replacement did not retire the prior request, profile change retained old inventory, and an old JSON body was accepted after profile change.",
+    "Separated fetch callback from the derived storage-summary callback, preserving the ten-second poll interval. Track and abort the active request on replacement/unmount. Account identity/revision events clear server inventory and selection and refresh; current-request and account-scope guards reject late success/error completions.",
+    "Read the unchanged storage scanner and its privacy fixture: it counts bytes and omits raw stored content. Existing synthetic path fixtures are unchanged. Doc Viewer header tests exercise explicit export callback and busy state; other document tests exercise rendering/copy helpers and canonical source structure."
+  ],
+  "limits": [
+    "Private unfrozen source proposal; no installed or public release acceptance. R380 does not contain the new storage lifecycle fix.",
+    "Canonical document source assertion reads server/translation files outside this public segment. Exclude that one assertion from exported runtime qualification and retain its canonical-only evidence explicitly.",
+    "Mocked storage HTTP and account events plus jsdom document controls do not establish a live authenticated inventory, real PDF download, translation provider result or scientific verification.",
+    "The client account scope follows cached identity/revision. Browser-local storage inventory is device-local; this fix does not redefine its owner scope or server authentication.",
+    "Replacing a pending refresh aborts its client request; abort does not cancel server work already started. Remaining solar components and full application build continue as separate review.",
+    "Five inherited intentional support-contact matches remain in the final owner publication review."
+  ]
+}

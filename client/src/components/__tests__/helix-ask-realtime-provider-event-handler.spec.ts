@@ -7,9 +7,11 @@ import { writePersonalVoiceDestination } from "@/lib/helix/personal-voice-route"
 type ServerHandoffOptions = {
   outcome?: "conversation_local" | "worker_grounded" | "durable_goal_bound" | "action_candidate";
   interactionMode?: "conversation_local" | "parallel_conversation" | "worker_required";
-  dispatchKind?: "none" | "ask_runtime" | "goal_wake" | "ask_runtime_read_only";
+  dispatchKind?: "none" | "ask_runtime" | "goal_wake" | "ask_runtime_read_only" |
+    "ask_runtime_governed_world_command";
   goalId?: string | null;
   runtimeProvider?: string | null;
+  threadId?: string;
 };
 
 const buildServerHandoff = (
@@ -20,6 +22,9 @@ const buildServerHandoff = (
   const handoffId = `realtime-stage-play-handoff:${suffix}`;
   const outcome = options.outcome ?? "worker_grounded";
   const dispatchKind = options.dispatchKind ?? "ask_runtime";
+  const governedWorldCommand =
+    dispatchKind === "ask_runtime_governed_world_command";
+  const threadId = options.threadId ?? "helix-ask:desktop";
   const goalId = options.goalId ?? (dispatchKind === "goal_wake" ? `goal:${suffix}` : null);
   const runtimeProvider = options.runtimeProvider ?? (dispatchKind === "none" ? null : "codex");
   const dispatchRequested = dispatchKind !== "none";
@@ -34,7 +39,7 @@ const buildServerHandoff = (
     admission_id: `realtime-worker-admission:${suffix}`,
     handoff_id: handoffId,
     realtime_session_id: "realtime:test",
-    thread_id: "helix-ask:desktop",
+    thread_id: threadId,
     decision_phase: "transcript_handoff",
     outcome,
     interaction_mode: interactionMode,
@@ -45,8 +50,10 @@ const buildServerHandoff = (
     selected_model: null,
     candidate_readonly_capability_ids: candidateReadonlyCapabilityIds,
     observed_readonly_capability_ids: [],
-    action_candidate_capability_ids:
-      outcome === "action_candidate" ? ["workstation.open_panel"] : [],
+    action_candidate_capability_ids: outcome === "action_candidate"
+      ? [governedWorldCommand
+        ? "com.casimirbot.minecraft.command" : "workstation.open_panel"]
+      : [],
     dispatch: {
       schema: "helix.realtime_worker_dispatch.v2",
       kind: dispatchKind,
@@ -64,8 +71,8 @@ const buildServerHandoff = (
       runtime_goal_session_ref: goalId ? `runtime-goal-session:${suffix}` : null,
       suppress_parallel_ask_turn:
         outcome === "conversation_local" || outcome === "durable_goal_bound",
-      read_only: true,
-      workstation_action_execution_allowed: false,
+      read_only: !governedWorldCommand,
+      workstation_action_execution_allowed: governedWorldCommand,
       realtime_provider_tool_execution_allowed: false,
       answer_authority: false,
       assistant_answer: false,
@@ -74,7 +81,7 @@ const buildServerHandoff = (
     },
     worker_turn_dispatched: false,
     spoken_relay_eligible: outcome === "worker_grounded" || outcome === "durable_goal_bound",
-    workstation_action_execution_allowed: false,
+    workstation_action_execution_allowed: governedWorldCommand,
     realtime_provider_tool_execution_allowed: false,
     evidence_refs: [observationRef],
     decided_at_ms: 100,
@@ -87,7 +94,7 @@ const buildServerHandoff = (
   schema: "helix.realtime_stage_play.ask_handoff.v1",
   handoff_id: handoffId,
   realtime_session_id: "realtime:test",
-  thread_id: "helix-ask:desktop",
+  thread_id: threadId,
   provider_event_ref: `event:transcript:${suffix}`,
   transcript_observation_ref: observationRef,
   stage_play_event_ref: `stage-play-event:${suffix}`,
@@ -105,8 +112,8 @@ const buildServerHandoff = (
     schema: "helix.ask.route_metadata.v1",
     source: "realtime_stage_play",
     invocationKind: "stage_play_realtime_transcript_handoff",
-    sourceTarget: "operator_text",
-    mailboxThreadId: "helix-ask:desktop",
+    sourceTarget: governedWorldCommand ? "live_environment" : "operator_text",
+    mailboxThreadId: threadId,
     handoffId,
     realtimeSessionId: "realtime:test",
     stagePlayEventRef: `stage-play-event:${suffix}`,
@@ -116,22 +123,24 @@ const buildServerHandoff = (
     currentTranscriptTextCharCount: 37,
     forbiddenCapabilities: [
       "workstation_mutation",
-      "workstation_action_execution",
+      ...(governedWorldCommand ? [] : ["workstation_action_execution"]),
       "realtime_provider_tool_execution",
     ],
     evidenceRefs: [observationRef, `stage-play-event:${suffix}`],
     source_target_intent: {
       must_enter_backend_ask:
-        dispatchKind === "ask_runtime" || dispatchKind === "ask_runtime_read_only",
+        dispatchKind === "ask_runtime" || dispatchKind === "ask_runtime_read_only" ||
+        governedWorldCommand,
       allow_client_shortcut: false,
-      admitted_readonly_handoff: true,
+      admitted_readonly_handoff: !governedWorldCommand,
+      admitted_governed_world_command_handoff: governedWorldCommand,
       assistant_answer: false,
       raw_content_included: false,
       realtime_worker_admission: workerAdmission,
       server_fixture_marker: suffix,
     },
   },
-  read_only: true,
+  read_only: !governedWorldCommand,
   transcript_is_user_intent_after_admission: true,
   reentry_required: true,
   answer_authority: false,
@@ -742,6 +751,131 @@ describe("Helix Ask Realtime provider event handler", () => {
       tool_execution_attempted: false,
     });
   });
+
+  it("launches only a server-admitted room Minecraft command handoff", async () => {
+    const observationRef = "obs:realtime:voice-command";
+    const threadId = "helix-ask:room:shared_realtime_room:voice-command";
+    const handoff = buildServerHandoff(observationRef, "voice-command", {
+      outcome: "action_candidate",
+      dispatchKind: "ask_runtime_governed_world_command",
+      threadId,
+    });
+    const launchPrompt = vi.fn();
+    const handler = createHelixAskRealtimeProviderEventHandler({
+      realtimeSessionId: "realtime:test",
+      runtimeAgentAuthority: "suggest_actions",
+      postEvent: vi.fn(async () => ({
+        ok: true,
+        realtime_transcript_observations: [{ observation_ref: observationRef }],
+        realtime_stage_play_ask_handoff: handoff,
+      })),
+      launchPrompt,
+    });
+    const result = await handler.handle({
+      type: "conversation.item.input_audio_transcription.completed",
+      event_id: "event:transcript:voice-command",
+      transcript: "In the connected Minecraft world, build a wall around my house.",
+    });
+    expect(launchPrompt).toHaveBeenCalledWith(expect.objectContaining({
+      question: "In the connected Minecraft world, build a wall around my house.",
+      routeMetadata: expect.objectContaining({
+        handoffId: handoff.handoff_id,
+        forbiddenCapabilities: [
+          "workstation_mutation",
+          "realtime_provider_tool_execution",
+        ],
+      }),
+    }));
+    expect(result).toMatchObject({
+      worker_dispatch_kind: "ask_runtime_governed_world_command",
+      worker_turn_dispatched: true,
+      workstation_action_executed: false,
+      tool_execution_attempted: false,
+    });
+
+    const forged = buildServerHandoff(observationRef, "voice-command-forged", {
+      outcome: "action_candidate",
+      dispatchKind: "ask_runtime_governed_world_command",
+      threadId,
+    });
+    forged.worker_admission.action_candidate_capability_ids = ["workstation.open_panel"];
+    const rejectedLaunch = vi.fn();
+    const rejected = createHelixAskRealtimeProviderEventHandler({
+      realtimeSessionId: "realtime:test",
+      runtimeAgentAuthority: "suggest_actions",
+      postEvent: vi.fn(async () => ({
+        ok: true,
+        realtime_transcript_observations: [{ observation_ref: observationRef }],
+        realtime_stage_play_ask_handoff: forged,
+      })),
+      launchPrompt: rejectedLaunch,
+    });
+    const rejectedResult = await rejected.handle({
+      type: "conversation.item.input_audio_transcription.completed",
+      event_id: "event:transcript:voice-command-forged",
+      transcript: "In the connected Minecraft world, build a wall around my house.",
+    });
+    expect(rejectedLaunch).not.toHaveBeenCalled();
+    expect(rejectedResult).toMatchObject({ reentry_status: "blocked" });
+  });
+
+  it.each([
+    ["personal thread", (h) => { h.thread_id = "helix-ask:desktop"; }],
+    ["missing room admission", (h) => {
+      h.route_metadata.source_target_intent.admitted_governed_world_command_handoff = false;
+    }],
+    ["durable goal attached", (h) => { h.worker_admission.dispatch.goal_id = "goal:other"; }],
+    ["goal session attached", (h) => {
+      h.worker_admission.dispatch.runtime_goal_session_ref = "runtime-goal-session:other";
+    }],
+    ["multiple capabilities", (h) => {
+      h.worker_admission.action_candidate_capability_ids.push("workstation.open_panel");
+    }],
+    ["non-action outcome", (h) => { h.worker_admission.outcome = "worker_grounded"; }],
+    ["parallel conversation", (h) => { h.worker_admission.interaction_mode = "parallel_conversation"; }],
+    ["provider tool permission", (h) => {
+      h.worker_admission.dispatch.realtime_provider_tool_execution_allowed = true;
+    }],
+    ["missing action dispatch admission", (h) => {
+      h.worker_admission.dispatch.workstation_action_execution_allowed = false;
+    }],
+    ["read-only dispatch contradiction", (h) => { h.worker_admission.dispatch.read_only = true; }],
+    ["runtime provider mismatch", (h) => {
+      h.worker_admission.dispatch.target_runtime_agent_provider = "gemini";
+    }],
+    ["missing provider tool prohibition", (h) => {
+      h.route_metadata.forbiddenCapabilities = ["workstation_mutation"];
+    }],
+  ] satisfies Array<[string, (handoff: ReturnType<typeof buildServerHandoff>) => void]>) (
+    "blocks a governed command handoff with %s before dispatch",
+    async (_label, mutate) => {
+      const observationRef = "obs:realtime:rejected-command";
+      const handoff = buildServerHandoff(observationRef, "rejected-command", {
+        outcome: "action_candidate", dispatchKind: "ask_runtime_governed_world_command",
+        threadId: "helix-ask:room:shared_realtime_room:command-test",
+      });
+      mutate(handoff);
+      const launchPrompt = vi.fn();
+      const requestGoalWake = vi.fn(() => true);
+      const handler = createHelixAskRealtimeProviderEventHandler({
+        realtimeSessionId: "realtime:test", runtimeAgentAuthority: "suggest_actions",
+        launchPrompt, requestGoalWake,
+        postEvent: async () => ({ ok: true,
+          realtime_transcript_observations: [{ observation_ref: observationRef }],
+          realtime_stage_play_ask_handoff: handoff }),
+      });
+      try {
+        const result = await handler.handle({
+          type: "conversation.item.input_audio_transcription.completed",
+          event_id: "event:transcript:rejected-command", transcript: "Build a test wall.",
+        });
+        expect(result).toMatchObject({ reentry_status: "blocked",
+          workstation_action_executed: false, tool_execution_attempted: false });
+        expect(launchPrompt).not.toHaveBeenCalled();
+        expect(requestGoalWake).not.toHaveBeenCalled();
+      } finally { handler.dispose(); }
+    },
+  );
 
   it("does not execute or re-enter provider tool-call events", async () => {
     const postEvent = vi.fn();

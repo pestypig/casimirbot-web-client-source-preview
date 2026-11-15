@@ -79,6 +79,10 @@ export function buildHelixAskComposerActionToolbarState({
     runtimePickerModel,
     runtimeMenuOpen,
     privateConnectionInspectorEnabled: accountPolicy?.account_type === "developer",
+    personalConnectionMenuEnabled: Boolean(
+      accountPolicy?.feature_flags.includes("profile_connections") &&
+      !accountPolicy.locked_features.includes("profile_connections"),
+    ),
     onRuntimePrimaryClick,
     onRuntimeSelect,
     onSelectPrivateApiChat,

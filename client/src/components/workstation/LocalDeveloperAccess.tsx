@@ -8,7 +8,9 @@ const viewSchema = z.object({ phase: z.enum(["active", "inactive", "unavailable"
     lastRefreshIssue: z.object({ at: z.number(), reason: z.enum(["account_unavailable", "vault_unavailable", "lease_publish_failed"]) }).nullable() }).optional(),
   issued: z.array(z.object({ grantId: z.string().uuid(), profileId: z.string(), expiresAt: z.number(), revoked: z.boolean() })).optional() });
 
-export function LocalDeveloperAccess({ signedIn, onChanged }: { signedIn: boolean; onChanged: () => void }) {
+export function LocalDeveloperAccess({ signedIn, canBootstrapIssuer = false, onChanged }: {
+  signedIn: boolean; canBootstrapIssuer?: boolean; onChanged: () => void;
+}) {
   const bridge = window.casimirDesktop?.localDeveloperAccess;
   const [view, setView] = React.useState<z.infer<typeof viewSchema> | null>(null);
   const [busy, setBusy] = React.useState(false);
@@ -37,11 +39,12 @@ export function LocalDeveloperAccess({ signedIn, onChanged }: { signedIn: boolea
   }, [bridge, signedIn, run]);
   if (!bridge) return null;
   const button = (label: string, action: string, disabled = false, argument?: string) =>
-    <button type="button" className="rounded border border-cyan-300/30 px-3 py-2 text-xs text-cyan-100 disabled:opacity-40"
+    <button data-helix-control-id="workstation.panel.account-session.local-developer-access.void-run-action-argument" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="rounded border border-cyan-300/30 px-3 py-2 text-xs text-cyan-100 disabled:opacity-40"
       disabled={busy || !signedIn || disabled} onClick={() => void run(action, argument)}>{label}</button>;
-  return <section className="mb-3 rounded-lg border border-cyan-300/20 bg-black/20 p-4" aria-label="Local developer USB access">
+  return <section className="mb-3 rounded-lg border border-cyan-300/20 bg-black/20 p-4"
+    aria-label="Local developer USB access" data-helix-guidance-target="local-developer-usb-access">
     <h2 className="text-sm font-semibold">Local developer USB access</h2>
-    <p className="mt-2 text-xs text-slate-300">Private development builds only. Grants retain your profile and expire within 24 hours. They do not verify email, fund AI, pair a task or grant game actions. USB documents contain no private login keys.</p>
+    <p className="mt-2 text-xs text-slate-300">Private development builds only. Personal Codex connections and Setup contracts use separate approval; they do not require this USB grant. Grants here retain your profile and expire within 24 hours. They do not verify email, fund AI, pair a task or grant game actions. USB documents contain no private login keys.</p>
     <p role="status" className="mt-2 text-xs text-cyan-100">{!signedIn ? "Sign in to your existing local profile first." : busy ? busyAction === "inspect" ? "Checking local developer access…" : "Complete the native dialog…" : error ?? view?.detail ?? "Checking local developer access…"}</p>
     {view?.phase === "active" ? <p className="mt-2 text-xs text-slate-300">
       Native lease last acknowledged: {view.nativeLease?.lastAcknowledgedAt ? new Date(view.nativeLease.lastAcknowledgedAt).toLocaleTimeString() : "not confirmed"}.
@@ -51,20 +54,20 @@ export function LocalDeveloperAccess({ signedIn, onChanged }: { signedIn: boolea
     {view?.phase === "active" && view.expiresAt ? <p className="mt-2 text-xs">Expires {new Date(view.expiresAt).toLocaleString()}. USB is a transport, not a hardware authenticator; removing it does not revoke an imported grant.</p> : null}
     <div className="mt-3 flex flex-wrap gap-2">
       {button("Check developer access", "inspect")}
-      {view?.phase === "inactive" && (!view.issuerInitialized || view.ownsIssuer)
+      {view?.phase === "inactive" && (view.ownsIssuer || (!view.issuerInitialized && canBootstrapIssuer))
         ? button("Activate this private development profile", "activate-self") : null}
       {button("Import my USB grant", "import-grant")}
       {button("Export my installation request", "export-request")}
       {view?.phase === "active" ? button("Disable my USB access", "disable") : null}
     </div>
-    {view?.phase === "inactive" && (!view.issuerInitialized || view.ownsIssuer)
+    {view?.phase === "inactive" && (view.ownsIssuer || (!view.issuerInitialized && canBootstrapIssuer))
       ? <p className="mt-2 text-xs text-slate-300">On this private developer PC, activation handles issuer creation, a 24-hour self-grant, USB backup, and local import in one reviewed native operation. It does not start the tunnel or authorize Minecraft or paid AI.</p> : null}
     {view?.phase !== "unavailable" ? <details className="mt-3 text-xs">
       <summary>Developer issuer: grant access to yourself or others</summary>
       <p className="my-2 text-slate-300">On the owner’s private development PC, create an issuer, then grant this profile or select another installation’s request. The recipient imports the signed bundle and compares the issuer fingerprint separately. Each installation gets its own grant.</p>
       {view?.fingerprint ? <p className="my-2 break-all">Issuer fingerprint: {view.fingerprint}</p> : null}
       <div className="flex flex-wrap gap-2">
-        {!view?.issuerInitialized ? button("Create developer issuer on this PC", "initialize-issuer") : null}
+        {!view?.issuerInitialized && canBootstrapIssuer ? button("Create developer issuer on this PC", "initialize-issuer") : null}
         {view?.ownsIssuer ? <>
           {button("Grant this profile and save to USB", "grant-self")}
           {button("Issue grant from installation request", "issue-grant")}
@@ -72,7 +75,7 @@ export function LocalDeveloperAccess({ signedIn, onChanged }: { signedIn: boolea
         </> : null}
       </div>
       {view?.ownsIssuer && view.issued?.length ? <div className="mt-3 flex flex-wrap gap-2">
-        <select aria-label="Developer grant to revoke" value={grantId} onChange={e => setGrantId(e.target.value)} disabled={busy}>
+        <select data-helix-control-id="workstation.panel.account-session.local-developer-access.developer-grant-to-revoke" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Developer grant to revoke" value={grantId} onChange={e => setGrantId(e.target.value)} disabled={busy}>
           <option value="">Select a grant</option>
           {view.issued.map(g => <option key={g.grantId} value={g.grantId} disabled={g.revoked}>{g.profileId} · {g.grantId.slice(0, 8)}{g.revoked ? " · revoked" : ""}</option>)}
         </select>

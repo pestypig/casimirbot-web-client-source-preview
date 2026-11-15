@@ -2,6 +2,7 @@
 import React from "react";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { HELIX_PINNED_LANGUAGE_MODEL_IDS } from "@shared/helix-language-model-policy";
 import type { AgentGoalSessionV1 } from "@shared/contracts/workstation-goal-context.v1";
 import { WORKSTATION_AGENT_GOAL_DEFAULT_FINAL_REPORT_REQUIREMENTS } from "@shared/contracts/workstation-goal-context.v1";
 
@@ -43,10 +44,10 @@ afterEach(() => {
 describe("HelixAskMinimalRuntimeShell", () => {
   it("creates one local Helix chat from the first submitted message without claiming provider-task creation", async () => {
     vi.spyOn(globalThis.crypto, "randomUUID")
-      .mockReturnValueOnce("local-helix-chat")
-      .mockReturnValueOnce("first-message-turn")
-      .mockReturnValueOnce("first-message-user")
-      .mockReturnValueOnce("first-message-assistant");
+      .mockReturnValueOnce("00000000-0000-4000-8000-000000000001")
+      .mockReturnValueOnce("00000000-0000-4000-8000-000000000002")
+      .mockReturnValueOnce("00000000-0000-4000-8000-000000000003")
+      .mockReturnValueOnce("00000000-0000-4000-8000-000000000004");
     const runTurn = vi.fn(async (payload) => ({
       selected_final_answer: "Local Helix response.",
       turn_id: payload.turnId,
@@ -62,17 +63,17 @@ describe("HelixAskMinimalRuntimeShell", () => {
 
     await waitFor(() => expect(screen.getByText("Local Helix response.")).toBeTruthy());
     const state = useAgiChatStore.getState();
-    expect(Object.keys(state.sessions)).toEqual(["local-helix-chat"]);
-    expect(state.activeId).toBe("local-helix-chat");
-    expect(state.sessions["local-helix-chat"]).toMatchObject({
+    expect(Object.keys(state.sessions)).toEqual(["00000000-0000-4000-8000-000000000001"]);
+    expect(state.activeId).toBe("00000000-0000-4000-8000-000000000001");
+    expect(state.sessions["00000000-0000-4000-8000-000000000001"]).toMatchObject({
       contextId: "ctx:first-message",
       title: "Create this local conversation",
     });
     expect(runTurn).toHaveBeenCalledWith(
       expect.objectContaining({
-        sessionId: "local-helix-chat",
+        sessionId: "00000000-0000-4000-8000-000000000001",
         workspace_context_snapshot: expect.objectContaining({
-          sessionId: "local-helix-chat",
+          sessionId: "00000000-0000-4000-8000-000000000001",
         }),
       }),
       expect.any(Function),
@@ -135,7 +136,7 @@ describe("HelixAskMinimalRuntimeShell", () => {
   });
 
   it("submits the selected language model profile from the recrowned minimal shell", async () => {
-    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue("minimal-shell-language-profile");
+    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue("00000000-0000-4000-8000-000000000005");
     const runTurn = vi.fn(async (payload) => ({
       selected_final_answer: "Deep profile received.",
       turn_id: payload.turnId,
@@ -164,8 +165,8 @@ describe("HelixAskMinimalRuntimeShell", () => {
     expect(window.localStorage.getItem(HELIX_ASK_LANGUAGE_MODEL_PROFILE_STORAGE_KEY)).toBe("deep");
   });
 
-  it("pins the lowest-cost supported Codex model in the UI and submits the explicit model-selection contract", async () => {
-    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue("minimal-shell-pinned-model");
+  it.each(HELIX_PINNED_LANGUAGE_MODEL_IDS)("pins a policy-listed model %s and retains it after reopening", async (pinnedModel) => {
+    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue("00000000-0000-4000-8000-000000000006");
     const runTurn = vi.fn(async (payload) => ({
       selected_final_answer: "Pinned model received.",
       turn_id: payload.turnId,
@@ -174,9 +175,10 @@ describe("HelixAskMinimalRuntimeShell", () => {
     render(<HelixAskMinimalRuntimeShell contextId="ctx" runTurn={runTurn} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Choose Ask AI mode" }));
-    fireEvent.click(screen.getByRole("menuitemradio", { name: /GPT-5.4 mini/ }));
+    fireEvent.click(screen.getByRole("menuitemradio", { name: (name) => name.includes(pinnedModel) }));
+    expect(runTurn).not.toHaveBeenCalled();
     fireEvent.change(screen.getByLabelText("Ask Helix"), {
-      target: { value: "Check this agent workflow at low cost" },
+      target: { value: "Check this agent workflow with the selected model" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Submit prompt" }));
 
@@ -185,25 +187,31 @@ describe("HelixAskMinimalRuntimeShell", () => {
     });
     expect(runTurn).toHaveBeenCalledWith(
       expect.objectContaining({
-        languageModelSelection: { mode: "pinned", model: "gpt-5.4-mini" },
-        language_model_selection: { mode: "pinned", model: "gpt-5.4-mini" },
-        question: "Check this agent workflow at low cost",
+        languageModelSelection: { mode: "pinned", model: pinnedModel },
+        language_model_selection: { mode: "pinned", model: pinnedModel },
+        question: "Check this agent workflow with the selected model",
       }),
       expect.any(Function),
     );
-    expect(window.localStorage.getItem(HELIX_ASK_PINNED_LANGUAGE_MODEL_STORAGE_KEY)).toBe("gpt-5.4-mini");
+    expect(window.localStorage.getItem(HELIX_ASK_PINNED_LANGUAGE_MODEL_STORAGE_KEY)).toBe(pinnedModel);
+    cleanup();
+    render(<HelixAskMinimalRuntimeShell contextId="ctx" runTurn={runTurn} />);
+    expect(screen.getByRole("button", { name: "Choose Ask AI mode" }).textContent).toContain(pinnedModel);
+    fireEvent.click(screen.getByRole("button", { name: "Choose Ask AI mode" }));
+    expect(screen.getByRole("menuitemradio", { name: (name) => name.includes(pinnedModel) }).getAttribute("aria-checked")).toBe("true");
+    expect(runTurn).toHaveBeenCalledTimes(1);
   });
 
   it("submits through injected transport and binds latest visible turn controls without HelixAskPill", async () => {
     window.history.pushState({}, "", "/desktop?doc=docs/research/nhm2-current-status-whitepaper.md");
-    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue("minimal-shell-turn");
+    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue("00000000-0000-4000-8000-000000000007");
     const copied: HelixAskMinimalRuntimeControlPayload[] = [];
     const debugCopied: HelixAskMinimalRuntimeControlPayload[] = [];
     const readAloud: HelixAskMinimalRuntimeControlPayload[] = [];
     const controlActions: HelixAskMinimalRuntimeControlActions = {
-      copyFinal: (payload) => copied.push(payload),
-      debugCopy: (payload) => debugCopied.push(payload),
-      readAloud: (payload) => readAloud.push(payload),
+      copyFinal: (payload) => { copied.push(payload); },
+      debugCopy: (payload) => { debugCopied.push(payload); },
+      readAloud: (payload) => { readAloud.push(payload); },
     };
     const runTurn = vi.fn(async (payload) => ({
       selected_final_answer: "Minimal shell final answer.",
@@ -233,7 +241,7 @@ describe("HelixAskMinimalRuntimeShell", () => {
     });
     expect(runTurn).toHaveBeenCalledWith(
       expect.objectContaining({
-        turnId: "ask:minimal-shell-turn",
+        turnId: "ask:00000000-0000-4000-8000-000000000007",
         agentRuntime: "codex",
         question: "Summarize the current whitepaper",
         contextFiles: ["docs/research/nhm2-current-status-whitepaper.md"],
@@ -249,17 +257,17 @@ describe("HelixAskMinimalRuntimeShell", () => {
     expect(debugCopied).toHaveLength(1);
     expect(readAloud).toHaveLength(1);
     expect(copied[0]).toMatchObject({
-      replyId: "ask:minimal-shell-turn",
-      turnId: "ask:minimal-shell-turn",
+      replyId: "ask:00000000-0000-4000-8000-000000000007",
+      turnId: "ask:00000000-0000-4000-8000-000000000007",
       isLatest: true,
       finalAnswerText: "Minimal shell final answer.",
     });
     expect(JSON.parse(debugCopied[0]?.debugCopyText ?? "{}")).toMatchObject({
       schema: "helix.ask.minimal_runtime.debug_copy.v1",
-      turn_id: "ask:minimal-shell-turn",
+      turn_id: "ask:00000000-0000-4000-8000-000000000007",
       final_answer: "Minimal shell final answer.",
       debug: {
-        debug_export_ref: "debug:ask:minimal-shell-turn",
+        debug_export_ref: "debug:ask:00000000-0000-4000-8000-000000000007",
       },
     });
     expect(readAloud[0]?.readAloudText).toBe("Minimal shell final answer.");
@@ -276,19 +284,19 @@ describe("HelixAskMinimalRuntimeShell", () => {
       {
         role: "user",
         content: "Summarize the current whitepaper",
-        traceId: "ask:minimal-shell-turn",
+        traceId: "ask:00000000-0000-4000-8000-000000000007",
         helixAsk: undefined,
       },
       {
         role: "assistant",
         content: "Minimal shell final answer.",
-        traceId: "ask:minimal-shell-turn",
+        traceId: "ask:00000000-0000-4000-8000-000000000007",
         helixAsk: expect.objectContaining({
           schema: "helix.ask.chat_backend_observation.v1",
           backend_ask_call_attempted: true,
           backend_ask_entrypoint_observed: true,
           use_backend_ask_turn_entrypoint: true,
-          turn_id: "ask:minimal-shell-turn",
+          turn_id: "ask:00000000-0000-4000-8000-000000000007",
         }),
       },
     ]);
@@ -297,7 +305,7 @@ describe("HelixAskMinimalRuntimeShell", () => {
   it("consumes launched postulate prompts through the recrowned backend runtime path", async () => {
     window.history.pushState({}, "", "/desktop?doc=docs/research/nhm2-current-status-whitepaper.md");
     vi.spyOn(globalThis.crypto, "randomUUID")
-      .mockReturnValueOnce("launched-postulate-prompt")
+      .mockReturnValueOnce("00000000-0000-4000-8000-000000000008")
       .mockReturnValueOnce("minimal-shell-launched-postulate-turn");
     const runTurn = vi.fn(async (payload) => ({
       selected_final_answer: "Postulate review completed.",
@@ -404,7 +412,7 @@ describe("HelixAskMinimalRuntimeShell", () => {
   });
 
   it("renders runtime provider, lane, backend, tool, terminal, and debug projection for the latest turn", async () => {
-    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue("runtime-provider-summary-turn");
+    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue("00000000-0000-4000-8000-000000000009");
     const runTurn = vi.fn(async (payload) => ({
       selected_final_answer: "The result is 72.",
       turn_id: payload.turnId,
@@ -460,7 +468,7 @@ describe("HelixAskMinimalRuntimeShell", () => {
           capability: "live_translation.translate_text",
           translated_text: "hola",
           observation: {
-            observation_ref: "ask:runtime-provider-summary-turn:live-translation:obs",
+            observation_ref: "ask:00000000-0000-4000-8000-000000000009:live-translation:obs",
             target_language: "es",
             source_id: "docs:current",
             chunk_id: "chunk-1",
@@ -474,7 +482,7 @@ describe("HelixAskMinimalRuntimeShell", () => {
           },
           observation_packet: {
             status: "succeeded",
-            observation_ref: "ask:runtime-provider-summary-turn:live-translation:obs",
+            observation_ref: "ask:00000000-0000-4000-8000-000000000009:live-translation:obs",
             state_delta: {
               live_translation_chunk: {
                 source_id: "docs:current",
@@ -494,7 +502,7 @@ describe("HelixAskMinimalRuntimeShell", () => {
           capability: "utility_text.normalize_text",
           normalized_text: "hello workstation",
           observation: {
-            observation_ref: "ask:runtime-provider-summary-turn:utility-text:obs",
+            observation_ref: "ask:00000000-0000-4000-8000-000000000009:utility-text:obs",
             normalization_mode: "lowercase",
             normalized_text: "hello workstation",
             terminal_eligible: false,
@@ -503,7 +511,7 @@ describe("HelixAskMinimalRuntimeShell", () => {
           },
           observation_packet: {
             status: "succeeded",
-            observation_ref: "ask:runtime-provider-summary-turn:utility-text:obs",
+            observation_ref: "ask:00000000-0000-4000-8000-000000000009:utility-text:obs",
             observation_summary: "Utility text normalization ready: lowercase.",
           },
         },
@@ -512,7 +520,7 @@ describe("HelixAskMinimalRuntimeShell", () => {
           capability: "workstation_tool_reference.list_capabilities",
           capability_count: 42,
           observation: {
-            observation_ref: "ask:runtime-provider-summary-turn:workstation-tool-reference:obs",
+            observation_ref: "ask:00000000-0000-4000-8000-000000000009:workstation-tool-reference:obs",
             gateway_mode: "act",
             capability_count: 42,
             terminal_eligible: false,
@@ -521,7 +529,7 @@ describe("HelixAskMinimalRuntimeShell", () => {
           },
           observation_packet: {
             status: "succeeded",
-            observation_ref: "ask:runtime-provider-summary-turn:workstation-tool-reference:obs",
+            observation_ref: "ask:00000000-0000-4000-8000-000000000009:workstation-tool-reference:obs",
             observation_summary: "Workstation gateway catalog ready: 42 capabilities.",
           },
         },
@@ -538,7 +546,7 @@ describe("HelixAskMinimalRuntimeShell", () => {
           session_status: "running",
           session_health: "healthy",
           source_id: "docs:current",
-          last_observation_ref: "ask:runtime-provider-summary-turn:live-translation:goal-obs",
+          last_observation_ref: "ask:00000000-0000-4000-8000-000000000009:live-translation:goal-obs",
           binding_status: "bound",
           terminal_authority_status: "pending_helix_terminal_authority",
           terminal_eligible: false,
@@ -555,8 +563,8 @@ describe("HelixAskMinimalRuntimeShell", () => {
         status: "waiting",
         runtime_agent_provider: "codex",
         runtime_session_id: "runtime-session-translate-docs",
-        latest_observation_refs: ["ask:runtime-provider-summary-turn:visible-doc:obs"],
-        latest_receipt_refs: ["ask:runtime-provider-summary-turn:visible-doc:receipt"],
+        latest_observation_refs: ["ask:00000000-0000-4000-8000-000000000009:visible-doc:obs"],
+        latest_receipt_refs: ["ask:00000000-0000-4000-8000-000000000009:visible-doc:receipt"],
         terminal_authority_status: "authorized",
       },
       runtime_goal_debug_export: {
@@ -567,7 +575,7 @@ describe("HelixAskMinimalRuntimeShell", () => {
         terminal_authority_status: "authorized",
       },
       terminal_artifact_kind: "workstation_tool_evaluation",
-      debug_export_ref: "ask:runtime-provider-summary-turn:debug-export",
+      debug_export_ref: "ask:00000000-0000-4000-8000-000000000009:debug-export",
       debug: {},
     }));
 
@@ -604,23 +612,23 @@ describe("HelixAskMinimalRuntimeShell", () => {
     expect(summary).toHaveTextContent("chunk chunk-1");
     expect(summary).toHaveTextContent("freshness fresh");
     expect(summary).toHaveTextContent("text hola");
-    expect(summary).toHaveTextContent("ask:runtime-provider-summary-turn:live-translation:obs");
+    expect(summary).toHaveTextContent("ask:00000000-0000-4000-8000-000000000009:live-translation:obs");
     expect(summary).toHaveTextContent("utility_text");
     expect(summary).toHaveTextContent("normalize_text");
     expect(summary).toHaveTextContent("mode lowercase");
     expect(summary).toHaveTextContent("text hello workstation");
-    expect(summary).toHaveTextContent("ask:runtime-provider-summary-turn:utility-text:obs");
+    expect(summary).toHaveTextContent("ask:00000000-0000-4000-8000-000000000009:utility-text:obs");
     expect(summary).toHaveTextContent("workstation_tool_reference");
     expect(summary).toHaveTextContent("list_capabilities");
     expect(summary).toHaveTextContent("mode act");
     expect(summary).toHaveTextContent("count 42");
-    expect(summary).toHaveTextContent("ask:runtime-provider-summary-turn:workstation-tool-reference:obs");
+    expect(summary).toHaveTextContent("ask:00000000-0000-4000-8000-000000000009:workstation-tool-reference:obs");
     expect(summary).toHaveTextContent("Goal-bound lanes");
     expect(summary).toHaveTextContent("goal goal:translate-docs");
     expect(summary).toHaveTextContent("session lane-session-runtime-provider-summary");
     expect(summary).toHaveTextContent("status bound/running");
     expect(summary).toHaveTextContent("backend live_translation.local_runtime");
-    expect(summary).toHaveTextContent("observation ask:runtime-provider-summary-turn:live-translation:goal-obs");
+    expect(summary).toHaveTextContent("observation ask:00000000-0000-4000-8000-000000000009:live-translation:goal-obs");
     expect(summary).toHaveTextContent("authority pending_helix_terminal_authority");
     expect(summary).toHaveTextContent("observation-only");
     expect(summary).toHaveTextContent("Runtime goal");
@@ -629,17 +637,17 @@ describe("HelixAskMinimalRuntimeShell", () => {
     expect(summary).toHaveTextContent("session runtime-session-translate-docs");
     expect(summary).toHaveTextContent("command wake");
     expect(summary).toHaveTextContent("wake manual_resume");
-    expect(summary).toHaveTextContent("observation ask:runtime-provider-summary-turn:visible-doc:obs");
-    expect(summary).toHaveTextContent("receipt ask:runtime-provider-summary-turn:visible-doc:receipt");
+    expect(summary).toHaveTextContent("observation ask:00000000-0000-4000-8000-000000000009:visible-doc:obs");
+    expect(summary).toHaveTextContent("receipt ask:00000000-0000-4000-8000-000000000009:visible-doc:receipt");
     expect(summary).toHaveTextContent("terminal authority authorized");
     expect(summary).toHaveTextContent("debug export available");
     expect(summary).toHaveTextContent("workstation_tool_evaluation");
-    expect(summary).toHaveTextContent("ask:runtime-provider-summary-turn:debug-export");
+    expect(summary).toHaveTextContent("ask:00000000-0000-4000-8000-000000000009:debug-export");
   });
 
   it("submits through the runtime shell minimal implementation without rendering the legacy bridge", async () => {
     window.history.pushState({}, "", "/desktop?doc=docs/current.md");
-    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue("runtime-shell-turn");
+    vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue("00000000-0000-4000-8000-000000000010");
     const writeText = vi.fn(async () => undefined);
     Object.defineProperty(window.navigator, "clipboard", {
       configurable: true,
@@ -831,7 +839,7 @@ describe("HelixAskMinimalRuntimeShell", () => {
     expect(screen.getByTestId("helix-ask-reply-list-bottom").parentElement).toHaveClass("min-h-0", "flex-1");
     expect(runTurn).toHaveBeenCalledWith(
       expect.objectContaining({
-        turnId: "ask:runtime-shell-turn",
+        turnId: "ask:00000000-0000-4000-8000-000000000010",
         question: "Use the active doc",
         contextFiles: ["docs/current.md"],
       }),
@@ -844,9 +852,9 @@ describe("HelixAskMinimalRuntimeShell", () => {
     await waitFor(() => {
       expect(screen.getByTestId("helix-debug-export-drawer")).toBeTruthy();
     });
-    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('"turn_id": "ask:runtime-shell-turn"'));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('"turn_id": "ask:00000000-0000-4000-8000-000000000010"'));
     expect(screen.getByTestId<HTMLTextAreaElement>("helix-debug-export-json").value).toContain(
-      '"turn_id": "ask:runtime-shell-turn"',
+      '"turn_id": "ask:00000000-0000-4000-8000-000000000010"',
     );
   });
 

@@ -1,0 +1,54 @@
+{
+  "observed_at": "2026-11-13T17:56:09.503802+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/agent-access/AgentConnectionSetup.tsx",
+      "canonical_sha256": "f4655a4f845d2a5c391bb4926fe5bfde5895c4aa2ab600fb9b6b61cd38164d67",
+      "export_sha256": "399330cef38181bc4eb6c7e1d0d937f3ee1d0270e5b518b63b48adb61352839d",
+      "bytes": 120087,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "1070aa51ee07b074564d6d6c4d317516cdfe706a6e7eaa1d2edf2edbb44595d6"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/AgentConnectionSetup.spec.tsx",
+      "canonical_sha256": "d5782d3996ed90173915fee75825dc4bdc0daad522f9c2f83d436156d9957b88",
+      "export_sha256": "0b37c096c743c1be594751d28f325baaa57685d8554e30a1153f2e404c2e9fde",
+      "bytes": 127967,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "86918326b2db93b2ca89198a3fbf424695826478f9b0d26e828dbf4cdd53d524"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/agent-access/agentConnectionSetupState.ts",
+      "canonical_sha256": "1ee08234ba9aa16a3405808e657b50f31f9ac5495ae6923905a9483f070e3aad",
+      "export_sha256": "8024f91a407bfe575d39d049d8a4de35a31edbcdc3a48efd1ed2b64ed9dcb7ff",
+      "bytes": 4772,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/agentConnectionSetupState.spec.ts",
+      "canonical_sha256": "06990ae3ad46842393cce646cb40de66d21e7a09cf5809ce119b15d5067b3a93",
+      "export_sha256": "3d5bf4707850271162da930d61d4f639693f6833a330a4fd0c1b707644ef400d",
+      "bytes": 2772,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed every changed production/test hunk against public source and the surrounding readiness, route inspection, trust, navigation, polling, diagnostics and binding lifecycle. Unchanged reducer and tests read in full. Existing private tests use synthetic identities and mocked HTTP/native bridges.",
+    "Personal Codex availability is inspected per account event with generation guarding; an ordinary account cannot use the developer startup/trust controls. A selected Codex task prefers the local approval route; standard MCP keeps its OAuth connection instructions. Availability alone does not prove successful authenticated pickup.",
+    "Fixed a reproduced route mismatch: a readiness response requiring authorization previously dispatched auth0-account-link even when local Codex setup was available. Recovery guidance now waits for route inspection and directs local setup to Account & Sessions; OAuth routes retain their account-link action. Updated the authorization copy and strengthened the existing test to observe guidance events during delayed native inspection.",
+    "Pending setup-contract guidance is forwarded to its inbox. An expired heartbeat is read once per deadline, with ongoing readiness polling separate. Pairing revocation explicitly describes that it revokes the chat pairing and requires confirmation.",
+    "Persisted state holds only selected client and viewed step. Readiness, finite pairing, room/game action, trust and funding remain separate evidence. Native/HTTP endpoints enforce authority; source tests do not qualify them."
+  ],
+  "limits": [
+    "Private unfrozen source proposal; no publication, restart, sign-in or live operation.",
+    "Tests execute the exact exported connection component and reducer; other components, shared contracts, stores and native helpers resolve from canonical source with mocked HTTP/native bridges. This is not a full public application build.",
+    "Cross-account outstanding native starts, trust mutations, diagnostic/claim completions and long-latency route inspection remain wider installed acceptance concerns. This change only repairs recovery navigation and copy.",
+    "Shared setup contracts, account portal/enrollment/billing and remaining web changes require separate review. All post-R380 changes still require installed acceptance."
+  ]
+}

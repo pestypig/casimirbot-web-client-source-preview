@@ -1,0 +1,101 @@
+{
+  "observed_at": "2026-11-13T15:20:04.367761+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/store/useWorkstationClipboardStore.ts",
+      "canonical_sha256": "064c5dcc9b7c29644ab0b725853d6410a7c2a4c2b20281eecd85242544d7fffd",
+      "export_sha256": "a4df8669e9c1dcff7a5d09458603375bc841f5b9299b5e01ba3edcbbfe3fa857",
+      "previous_proposal_sha256": "786d4f34438ba7ff7a6d47c0558516e46d5de8c6879a20e75e3585bda35fae84",
+      "bytes": 7833,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useWorkstationClipboardStore.account-scope.spec.ts",
+      "canonical_sha256": "14486c8c0272d9f4fb0f16492b02cf33f695abaab55c3df556b8f6dbea8251a5",
+      "export_sha256": "14486c8c0272d9f4fb0f16492b02cf33f695abaab55c3df556b8f6dbea8251a5",
+      "previous_proposal_sha256": null,
+      "bytes": 2549,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useWorkstationNotesStore.ts",
+      "canonical_sha256": "9005a65b0a64bc119870a0c6ca62adbee4538b971857e52275fc2e8196d84601",
+      "export_sha256": "9005a65b0a64bc119870a0c6ca62adbee4538b971857e52275fc2e8196d84601",
+      "previous_proposal_sha256": "9e8a352d6e35ae96dec27c6a25066c6285542b06c8630bf080288398903a5725",
+      "bytes": 13723,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useWorkstationNotesStore.account-scope.spec.ts",
+      "canonical_sha256": "c659eebe18f46db2515337447bf540f0ee346eead4a85b9602910f514a91a81d",
+      "export_sha256": "c659eebe18f46db2515337447bf540f0ee346eead4a85b9602910f514a91a81d",
+      "previous_proposal_sha256": null,
+      "bytes": 2293,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useWorkstationSessionMemoryStore.ts",
+      "canonical_sha256": "79e2d62d8f5c47d0b853517f136f099d587b51d9655b364da8b32502ccae7692",
+      "export_sha256": "79e2d62d8f5c47d0b853517f136f099d587b51d9655b364da8b32502ccae7692",
+      "previous_proposal_sha256": "a829072e5a3e155ae023eeb89861e4b77d878ca9537e006317571e70c8e585c1",
+      "bytes": 6863,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useWorkstationSessionMemoryStore.account-scope.spec.ts",
+      "canonical_sha256": "e95b13d874f4d7a52d31c365d91eef0cf4dbcd35f7b53e0517c5f4f927908ea8",
+      "export_sha256": "e95b13d874f4d7a52d31c365d91eef0cf4dbcd35f7b53e0517c5f4f927908ea8",
+      "previous_proposal_sha256": null,
+      "bytes": 2279,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useWorkstationWorkflowTimelineStore.ts",
+      "canonical_sha256": "d24bfcad23b674836a052dda28b77fb30e4ca1fe546414aa4599930a865c474b",
+      "export_sha256": "d24bfcad23b674836a052dda28b77fb30e4ca1fe546414aa4599930a865c474b",
+      "previous_proposal_sha256": "d043ca86019f129637c9acbd9a85f1493642af81e7d5ccc8cc3ef0381981593e",
+      "bytes": 3373,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useWorkstationWorkflowTimelineStore.account-scope.spec.ts",
+      "canonical_sha256": "41db4473f9f537a8a25578606a751983c22897f07f5f80e447e74cc87e886943",
+      "export_sha256": "41db4473f9f537a8a25578606a751983c22897f07f5f80e447e74cc87e886943",
+      "previous_proposal_sha256": null,
+      "bytes": 1885,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/store/useWorkstationStores.spec.ts",
+      "canonical_sha256": "fac5e214bc1f7aa6b0573850770c7b417acc45bc8840ede81707c7b994e56028",
+      "export_sha256": "fac5e214bc1f7aa6b0573850770c7b417acc45bc8840ede81707c7b994e56028",
+      "previous_proposal_sha256": "b26fc0c355e65ad737218a67c19e7b1efc0adfa7d0334407dd69c12da8a96581",
+      "bytes": 16132,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/store/useWorkstationNotesStore.live-sink.spec.ts",
+      "canonical_sha256": "fe3c55536e6bb947f62079e43b1340b9b0890737c0feae019ef9f70242e41ba8",
+      "export_sha256": "10dc6c007c48044c17b9b9b9f65e3e80275ebd44cd4b7bc72d5e29f65368965f"
+    }
+  ],
+  "review": [
+    "Read four complete production stores and six tests. Exact source export, line endings normalized only; no canonical source edit.",
+    "Named profiles, signed-out guest and unresolved identity have separate local/session storage keys. Account transitions swap persistence target and state. Shared v1 storage stays unclaimed. Clipboard additionally refuses hydration of unresolved stored receipts.",
+    "Clipboard retention bounds text, metadata and saved receipt count; quota failure retains in-memory state. Notes retain an in-memory fallback and register account-scoped artifact identifiers.",
+    "Timeline events and session draft metadata are projections only. No new server authorization, pairing, game operation, network transport or automatic context grant is implemented by this cohort.",
+    "Only first-party source and synthetic alpha/beta/example test fixtures included; no live notes, clipboard, profile files, credentials or canonical private Git history exported."
+  ],
+  "limits": [
+    "Private source proposal only; no commit, push or new build.",
+    "Local-store unit checks do not qualify cross-device backup, provider voice, game actions or installed account switching.",
+    "Legacy unscoped records are preserved but not automatically migrated.",
+    "Account policy, chat and registry dependencies were separately reviewed; live event bus, shared contracts and other test dependencies remain separate inputs."
+  ]
+}

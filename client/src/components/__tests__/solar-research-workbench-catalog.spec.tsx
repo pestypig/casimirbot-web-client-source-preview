@@ -11,7 +11,8 @@ import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from '../../lib/workstation/acc
 const packageId = 'solar-package:' + 'a'.repeat(64);
 const recordId = 'solar-primary:' + 'b'.repeat(64);
 const indexId = 'solar-evidence-index:' + 'c'.repeat(64);
-const account = { session: { profile: { profile_id: 'owner-1' } }, account_policy: { account_type: 'developer' } };
+const account = { session: { profile: { profile_id: 'owner-1' } }, account_policy: {
+  account_type: 'developer', feature_flags: ['local_solar_source_inspection'] } };
 const packages = { ok: true, profileId: 'owner-1', schemaVersion: 'solar-package-catalog/1', offset: 0,
   totalPackages: 1, nextOffset: null, order: 'package_id_lexicographic', scientificAdmission: false, scienceRunAllowed: false,
   packages: [{ packageId, indexId, totalBytes: 100, comparisonRecordId: recordId, comparisonRows: 37,
@@ -60,13 +61,41 @@ it('reads owner catalogs only on request and carries the exact selected record i
   expect(fetch).toHaveBeenCalledTimes(4);
 });
 
-it('rejects non-developer policy before any archive request', async () => {
-  const fetch = vi.fn().mockResolvedValue(reply({ ...account, account_policy: { account_type: 'user' } }));
+it('reads ordinary-owner catalogs without requesting developer-only local inputs', async () => {
+  const fetch = vi.fn().mockResolvedValueOnce(reply({ ...account, account_policy: {
+    account_type: 'user', feature_flags: ['local_solar_source_inspection'] } }))
+    .mockResolvedValueOnce(reply(packages)).mockResolvedValueOnce(reply(records));
   vi.stubGlobal('fetch', fetch);
   render(<SolarResearchWorkbenchCatalog />);
   fireEvent.click(screen.getByRole('button', { name: 'Inspect research products' }));
-  await waitFor(() => expect(screen.getByText(/signed-in developer account is required/)).toBeTruthy());
-  expect(fetch).toHaveBeenCalledTimes(1);
+  await waitFor(() => expect(screen.getByText(recordId)).toBeTruthy());
+  expect(fetch).toHaveBeenCalledTimes(3);
+  expect(fetch.mock.calls.some(([url]) => String(url).includes('/local-products'))).toBe(false);
+  expect(screen.queryByText('Known local inputs (checked against this runtime)')).toBeNull();
+});
+
+it('requires the explicit feature on a developer account for local inputs', async () => {
+  const fetch = vi.fn().mockResolvedValueOnce(reply({ ...account, account_policy: {
+    account_type: 'developer', feature_flags: [] } }))
+    .mockResolvedValueOnce(reply(packages)).mockResolvedValueOnce(reply(records));
+  vi.stubGlobal('fetch', fetch);
+  render(<SolarResearchWorkbenchCatalog />);
+  fireEvent.click(screen.getByRole('button', { name: 'Inspect research products' }));
+  await waitFor(() => expect(screen.getByText(recordId)).toBeTruthy());
+  expect(fetch).toHaveBeenCalledTimes(3);
+  expect(fetch.mock.calls.some(([url]) => String(url).includes('/local-products'))).toBe(false);
+});
+
+it('honors an explicit local-source lock even when the developer feature is listed', async () => {
+  const fetch = vi.fn().mockResolvedValueOnce(reply({ ...account, account_policy: {
+    ...account.account_policy, locked_features: ['local_solar_source_inspection'] } }))
+    .mockResolvedValueOnce(reply(packages)).mockResolvedValueOnce(reply(records)).mockResolvedValueOnce(reply(local));
+  vi.stubGlobal('fetch', fetch);
+  render(<SolarResearchWorkbenchCatalog />);
+  fireEvent.click(screen.getByRole('button', { name: 'Inspect research products' }));
+  await waitFor(() => expect(screen.getByText(recordId)).toBeTruthy());
+  expect(fetch.mock.calls.some(([url]) => String(url).includes('/local-products'))).toBe(false);
+  expect(screen.queryByText('Known local inputs (checked against this runtime)')).toBeNull();
 });
 
 it('rejects a catalog scientific-admission claim', async () => {

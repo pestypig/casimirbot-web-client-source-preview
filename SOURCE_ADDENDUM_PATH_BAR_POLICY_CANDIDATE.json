@@ -1,0 +1,91 @@
+{
+  "observed_at": "2026-11-13T19:28:23.684478+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/workstation/WorkstationPathBar.tsx",
+      "canonical_sha256": "9295be965b42b3c6df9499bda9dafafe3338e6b0209105083269cabf0d74063a",
+      "export_sha256": "6558e3dc7fec79ea8671fc296897e49ccccf0dd36b84d194f89c0c7e4f3de090",
+      "bytes": 15408,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "ec23fd85a8ce2605a3212d4ec7f65f2f11a6a893107e35f5854343421fdd35e5"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/WorkstationPathBar.suggestions.spec.tsx",
+      "canonical_sha256": "89df4dcb59b05e724d3036c2112433b142827729b858e161597b24ecb0673c71",
+      "export_sha256": "89df4dcb59b05e724d3036c2112433b142827729b858e161597b24ecb0673c71",
+      "bytes": 2583,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "648300256d7900cfe9237d5e6ca033654ea48df5f3ddcf109e910245bb31e4bf"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/WorkstationPathBar.account-policy.spec.tsx",
+      "canonical_sha256": "f82b3c0faa07956a0e636e37b2eb106576e3b545fc9be92dfd7c6c74716de077",
+      "export_sha256": "d4fa5217e8947cedd92f37299b1fce89fe860056df84d73fb85d1fdc3bfc973a",
+      "bytes": 5753,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/workstation/workstationDeepLink.ts",
+      "canonical_sha256": "8f37333b761fe1ad7f3fab081cac17289a14c8c3444c9a31f4dc43fec0730aef",
+      "export_sha256": "8f37333b761fe1ad7f3fab081cac17289a14c8c3444c9a31f4dc43fec0730aef",
+      "bytes": 8454,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/workstationDeepLink.spec.ts",
+      "canonical_sha256": "e2ea06961713b162211a409fcd54836e42f8f0bab0586a1a7cf9164104516543",
+      "export_sha256": "e2ea06961713b162211a409fcd54836e42f8f0bab0586a1a7cf9164104516543",
+      "bytes": 6445,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/launchPanelPolicy.ts",
+      "canonical_sha256": "eef8c5979bc8022339ead1858ca6a85d4f02d9dbc21805973c253c54816920e2",
+      "export_sha256": "31a133985d639b7610eb2f782846ccbfe97f87c69c7f27beadcbc55336f64db0",
+      "bytes": 2013,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/experimentalLaunchPanels.ts",
+      "canonical_sha256": "7535f86bbb9b869fd83321c76393e7d57409db4fb8e4f5c7cace137f203e8c10",
+      "export_sha256": "1e5ceb2c7ae8c58a30bc8ca164cb35d5c65ba7a5fd6df7686b780da600a08444",
+      "bytes": 2202,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/desktop/panelRegistry.ts",
+      "canonical_sha256": "786a4489913bf88e0ed2c5fd65c9b315945c4b2bb24d5fe459292acc926ddc2a",
+      "export_sha256": "d96cb12c7bb8dbb41cca2c512725ad5bd44c10c16c1d26426c25b2d292b382b1",
+      "bytes": 16377,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Read the complete path-bar component, its suggestion test, current account launch/access helpers, experimental visibility helper and deep-link parser/test. Existing suggestion delta replaces account-type-only filtering with the complete policy and experimental visibility preferences.",
+    "Reproduced four direct navigation failures: an explicitly locked panel, a policy revoked after typing, a locked Docs destination and a mixed equation route with one locked associated panel. The component mutated layout/document state without policy admission despite filtering suggestions.",
+    "Gather all route panels, equation-associated panels, document destination and focus before mutation. Read the current cached account policy at submission and reject the whole route if any panel is inaccessible. This preserves atomic rejection and prevents a partially opened document or focus change.",
+    "Use panel accessibility rather than launch visibility: an admitted experimental panel still opens by exact path while omitted from suggestions. Source checks include this positive case and ordinary admitted panel navigation.",
+    "The deep-link parser remains unchanged; normalization rejects raw local paths and unknown panel identities. Existing synthetic local path fixtures are retained unchanged, not copied personal file content."
+  ],
+  "limits": [
+    "Private unfrozen source proposal; R380 does not contain this fix. Source tests do not establish signed installed or public release acceptance.",
+    "Client layout admission follows observed cached policy and does not replace server authentication or operation-specific grants. No game, model, adapter or terminal authority is granted by navigation.",
+    "Tests use jsdom and mocked stores/account observations. Export compilation follows selected/reviewed inputs and externalizes omitted dependencies; it is not a complete public application build.",
+    "Doc Viewer printing policy, solar storage presentation and remaining source inventory continue separately.",
+    "Five inherited intentional support-contact matches remain in the final owner publication review."
+  ]
+}

@@ -5,8 +5,12 @@ import {
   type HelixWorkstationMemorySnapshot,
 } from "@shared/helix-workstation-memory";
 import { useWorkspaceMemoryRegistryStore } from "@/store/useWorkspaceMemoryRegistryStore";
+import {
+  HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
+  readCachedAccountProfileIdentity,
+} from "@/lib/workstation/accountCapabilityPolicy";
 
-const WORKSTATION_SESSION_MEMORY_KEY = "workstation-session-memory:v1";
+const WORKSTATION_SESSION_MEMORY_PREFIX = "workstation-session-memory:v2:";
 
 export type WorkstationScrollMemory = {
   scrollTop: number;
@@ -62,18 +66,41 @@ function normalizeKey(key: string): string {
   return key.trim();
 }
 
+const memoryStorageKey = (profileId: string | null | undefined): string =>
+  `${WORKSTATION_SESSION_MEMORY_PREFIX}${profileId === undefined
+    ? "unresolved" : profileId === null ? "guest" : `profile:${encodeURIComponent(profileId)}`}`;
+
+function readStoredMemory(key: string): Pick<WorkstationSessionMemoryState, "panelScroll" | "drafts"> {
+  try {
+    const raw = resolveSessionStorage().getItem(key);
+    const state = (JSON.parse(raw ?? "null") as {
+      state?: Partial<Pick<WorkstationSessionMemoryState, "panelScroll" | "drafts">>;
+    } | null)?.state;
+    return {
+      panelScroll: state?.panelScroll && typeof state.panelScroll === "object" && !Array.isArray(state.panelScroll)
+        ? state.panelScroll : {},
+      drafts: state?.drafts && typeof state.drafts === "object" && !Array.isArray(state.drafts)
+        ? state.drafts : {},
+    };
+  } catch {
+    return { panelScroll: {}, drafts: {} };
+  }
+}
+
+let currentMemoryStorageKey = memoryStorageKey(readCachedAccountProfileIdentity().profileId);
+const initialMemory = readStoredMemory(currentMemoryStorageKey);
+
 export const useWorkstationSessionMemoryStore = create<WorkstationSessionMemoryState>()(
   persist(
     (set, get) => ({
-      panelScroll: {},
-      drafts: {},
+      ...initialMemory,
       rememberPanelScroll: (key, scroll) => {
         const normalizedKey = normalizeKey(key);
         if (!normalizedKey) return;
         useWorkspaceMemoryRegistryStore.getState().upsertArtifact({
           artifact_id: `workstation-panel-scroll:${normalizedKey}`,
           artifact_type: "workstation_panel_scroll",
-          storage_key: WORKSTATION_SESSION_MEMORY_KEY,
+          storage_key: currentMemoryStorageKey,
           storage_backend: "sessionStorage",
           owner_scope: "surface_session_only",
           sync_status: "local_only",
@@ -102,7 +129,7 @@ export const useWorkstationSessionMemoryStore = create<WorkstationSessionMemoryS
         useWorkspaceMemoryRegistryStore.getState().upsertArtifact({
           artifact_id: `workstation-session-draft:${normalizedKey}`,
           artifact_type: "workstation_session_draft",
-          storage_key: WORKSTATION_SESSION_MEMORY_KEY,
+          storage_key: currentMemoryStorageKey,
           storage_backend: "sessionStorage",
           owner_scope: "surface_session_only",
           sync_status: "local_only",
@@ -147,8 +174,9 @@ export const useWorkstationSessionMemoryStore = create<WorkstationSessionMemoryS
       }),
     }),
     {
-      name: WORKSTATION_SESSION_MEMORY_KEY,
+      name: currentMemoryStorageKey,
       storage: createJSONStorage(resolveSessionStorage),
+      skipHydration: true,
       partialize: (state) => ({
         panelScroll: state.panelScroll,
         drafts: state.drafts,
@@ -156,3 +184,16 @@ export const useWorkstationSessionMemoryStore = create<WorkstationSessionMemoryS
     },
   ),
 );
+
+if (typeof window !== "undefined") {
+  window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, () => {
+    const profileId = readCachedAccountProfileIdentity().profileId;
+    const nextKey = memoryStorageKey(profileId);
+    if (nextKey !== currentMemoryStorageKey) {
+      const nextMemory = readStoredMemory(nextKey);
+      currentMemoryStorageKey = nextKey;
+      useWorkstationSessionMemoryStore.persist.setOptions({ name: nextKey });
+      useWorkstationSessionMemoryStore.setState(nextMemory);
+    }
+  });
+}

@@ -1,0 +1,54 @@
+{
+  "observed_at": "2026-11-14T06:19:42.252629+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/pages/simulation.tsx",
+      "canonical_sha256": "5e36ca9a2044692f6437c41eaecc5f7fcda7acee9dfb899c74422ffb97c7919a",
+      "export_sha256": "5e36ca9a2044692f6437c41eaecc5f7fcda7acee9dfb899c74422ffb97c7919a",
+      "previous_public_sha256": "3026713a39c00760f33f9edbfad6864d2be30d4f1e980800467fdc1ad43012d2",
+      "bytes": 10931,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/lib/theory/theoryBadgeCombinationReader.ts",
+      "canonical_sha256": "4a2024c7bda88eddcfaf037311ad16121dfa5a29e9e1489eabddca1da4b3981f",
+      "export_sha256": "4a2024c7bda88eddcfaf037311ad16121dfa5a29e9e1489eabddca1da4b3981f",
+      "previous_public_sha256": "d72afe88da9868f5b2b2903b45b706df9aefc0f09e91a6d347ada07f81d53849",
+      "bytes": 9597,
+      "transformation": "identity"
+    },
+    {
+      "path": "client/src/lib/workstation/panelActionAdapters.ts",
+      "canonical_sha256": "a683ffd0f2e275c54e71d6e7796882cdd945ff091a9727a3985aa21d9c061878",
+      "export_sha256": "a683ffd0f2e275c54e71d6e7796882cdd945ff091a9727a3985aa21d9c061878",
+      "previous_public_sha256": "308348e4d66e9567ebb6797059c8701d5094b4d5cfeb34f5f9fa4addcbf03de8",
+      "bytes": 282584,
+      "transformation": "identity"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/components/__tests__/needle-hull-preset.contract.spec.tsx",
+      "canonical_sha256": "d1d086e19d7f12ebc500a528c29c9f322a4f0f2a77b21189a07abfa6c53375c1"
+    },
+    {
+      "path": "client/src/lib/theory/__tests__/theoryBadgeCombinationReader.spec.ts",
+      "canonical_sha256": "4f6d85efc4dd56f80ed94d5f06a2a8ef6b4626425d8bce14929a507cc5fd6362"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/panelActionAdapters.spec.ts",
+      "canonical_sha256": "ce62bfbfebe646773ed60f4d16bf8e7dab231a54f6ead03547980d8364531130"
+    }
+  ],
+  "classification": "presentation and evidence normalization",
+  "review": [
+    "Widen only the four literal-inferred strokeAmplitude, burstTime, cycleTime and xiPoints React states to number, preserving defaults, callbacks and emitted JavaScript.",
+    "Explicitly narrow a Map lookup from badge-or-undefined before reading its display level.",
+    "Normalize an absent optional frontier seed to undefined; both downstream consumers retain the same nullish default. No tool admission, execution policy, search calculations or authority changes.",
+    "Omit only the generic schema discriminator before declaring the existing solar-specific discriminator. All other inherited fields and runtime bytes remain unchanged."
+  ],
+  "source_frozen": false,
+  "published": false
+}

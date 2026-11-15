@@ -1121,7 +1121,7 @@ export function MoralGraphPanel({
       : selectedNodeIds;
   const selectedNodes = selectedBindingNodeIds
     .map((id) => graph.nodes.find((node) => node.id === id))
-    .filter((node): node is MoralGraphNode => Boolean(node));
+    .filter((node) => node !== undefined);
   const hoveredNode = hoveredNodeId ? graph.nodes.find((node) => node.id === hoveredNodeId) ?? null : null;
   const evidenceHighlighted = new Set(
     objectiveBindingsOpen

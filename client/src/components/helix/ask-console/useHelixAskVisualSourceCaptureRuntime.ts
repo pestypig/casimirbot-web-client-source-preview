@@ -416,7 +416,8 @@ export function useHelixAskVisualSourceCaptureRuntime(
           cameraFacingMode: "user",
         });
       }
-      sourceId = await ensureHelixAskVisualSource(input.kind, input.signal);
+      const registeredSourceId = await ensureHelixAskVisualSource(input.kind, input.signal);
+      sourceId = registeredSourceId;
       if (input.signal?.aborted) throw new Error("visual_capture_cancelled");
       if (pendingMediaRequest) {
         const supersededStream = stream;
@@ -437,18 +438,19 @@ export function useHelixAskVisualSourceCaptureRuntime(
           supersededStream?.getTracks().forEach((track) => track.stop());
         }
       }
+      if (!stream) throw new Error("visual_capture_stream_missing");
       visualSituationStreamRef.current = stream;
       const observedStream = stream;
-      const observedTrack = stream.getVideoTracks()[0] ?? stream.getTracks()[0] ?? null;
+      const observedTrack = observedStream.getVideoTracks()[0] ?? observedStream.getTracks()[0] ?? null;
       observedTrack?.addEventListener("ended", () => {
         if (visualSituationStreamRef.current !== observedStream) return;
         visualSituationCaptureAbortRef.current?.abort();
         visualSituationCaptureAbortRef.current = null;
         stopVisualSourceMediaStream(observedStream);
         visualSituationStreamRef.current = null;
-        if (visualSituationSourceIdRef.current === sourceId) {
+        if (visualSituationSourceIdRef.current === registeredSourceId) {
           setVisualSituationSourceId(null);
-          stopRegisteredHelixAskVisualSource(sourceId, input.kind);
+          stopRegisteredHelixAskVisualSource(registeredSourceId, input.kind);
           setVisualSituationSourceStatus("idle");
           setVisualSituationSourceLabel(null);
           setVisualSituationEvidenceForTurn(null);
@@ -459,7 +461,7 @@ export function useHelixAskVisualSourceCaptureRuntime(
         sourceId,
         threadId: HELIX_ASK_THREAD_ID,
         roomId: null,
-        stream,
+        stream: observedStream,
         postJson: postSituationJson,
         cadenceMs: HELIX_ASK_LIVE_VISUAL_CAPTURE_CADENCE_MS,
         preserveExistingStream: !ownsStream,
@@ -469,12 +471,12 @@ export function useHelixAskVisualSourceCaptureRuntime(
         signal: input.signal,
       });
       if (input.signal?.aborted) throw new Error("visual_capture_cancelled");
-      const liveTrack = stream.getVideoTracks()[0] ?? stream.getTracks()[0] ?? null;
+      const liveTrack = observedStream.getVideoTracks()[0] ?? observedStream.getTracks()[0] ?? null;
       if (!liveTrack || liveTrack.readyState === "ended") {
         throw new Error("visual_capture_track_ended");
       }
       if (includeDisplayAudio) {
-        if (stream.getAudioTracks().some((track) => track.readyState !== "ended")) {
+        if (observedStream.getAudioTracks().some((track) => track.readyState !== "ended")) {
           const situationStore = useSituationRoomStore.getState();
           const existingRoomId =
             situationStore.active_room_id && situationStore.rooms[situationStore.active_room_id]
@@ -498,14 +500,14 @@ export function useHelixAskVisualSourceCaptureRuntime(
             register: () => registerHelixAskAudioTranscriptSource({
               sourceId: audioTranscriptSourceId,
               roomId: audioRoomId,
-              stream,
+              stream: observedStream,
               signal: input.signal,
             }),
             attach: () => situationStore.attachDisplayAudioSource(
               audioRoomId,
               "Helix Ask shared tab audio",
               {
-                stream,
+                stream: observedStream,
                 stopStreamOnStop: false,
                 chunkMs: HELIX_ASK_DISPLAY_AUDIO_CHUNK_MS,
                 onTranscriptChunk: (chunk) => postHelixAskAudioTranscriptChunk(
@@ -517,7 +519,7 @@ export function useHelixAskVisualSourceCaptureRuntime(
             stopRegistered: () => stopRegisteredHelixAskAudioTranscriptSource({
               sourceId: audioTranscriptSourceId,
               roomId: audioRoomId,
-              stream,
+              stream: observedStream,
             }),
             stopAttached: (lateSource) => {
               if (lateSource?.source_id) situationStore.stopSource(lateSource.source_id);
@@ -528,7 +530,7 @@ export function useHelixAskVisualSourceCaptureRuntime(
             await stopRegisteredHelixAskAudioTranscriptSource({
               sourceId: audioTranscriptSourceId,
               roomId: audioRoomId,
-              stream,
+              stream: observedStream,
             });
             if (displayAudioTranscriptSourceIdRef.current === audioTranscriptSourceId) {
               displayAudioTranscriptSourceIdRef.current = null;

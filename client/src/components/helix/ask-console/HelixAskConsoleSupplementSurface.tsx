@@ -26,7 +26,7 @@ export type HelixAskConsoleSupplementSurfaceProps = {
   onRemoveAttachment: (attachmentId: string) => void;
   contextCapsulePreview: HelixAskContextCapsulePreviewModel | null;
   contextCapsuleAutoApplied: boolean;
-  voiceStatusLabel: string;
+  voiceStatusLabel: string | null;
   voiceStatusState: HelixAskVoiceInputStatus;
   situationRoomSource: {
     visible: boolean;

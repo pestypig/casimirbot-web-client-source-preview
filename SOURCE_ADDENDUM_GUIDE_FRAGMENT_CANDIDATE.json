@@ -1,0 +1,26 @@
+{
+  "observed_at": "2026-11-15T04:24:21.663165+00:00",
+  "canonical_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "canonical_dirty": true,
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/pages/getting-started.tsx",
+      "canonical_sha256": "b3ca0fa0fc9fd2e3f01906f41d93dff561e478455da988c8fdc4ff3339bbbf37",
+      "export_sha256": "131d822a732392e98017ab497881773db25cb09e6eb9197571417d04837c4359",
+      "previous_export_sha256": "2506fdc2bb1f603e42e35129eeb3da4ff785c8813fbc8565e11a627c651a1032",
+      "transformation": "CRLF to LF only",
+      "review": "Adds a React mount effect to resolve an initial guide fragment after its section exists. Malformed and missing fragments do not throw. No other source or guide wording changed."
+    }
+  ],
+  "qualification": [
+    "Fresh production-site navigation to Friends and Minecraft sections visually verified",
+    "Plain guide starts at top and existing Minecraft navigation still works",
+    "Production public-site build and HTTP/static delivery checks passed"
+  ],
+  "limits": [
+    "Unpublished selected source only; not a standalone application build or public release acceptance",
+    "No change to account, consent, game, funding, pairing or room authority"
+  ]
+}

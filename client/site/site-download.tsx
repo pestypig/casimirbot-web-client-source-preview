@@ -38,6 +38,7 @@ export function SiteDownloadPage() {
         <nav className="flex items-center justify-between gap-4 border-b border-white/10 pb-5">
           <a href="/" className="inline-flex items-center gap-2 text-sm text-slate-200 hover:text-white"><ArrowLeft className="h-4 w-4" /> Home</a>
           <a href="/account" className="text-sm text-cyan-200 hover:text-white">Account</a>
+          <a href="/getting-started" className="text-sm text-cyan-200 hover:text-white">Get started</a>
         </nav>
         <section className="py-16 sm:py-24">
           <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm text-cyan-100"><ShieldCheck className="h-4 w-4" /> Release availability</span>

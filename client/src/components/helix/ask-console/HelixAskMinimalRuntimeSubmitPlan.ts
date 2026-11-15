@@ -16,6 +16,7 @@ import {
   buildHelixAskSubmitAdmission,
   type HelixAskSubmitAdmissionDecision,
 } from "./HelixAskSubmitAdmission";
+import { resolveHelixAskSubmitRuntime } from "./HelixAskSubmitBackendEntrypointOptions";
 import type { PendingHelixAskPrompt } from "@/lib/helix/ask-prompt-launch";
 import {
   buildHelixAskChatReferentContextForSubmit,
@@ -40,8 +41,10 @@ export function buildHelixAskMinimalRuntimeSubmitPlan(args: {
   durableReplies?: readonly HelixAskChatReferentReplyLike[];
   visibleReplies?: readonly HelixAskChatReferentReplyLike[];
 }): HelixAskMinimalRuntimeSubmitPlan {
-  const effectiveRuntime =
-    args.pendingPrompt?.serverAdmittedRuntimeAgentProvider ?? args.selectedRuntime;
+  const effectiveRuntime = resolveHelixAskSubmitRuntime({
+    selectedRuntime: args.selectedRuntime,
+    serverAdmittedRuntimeAgentProvider: args.pendingPrompt?.serverAdmittedRuntimeAgentProvider,
+  });
   const admission = buildHelixAskSubmitAdmission({
     entries: [args.draft],
     askBusy: false,

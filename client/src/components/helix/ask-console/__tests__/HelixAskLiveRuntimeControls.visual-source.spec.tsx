@@ -13,7 +13,9 @@ const mocks = vi.hoisted(() => ({
   runtime: {
     active: true,
     error: null as string | null,
-    lifecycleState: "active" as "active" | "off",
+    lifecycleState: "active" as "active" | "off" | "requesting",
+    localPlaybackMuted: false,
+    setLocalPlaybackMuted: vi.fn(),
     microphoneEnabled: false,
     setMicrophoneEnabled: vi.fn(() => true),
     setVisualInputEnabled: vi.fn(() => true),
@@ -182,12 +184,19 @@ describe("Helix Ask GPT Live Vision source coordination", () => {
     render(<HelixAskLiveRuntimeControls model={userModel} />);
     fireEvent.click(screen.getByRole("button", { name: "Voice settings" }));
 
-    expect(userModel.controlState.runtime_agent_authority).toBe("observe_only");
+    expect(userModel.controlState.runtime_agent_authority).toBe("suggest_actions");
     expect(screen.getByRole("button", { name: "Live runtime agent mode" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Enable Live Voice microphone" })).toBeEnabled();
-    expect(screen.queryByRole("button", { name: "Live runtime agent authority" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Live runtime agent authority" })).toBeVisible();
     expect(screen.queryByRole("button", { name: "Share visual frames with GPT Live" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Open Shared GPT Live Room" })).toBeNull();
+  });
+
+  it("does not offer live controls or visual capture before account policy resolves", () => {
+    const unresolved = buildHelixAskLiveRuntimeControlsModel({ accountPolicy: null });
+    expect(unresolved.visible).toBe(false);
+    expect(unresolved.visualInputAllowed).toBe(false);
+    expect(unresolved.sharedRealtimeRoomsAllowed).toBe(false);
   });
 
   it("keeps the Observe/Suggest authority selector available to developers", () => {
@@ -220,6 +229,23 @@ describe("Helix Ask GPT Live Vision source coordination", () => {
     render(<HelixAskLiveRuntimeControls model={model} />);
     writePersonalVoiceDestination("message_codex");
     expect(mocks.runtime.stop).toHaveBeenCalledOnce();
+  });
+
+  it("cancels a pending start if another control changes the voice route", () => {
+    mocks.runtime.active = false;
+    mocks.runtime.lifecycleState = "requesting";
+    render(<HelixAskLiveRuntimeControls model={model} />);
+    writePersonalVoiceDestination("message_codex");
+    expect(mocks.runtime.stop).toHaveBeenCalledOnce();
+  });
+
+  it("exposes local playback mute as a separate explicit control", () => {
+    render(<HelixAskLiveRuntimeControls model={model} />);
+    fireEvent.click(screen.getByRole("button", { name: "Voice settings" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: /Mute GPT Live on this computer/ }));
+    expect(mocks.runtime.setLocalPlaybackMuted).toHaveBeenCalledWith(true);
+    expect(mocks.runtime.setMicrophoneEnabled).not.toHaveBeenCalled();
+    expect(mocks.runtime.start).not.toHaveBeenCalled();
   });
 
   it("shows an actionable provider-auth status without projecting credential material", () => {

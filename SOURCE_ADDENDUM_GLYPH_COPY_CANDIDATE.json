@@ -1,0 +1,109 @@
+{
+  "observed_at": "2026-11-13T14:27:59.784449+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/store/usePhysicsGlyphWorkspaceStore.ts",
+      "canonical_sha256": "114c667970988a741eb80133bc8e20553dcbfe8de31b2f86c42220bfdad493ff",
+      "export_sha256": "c993e3ef89ba7f7c8aa85b20c06f1a6c2d8932da6b28cb0152e9176d0b8ed3cd",
+      "previous_proposal_sha256": null,
+      "bytes": 6531,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/physicsGlyphClientTransport.ts",
+      "canonical_sha256": "b4b81be7f54a8fcecb087c14ca1589fd661d64f099943dee43aa3001682a24f8",
+      "export_sha256": "b4b81be7f54a8fcecb087c14ca1589fd661d64f099943dee43aa3001682a24f8",
+      "previous_proposal_sha256": null,
+      "bytes": 4859,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/physics-glyphs/QuantumGlyphAnswer.tsx",
+      "canonical_sha256": "af640ea413ecf39ed8a9cdd51a1d0ddd03f48944d249140430b4cc04091f402f",
+      "export_sha256": "af640ea413ecf39ed8a9cdd51a1d0ddd03f48944d249140430b4cc04091f402f",
+      "previous_proposal_sha256": null,
+      "bytes": 4441,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/physics-glyphs/UnifiedQuantumGlyphAnswer.tsx",
+      "canonical_sha256": "b1c41cf856d14c0b5ff798a5aa3f31352aa41e0eafac8e3ca71c6fb2526c1741",
+      "export_sha256": "a2bc019ac90ea35d4ba7569c3052d1e9d0201d56d41660d63c0878bb8d144546",
+      "previous_proposal_sha256": null,
+      "bytes": 3500,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/physics-glyphs/SampledLayers.tsx",
+      "canonical_sha256": "db687a09849f5cbb92b129cf1801cd63105b58f87a358e65f020e084f8242872",
+      "export_sha256": "76a1dd2132ab87a0abade7be23f4eb4ab439f6b42ddce49d73d555c410bf6d5a",
+      "previous_proposal_sha256": null,
+      "bytes": 1552,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/physics-glyphs/PhysicsGenerationDetails.tsx",
+      "canonical_sha256": "fa7a529d33c0790b8bc97f1e597a09a6134b51b0a3ec5583ce78aca4d981cb71",
+      "export_sha256": "fa7a529d33c0790b8bc97f1e597a09a6134b51b0a3ec5583ce78aca4d981cb71",
+      "previous_proposal_sha256": null,
+      "bytes": 4441,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendArtifactWorkspace.tsx",
+      "canonical_sha256": "4adb4153d892fc4a36766ff900a91cff2d078c530aa07073c8bbe4575a1a61c6",
+      "export_sha256": "4adb4153d892fc4a36766ff900a91cff2d078c530aa07073c8bbe4575a1a61c6",
+      "previous_proposal_sha256": "c0381a1e2020df1dab91f5a2474fc7f3509eba28ee937f0e99bba7284b2e7b33",
+      "bytes": 6491,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/physics-glyphs/__tests__/received-workspace-rendering.spec.tsx",
+      "canonical_sha256": "5ec5d16d902dd83da1a974b21b43cae40e597aae3a3df619a0e05b70b880296e",
+      "export_sha256": "5ec5d16d902dd83da1a974b21b43cae40e597aae3a3df619a0e05b70b880296e",
+      "previous_proposal_sha256": null,
+      "bytes": 4527,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/physics-glyphs/__tests__/unified-answer.spec.tsx",
+      "canonical_sha256": "7ecdd8346022e54f63c398e03dfc361d3708eb5b70397af19e877a9790c402c9",
+      "export_sha256": "7ecdd8346022e54f63c398e03dfc361d3708eb5b70397af19e877a9790c402c9",
+      "previous_proposal_sha256": null,
+      "bytes": 5297,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/physics-glyphs/__tests__/hydrogen-gas-answer.spec.tsx",
+      "canonical_sha256": "aa9bf6a556e31937b15ee6274a921d72486a4304e3aa94f3d7e87ee91844752a",
+      "export_sha256": "aa9bf6a556e31937b15ee6274a921d72486a4304e3aa94f3d7e87ee91844752a",
+      "previous_proposal_sha256": null,
+      "bytes": 2618,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "supersedes": [
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendArtifactWorkspace.tsx",
+      "prior_manifest": "SOURCE_ADDENDUM_FRIEND_BOARD_CANDIDATE.json",
+      "reason": "Pass the isolated store into the v3 renderer; previous board receipt remains a dated source snapshot."
+    }
+  ],
+  "review": [
+    "All ten source/test files read. Store supports injected identity/storage; transport registration, commands and acknowledgements use the injected store and reject changed-profile continuations.",
+    "V3 answer wrapper, renderer and sampled-layer display now accept the selected workspace store. Received-copy entry passes its isolated store; existing callers retain the default global store. Tests reproduce cross-workspace status and sidecar leakage before the fix.",
+    "Sampled layers remain declared bounded output, and generation detail text separates qualitative, reported, replayed and empirical claims. No solver, scientific contract, certificate or research input was changed.",
+    "Tests use synthetic display-only records for sidecar isolation; mocked renderer outputs fixed markers. Real shared scenario fixtures remain canonical dependencies, not copied external papers or datasets.",
+    "Production copies contain authored TS/React, no account content, media, tokens, or downloaded material. Client registration/steering is not invoked against live services."
+  ],
+  "limits": [
+    "Private source proposal; no commit, push, package or deployment.",
+    "Four production UI files changed after R378. They require next-package and installed qualification.",
+    "Shared physics contracts/operators/fixtures, sandbox, external packages and other client dependencies remain separate review inputs.",
+    "Mock/store tests do not prove scientific validity, empirical results, two-profile delivery, native context insertion or real installed tool connection."
+  ]
+}

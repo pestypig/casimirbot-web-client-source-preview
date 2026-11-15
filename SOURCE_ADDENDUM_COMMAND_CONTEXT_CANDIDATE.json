@@ -1,0 +1,106 @@
+{
+  "observed_at": "2026-11-13T22:16:17.629957+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/HelixAskSlashCommandCatalog.ts",
+      "canonical_sha256": "3ad83e34bd6ba82b331e1071eba4e52fd01dd0735f671abbb68dd97e3c86254f",
+      "export_sha256": "3ad83e34bd6ba82b331e1071eba4e52fd01dd0735f671abbb68dd97e3c86254f",
+      "bytes": 12338,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "3c0b11ae2ab4d98cb1ae4f34b5c49e8240f5cbe34184529accd8f20d59fde65c"
+    },
+    {
+      "path": "client/src/lib/agi/api.ts",
+      "canonical_sha256": "4a0db35c69d5be98c192c187913e793c3c60458627f2b81a22953e516a27e0ba",
+      "export_sha256": "16228b566d3798e6353872788d6f5c1e9c7b88f58a3c8593cce8c1c0b0cfee3b",
+      "bytes": 146033,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "775044be3030e26282e37da0bf3aa21c3eeb28074f0a80b8cbe482881ed30898"
+    },
+    {
+      "path": "client/src/components/workstation/DiscordSessionPanel.tsx",
+      "canonical_sha256": "52c1695dbd01321da53f738bfc12dcb64dbd2389c27fa97af0cc3a4e1d0284ce",
+      "export_sha256": "52c1695dbd01321da53f738bfc12dcb64dbd2389c27fa97af0cc3a4e1d0284ce",
+      "bytes": 8689,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "2c8e2e698601ee27de2c31007055391be14c022cdbbd2b55acf65117b8f9d5cc"
+    },
+    {
+      "path": "client/src/lib/i18n/messages/source.ts",
+      "canonical_sha256": "7ff9ca5e101a91bb142734b112cbbae58f58c2d82e7259945e767dc5b9bb12a2",
+      "export_sha256": "d2a31eb5ffedfc6f1854f860c096a010d9d84ec1b1d7c61c1a36260dd5721673",
+      "bytes": 2951752,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "67f5a4b0072252372cefa32376652249411c34c487890e9a53c9ba3dfe184ef0"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-ask-slash-command-menu.spec.tsx",
+      "canonical_sha256": "cb0f553cc345ff8ca4ba3e7bfc7603125c684593e625c39269b90f490e683cd0",
+      "export_sha256": "cb0f553cc345ff8ca4ba3e7bfc7603125c684593e625c39269b90f490e683cd0",
+      "bytes": 11404,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "09232658a8709038977d2a8203cbc678d33b393ffcac61f32c9c928571e6a4b1"
+    },
+    {
+      "path": "client/src/lib/agi/__tests__/api.physics-scenario-context.spec.ts",
+      "canonical_sha256": "04b6b1585c5bb8749a0917f6ea2dce5141f6a69e541e9fa7adb441e7486e8cad",
+      "export_sha256": "04b6b1585c5bb8749a0917f6ea2dce5141f6a69e541e9fa7adb441e7486e8cad",
+      "bytes": 3127,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/agent-run-observer/__tests__/useAgentRunObserver.spec.tsx",
+      "canonical_sha256": "0a75a8bdb00cf5ca813bfc23c6795d291382b305584715c87fe57a51835e1c92",
+      "export_sha256": "0a75a8bdb00cf5ca813bfc23c6795d291382b305584715c87fe57a51835e1c92",
+      "bytes": 9789,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "5dd2810a594d2e8b53cf2ad82dbe3fad5fb1b6d00b0fc9788814973368bb8e9c"
+    },
+    {
+      "path": "client/src/lib/helix/workflow-demos/__tests__/research-paper-to-proposal.spec.ts",
+      "canonical_sha256": "0426fcfb2608e755d47bb303d503fde5b037d2f5a267f43b7d26af0f8d2374c5",
+      "export_sha256": "0426fcfb2608e755d47bb303d503fde5b037d2f5a267f43b7d26af0f8d2374c5",
+      "bytes": 18763,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "c7524df0f5ccace9d5a21f4035cd32d3524b111b2d7bcf11383643711ea1b2ce"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/workstation/physicsGlyphAskContext.ts",
+      "canonical_sha256": "c13310d44b7e705ff735bf75d11e046e7332fcbba434bc578d8b045005f4f781",
+      "export_sha256": "c13310d44b7e705ff735bf75d11e046e7332fcbba434bc578d8b045005f4f781",
+      "bytes": 1288,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/AccountSessionPanel.i18n.spec.tsx",
+      "canonical_sha256": "ad6c1a026466478edaa4faf73476094afdceeca6fd65e1a8a5542e37c8f6d09a",
+      "export_sha256": "aaa621d7c1f09d59506c0393115948519730160f41aaf8225096ff27b9b8003f",
+      "bytes": 17018,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed all selected deltas against the proposal, the complete slash-command catalog, Physics Glyph context helper and request-boundary suite, Ask body-builder integration, Discord panel, changed persistence/capability assertions and changed source-language labels. Retained large API/i18n modules were reviewed at their changed boundaries rather than claimed as entirely requalified.",
+    "Unresolved command policy defaults to signed-out discovery. A panel fallback is allowed only for a missing capability and an admitted non-developer panel; it cannot override an explicit capability lock or an excluded/locked panel. Selecting a menu item inserts a prompt scaffold and does not execute a tool.",
+    "Both streamed and non-streamed Ask requests attach the explicitly connected same-profile Physics Glyph peer as context, preserve the question, strip stale Glyph context and respect isolated mode. The client metadata adds no workstation action or mandatory tool. Extended existing tests so all three negative conditions run at both request boundaries.",
+    "The observer persistence fixture now uses the account-scoped chat storage key. The workflow-demo policy fixture checks the existing wildcard public panel policy. These are test migrations, not newly granted authority.",
+    "DiscordSessionPanel adds only a redundant React fragment around its existing section. Source-language Account labels distinguish active installation command sessions from a remembered website account link and direct users to Discord status. No new Discord endpoint, operation or permission was added.",
+    "The unchanged account-scoped Glyph helper and Account panel localization suite retain indexed byte parity. Tests use mocked network/native boundaries and canonical unselected dependencies.",
+    "The isolated export API suite exposed an incomplete full account-policy mock. Its fixture now imports the real module exports and overrides only profile identity; eight request checks pass without changing production code."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal. Existing private runtime changes are not newly installed by this export; no runtime source was edited in this cohort.",
+    "Only the request-boundary test matrix was extended, adding three streamed negative cases. No real inference, scenario, stream send, room action or physics verification occurred.",
+    "Context attachment is presentation metadata, not a verified Physics Glyph certificate, independent-copy test or game-action grant. Those goal requirements retain their own acceptance evidence.",
+    "The retained Discord diagnostic polling component has no new lifecycle qualification here. Native/server identity, full application typechecking, installed account-switch delivery and provider funding remain separate.",
+    "Export tests use selected production modules with other dependencies from canonical source; scoped compilation is not a complete exported application build.",
+    "Five intentional support-contact matches elsewhere remain for exact public-candidate owner review."
+  ]
+}

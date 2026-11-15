@@ -1,0 +1,118 @@
+{
+  "observed_at": "2026-11-13T18:34:54.246443+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/agent-access/ConnectionHealthPanel.tsx",
+      "canonical_sha256": "b20101316cebab97dfbb2279b858ffa7592f8945cd8b45416f6d808e492cca2a",
+      "export_sha256": "b20101316cebab97dfbb2279b858ffa7592f8945cd8b45416f6d808e492cca2a",
+      "bytes": 22482,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/ConnectionHealthPanel.spec.tsx",
+      "canonical_sha256": "e3fe86a87f9cbb2ee444dee2982e65deb93e27f1e518685f5b3eea4126eb18bd",
+      "export_sha256": "e3fe86a87f9cbb2ee444dee2982e65deb93e27f1e518685f5b3eea4126eb18bd",
+      "bytes": 19194,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/CaptainKeyesTaskAccess.tsx",
+      "canonical_sha256": "c5951a216af77ebb72b1a0b43aacf07dad75287811cea5bc190bcde6591a92ee",
+      "export_sha256": "c5951a216af77ebb72b1a0b43aacf07dad75287811cea5bc190bcde6591a92ee",
+      "bytes": 15296,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/CaptainKeyesTaskAccess.spec.tsx",
+      "canonical_sha256": "d0d4fd4afee31189af0cf3d31c8877f71ebff98cef4b0af2cf8cc82e458a1029",
+      "export_sha256": "d0d4fd4afee31189af0cf3d31c8877f71ebff98cef4b0af2cf8cc82e458a1029",
+      "bytes": 14349,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/agent-access/connectionHealth.ts",
+      "canonical_sha256": "fe79e4d55a44a86f7edc42eac05c84a225bb427c1fdd6f2607e58657f366c55e",
+      "export_sha256": "fe79e4d55a44a86f7edc42eac05c84a225bb427c1fdd6f2607e58657f366c55e",
+      "bytes": 16949,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/agent-access/connectionHealthMemory.ts",
+      "canonical_sha256": "21e4ae8434498a24144c4d528fc0b0f1cd3210336771cb4a08c028f127e15f8e",
+      "export_sha256": "21e4ae8434498a24144c4d528fc0b0f1cd3210336771cb4a08c028f127e15f8e",
+      "bytes": 2990,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/lib/agent-access/__tests__/connectionHealth.spec.ts",
+      "canonical_sha256": "2d3164d10a8d3e6dd8c9f4206467e1030b6abbdccf4b465e0dbca23c40b15857",
+      "export_sha256": "2d3164d10a8d3e6dd8c9f4206467e1030b6abbdccf4b465e0dbca23c40b15857",
+      "bytes": 11145,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/agent-access/LiveConnectionSettings.tsx",
+      "canonical_sha256": "dc2eace20c8be5ee1e4285aab4e27311eb4a7e3f56f193599202911c676b4302",
+      "export_sha256": "dc2eace20c8be5ee1e4285aab4e27311eb4a7e3f56f193599202911c676b4302",
+      "bytes": 12857,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/LiveConnectionSettings.spec.tsx",
+      "canonical_sha256": "a9375237180f5b6acff14e40c44d3946dc516b1407742e2e97da9c55def6d374",
+      "export_sha256": "a9375237180f5b6acff14e40c44d3946dc516b1407742e2e97da9c55def6d374",
+      "bytes": 5961,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/GeminiConnectionSettings.tsx",
+      "canonical_sha256": "cf57de16306c682c732dfd3378865bad60ef1ede26482b545372b25eb89b8559",
+      "export_sha256": "cf57de16306c682c732dfd3378865bad60ef1ede26482b545372b25eb89b8559",
+      "bytes": 8428,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/GeminiConnectionSettings.spec.tsx",
+      "canonical_sha256": "2affeae17200a7d7479a53eb528134eb7c2a452273e7563f2fa9a5cb83e537e9",
+      "export_sha256": "2affeae17200a7d7479a53eb528134eb7c2a452273e7563f2fa9a5cb83e537e9",
+      "bytes": 3159,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/LiveConnectionEvents.ts",
+      "canonical_sha256": "81e9138f8a5885edf1d4d786274b82442cdf7c412b6a013a010d6bde4c18f328",
+      "export_sha256": "20ac160a4450322b54e801fbec56fff9fa073a23446cf91baacdbbe7f6daa03f",
+      "bytes": 188,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Read the complete personal OpenAI/Gemini settings and suites, ConnectionHealthPanel/provider and suite, CaptainKeyesTaskAccess and suite, health projection/memory helpers and their shared suite. The key settings, their tests and connection event constant are unchanged from the public preview (five files). Seven new files are proposed.",
+    "Personal keys are submitted only through the explicit native bridge. Password inputs clear before submission, account events clear drafts/state, and generations ignore late results. Key save, read-only model check, managed chat test and optional Gemini diagnostic remain distinct. No real key was read or saved; tests contain named dummy values only.",
+    "Connection health separates selected route/purpose, local transport/computer approval, OAuth, fresh authenticated presence, exact task, pairing, runtime binding, catalog and package selection. Presence must be fresh and identity matched; a missing registration alone does not revoke pairing. Health observation does not renew grants, pair or start work. Idle personal presence is unverified, not proof of revocation.",
+    "Health memory admits hashes and validated build labels only. Notifications require opt-in and same-account prior evidence, are deduplicated and time bounded, and stay quiet on owner Stop. Tests mock cryptographic hashing and native/HTTP reads; exact native identity is not established by those mocks.",
+    "Captain Keyes reads status on mount. Saved configuration and task inspection are explicit, owner matched and schema checked; write-scoped Stop requires an inspected task and an unknown result disables automatic retry. Exact operations, sources, audience, reasoning host, budget and persistent redirect effects are shown for private website review.",
+    "Reproduced two late authorization failures after account invalidation/unmount. Added a generation guard before forwarding a returned authorization URL to the native bridge; both regressions and existing authorization test pass. No approval or native/server authority was changed."
+  ],
+  "limits": [
+    "Private unfrozen source proposal; no publication, provider key operation, real notification, task mutation, model call or native authorization occurred.",
+    "Fifty-four mocked tests in five files qualify selected source behavior. They do not establish installed native custody, provider billing/access, OAuth, real Windows notifications or signed-update acceptance.",
+    "ManagedConversationPreview was read as a dependency, but its hook/runtime and full private conversation behavior remain separate source/acceptance work. The unchanged key suites use those canonical dependencies.",
+    "Captain Keyes task-selection changes during an outstanding inspect, competing status reads and disconnect finalizer concurrency remain separate qualification; only late authorization dispatch was changed.",
+    "Health projection shared contracts/account-policy/native bindings remain separately reviewed inputs. Storage-denied behavior, native-event identity and real browser/account concurrency are not qualified here.",
+    "Five intentional support-contact matches inherited from prior candidates remain in the final owner publication review."
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "observed_at": "2026-11-13T14:10:55.280305+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendsConnectionRecovery.tsx",
+      "canonical_sha256": "bba31b9551561d3761623580688c94d5becb34dd3886cc89c2ddba1401f78132",
+      "export_sha256": "bba31b9551561d3761623580688c94d5becb34dd3886cc89c2ddba1401f78132",
+      "previous_public_sha256": null,
+      "bytes": 4148,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/useFriendPanelSelection.ts",
+      "canonical_sha256": "ef2191d78872d66cf197ad16cbd09171599ad5225a448a8d278f6e0d1aefe2d4",
+      "export_sha256": "ef2191d78872d66cf197ad16cbd09171599ad5225a448a8d278f6e0d1aefe2d4",
+      "previous_public_sha256": null,
+      "bytes": 1128,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendStreamsApi.ts",
+      "canonical_sha256": "ce8fc3d34e19d74792fa701a13192607a7c57c8d4f7a1a15d6b5b22693c0faff",
+      "export_sha256": "ce8fc3d34e19d74792fa701a13192607a7c57c8d4f7a1a15d6b5b22693c0faff",
+      "previous_public_sha256": null,
+      "bytes": 3294,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/useFriendStreamPublisher.ts",
+      "canonical_sha256": "92e3bc126a0b6ffe4f542dcfa7d7ade6d17cf7ed37e14218d967cf97aa4372f1",
+      "export_sha256": "92e3bc126a0b6ffe4f542dcfa7d7ade6d17cf7ed37e14218d967cf97aa4372f1",
+      "previous_public_sha256": null,
+      "bytes": 10144,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/FriendStreamsPanel.tsx",
+      "canonical_sha256": "26b46708bd9f4f497aabe61991f7fa0a46e69e434e27ce6213c78fe340a901e0",
+      "export_sha256": "26b46708bd9f4f497aabe61991f7fa0a46e69e434e27ce6213c78fe340a901e0",
+      "previous_public_sha256": null,
+      "bytes": 16133,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/FriendsConnectionRecovery.spec.tsx",
+      "canonical_sha256": "6c04675d2664ec3f19718ab1fde7e198d1cd32b7502d7f67c8945c2705cf0d8a",
+      "export_sha256": "6c04675d2664ec3f19718ab1fde7e198d1cd32b7502d7f67c8945c2705cf0d8a",
+      "previous_public_sha256": null,
+      "bytes": 5110,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/FriendStreamsApi.spec.ts",
+      "canonical_sha256": "5c5719e2aab9a0e7475ec58a73edb01688d819186275478b235342fd676feaf8",
+      "export_sha256": "5c5719e2aab9a0e7475ec58a73edb01688d819186275478b235342fd676feaf8",
+      "previous_public_sha256": null,
+      "bytes": 1825,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/FriendStreamPublisher.spec.tsx",
+      "canonical_sha256": "bd94e938b3c2bcd020c51e6cd5a1d4b5a30bbd36327d0054b967de124d00cc9a",
+      "export_sha256": "bd94e938b3c2bcd020c51e6cd5a1d4b5a30bbd36327d0054b967de124d00cc9a",
+      "previous_public_sha256": null,
+      "bytes": 9209,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/friends-parties/__tests__/FriendStreamsPanel.spec.tsx",
+      "canonical_sha256": "07a336c149b9a203483bf7c489278f286627243c6450727e0c7f07dc0b1e5ebc",
+      "export_sha256": "07a336c149b9a203483bf7c489278f286627243c6450727e0c7f07dc0b1e5ebc",
+      "previous_public_sha256": null,
+      "bytes": 11597,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "All nine complete files read: authored React UI, stream requests/publisher, volatile account-scoped navigation choices and synthetic tests. No third-party copied assets included.",
+    "Sharing requires an explicit source/audience action. Automatic publication baselines prior output, excludes user prompts/import markers, binds requests to publishing revision and installation, and checks account revision around awaits. Server authorization remains a separate boundary.",
+    "Receiving requires an explicit destination and follow action. Codex binding identity/epoch and native installation are rechecked at follow; API run selection does not start or fund a model.",
+    "Source revoke remains local even when remote retirement fails; guidance distinguishes local stop from unconfirmed remote removal. Account switch drops local publishing; remote lease expiry remains server-owned.",
+    "Friends recovery starts PKCE only after a click, filters room-purpose callbacks, aborts outstanding requests on stop/unmount and presents actionable timeout/scope/account guidance without displaying the synthetic authorization URL.",
+    "Fixtures use alice/bob, example.auth0.com, dummy UUIDs and named fake bindings/runs; fetch/native operations are mocked. No real profile, conversation content, invite or credential included."
+  ],
+  "limits": [
+    "Private source proposal only; no commit, push, package or deployment.",
+    "Parent Friends panel, account/binding helpers and shared contracts remain separate review inputs; this addition is not a standalone application.",
+    "Synthetic component checks do not prove two-profile delivery, room membership cutoff, funded Agent API receive, signed installation, native background timing or real OAuth consent.",
+    "Navigation preferences persist within the current renderer/account revision, not across full application restart."
+  ]
+}

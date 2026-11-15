@@ -615,7 +615,7 @@ export default function RealtimeTexturePackControls() {
         <div className="rounded-lg border border-sky-300/15 bg-sky-950/15 p-3" data-testid="realtime-texture-pack-provider-controls">
           <label className="block text-xs text-slate-300">
             Image provider
-            <select
+            <select data-helix-control-id="workstation.panel.image-lens.realtime-texture-pack-controls.realtime-texture-pack-image-provider" data-helix-interaction-kind="configure" data-helix-authority-state="client_local"
               aria-label="Realtime Texture Pack image provider"
               value={providerChoice}
               disabled={captureActive || falBusy}
@@ -635,7 +635,7 @@ export default function RealtimeTexturePackControls() {
                 </div>
               </div>
               <label className="flex items-start gap-2 rounded border border-white/10 p-2">
-                <input
+                <input data-helix-control-id="workstation.panel.image-lens.realtime-texture-pack-controls.acknowledge-external-frame-egress" data-helix-interaction-kind="configure" data-helix-authority-state="client_local"
                   type="checkbox"
                   aria-label="Acknowledge external frame egress"
                   checked={falEgressAcknowledged}
@@ -645,7 +645,7 @@ export default function RealtimeTexturePackControls() {
                 <span>I understand each accepted source frame is sent to fal for image transformation.</span>
               </label>
               <label className="flex items-start gap-2 rounded border border-white/10 p-2">
-                <input
+                <input data-helix-control-id="workstation.panel.image-lens.realtime-texture-pack-controls.acknowledge-billable-provider-calls" data-helix-interaction-kind="configure" data-helix-authority-state="client_local"
                   type="checkbox"
                   aria-label="Acknowledge billable provider calls"
                   checked={falBillingAcknowledged}
@@ -655,7 +655,7 @@ export default function RealtimeTexturePackControls() {
                 <span>I approve this one attended session only: at most 60 seconds, 60 requests, and USD $1.00.</span>
               </label>
               <div className="grid grid-cols-2 gap-2">
-                <button
+                <button data-helix-control-id="workstation.panel.image-lens.realtime-texture-pack-controls.void-handle-arm-fal" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
                   type="button"
                   onClick={() => void handleArmFal()}
                   disabled={!captureActive || !falReadiness?.ready_for_attended_arm || !falEgressAcknowledged || !falBillingAcknowledged || falBusy || Boolean(falSession)}
@@ -663,7 +663,7 @@ export default function RealtimeTexturePackControls() {
                 >
                   {falBusy ? "Arming…" : "Arm attended API"}
                 </button>
-                <button
+                <button data-helix-control-id="workstation.panel.image-lens.realtime-texture-pack-controls.stop-provider" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local"
                   type="button"
                   onClick={() => void stopFalSession("user_provider_stop")}
                   disabled={!falSession || falBusy}
@@ -793,7 +793,7 @@ export default function RealtimeTexturePackControls() {
             </div>
             <label className="flex items-center gap-2 text-[11px] text-fuchsia-100">
               Agent control
-              <input
+              <input data-helix-control-id="workstation.panel.image-lens.realtime-texture-pack-controls.enable-agent-visual-direction-control" data-helix-interaction-kind="configure" data-helix-authority-state="client_local"
                 type="checkbox"
                 aria-label="Enable agent visual direction control"
                 checked={visualDirectionControlEnabled}
@@ -809,13 +809,13 @@ export default function RealtimeTexturePackControls() {
           <div className="mt-3 grid gap-2 text-[10px]">
             <label className="text-slate-300">
               Visual source
-              <select aria-label="Visual direction source" disabled className="mt-1 w-full rounded border border-white/10 bg-slate-950 px-2 py-1.5 text-slate-300">
+              <select data-helix-control-id="workstation.panel.image-lens.realtime-texture-pack-controls.visual-direction-source" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Visual direction source" disabled className="mt-1 w-full rounded border border-white/10 bg-slate-950 px-2 py-1.5 text-slate-300">
                 <option>Captured game/window (user chosen)</option>
               </select>
             </label>
             <label className="text-slate-300">
               Environment context
-              <select aria-label="Visual direction environment" disabled className="mt-1 w-full rounded border border-white/10 bg-slate-950 px-2 py-1.5 text-slate-300">
+              <select data-helix-control-id="workstation.panel.image-lens.realtime-texture-pack-controls.visual-direction-environment" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Visual direction environment" disabled className="mt-1 w-full rounded border border-white/10 bg-slate-950 px-2 py-1.5 text-slate-300">
                 <option>None — static prompt fallback</option>
               </select>
             </label>
@@ -825,7 +825,7 @@ export default function RealtimeTexturePackControls() {
             <div className="grid grid-cols-2 gap-2">
               <label className="text-slate-300">
                 Direction mode
-                <select aria-label="Visual direction mode" value="static_prompt_only" disabled className="mt-1 w-full rounded border border-white/10 bg-slate-950 px-2 py-1.5 text-slate-300">
+                <select data-helix-control-id="workstation.panel.image-lens.realtime-texture-pack-controls.visual-direction-mode" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" aria-label="Visual direction mode" value="static_prompt_only" disabled className="mt-1 w-full rounded border border-white/10 bg-slate-950 px-2 py-1.5 text-slate-300">
                   <option value="static_prompt_only">Static prompt</option>
                   <option value="environment_reactive">Environment reactive</option>
                 </select>
@@ -833,7 +833,7 @@ export default function RealtimeTexturePackControls() {
               <div className="text-slate-300">
                 Output target
                 <label className="mt-1 flex h-[30px] items-center gap-2 rounded border border-white/10 bg-slate-950 px-2">
-                  <input type="checkbox" checked readOnly /> Overlay
+                  <input data-helix-control-id="workstation.panel.image-lens.realtime-texture-pack-controls.input.2" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" type="checkbox" checked readOnly /> Overlay
                 </label>
               </div>
             </div>
@@ -842,7 +842,7 @@ export default function RealtimeTexturePackControls() {
               <div className="mt-1 grid grid-cols-3 gap-1">
                 {["dimension", "biome", "time", "weather", "activity", "hazards", "focus", "workflow"].map((family) => (
                   <label key={family} className="flex items-center gap-1 rounded border border-white/10 px-1.5 py-1 text-slate-300">
-                    <input
+                    <input data-helix-control-id="workstation.panel.image-lens.realtime-texture-pack-controls.input.3" data-helix-interaction-kind="configure" data-helix-authority-state="client_local"
                       type="checkbox"
                       checked={visualDirection.enabled_cue_families.includes(family)}
                       onChange={() => toggleCueFamily(family)}
@@ -853,8 +853,8 @@ export default function RealtimeTexturePackControls() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button type="button" onClick={() => setPinnedByUser(true)} disabled={visualDirection.pinned} className="flex-1 rounded border border-white/15 px-2 py-1.5 text-slate-200 disabled:opacity-40">Pin direction</button>
-              <button type="button" onClick={() => setPinnedByUser(false)} disabled={!visualDirection.pinned} className="flex-1 rounded border border-white/15 px-2 py-1.5 text-slate-200 disabled:opacity-40">Resume dynamic</button>
+              <button data-helix-control-id="workstation.panel.image-lens.realtime-texture-pack-controls.pin-direction" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" onClick={() => setPinnedByUser(true)} disabled={visualDirection.pinned} className="flex-1 rounded border border-white/15 px-2 py-1.5 text-slate-200 disabled:opacity-40">Pin direction</button>
+              <button data-helix-control-id="workstation.panel.image-lens.realtime-texture-pack-controls.resume-dynamic" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" onClick={() => setPinnedByUser(false)} disabled={!visualDirection.pinned} className="flex-1 rounded border border-white/15 px-2 py-1.5 text-slate-200 disabled:opacity-40">Resume dynamic</button>
             </div>
             <details className="rounded border border-white/10 bg-black/20 p-2">
               <summary className="cursor-pointer text-slate-300">Compiled prompt preview</summary>

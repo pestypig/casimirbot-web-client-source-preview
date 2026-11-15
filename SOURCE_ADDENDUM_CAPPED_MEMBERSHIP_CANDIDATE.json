@@ -1,0 +1,121 @@
+{
+  "observed_at": "2026-11-13T18:05:27.097456+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/account/CappedMembershipLedgerStatus.tsx",
+      "canonical_sha256": "2126f3150cbe92e39effa86a97d8c2ae69a0bac284308f1d972d4d17c7d7f0e8",
+      "export_sha256": "99b62e5e9ad63aa78f0999f7aea316d95035a3e6cc9f413e30d68a4721a7fc6a",
+      "bytes": 18885,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/CappedMembershipCancellation.tsx",
+      "canonical_sha256": "5c56b5847333efceee5cd58d3814c4007ef1a331c07ef497e57fb1de0e11da9c",
+      "export_sha256": "7152eead08de51e5a57fde5763f00e06136465e1499c2235f88749e70dbe661f",
+      "bytes": 4607,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/CappedMembershipSandboxCheckout.tsx",
+      "canonical_sha256": "4095206dbd614948655fa30707fa018e48b151b05b8cf57079e16eea0c629b00",
+      "export_sha256": "4095206dbd614948655fa30707fa018e48b151b05b8cf57079e16eea0c629b00",
+      "bytes": 10879,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/CappedMembershipAgentProbe.tsx",
+      "canonical_sha256": "62c281596cb792c1da3c5d117d96b7d4ee69dbfc55e1c12cfdf42e98ec02175c",
+      "export_sha256": "62c281596cb792c1da3c5d117d96b7d4ee69dbfc55e1c12cfdf42e98ec02175c",
+      "bytes": 3817,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/CappedMembershipLiveProbe.tsx",
+      "canonical_sha256": "ccfdca2bbb980b24538f9a390d1995b4bd52a5ae767f3060505e87b79818a89f",
+      "export_sha256": "ccfdca2bbb980b24538f9a390d1995b4bd52a5ae767f3060505e87b79818a89f",
+      "bytes": 4230,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/CappedMembershipMeterSandboxDelivery.tsx",
+      "canonical_sha256": "75462b92a5699c630837b9d56f3f7ddcdf9f2a6c9ff3ff3361a56312cea36697",
+      "export_sha256": "75462b92a5699c630837b9d56f3f7ddcdf9f2a6c9ff3ff3361a56312cea36697",
+      "bytes": 4110,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/__tests__/CappedMembershipLedgerStatus.spec.tsx",
+      "canonical_sha256": "572e3940676fc7c46d36b53c7f098660b44781f6062f1629b35ad8b9fa968cb2",
+      "export_sha256": "caf97108082b5613cce6efd26194c4c37cecc277343d826376fe1a3ac166dffe",
+      "bytes": 13185,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/__tests__/CappedMembershipCancellation.spec.tsx",
+      "canonical_sha256": "778c7d20612dcd822aceb6222fc28516bf955d0858f1d09478ab6457ce87d8f8",
+      "export_sha256": "f93a9df6dcb292392231ff0472dc3e923fa82031c51b89a7df8bfe1487b26419",
+      "bytes": 2053,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/__tests__/CappedMembershipSandboxCheckout.test.tsx",
+      "canonical_sha256": "9be914acfc95c402b261082b0967a297c8c5773bdd858e119f5b06d50d447140",
+      "export_sha256": "9be914acfc95c402b261082b0967a297c8c5773bdd858e119f5b06d50d447140",
+      "bytes": 7769,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/__tests__/CappedMembershipAgentProbe.spec.tsx",
+      "canonical_sha256": "401d16a96dde2674d5b64ee09a3aab834a8ad9553586fe87850782baeac7b584",
+      "export_sha256": "401d16a96dde2674d5b64ee09a3aab834a8ad9553586fe87850782baeac7b584",
+      "bytes": 1932,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/__tests__/CappedMembershipLiveProbe.test.tsx",
+      "canonical_sha256": "bbd7009ff0dc9bb2542b9f63319f73f4fde9d4f0a93824dda04a18071a16ca7a",
+      "export_sha256": "bbd7009ff0dc9bb2542b9f63319f73f4fde9d4f0a93824dda04a18071a16ca7a",
+      "bytes": 2888,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/account/__tests__/CappedMembershipMeterSandboxDelivery.test.tsx",
+      "canonical_sha256": "9f4993d5990c4b6b19f1000aa514ea0941782ec3f1f58fc7b62c925387a17dca",
+      "export_sha256": "9f4993d5990c4b6b19f1000aa514ea0941782ec3f1f58fc7b62c925387a17dca",
+      "bytes": 2984,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Read all six first-party capped-membership components and six test suites. Private sandbox/test controls require admitted status responses. Fixed review text describes base/included allowance, total cap, metered use, renewal/cancellation and test-only status. No legal, production-pricing or payment-processor qualification is inferred from this source review.",
+    "Ledger parser validates finite dates, currencies, nonnegative safe integer totals and cap arithmetic. Amount input converts decimal strings to exact minor units. Cap POSTs carry exact period, expected cap, reviewed next cap, disclosure revision and a stable retry ID for unchanged input. Increasing requires a distinct checkbox.",
+    "Reproduced and fixed consent/receipt state crossing paid periods with equal caps. A period-keyed inner form now discards prior drafts, checkbox consent and late UI receipts. Four added cases cover period replacement, delayed result and confirmed changes whose follow-up ledger read fails. Unknown mutation responses no longer claim the cap is unchanged.",
+    "Sandbox checkout validates the fixed test offer and Stripe HTTPS checkout origin, retains a stable browser attempt and separates a return selector from server reconciliation. Existing open sessions are restored read-only. Cancellation/payment-method UI checks exact period/test availability and opens only the Stripe billing origin; the user completes any processor decision there.",
+    "Responses, silent Live and usage-meter probes require explicit checkboxes and one-shot local attempt state. Responses is fixed/no-tool and bounded; silent Live sends no microphone/Discord audio and cannot qualify paid voice. Meter delivery submits the exact reviewed event without model work. Failed or uncertain probe delivery stays non-repeatable in the mounted control.",
+    "The source intentionally includes an author-specified support contact in the ledger display and download, with matching tests. It is a new public-source contact, not a provider credential; retain it in the exact-candidate owner publication review. No third-party source was copied."
+  ],
+  "limits": [
+    "Private unfrozen source proposal; no Stripe request, model call, payment, cap change or subscription operation performed during these tests.",
+    "Twenty-nine mocked tests verify component behavior, not production billing, budget enforcement, external receipts, legal terms or installed ordinary-account acceptance. All paid/provider routes remain separate server qualification boundaries.",
+    "The cap form lifecycle fix is newer than R380 and requires installed acceptance. Its period reset does not cancel an already issued server mutation; the exact old-period request and server checks remain responsible for settlement.",
+    "Account portal integration remains held. Cross-account checkout/recovery callbacks, provider/meter state across remount, signed deployment and processor reconciliation still require end-to-end acceptance.",
+    "The intentional support contact requires inclusion in the final owner-reviewed publication candidate. It was absent from the compared public web base; source staging is not publication approval."
+  ]
+}

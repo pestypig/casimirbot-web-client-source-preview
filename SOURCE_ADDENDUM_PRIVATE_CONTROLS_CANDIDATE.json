@@ -1,0 +1,123 @@
+{
+  "observed_at": "2026-11-13T22:38:46.556868+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/PrivateManagedDiscordVoice.tsx",
+      "canonical_sha256": "9f38c5dc5c756f392ddae19d1c5455d20b9088b27ee74bd71d0a465f6c5857c7",
+      "export_sha256": "9f38c5dc5c756f392ddae19d1c5455d20b9088b27ee74bd71d0a465f6c5857c7",
+      "bytes": 6880,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/isolatedSpeechWav.ts",
+      "canonical_sha256": "fbe3ac7bee71d8a27a33f7162bfa946889ffb18c26b90ff111433623f7a5dfbc",
+      "export_sha256": "fbe3ac7bee71d8a27a33f7162bfa946889ffb18c26b90ff111433623f7a5dfbc",
+      "bytes": 1111,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/workstation/DeveloperConnectorGuide.tsx",
+      "canonical_sha256": "7452de65b991fdbb260d022aef6e54b570a027e44abaac4f3866d94c2000d5a8",
+      "export_sha256": "7452de65b991fdbb260d022aef6e54b570a027e44abaac4f3866d94c2000d5a8",
+      "bytes": 3473,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/workstation/LocalConnectorPackageInspection.tsx",
+      "canonical_sha256": "a082cea4f1a0d337893c174a5dbd72b028c9b6fd5914e50a372cc9c250f72ec4",
+      "export_sha256": "a082cea4f1a0d337893c174a5dbd72b028c9b6fd5914e50a372cc9c250f72ec4",
+      "bytes": 6416,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/workstation/ReviewedConnectorImport.tsx",
+      "canonical_sha256": "250ac98560e30706ba8ac8feb544489622058de9d191f9622c7bea6fe706e4ec",
+      "export_sha256": "250ac98560e30706ba8ac8feb544489622058de9d191f9622c7bea6fe706e4ec",
+      "bytes": 6266,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/PrivateManagedDiscordVoice.spec.tsx",
+      "canonical_sha256": "5a32908500024a499c07d3c71068d040575647a87437a6ed31199cad4bf45eb9",
+      "export_sha256": "5a32908500024a499c07d3c71068d040575647a87437a6ed31199cad4bf45eb9",
+      "bytes": 6704,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/PrivateManagedDiscordVoice.test.ts",
+      "canonical_sha256": "2569649476f55bbd0de6b1fb3df3885bae439e89907062a1cd9f550f83067443",
+      "export_sha256": "2569649476f55bbd0de6b1fb3df3885bae439e89907062a1cd9f550f83067443",
+      "bytes": 2762,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/isolatedSpeechWav.spec.ts",
+      "canonical_sha256": "e730a4f1196dc2138d9ed4b1f6f4134d4f38c7a9d6545d8e49d980612e2f4920",
+      "export_sha256": "e730a4f1196dc2138d9ed4b1f6f4134d4f38c7a9d6545d8e49d980612e2f4920",
+      "bytes": 759,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/DeveloperConnectorGuide.spec.tsx",
+      "canonical_sha256": "3eef49cafabc29e1823ccb6eedcaa50ff513f7efe8cffebd19cd7555880aa716",
+      "export_sha256": "3eef49cafabc29e1823ccb6eedcaa50ff513f7efe8cffebd19cd7555880aa716",
+      "bytes": 2780,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/LocalConnectorPackageInspection.spec.tsx",
+      "canonical_sha256": "92edfc338191f0c08985335b226bc92aa554db8a90c3507e95c4d349d58e1c91",
+      "export_sha256": "92edfc338191f0c08985335b226bc92aa554db8a90c3507e95c4d349d58e1c91",
+      "bytes": 6081,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/ReviewedConnectorImport.spec.tsx",
+      "canonical_sha256": "55732ba3b39d2216b1b4009e6c8b320b72395f5d90b49ae91d94f0ade9a642b8",
+      "export_sha256": "55732ba3b39d2216b1b4009e6c8b320b72395f5d90b49ae91d94f0ade9a642b8",
+      "bytes": 8418,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/RoomReviewScope.tsx",
+      "canonical_sha256": "d9117e85479c13dd0315c08a3f8047b0cea37147aad61f8af0bd551cf9cae6cf",
+      "export_sha256": "d9117e85479c13dd0315c08a3f8047b0cea37147aad61f8af0bd551cf9cae6cf",
+      "bytes": 1816,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Read all five selected runtime modules and six suites, plus the unchanged scoped review boundary and shared guide content. This is a client source cohort; native provider, installer and shared contracts retain separate source/acceptance scopes.",
+    "Managed Discord voice is explicitly a private paid-sandbox check. It requires the exact approved task, installation and review revision, matching room scope, current invitation lease and duration. The UI caps duration to the shortest approval/lease/scope bound and ten minutes. Native/domain/worker consent and funding checks remain authoritative.",
+    "Runtime fix 41 uses the existing room/account review boundary around probe, binding, approval-body and native-call continuations. Six failures reproduced before the change: late binding or approval reads after room change, account change or unmount could reach native start. All now stop before invoking that path.",
+    "The PCM helper accepts complete bounded 48 kHz stereo PCM16 frames and wraps them in WAV. Its tests validate the result with the existing native WAV validator and reject incomplete/oversized segments; no real speech or transcription request was used.",
+    "Developer guidance copies only an explicit prompt or source URL and labels checkout-only tooling and unproven public import/action capability. Local package inspection requires explicit file selection, compares SHA-256 locally, and never uploads, extracts, installs or grants trust.",
+    "Reviewed connector import uses a separate fixed-review native prototype. It parses strict native state, waits for explicit import/remove, keeps installed code stopped, clears stale account/bridge results and preserves removal after review expiry. Unmount cancels only a pending mutation, not a read-only inspection.",
+    "Thirty-three mocked tests cover these paths. The actual inspection helper is mocked in UI tests; integrity/compatibility/native ordinary-account acceptance remains independently required."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal; fix 41 and earlier post-R380 changes remain uninstalled.",
+    "No microphone, Discord session, provider billing, audio playback, archive import, executable download or real native approval occurred.",
+    "Already accepted native/provider operations are not undone by client retirement. Outcome reconciliation, cost settlement, participant consent and real revocation require native/service receipts.",
+    "Neither a matching archive checksum nor the private fixed-review import establishes general community adapter admission, capability registration, program grants or runtime execution.",
+    "The web preview omits separately scoped native/shared contracts. Export tests use canonical unselected dependencies, including the native WAV validator. They are not a full installed application acceptance run.",
+    "Five intentional support-contact matches elsewhere remain for the exact public-candidate review."
+  ]
+}

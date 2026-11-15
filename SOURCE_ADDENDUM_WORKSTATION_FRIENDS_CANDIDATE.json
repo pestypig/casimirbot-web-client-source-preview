@@ -1,0 +1,80 @@
+{
+  "observed_at": "2026-11-13T14:22:57.359062+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/workstation/HelixWorkstationShell.tsx",
+      "canonical_sha256": "db5f20a256a859769d0547de97309c14d9722dacd864478b450854292a66623f",
+      "export_sha256": "db5f20a256a859769d0547de97309c14d9722dacd864478b450854292a66623f",
+      "previous_public_sha256": "4f479476e7ff3b51a4387954837a154915fbe08ac4a47a47617df8038c467072",
+      "bytes": 30036,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "previous_public_sha256": "f05608d0d6070d7409dce28647f86d5610efd5dc63ffd6c1021703cf56380f00",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/__tests__/accountCapabilityPolicy.spec.ts",
+      "canonical_sha256": "16de24c238b74c4c03f9ba7ce794e2fe2b8bcd83f0bc2b4a7563efe0661c9178",
+      "export_sha256": "16de24c238b74c4c03f9ba7ce794e2fe2b8bcd83f0bc2b4a7563efe0661c9178",
+      "previous_public_sha256": "e476705e2af9b1c5e36cb97b57727d9d27433adf15b097b491529ede86e6f462",
+      "bytes": 7970,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_dependencies": [
+    {
+      "path": "client/src/lib/agent-access/reasoningTaskBinding.ts",
+      "canonical_sha256": "f950ec68608751279b054d5355080b540defba9d000f832d4f9fe21beac5c515",
+      "export_sha256": "9b4ab8631bf8c7e38f35a53d1b7ba5927f939c60a64a04ed81f398d94447c9dc",
+      "previous_public_sha256": "9b4ab8631bf8c7e38f35a53d1b7ba5927f939c60a64a04ed81f398d94447c9dc",
+      "bytes": 10336,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/agent-access/__tests__/reasoningTaskBinding.spec.ts",
+      "canonical_sha256": "2a67eb0af40c2aca44c9f455f0ed39e9c4b3a5ebcdbf701e0e985649f83e1b8f",
+      "export_sha256": "eed719bae4f8a9795f30638e39fdf6546e5e08cbde38dcbd1aec7244023502f6",
+      "previous_public_sha256": "eed719bae4f8a9795f30638e39fdf6546e5e08cbde38dcbd1aec7244023502f6",
+      "bytes": 3894,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-workstation-shell-mobile.spec.tsx",
+      "canonical_sha256": "cdccac1f0abaf40eaec2cfbc1e01f0016ed226478652b63088957f8b8d52faac",
+      "export_sha256": "cdccac1f0abaf40eaec2cfbc1e01f0016ed226478652b63088957f8b8d52faac",
+      "previous_public_sha256": "cdccac1f0abaf40eaec2cfbc1e01f0016ed226478652b63088957f8b8d52faac",
+      "bytes": 9028,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/__tests__/helix-workstation-shell-layout.spec.ts",
+      "canonical_sha256": "85cf48f1597c4e632470bf10d047b1b40025c060e03e271fa67956292a1438f5",
+      "export_sha256": "85cf48f1597c4e632470bf10d047b1b40025c060e03e271fa67956292a1438f5",
+      "previous_public_sha256": "85cf48f1597c4e632470bf10d047b1b40025c060e03e271fa67956292a1438f5",
+      "bytes": 4509,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "All changed hunks read: four shell lines attach the existing presence and explicit publisher hooks to workstation lifetime; the account-policy change uses the finite signed-out fallback when no current policy is available.",
+    "Full account policy module and tests read: pending reads cannot restore a previous profile or developer policy after sign-out, profile switch, role downgrade or cross-tab invalidation.",
+    "Exact-chat binding helper and its tests read in full and already match the public preview after newline normalization. Saved bindings are display/cache state, not authority; current inspection names the Helix chat and server requests retain exact binding/epoch fields.",
+    "Existing mobile tests exercise navigation, selected chat preservation, local rename/clear and overlay behavior. Layout tests partly inspect canonical source text and are not browser layout proof.",
+    "No real account, chat content, key or media copied. All new fixture data is synthetic. No new code generation, model request, pairing, consent or game action performed."
+  ],
+  "limits": [
+    "Private three-file source proposal; no source commit, public push, build or deployment.",
+    "Shell delta review only, with existing public baseline retained for the unchanged shell body. Other shell dependencies remain separate review inputs.",
+    "Local mocked and source-string checks do not qualify signed-account, real browser or installed behavior.",
+    "Source identity is not frozen; current main working-tree hashes identify these bytes."
+  ]
+}

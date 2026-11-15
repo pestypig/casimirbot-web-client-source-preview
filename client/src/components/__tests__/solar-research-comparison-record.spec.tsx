@@ -49,7 +49,7 @@ describe('operator-aware research record panel',()=>{
     act(()=>window.dispatchEvent(new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT)));
     await act(async()=>{finish(bundle);});
     expect(screen.queryByRole('table')).toBeNull();
-    expect(screen.queryByText('Retain comparison in developer profile')).toBeNull();
+    expect(screen.queryByText('Retain comparison in profile')).toBeNull();
     expect(screen.queryByText('Artifacts prepared locally; no file has been saved or published.')).toBeNull();
     expect(screen.queryByLabelText('Interconnected evidence index JSON')).toBeNull();
     expect(screen.getByText('Account changed; research record and derived artifacts cleared.')).toBeTruthy();
@@ -61,10 +61,10 @@ describe('operator-aware research record panel',()=>{
     select({size:100,text:async()=>JSON.stringify(record)});
     await waitFor(()=>expect(screen.getByRole('table')).toBeTruthy());
     fireEvent.click(screen.getByText('Prepare replay JSON and table CSV'));
-    await waitFor(()=>expect(screen.getByText('Retain comparison in developer profile')).toBeTruthy());
+    await waitFor(()=>expect(screen.getByText('Retain comparison in profile')).toBeTruthy());
     act(()=>window.dispatchEvent(new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT)));
     expect(screen.queryByRole('table')).toBeNull();
-    expect(screen.queryByText('Retain comparison in developer profile')).toBeNull();
+    expect(screen.queryByText('Retain comparison in profile')).toBeNull();
     let finish!:(text:string)=>void;
     select({size:100,text:()=>new Promise<string>(resolve=>{finish=resolve;})});
     act(()=>window.dispatchEvent(new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT)));
@@ -174,25 +174,30 @@ describe('operator-aware research record panel',()=>{
     select({size:100,text:async()=>JSON.stringify(record)});
     await waitFor(()=>expect(screen.getByRole('table')).toBeTruthy());
     fireEvent.click(screen.getByText('Prepare replay JSON and table CSV'));
-    await waitFor(()=>expect(screen.getByText('Retain comparison in developer profile')).toBeTruthy());
+    await waitFor(()=>expect(screen.getByText('Retain comparison in profile')).toBeTruthy());
     expect(fetcher).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByText('Retain comparison in developer profile'));
+    fireEvent.click(screen.getByText('Retain comparison in profile'));
     await waitFor(()=>expect(screen.getByText(/Retained in profile test-developer/)).toBeTruthy());
     expect(fetcher).toHaveBeenCalledTimes(2);
   });
-  it.skipIf(!present)('does not post retention for a public account',async()=>{
+  it.skipIf(!present)('posts retention for a signed-in ordinary owner',async()=>{
     vi.stubGlobal('crypto',webcrypto);
-    const fetcher=vi.fn(async()=>new Response(JSON.stringify({session:{profile:{profile_id:'public'}},account_policy:{account_type:'user'}})));
+    const fetcher=vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>{
+      if(String(input)==='/api/account/session')return new Response(JSON.stringify({session:{profile:{profile_id:'public'}},account_policy:{account_type:'user'}}));
+      const body=JSON.parse(String(init?.body));
+      return new Response(JSON.stringify({ok:true,saved:true,recordId:body.bundle.recordId,
+        scienceRunAllowed:false,admissionAllowed:false}));
+    });
     vi.stubGlobal('fetch',fetcher);
     render(<SolarResearchComparisonRecord />);
     const record=await loadLocalPrimaryObservation(process.cwd(),'2026-09-26T20:00:00Z');
     select({size:100,text:async()=>JSON.stringify(record)});
     await waitFor(()=>expect(screen.getByRole('table')).toBeTruthy());
     fireEvent.click(screen.getByText('Prepare replay JSON and table CSV'));
-    await waitFor(()=>expect(screen.getByText('Retain comparison in developer profile')).toBeTruthy());
-    fireEvent.click(screen.getByText('Retain comparison in developer profile'));
-    await waitFor(()=>expect(screen.getByText('A signed-in developer account is required for research retention')).toBeTruthy());
-    expect(fetcher).toHaveBeenCalledTimes(1);
+    await waitFor(()=>expect(screen.getByText('Retain comparison in profile')).toBeTruthy());
+    fireEvent.click(screen.getByText('Retain comparison in profile'));
+    await waitFor(()=>expect(screen.getByText(/Retained in profile public/)).toBeTruthy());
+    expect(fetcher).toHaveBeenCalledTimes(2);
   });
   it('starts without fabricated observations or scores',()=>{
     render(<SolarResearchComparisonRecord />);

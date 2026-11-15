@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 import {
   CreditCard,
@@ -37,6 +37,12 @@ import {
   helixBillingEntitlementSchema,
   type HelixBillingEntitlement,
 } from "@shared/helix-billing-entitlement";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from
+  "@/components/ui/dialog";
+import { LiveConnectionSettings } from "@/components/agent-access/LiveConnectionSettings";
+import { GeminiConnectionSettings } from "@/components/agent-access/GeminiConnectionSettings";
+import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, readCachedAccountProfileIdentity } from
+  "@/lib/workstation/accountCapabilityPolicy";
 
 const ENDPOINT = "/api/account/installed-services";
 const BILLING_ENDPOINT = "/api/account/billing-entitlement";
@@ -155,7 +161,23 @@ function ConnectionCard(props: {
   );
 }
 
+const subscribeAccountProfile = (listener: () => void): (() => void) => {
+  window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, listener);
+  return () => window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, listener);
+};
+const readAccountProfileRevision = (): number => readCachedAccountProfileIdentity().revision;
+
 export default function InstalledServicesPanel() {
+  const revision = useSyncExternalStore(subscribeAccountProfile, readAccountProfileRevision, () => 0);
+  return <InstalledAccountServicesPanel key={revision} />;
+}
+
+function InstalledAccountServicesPanel() {
+  const operationEpoch = useRef(0);
+  useEffect(() => {
+    operationEpoch.current++;
+    return () => { operationEpoch.current++; };
+  }, []);
   const runtime = useRuntimeSurface();
   const openPanel = useWorkstationLayoutStore((state) =>
     state.openPanelInActiveGroup);
@@ -176,6 +198,13 @@ export default function InstalledServicesPanel() {
   const [supervisorMessage, setSupervisorMessage] = useState<string | null>(null);
   const [billingStatus, setBillingStatus] =
     useState<HelixBillingEntitlement | null>(null);
+  const [personalKeysOpen, setPersonalKeysOpen] = useState(false);
+
+  useEffect(() => {
+    const closeOnAccountChange = () => setPersonalKeysOpen(false);
+    window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, closeOnAccountChange);
+    return () => window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, closeOnAccountChange);
+  }, []);
 
   const load = useCallback(async () => {
     if (runtime.surface !== "desktop_native" || runtime.nativeHandshake !== "ready") {
@@ -304,7 +333,9 @@ export default function InstalledServicesPanel() {
   useEffect(() => {
     const bridge = window.casimirDesktop;
     if (!bridge?.onAuth0StepUpCompletion) return;
+    const epoch = operationEpoch.current;
     return bridge.onAuth0StepUpCompletion((candidate) => {
+      if (epoch !== operationEpoch.current) return;
       const parsed = helixStepUpCompletionProjectionSchema.safeParse(candidate);
       if (!parsed.success) {
         setSecurityMessage("The native MFA completion was invalid.");
@@ -329,6 +360,7 @@ export default function InstalledServicesPanel() {
     purpose: HelixStepUpPurpose,
     targetRef: string | null = null,
   ) => {
+    const epoch = operationEpoch.current;
     const bridge = window.casimirDesktop;
     if (!bridge?.openAuth0StepUp) {
       setSecurityMessage("The trusted native MFA bridge is unavailable.");
@@ -347,6 +379,7 @@ export default function InstalledServicesPanel() {
         body: JSON.stringify({ purpose, target_ref: targetRef }),
       });
       const body = await response.json().catch(() => null);
+      if (epoch !== operationEpoch.current) return;
       const parsed = helixStepUpStartReceiptSchema.safeParse(body);
       if (!response.ok || !parsed.success) {
         const message = body && typeof body === "object" &&
@@ -357,15 +390,18 @@ export default function InstalledServicesPanel() {
       }
       intentStarted = true;
       const opened = await bridge.openAuth0StepUp(parsed.data.authorization_url);
+      if (epoch !== operationEpoch.current) return;
       if (
         opened && typeof opened === "object" &&
         "cancelled" in opened && opened.cancelled === true
       ) {
         try {
           await cancelPendingStepUp();
+          if (epoch !== operationEpoch.current) return;
           setSecurityBusy(false);
           setSecurityMessage("Security step-up was cancelled before opening Auth0.");
         } catch {
+          if (epoch !== operationEpoch.current) return;
           setSecurityWaiting(true);
           setSecurityMessage("Native confirmation was cancelled, but its pending request could not be invalidated. Use Stop waiting for MFA before retrying.");
         }
@@ -377,10 +413,13 @@ export default function InstalledServicesPanel() {
         throw new Error("The native MFA bridge did not open Auth0.");
       }
     } catch (caught) {
+      if (epoch !== operationEpoch.current) return;
       if (intentStarted) {
         try {
           await cancelPendingStepUp();
+          if (epoch !== operationEpoch.current) return;
         } catch {
+          if (epoch !== operationEpoch.current) return;
           setSecurityWaiting(true);
           setSecurityMessage("The native MFA attempt could not be opened or invalidated. Use Stop waiting for MFA before retrying.");
           return;
@@ -399,9 +438,11 @@ export default function InstalledServicesPanel() {
   }, []);
 
   const stopWaitingForStepUp = useCallback(async () => {
+    const epoch = operationEpoch.current;
     setSecurityCancelBusy(true);
     try {
       const cancelled = await cancelPendingStepUp();
+      if (epoch !== operationEpoch.current) return;
       setSecurityBusy(false);
       setSecurityWaiting(false);
       setSecurityMessage(cancelled > 0
@@ -409,9 +450,10 @@ export default function InstalledServicesPanel() {
         : "No pending MFA request remains. Close the old browser tab, then start a fresh attempt.");
       void loadSecurity();
     } catch (caught) {
-      setSecurityMessage(caught instanceof Error ? caught.message : String(caught));
+      if (epoch === operationEpoch.current)
+        setSecurityMessage(caught instanceof Error ? caught.message : String(caught));
     } finally {
-      setSecurityCancelBusy(false);
+      if (epoch === operationEpoch.current) setSecurityCancelBusy(false);
     }
   }, [loadSecurity]);
 
@@ -450,8 +492,8 @@ export default function InstalledServicesPanel() {
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
               One place to distinguish Codex access, provider connections,
               subscription entitlement, this device, and bounded agent authority.
-              Production payment and API-key enrollment remain unavailable; installed
-              device security uses owner-attended Auth0 MFA.
+              Production payment and provider-broker key enrollment remain unavailable;
+              installed device security uses owner-attended Auth0 MFA.
             </p>
           </div>
           <button
@@ -552,8 +594,10 @@ export default function InstalledServicesPanel() {
             <SummaryCard
               icon={<Laptop className="h-4 w-4" />}
               title="Device registration"
-              status={projection?.device.registration ?? "unavailable"}
-              detail="This installation is local-only until SPB-3 adds fresh MFA and registered-device lifecycle authority."
+              status={securityStatus?.current_device.status ?? "unavailable"}
+              detail={securityStatus
+                ? "Device registration is separate from a Codex client grant and program authority."
+                : "Device security status could not be verified."}
             />
             <SummaryCard
               icon={<ShieldCheck className="h-4 w-4" />}
@@ -586,6 +630,22 @@ export default function InstalledServicesPanel() {
 
       {activeTab === "connections" ? (
         <section id="installed-services-panel-connections" role="tabpanel" aria-labelledby="installed-services-tab-connections" className="mt-4">
+          {projection && window.casimirDesktop?.liveConnection ? (
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+              <div>
+                <h2 className="text-sm font-semibold text-slate-100">Personal AI keys</h2>
+                <p className="mt-1 text-xs text-slate-400">OpenAI and Gemini for this profile; separate from provider-broker enrollment.</p>
+              </div>
+              <button type="button" onClick={() => setPersonalKeysOpen(true)}
+                data-helix-guidance-target="personal-ai-keys"
+                data-helix-control-id="workstation.panel.connections-billing-security.personal-keys"
+                data-helix-interaction-kind="configure" data-helix-authority-state="client_local"
+                className="inline-flex items-center gap-2 rounded border border-cyan-300/30 px-3 py-2 text-xs text-cyan-100 hover:bg-cyan-400/10">
+                <KeyRound className="h-4 w-4" aria-hidden="true" />
+                Manage personal keys
+              </button>
+            </div>
+          ) : null}
           <div className="grid gap-3 lg:grid-cols-2">
             {projection?.connections.map((connection) => (
               <ConnectionCard
@@ -829,6 +889,18 @@ export default function InstalledServicesPanel() {
           </section>
         </section>
       ) : null}
+      <Dialog open={personalKeysOpen} onOpenChange={setPersonalKeysOpen}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto bg-slate-950 text-slate-100">
+          <DialogHeader>
+            <DialogTitle>Personal AI keys</DialogTitle>
+            <DialogDescription>OpenAI and Gemini connections for this signed-in profile.</DialogDescription>
+          </DialogHeader>
+          {personalKeysOpen ? <>
+            <LiveConnectionSettings showManagedConversation={false} />
+            <GeminiConnectionSettings />
+          </> : null}
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }

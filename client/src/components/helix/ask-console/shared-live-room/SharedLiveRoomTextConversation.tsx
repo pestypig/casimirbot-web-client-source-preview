@@ -164,15 +164,15 @@ function SharedLiveRoomTextConversationView({ room, conversation, onOpenInConsol
         <span className="font-semibold text-cyan-100">{room.participants.find(p => p.participant_id === message.author_participant_id)?.display_name ?? "Former member"}: </span>{message.text}
       </p>) : <p className="text-slate-500">No room text yet.</p>}
     </div>
-    {onOpenInConsole ? <button type="button" disabled={!admitted || room.status === "closed"}
+    {onOpenInConsole ? <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-text-conversation.write-in-console" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={!admitted || room.status === "closed"}
       onClick={onOpenInConsole} className="mt-3 rounded-lg border border-cyan-300/30 px-3 py-1.5 text-cyan-100 disabled:opacity-40">
       Write in Console
     </button> : <><label className="mt-3 block text-slate-300">Message to room members
-      <textarea value={draft} maxLength={2000} disabled={sending || !admitted || room.status === "closed"}
+      <textarea data-helix-control-id="helix.ask.shared_live_room.shared-live-room-text-conversation.textarea" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" value={draft} maxLength={2000} disabled={sending || !admitted || room.status === "closed"}
         onChange={event => updateDraft(event.target.value)}
         className="mt-1 w-full rounded-lg border border-white/15 bg-slate-950 p-2 text-slate-100" rows={2} />
     </label>
-    <button type="button" disabled={sending || !admitted || !draft.trim() || room.status === "closed"} onClick={() => void send()}
+    <button data-helix-control-id="helix.ask.shared_live_room.shared-live-room-text-conversation.send-to-room" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" disabled={sending || !admitted || !draft.trim() || room.status === "closed"} onClick={() => void send()}
       className="mt-2 rounded-lg border border-cyan-300/30 px-3 py-1.5 text-cyan-100 disabled:opacity-40">Send to room</button></>}
     <SharedRoomTextReleaseControls room={room} messages={messages} admitted={admitted} />
     <SharedRoomMissionTextChoices room={room} messages={messages} admitted={admitted} />

@@ -17,7 +17,7 @@ export function LocalRoomConsoleHistory({ snapshot }: { snapshot: LocalRoomTextO
             person.participant_id === message.author_participant_id)?.display_name ?? "Former member"} />)
         : <p className="text-slate-500">No room text yet.</p>}
     </div>
-    <button type="button" className="text-cyan-100 underline decoration-cyan-300/30"
+    <button data-helix-control-id="helix.ask.shared_live_room.local-room-console-channel.review-ai-sharing-and-room-details" data-helix-interaction-kind="human_only" data-helix-authority-state="blocked_pending_contract" type="button" className="text-cyan-100 underline decoration-cyan-300/30"
       onClick={() => window.dispatchEvent(new CustomEvent(HELIX_SHARED_LIVE_ROOM_OPEN_DIALOG_EVENT,
         { cancelable: true, detail: { roomId: room.room_id, refresh: true } }))}>
       Review AI sharing and room details
@@ -43,12 +43,12 @@ export function LocalRoomPillSurface({ frameState, snapshot }: {
         <span className="text-slate-400">{conversation.admitted ? "Members only" : "Checking membership"}</span>
       </div>
       <label htmlFor="helix-local-room-text-draft" className="sr-only">Message Party Chat members</label>
-      <textarea id="helix-local-room-text-draft" value={conversation.draft} maxLength={2000}
+      <textarea data-helix-control-id="helix.ask.shared_live_room.local-room-console-channel.helix-local-room-text-draft" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract" id="helix-local-room-text-draft" value={conversation.draft} maxLength={2000}
         disabled={!conversation.admitted || conversation.sending || room.status === "closed"}
         onChange={event => conversation.updateDraft(event.target.value)}
         placeholder="Message room members…"
         className="min-h-20 w-full resize-y rounded-lg bg-slate-950/60 p-2 text-slate-100 outline-none placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-cyan-300" />
-      <div className="flex justify-end"><button type="submit"
+      <div className="flex justify-end"><button data-helix-control-id="helix.ask.shared_live_room.local-room-console-channel.button" data-helix-interaction-kind="act" data-helix-authority-state="blocked_pending_contract" type="submit"
         disabled={!conversation.admitted || conversation.sending || !conversation.draft.trim() || room.status === "closed"}
         className="rounded-lg bg-cyan-500/20 px-3 py-1.5 font-semibold text-cyan-50 disabled:opacity-40">
         {conversation.sending ? "Sending…" : "Send to Party Chat"}

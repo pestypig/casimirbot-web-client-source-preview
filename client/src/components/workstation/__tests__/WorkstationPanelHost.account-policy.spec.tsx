@@ -7,6 +7,8 @@ import { HELIX_USER_ACCOUNT_POLICY } from "@shared/helix-account-session";
 import { fetchAccountCapabilityPolicy } from "@/lib/workstation/accountCapabilityPolicy";
 import { WorkstationPanelHost } from "../WorkstationPanelHost";
 
+const lazyPanelWait = { timeout: 10_000 };
+
 const testState = vi.hoisted(() => ({
   interfaceLanguage: "en",
 }));
@@ -54,8 +56,55 @@ describe("WorkstationPanelHost account policy", () => {
 
     render(<WorkstationPanelHost panelId="workflow-demo-lab" />);
 
-    expect(await screen.findByTestId("workflow-demo-lab-panel")).toBeTruthy();
+    expect(await screen.findByTestId("workflow-demo-lab-panel", {}, lazyPanelWait)).toBeTruthy();
     expect(screen.queryByText(/reserved for developer mode/i)).toBeNull();
+  });
+
+  it("opens the contextual Fruition Calculator for an ordinary account without listing it", async () => {
+    vi.stubGlobal("React", React);
+    vi.stubGlobal("fetch", vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ account_policy: HELIX_USER_ACCOUNT_POLICY }),
+    })));
+    await fetchAccountCapabilityPolicy();
+
+    render(<WorkstationPanelHost panelId="fruition-calculator" />);
+
+    expect(await screen.findByTestId("fruition-calculator-panel", {}, lazyPanelWait)).toBeTruthy();
+    expect(screen.queryByText(/reserved for developer mode/i)).toBeNull();
+  });
+
+  it("locks a normally public panel when the current policy explicitly locks it", async () => {
+    const policy = {
+      ...HELIX_USER_ACCOUNT_POLICY,
+      locked_panels: [...HELIX_USER_ACCOUNT_POLICY.locked_panels, "star-watcher"],
+    };
+    vi.stubGlobal("fetch", vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ account_policy: policy }),
+    })));
+    await fetchAccountCapabilityPolicy();
+
+    render(<WorkstationPanelHost panelId="star-watcher" />);
+
+    expect(screen.getByText("Star Watcher is locked")).toBeTruthy();
+    expect(document.querySelector('[data-workstation-panel-id="star-watcher"]')
+      ?.getAttribute("data-workstation-panel-locked")).toBe("true");
+  });
+
+  it("keeps named developer panels locked for users despite a permissive policy payload", async () => {
+    const policy = { ...HELIX_USER_ACCOUNT_POLICY, locked_panels: [] };
+    vi.stubGlobal("fetch", vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ account_policy: policy }),
+    })));
+    await fetchAccountCapabilityPolicy();
+
+    render(<WorkstationPanelHost panelId="code-admin" />);
+
+    expect(screen.getByText("Code Admin is locked")).toBeTruthy();
+    expect(document.querySelector('[data-workstation-panel-id="code-admin"]')
+      ?.getAttribute("data-workstation-panel-locked")).toBe("true");
   });
 
   it("renders Home for a signed-out user even though the server tool policy stays restricted", async () => {
@@ -68,7 +117,7 @@ describe("WorkstationPanelHost account policy", () => {
 
     render(<WorkstationPanelHost panelId="environment-home" />);
 
-    expect(await screen.findByRole("heading", { name: "Home" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Home" }, lazyPanelWait)).toBeTruthy();
     expect(screen.queryByText(/reserved for developer mode/i)).toBeNull();
   });
 
@@ -119,7 +168,7 @@ describe("WorkstationPanelHost account policy", () => {
 
     render(<WorkstationPanelHost panelId="local-harness" />);
 
-    expect(await screen.findByText("Installed app required")).toBeTruthy();
+    expect(await screen.findByText("Installed app required", {}, lazyPanelWait)).toBeTruthy();
     expect(screen.queryByText(/reserved for developer mode/i)).toBeNull();
   });
 
@@ -156,7 +205,7 @@ describe("WorkstationPanelHost account policy", () => {
 
     render(<WorkstationPanelHost panelId="connections-billing-security" />);
 
-    expect(await screen.findByText("Installed app required")).toBeTruthy();
+    expect(await screen.findByText("Installed app required", {}, lazyPanelWait)).toBeTruthy();
     expect(screen.queryByText(/reserved for developer mode/i)).toBeNull();
   });
 });

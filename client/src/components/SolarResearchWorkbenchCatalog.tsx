@@ -81,34 +81,47 @@ export function SolarResearchWorkbenchCatalog({ observationLoaded = false, onOpe
       const account = await accountResponse.json();
       const profileId = account.session?.profile?.profile_id;
       if (!current()) return;
-      if (typeof profileId !== 'string' || !profileId || account.account_policy?.account_type !== 'developer')
-        throw new Error('A signed-in developer account is required to inspect retained research products');
+      if (typeof profileId !== 'string' || !profileId)
+        throw new Error('A signed-in account is required to inspect retained research products');
+      const canInspectLocalProducts = account.account_policy?.account_type === 'developer' &&
+        account.account_policy?.feature_flags?.includes('local_solar_source_inspection') === true &&
+        account.account_policy?.locked_features?.includes('local_solar_source_inspection') !== true;
       const query = new URLSearchParams({ expected_profile_id: profileId, offset: String(offset), limit: '10' });
       const [packageResponse, recordResponse, localResponse] = await Promise.all([
         fetch(`/api/account/solar-research/packages?${query}`, { signal: controller.signal }),
         fetch(`/api/account/solar-research/records?${query}`, { signal: controller.signal }),
-        fetch(`/api/account/solar-research/local-products?expected_profile_id=${encodeURIComponent(profileId)}`, { signal: controller.signal }),
+        canInspectLocalProducts
+          ? fetch(`/api/account/solar-research/local-products?expected_profile_id=${encodeURIComponent(profileId)}`, { signal: controller.signal })
+          : Promise.resolve(null),
       ]);
-      const [packageResult, recordResult, localResult] = await Promise.all([packageResponse.json(), recordResponse.json(), localResponse.json()]);
+      const [packageResult, recordResult, localResult] = await Promise.all([
+        packageResponse.json(), recordResponse.json(), localResponse?.json() ?? Promise.resolve(null),
+      ]);
       if (!current()) return;
       if (!packageResponse.ok || packageResult.ok !== true || packageResult.profileId !== profileId)
         throw new Error(catalogFailure(packageResult, 'Owner package catalog unavailable'));
       if (!recordResponse.ok || recordResult.ok !== true || recordResult.profileId !== profileId)
         throw new Error(catalogFailure(recordResult, 'Owner research record catalog unavailable'));
-      if (!localResponse.ok || localResult.ok !== true || localResult.profileId !== profileId)
+      if (localResponse && (!localResponse.ok || localResult.ok !== true || localResult.profileId !== profileId))
         throw new Error(catalogFailure(localResult, 'Local research inventory unavailable'));
       const packagePayload = { ...packageResult }; delete packagePayload.ok; delete packagePayload.profileId;
       const recordPayload = { ...recordResult }; delete recordPayload.ok; delete recordPayload.profileId;
-      const localPayload = { ...localResult }; delete localPayload.ok; delete localPayload.profileId;
       const parsedPackage = solarPackageCatalogSchema.safeParse(packagePayload);
       if (!parsedPackage.success) throw new Error('Package catalog identity or claim boundary rejected');
       const packagePage = parsedPackage.data;
       if (packagePage.offset !== offset || packagePage.packages.length > 10) throw new Error('Package catalog page rejected');
       const recordPage = parseRecordPage(recordPayload, offset);
-      const parsedLocal = solarLocalProductInventorySchema.safeParse(localPayload);
-      if (!parsedLocal.success) throw new Error('Local inventory identity or claim boundary rejected');
-      setPackages(packagePage); setRecords(recordPage); setLocalProducts(parsedLocal.data); setOwnerProfileId(profileId);
-      setMessage('Account pages and bounded local inputs were checked at read time. Other pages, source authentication and scientific admission are not implied.');
+      let localInventory: SolarLocalProductInventory | null = null;
+      if (localResult) {
+        const localPayload = { ...localResult }; delete localPayload.ok; delete localPayload.profileId;
+        const parsedLocal = solarLocalProductInventorySchema.safeParse(localPayload);
+        if (!parsedLocal.success) throw new Error('Local inventory identity or claim boundary rejected');
+        localInventory = parsedLocal.data;
+      }
+      setPackages(packagePage); setRecords(recordPage); setLocalProducts(localInventory); setOwnerProfileId(profileId);
+      setMessage(localInventory
+        ? 'Account pages and bounded local inputs were checked at read time. Other pages, source authentication and scientific admission are not implied.'
+        : 'Owner account pages were checked at read time. Source authentication and scientific admission are not implied.');
     } catch (error) {
       if (current()) setMessage(error instanceof Error ? error.message : 'Research catalog unavailable');
     } finally { if (current()) setBusy(false); }
@@ -143,7 +156,7 @@ export function SolarResearchWorkbenchCatalog({ observationLoaded = false, onOpe
   return <section id="solar-research-catalog" aria-label="Solar research workbench catalog" className="rounded border border-cyan-700/40 bg-slate-950/70 p-3 space-y-3 text-sm">
     <div>
       <h2 className="font-semibold text-slate-100">Research inputs and retained records</h2>
-      <p className="text-xs text-slate-400">Inspect a fixed set of repository inputs and verified retained account records. This is not an unrestricted disk scan or a MESA run.</p>
+      <p className="text-xs text-slate-400">Inspect verified retained account records. Developer sessions can also inspect fixed repository inputs. This is not an unrestricted disk scan or a MESA run.</p>
     </div>
     <div className="grid gap-2 text-xs sm:grid-cols-3">
       <p>SunPy context: {observationLoaded ? 'loaded for display; not an interior measurement' : 'not loaded'}</p>

@@ -13,7 +13,7 @@ import {
   reconcileAgentRunObserverTerminalMessage,
   useAgentRunObserver,
 } from "../useAgentRunObserver";
-import { AGI_CHAT_STORAGE_KEY, useAgiChatStore } from "@/store/useAgiChatStore";
+import { getCurrentAgiChatStorageKey, useAgiChatStore } from "@/store/useAgiChatStore";
 import { useWorkspaceMemoryRegistryStore } from "@/store/useWorkspaceMemoryRegistryStore";
 
 const falseAuthority = {
@@ -190,14 +190,14 @@ describe("useAgentRunObserver", () => {
       helixAsk: { ...longTerminalMessage.helixAsk },
     });
     const persistedEnvelope =
-      window.localStorage.getItem(AGI_CHAT_STORAGE_KEY) ?? "";
+      window.localStorage.getItem(getCurrentAgiChatStorageKey()) ?? "";
 
     useAgiChatStore.setState({
       sessions: {},
       activeId: undefined,
       hydrated: false,
     });
-    window.localStorage.setItem(AGI_CHAT_STORAGE_KEY, persistedEnvelope);
+    window.localStorage.setItem(getCurrentAgiChatStorageKey(), persistedEnvelope);
     await useAgiChatStore.persist.rehydrate();
     expect(
       useAgiChatStore.getState().sessions[chatSessionId]?.messages[0]?.content,

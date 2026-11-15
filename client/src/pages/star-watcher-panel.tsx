@@ -21,17 +21,23 @@ import {SolarEvidenceStatus} from '@/components/SolarEvidenceStatus';
 import { SolarProfileComparison } from "@/components/SolarProfileComparison";
 import { SolarResearchWorkbenchCatalog } from "@/components/SolarResearchWorkbenchCatalog";
 import { SolarEventEvidenceInspector } from "@/components/SolarEventEvidenceInspector";
+import { DailySolarEvents } from "@/components/DailySolarEvents";
+import { SolarReasoningBudget } from "@/components/SolarReasoningBudget";
 import { SolarCacheManager } from "@/components/SolarCacheManager";
 import { SolarMagneticArchiveDirectory } from '@/components/SolarMagneticArchiveDirectory';
+import {GcnSourceConnection} from '@/components/GcnSourceConnection';
 import { SolarActiveRegionCatalog } from '@/components/SolarActiveRegionCatalog';
 import { SolarRegisteredRegionDisplay } from '@/components/SolarRegisteredRegionDisplay';
 import { isRegisteredSolarRegionsReceipt, type RegisteredSolarRegionsReceipt } from '@/lib/solar-registered-regions';
 import { fetchSolarWithTimeout as fetchWithTimeout } from "@/lib/solar-fetch";
-import { readObservationReplayInput } from "@/lib/solar-observation-replay";
+import { readObservationReplayInput, serializeObservationSnapshot, validateObservationReplay } from "@/lib/solar-observation-replay";
 import { exportObservationSnapshot } from "@/lib/solar-observation-export";
 import {createSolarObservationOwnership} from '@/lib/solar-observation-ownership';
 import {createSolarObservationViewStore,useSolarObservationView} from '@/lib/solar-observation-view-store';
-import {HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT} from '@/lib/workstation/accountCapabilityPolicy';
+import {HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,readCachedAccountCapabilityPolicy,readCachedAccountProfileIdentity} from '@/lib/workstation/accountCapabilityPolicy';
+import {captureAccountOperationScope} from '@/lib/workstation/accountOperationScope';
+import {solarObservationSourceListSchema,solarObservationSourceReceiptSchema,type SolarObservationSourceReceipt} from '@shared/solar-observation-source';
+import {verifyRetainedSolarObservation} from '@/lib/solar-retained-observation';
 import { useWorkstationLayoutStore } from "@/store/useWorkstationLayoutStore";
 import { SOLAR_SPECIALIST_PANELS,SOLAR_SPECIALIST_SECTIONS } from "@/lib/workstation/solarSpecialistPanels";
 import type {SolarObserverGeometry} from '@shared/solar-surface-registration';
@@ -170,6 +176,9 @@ interface SunpyExportFrame {
   fits_path?: string | null;
   grid_size?: number;
   map_b64?: string | null;
+  fits_sha256?: string;
+  display_sha256?: string;
+  coordinate_frame?: string;
   display_processing?: string;
   display_normalization?: unknown;
   wcs_header?: Record<string,unknown>|null;
@@ -194,6 +203,7 @@ interface SunpyExportEvent {
   noaa_ar?: number;
   ch_area?: number;
   frm_name?: string;
+  references?: Array<{ name: string | null; type: 'movie' | 'image' | 'thumbnail' | 'html' | 'unknown'; url: string }>;
   reference_urls?: string[];
   bbox?: Array<{ u: number; v: number }>;
   peak_flux?: number;
@@ -284,6 +294,8 @@ interface SunpySharpSummary {
 
 interface SunpyExportPayload {
   archive_identity?: {snapshotId:string;processingRecipe:string};
+  source_retention?: {state:'staged';ticket:string;archiveId:string;frameCount:number;expiresAtUtc:string}|
+    {state:'not_staged';reason:string};
   selected_event_context?: SolarEventImageSelection;
   selected_goes_window?: SolarGoesFrameWindow;
   instrument: string;
@@ -293,7 +305,7 @@ interface SunpyExportPayload {
   bridge?: SunpyBridgeSummary;
   debug?: SunpyExportDebug;
   meta?: {
-    source?: string;
+    source?: string | null;
     fetched_at_utc?: string | null;
     start?: string;
     end?: string;
@@ -305,7 +317,6 @@ interface SunpyExportPayload {
     rsun_arcsec?: number;
     frames_missing?: boolean;
     frames_missing_reason?: string | null;
-    source?: string | null;
     reason?: string | null;
     requested_start?: string;
     requested_end?: string;
@@ -371,16 +382,31 @@ type SunpyPreflight = {
 
 const solarObservationViewStore=createSolarObservationViewStore<SunpyExportPayload>();
 const SolarMagneticGlobe=React.lazy(()=>import("@/components/SolarMagneticGlobe").then(module=>({default:module.SolarMagneticGlobe})));
+const SolarTimePlayer=React.lazy(()=>import("@/components/SolarTimePlayer").then(module=>({default:module.SolarTimePlayer})));
 const StellarSceneContext=React.lazy(()=>import("@/components/StellarSceneContext").then(module=>({default:module.StellarSceneContext})));
+const canManageSolarCacheForCurrentPolicy=()=>{
+  const policy=readCachedAccountCapabilityPolicy();
+  return Boolean(policy?.feature_flags.includes('solar_cache_management')&&
+    !policy.locked_features.includes('solar_cache_management'));
+};
 
 export default function StarWatcherPanel() {
+  const [canManageSolarCache,setCanManageSolarCache]=React.useState(() =>
+    canManageSolarCacheForCurrentPolicy());
   const [activePage, setActivePage] = React.useState<SolarWorkbenchPage>("surface");
-  const [surfaceView, setSurfaceView] = React.useState<"disk" | "magnetic-globe" | "graphs">("disk");
+  const [surfaceView, setSurfaceView] = React.useState<"disk" | "magnetic-globe" | "time-player" | "graphs">("disk");
   const [magneticAcquisitionId,setMagneticAcquisitionId]=React.useState<string|null>(null);
   const [hmiMagneticAcquisitionId,setHmiMagneticAcquisitionId]=React.useState<string|null>(null);
   const openSpecialistPanel = useWorkstationLayoutStore((state) => state.openPanelInActiveGroup);
   const optionsMenuRef = useRef<HTMLDetailsElement>(null);
   const [sunpyData, setSunpyData] = useSolarObservationView(solarObservationViewStore);
+  const [retainedImageSource,setRetainedImageSource]=React.useState<{
+    id:string;archiveId:string;frameIndex:number;displaySha256:string;sourceFitsSha256:string;
+  }|null>(null);
+  const [retainedImageSources,setRetainedImageSources]=React.useState<SolarObservationSourceReceipt[]>([]);
+  const retainedListRequest=useRef<AbortController|null>(null);
+  const retainedReadRequest=useRef<AbortController|null>(null);
+  const [selectedRetainedImageId,setSelectedRetainedImageId]=React.useState('');
   const [liveChannel, setLiveChannel] = React.useState<SdoLiveChannel>("hmiContinuum");
   const [livePreview, setLivePreview] = React.useState<SdoLivePreview | null>(null);
   const [livePreviewStatus, setLivePreviewStatus] = React.useState("Checking solar browse sources…");
@@ -425,7 +451,7 @@ export default function StarWatcherPanel() {
       setJsocConnectionMessage(mode === "connect" ? "JSOC email saved for this server session. Provider registration is not verified." : "Session connection removed.");
     } catch {
       if (requestGeneration !== jsocRequestGeneration.current) return;
-      setJsocConnectionMessage("Connection update failed. Check the email and signed-in developer session.");
+      setJsocConnectionMessage("Connection update failed. Check the email and signed-in session.");
     } finally { if (requestGeneration === jsocRequestGeneration.current) setJsocConnectionBusy(false); }
   };
   useEffect(() => {
@@ -537,6 +563,7 @@ export default function StarWatcherPanel() {
     instrument: "AIA",
     wavelength: "193",
     maxFrames: 3,
+    gridSize: 192 as 192|512,
   });
   const [sunpyEventTypes, setSunpyEventTypes] = React.useState<Record<string, boolean>>({
     FL: true,
@@ -553,7 +580,10 @@ export default function StarWatcherPanel() {
   const observationOwnership=useRef(createSolarObservationOwnership());
   const snapshotSaveAttempt=useRef(0);
   const sunpyPreflightRequest = useRef<AbortController | null>(null);
-  useEffect(() => () => { observationOwnership.current.begin();sunpyRequest.current?.abort(); sunpyPreflightRequest.current?.abort(); }, []);
+  useEffect(() => () => {
+    observationOwnership.current.begin();sunpyRequest.current?.abort();sunpyPreflightRequest.current?.abort();
+    retainedListRequest.current?.abort();retainedReadRequest.current?.abort();
+  }, []);
   const [sunpyImagesOnly, setSunpyImagesOnly] = React.useState(true);
   const [replayStatus, setReplayStatus] = React.useState("");
   const [solarRuntime, setSolarRuntime] = React.useState<{ available: boolean; reason?: string } | null>(null);
@@ -569,9 +599,13 @@ export default function StarWatcherPanel() {
   const [sunpyPreflightStatus, setSunpyPreflightStatus] = React.useState<string>("SunPy preflight idle");
   useEffect(()=>{
     const changed=()=>{
+      setCanManageSolarCache(canManageSolarCacheForCurrentPolicy());
       observationOwnership.current.begin();snapshotSaveAttempt.current++;
       sunpyRequest.current?.abort();sunpyRequest.current=null;
       sunpyPreflightRequest.current?.abort();sunpyPreflightRequest.current=null;
+      retainedListRequest.current?.abort();retainedListRequest.current=null;
+      retainedReadRequest.current?.abort();retainedReadRequest.current=null;
+      setRetainedImageSource(null);setRetainedImageSources([]);setSelectedRetainedImageId('');
       setSunpyLoading(false);setSunpyPreflight(null);setReplayStatus("");
       setReport("");setDebugLog([]);
       setSunpyStatus("Account policy changed; loaded observation cleared.");
@@ -817,6 +851,11 @@ export default function StarWatcherPanel() {
       setSunpyStatus(error instanceof Error ? error.message : "Invalid frame count");
       return;
     }
+    if(sunpyForm.gridSize===512&&sunpyForm.maxFrames>3){
+      setSunpyStatus('512-pixel display needs at most 3 frames for retained replay.');
+      return;
+    }
+    params.set('gridSize',String(sunpyForm.gridSize));
     params.set("eventTypes", activeTypes);
     if (sunpyImagesOnly) {
       params.set("includeEvents", "false");
@@ -859,6 +898,7 @@ export default function StarWatcherPanel() {
       if(sunpyForm.maxFrames>0 && (!Array.isArray(payload.frames) || payload.frames.length===0))
         throw new Error(`No observation images returned; previous observation retained (${payload.meta?.frames_missing_reason ?? payload.reason ?? 'empty export'}).`);
       setSunpyData(payload);
+      setRetainedImageSource(null);
       // A fresh archive response must not inherit a previous replay/save receipt.
       setReplayStatus("");
       setFrameIndex(0);
@@ -874,14 +914,14 @@ export default function StarWatcherPanel() {
         pushDebug("SunPy fallback attempted but archive still returned no frames");
       }
       refreshStarTelemetry();
-      if (!sunpyImagesOnly && !payload.events?.length) {
+      if (!sunpyImagesOnly) {
         try {
           const evParams = new URLSearchParams();
           evParams.set("start", sunpyForm.start);
           evParams.set("end", sunpyForm.end);
           evParams.set("eventTypes", activeTypes);
           evParams.set("sunpy", "1");
-          pushDebug("API call: /api/star-watcher/solar-events (HEK fallback)");
+          pushDebug("API call: /api/star-watcher/solar-events (HEK metadata)");
           const evRes = await fetchWithTimeout(
             `/api/star-watcher/solar-events?${evParams.toString()}`,
             { method: "GET", signal: download.signal },
@@ -892,12 +932,23 @@ export default function StarWatcherPanel() {
           if (evRes.ok) {
             const evJson = JSON.parse(evText) as { events?: SunpyExportEvent[] };
             if (Array.isArray(evJson.events)) {
-              setSunpyData((prev) =>
-                !observationOwnership.current.isCurrent(selectedObservation) || download.signal.aborted ? prev : prev
-                  ? { ...prev, events: evJson.events ?? prev.events ?? [] }
-                  : { ...payload, events: evJson.events ?? [] },
-              );
-              pushDebug(`HEK fallback loaded ${evJson.events.length} events`);
+              const metadataById = new Map<string, SunpyExportEvent>();
+              for (const event of evJson.events) {
+                const id = event.ivorn ?? event.id;
+                if (id) metadataById.set(id, event);
+              }
+              setSunpyData((prev) => {
+                if (!observationOwnership.current.isCurrent(selectedObservation) || download.signal.aborted) return prev;
+                const base = prev ?? payload;
+                const existing = base.events ?? [];
+                return { ...base, events: existing.length ? existing.map((event) => {
+                  const id = event.ivorn ?? event.id;
+                  const metadata = id ? metadataById.get(id) : undefined;
+                  return metadata ? { ...event, references: metadata.references,
+                    reference_urls: metadata.reference_urls } : event;
+                }) : evJson.events ?? [] };
+              });
+              pushDebug(`HEK metadata loaded ${evJson.events.length} events`);
             }
           } else {
             pushDebug(`HEK fallback failed: status=${evRes.status} body=${evText.slice(0, 200)}`);
@@ -1082,6 +1133,24 @@ export default function StarWatcherPanel() {
     const clamped = Math.min(Math.max(frameIndex, 0), sunpyData.frames.length - 1);
     return sunpyData.frames[clamped];
   }, [sunpyData, frameIndex]);
+  const retainedSourceMatchesFrame=Boolean(retainedImageSource&&currentSunpyFrame&&
+    sunpyData?.archive_identity?.snapshotId===retainedImageSource.archiveId&&
+    currentSunpyFrame.index===retainedImageSource.frameIndex&&
+    currentSunpyFrame.display_sha256===retainedImageSource.displaySha256&&
+    currentSunpyFrame.fits_sha256===retainedImageSource.sourceFitsSha256);
+  const robEarthImage = React.useMemo(() => {
+    const frame=currentSunpyFrame,archive=sunpyData?.archive_identity;
+    if(sunpyData?.meta?.source!=='imported_observation_replay'||!archive||!frame||
+       !frame.map_b64||!frame.grid_size||!frame.wcs_header||!frame.registration_geometry||
+       !frame.display_sha256||!frame.fits_sha256||
+       frame.coordinate_frame!=='native_instrument_pixel_grid')return null;
+    return {archiveId:archive.snapshotId,instrument:sunpyData.instrument,
+      wavelengthAngstrom:sunpyData.wavelength_A,frameIndex:frame.index,
+      observedAtUtc:frame.obstime,displaySha256:frame.display_sha256,
+      declaredFitsSha256:frame.fits_sha256,gridSize:frame.grid_size,
+      ...(retainedSourceMatchesFrame?{retainedSourceImageId:retainedImageSource!.id}:{}),
+      mapBase64:frame.map_b64,wcsHeader:frame.wcs_header,observer:frame.registration_geometry};
+  },[sunpyData,currentSunpyFrame,retainedImageSource,retainedSourceMatchesFrame]);
 
   const currentTimeIso = React.useMemo(() => {
     if (currentSunpyFrame?.obstime) return currentSunpyFrame.obstime;
@@ -1141,6 +1210,85 @@ export default function StarWatcherPanel() {
       return sunpyData;
     }
   }, [sunpyData, selectedEventId, frameIndex, findSunpyEventById]);
+
+  const canFreezeObservationForGlobe=Boolean(sunpyData&&currentSunpyFrame&&
+    sunpyData.meta?.source!=='imported_observation_replay'&&
+    currentSunpyFrame.map_b64&&currentSunpyFrame.display_sha256&&currentSunpyFrame.fits_sha256&&
+    currentSunpyFrame.coordinate_frame==='native_instrument_pixel_grid'&&
+    currentSunpyFrame.wcs_header&&currentSunpyFrame.registration_geometry);
+  const freezeObservationForGlobe=async()=>{
+    if(!canFreezeObservationForGlobe||!sunpyData)return;
+    const selectedObservation=observationOwnership.current.begin();
+    retainedReadRequest.current?.abort();
+    const controller=new AbortController();retainedReadRequest.current=controller;
+    const owner=readCachedAccountProfileIdentity().profileId;
+    const isAccountCurrent=captureAccountOperationScope();
+    const isCurrent=()=>!controller.signal.aborted&&isAccountCurrent()&&observationOwnership.current.isCurrent(selectedObservation);
+    snapshotSaveAttempt.current++;
+    sunpyRequest.current?.abort();sunpyRequest.current=null;setSunpyLoading(false);
+    setReplayStatus('Verifying the current observation for the magnetic globe; previous image retained.');
+    try {
+      const serialized=await serializeObservationSnapshot(researchObservationArchive ?? sunpyData);
+      const snapshot=await validateObservationReplay(JSON.parse(serialized));
+      if(!isCurrent())return;
+      const selectedIndex=Math.min(Math.max(frameIndex,0),snapshot.frames.length-1);
+      const frame=snapshot.frames[selectedIndex];
+      if(!frame?.wcs_header||!frame.registration_geometry)
+        throw new Error('Selected frame lacks WCS or observer geometry');
+      let selectedArchive=snapshot;
+      let sourceMessage='Display bytes checked; source FITS hash remains declared, not authenticated.';
+      let sourceLink:typeof retainedImageSource=null;
+      if(sunpyData.source_retention?.state==='staged'){
+        try{
+          if(!owner)throw new Error('Sign in before retaining source images');
+          const retained=await fetch('/api/star-watcher/observation-source/retain',{
+            method:'POST',credentials:'same-origin',cache:'no-store',signal:controller.signal,
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ticket:sunpyData.source_retention.ticket,frameIndex:selectedIndex}),
+          });
+          const result=await retained.json();
+          if(!isCurrent())return;
+          if(!retained.ok)throw new Error(result.error??'Source retention failed');
+          const receipt=solarObservationSourceReceiptSchema.parse(result);
+          if(receipt.ownerProfileId!==owner||receipt.frameIndex!==selectedIndex||
+             receipt.displaySha256!==frame.display_sha256||receipt.sourceFitsSha256!==frame.fits_sha256||
+             receipt.observedAtUtc!==frame.obstime||receipt.instrument!==snapshot.instrument||
+             receipt.wavelengthAngstrom!==snapshot.wavelength_A)
+            throw new Error('Retained source receipt does not match selected observation');
+          const reopened=await fetch(`/api/star-watcher/observation-source/retained?acquisitionId=${encodeURIComponent(receipt.acquisitionId)}`,
+            {credentials:'same-origin',cache:'no-store',signal:controller.signal});
+          const saved=await reopened.json();
+          if(!isCurrent())return;
+          if(!reopened.ok)throw new Error(saved.error??'Source readback failed');
+          const {archive:verified}=await verifyRetainedSolarObservation(saved,owner,receipt);
+          const sourceFrame=verified.frames[receipt.frameIndex];
+          if(!sourceFrame||sourceFrame.display_sha256!==frame.display_sha256||
+             sourceFrame.fits_sha256!==frame.fits_sha256||sourceFrame.obstime!==frame.obstime)
+            throw new Error('Retained source frame does not match selected display frame');
+          if(!isCurrent())return;
+          selectedArchive=verified;
+          sourceLink={id:receipt.acquisitionId,archiveId:receipt.archiveId,
+            frameIndex:receipt.frameIndex,displaySha256:receipt.displaySha256,
+            sourceFitsSha256:receipt.sourceFitsSha256};
+          sourceMessage=`Retained source FITS and display bytes rehashed: ${sourceLink.id}. Provider identity and image-to-model registration remain unverified.`;
+        }catch(error){
+          sourceMessage=`Display archive only; source retention unavailable: ${error instanceof Error?error.message:'unknown error'}`;
+        }
+      }
+      if(!isCurrent())return;
+      setRetainedImageSource(sourceLink);
+      setSunpyData(selectedArchive);
+      setFrameIndex(selectedIndex);
+      setSelectedEventId(selectedArchive.selected_event_context?.eventId ?? null);
+      setHoverEventId(null);
+      setReplayStatus(`Verified archive ${selectedArchive.archive_identity?.snapshotId}. ${sourceMessage}`);
+      setSunpyStatus('Current observation frozen as a display archive for the magnetic globe.');
+      setSurfaceView('magnetic-globe');setActivePage('surface');
+    } catch(error) {
+      if(!isCurrent())return;
+      setReplayStatus(`Globe image not bound; previous observation retained: ${error instanceof Error?error.message:'Invalid observation'}`);
+    }finally{if(retainedReadRequest.current===controller)retainedReadRequest.current=null;}
+  };
 
   const eventToGlyph = React.useCallback(
     (ev: SunpyExportEvent, idx: number): DiskEventGlyph | null => {
@@ -1807,15 +1955,17 @@ export default function StarWatcherPanel() {
       <div role="group" aria-label="Solar surface view" className="flex flex-wrap gap-2">
         <Button size="sm" variant={surfaceView === "disk" ? "default" : "outline"} aria-pressed={surfaceView === "disk"} onClick={() => setSurfaceView("disk")}>Solar disk</Button>
         <Button size="sm" variant={surfaceView === "magnetic-globe" ? "default" : "outline"} aria-pressed={surfaceView === "magnetic-globe"} onClick={() => setSurfaceView("magnetic-globe")}>3D magnetic globe</Button>
+        <Button size="sm" variant={surfaceView === "time-player" ? "default" : "outline"} aria-pressed={surfaceView === "time-player"} onClick={() => setSurfaceView("time-player")}>Solar time player</Button>
         <Button size="sm" variant={surfaceView === "graphs" ? "default" : "outline"} aria-pressed={surfaceView === "graphs"} onClick={() => setSurfaceView("graphs")}>Graphs & timing</Button>
         {surfaceView === 'magnetic-globe' && <Button size="sm" variant="outline" onClick={() => {
           setActivePage('sources');
           window.requestAnimationFrame(() => document.getElementById('solar-source-access')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' }));
         }}>Find magnetic data</Button>}
       </div>
-      {surfaceView === "magnetic-globe" ? <div>
+      {surfaceView === "time-player" ? <React.Suspense fallback={<p className="text-xs text-slate-400">Loading solar time player…</p>}><SolarTimePlayer/></React.Suspense> : surfaceView === "magnetic-globe" ? <div>
         {selectedEventId && <p className="mb-2 text-xs text-amber-200">Selected event {selectedEventId}: no WCS-validated positional link from the current image to this globe. Any HEK marker is independent catalog context, not an inferred image location.</p>}
-        <React.Suspense fallback={<p className="text-xs text-slate-400">Loading 3D magnetic globe…</p>}><SolarMagneticGlobe acquisitionId={magneticAcquisitionId} hmiAcquisitionId={hmiMagneticAcquisitionId}
+        {canFreezeObservationForGlobe && <Button size="sm" variant="outline" className="mb-2" onClick={freezeObservationForGlobe}>Verify current observation for globe</Button>}
+         <React.Suspense fallback={<p className="text-xs text-slate-400">Loading 3D magnetic globe…</p>}><SolarMagneticGlobe acquisitionId={magneticAcquisitionId} hmiAcquisitionId={hmiMagneticAcquisitionId} earthImage={robEarthImage}
           catalogEvents={activeSunpyEvents} selectedCatalogEventId={selectedEventId} onCatalogEventSelect={handleEventSelect} /></React.Suspense>
       </div> : surfaceView === "graphs" ? <section aria-label="Solar graphs and timing" className="space-y-3 rounded-xl border border-cyan-700/40 bg-slate-950/80 p-4">
         <h2 className="text-lg font-semibold text-slate-100">Graphs & timing</h2>
@@ -1939,6 +2089,7 @@ export default function StarWatcherPanel() {
         <SolarMagneticArchiveDirectory gongAcquisitionId={magneticAcquisitionId}
           onOpenGongMap={id=>{setMagneticAcquisitionId(id);setHmiMagneticAcquisitionId(null);setSurfaceView('magnetic-globe');setActivePage('surface');}}
           onCompareHmi={id=>{setHmiMagneticAcquisitionId(id);setSurfaceView('magnetic-globe');setActivePage('surface');}} />
+        <GcnSourceConnection />
         <div className="grid gap-3 lg:grid-cols-2">
           <div className="rounded border border-slate-700 bg-slate-900/60 p-3 text-xs">
             <h3 className="text-sm font-medium text-slate-100">Solar browse preview · compatible SDO alternatives</h3>
@@ -1983,6 +2134,8 @@ export default function StarWatcherPanel() {
           </div>
         </div>
       </section>
+
+      {activePage === "surface" && surfaceView === "disk" && <DailySolarEvents compact />}
 
       <section hidden={activePage !== "explore"} aria-label="Solar specialist tools" className={activePage === "explore" ? "rounded border border-slate-800 bg-slate-950/70 p-3" : "hidden"}>
         <h2 className="text-sm font-semibold text-slate-100">Models & concepts</h2>
@@ -2107,6 +2260,18 @@ export default function StarWatcherPanel() {
                       <Input type="number" min={0} max={40} value={sunpyForm.maxFrames}
                         onChange={(e) => setSunpyForm({ ...sunpyForm, maxFrames: Number.isFinite(Number(e.target.value)) ? Number(e.target.value) : 3 })} />
                     </div>
+                    <div>
+                      <Label>Image display grid</Label>
+                      <select aria-label="Solar image display grid" value={sunpyForm.gridSize}
+                        onChange={e=>setSunpyForm({...sunpyForm,gridSize:Number(e.target.value) as 192|512,
+                          maxFrames:e.target.value==='512'?Math.min(sunpyForm.maxFrames,3):sunpyForm.maxFrames})}
+                        className="w-full rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm text-slate-100">
+                        <option value={192}>192 × 192 (quick)</option>
+                        <option value={512}>512 × 512 (detailed, up to 3 frames)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
                     <div className="flex flex-col">
                       <Label>Event types</Label>
                       <div className="flex flex-wrap gap-2 pt-1">
@@ -2231,13 +2396,75 @@ export default function StarWatcherPanel() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div id="solar-compare" className={activePage === "research" ? "" : "hidden"}><SolarProfileComparison observationArchive={researchObservationArchive} selectedRecordId={selectedResearchRecordId} selectedLocalBundle={selectedLocalResearchBundle} /></div>
-              <div className={activePage === "imagery" ? "" : "hidden"}><SolarCacheManager /></div>
+              {canManageSolarCache && <div className={activePage === "imagery" ? "" : "hidden"}><SolarCacheManager /></div>}
               <section id="solar-replay" className={`${activePage === "imagery" ? "" : "hidden"} space-y-2 rounded border border-slate-700 p-3`}>
-                <p className="text-xs text-slate-400">The selected observation survives panel navigation in renderer memory (maximum 8 MB), not app restart. This is not a saved archive or a fresh acquisition. Account-policy changes clear it.</p>
+                <p className="text-xs text-slate-400">An unretained display observation survives panel navigation in renderer memory (maximum 8 MB), not app restart. Reopen an owner-retained source image to recheck its FITS and display bytes after restart; that replay is not a fresh acquisition.</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={async()=>{
+                    retainedListRequest.current?.abort();retainedReadRequest.current?.abort();
+                    const controller=new AbortController();retainedListRequest.current=controller;
+                    const owner=readCachedAccountProfileIdentity().profileId;
+                    const isAccountCurrent=captureAccountOperationScope();
+                    const isCurrent=()=>!controller.signal.aborted&&isAccountCurrent();
+                    setRetainedImageSources([]);setSelectedRetainedImageId('');
+                    try{
+                      if(!owner)throw new Error('Sign in before listing retained source images');
+                      const response=await fetch('/api/star-watcher/observation-source/list',
+                        {credentials:'same-origin',cache:'no-store',signal:controller.signal});
+                      const result=await response.json();
+                      if(!isCurrent())return;
+                      if(!response.ok)throw new Error(result.error??'Retained image list failed');
+                      const {entries}=solarObservationSourceListSchema.parse(result);
+                      if(entries.some(entry=>entry.ownerProfileId!==owner))throw new Error('Retained image owner mismatch');
+                      setRetainedImageSources(entries);
+                      setSelectedRetainedImageId(entries[0]?.acquisitionId??'');
+                      setReplayStatus(`${entries.length} owner-retained source image receipts listed; reopen a selection to recheck bytes.`);
+                    }catch(error){if(isCurrent())setReplayStatus(`Retained image list unavailable: ${error instanceof Error?error.message:'unknown error'}`);}
+                    finally{if(retainedListRequest.current===controller)retainedListRequest.current=null;}
+                  }}>List retained source images</Button>
+                  <select aria-label="Retained solar source image" value={selectedRetainedImageId}
+                    onChange={event=>{retainedReadRequest.current?.abort();setSelectedRetainedImageId(event.target.value);}}
+                    className="max-w-full rounded border border-slate-700 bg-slate-950 p-2 text-xs text-slate-100">
+                    <option value="">Select retained image</option>
+                    {retainedImageSources.map(entry=><option key={entry.acquisitionId} value={entry.acquisitionId}>
+                      {entry.observedAtUtc} · {entry.instrument} {entry.wavelengthAngstrom} Å · {entry.acquisitionId.slice(0,32)}…
+                    </option>)}
+                  </select>
+                  <Button variant="outline" size="sm" disabled={!selectedRetainedImageId} onClick={async()=>{
+                    const selectedObservation=observationOwnership.current.begin();
+                    sunpyRequest.current?.abort();sunpyRequest.current=null;setSunpyLoading(false);
+                    retainedReadRequest.current?.abort();
+                    const controller=new AbortController();retainedReadRequest.current=controller;
+                    const owner=readCachedAccountProfileIdentity().profileId;
+                    const isAccountCurrent=captureAccountOperationScope();
+                    const isCurrent=()=>!controller.signal.aborted&&isAccountCurrent()&&observationOwnership.current.isCurrent(selectedObservation);
+                    try{
+                      const selected=retainedImageSources.find(entry=>entry.acquisitionId===selectedRetainedImageId);
+                      if(!owner||!selected)throw new Error('List and select a source for the signed-in account');
+                      const response=await fetch(`/api/star-watcher/observation-source/retained?acquisitionId=${encodeURIComponent(selected.acquisitionId)}`,
+                        {credentials:'same-origin',cache:'no-store',signal:controller.signal});
+                      const result=await response.json();
+                      if(!isCurrent())return;
+                      if(!response.ok)throw new Error(result.error??'Retained image read failed');
+                      const {archive,receipt}=await verifyRetainedSolarObservation(result,owner,selected);
+                      if(!isCurrent())return;
+                      setSunpyData(archive);setFrameIndex(receipt.frameIndex);
+                      setRetainedImageSource({id:receipt.acquisitionId,
+                        archiveId:receipt.archiveId,frameIndex:receipt.frameIndex,
+                        displaySha256:receipt.displaySha256,sourceFitsSha256:receipt.sourceFitsSha256});
+                      setSelectedEventId(null);setHoverEventId(null);
+                      setReplayStatus(`Reopened ${receipt.acquisitionId}; source FITS and display bytes rehashed. Provider identity and model registration remain unverified.`);
+                      setSunpyStatus('Owner-retained observation source reopened for globe pairing.');
+                    }catch(error){
+                      if(isCurrent())setReplayStatus(`Retained image not reopened; previous observation retained: ${error instanceof Error?error.message:'unknown error'}`);
+                    }finally{if(retainedReadRequest.current===controller)retainedReadRequest.current=null;}
+                  }}>Reopen source and display</Button>
+                </div>
                 <Button disabled={!sunpyData} onClick={()=>{
                   observationOwnership.current.begin();snapshotSaveAttempt.current++;
                   sunpyRequest.current?.abort();sunpyRequest.current=null;setSunpyLoading(false);
                   setSunpyData(null);setReplayStatus("");setFrameIndex(0);
+                  setRetainedImageSource(null);
                   setReport("");
                   setSelectedEventId(null);setHoverEventId(null);
                   setSunpyStatus("Loaded observation cleared from renderer memory.");
@@ -2255,6 +2482,7 @@ export default function StarWatcherPanel() {
                       const snapshot = await readObservationReplayInput(input);
                       if(!observationOwnership.current.isCurrent(selectedObservation))return;
                       setSunpyData(snapshot);
+                      setRetainedImageSource(null);
                       setFrameIndex(snapshot.selected_event_context?.selectedFrameIndex ?? snapshot.selected_goes_window?.selectedFrameIndex ?? 0);
                       setSelectedEventId(snapshot.selected_event_context?.eventId ?? null);setHoverEventId(null);
                       setReplayStatus("ARCHIVE REPLAY — display hashes verified; source FITS hashes declared, not independently authenticated.");
@@ -2269,15 +2497,18 @@ export default function StarWatcherPanel() {
                   const selectedObservation=observationOwnership.current.current();
                   const attempt=++snapshotSaveAttempt.current;
                   try {
-                    const receipt=await exportObservationSnapshot(researchObservationArchive ?? sunpyData, window.casimirDesktop);
+                     const bridge=(window as Window & {casimirDesktop?:Parameters<typeof exportObservationSnapshot>[1]}).casimirDesktop;
+                     const receipt=await exportObservationSnapshot(researchObservationArchive ?? sunpyData, bridge);
                     if(observationOwnership.current.isCurrent(selectedObservation) && snapshotSaveAttempt.current===attempt)setReplayStatus(receipt);
                   } catch (error) {
                     if(!observationOwnership.current.isCurrent(selectedObservation) || snapshotSaveAttempt.current!==attempt)return;
                     setReplayStatus(`Snapshot not saved: ${error instanceof Error ? error.message : 'Invalid observation'}`);
                   }
                 }}>Save observation snapshot</Button>
+                <Button disabled={!canFreezeObservationForGlobe} variant="outline" onClick={freezeObservationForGlobe}>Verify current observation for magnetic globe</Button>
                 <p role="status" className="text-xs text-amber-200">{replayStatus}</p>
-                {sunpyData?.archive_identity && <p className="text-xs break-all text-slate-400">Verified archive identity: {sunpyData.archive_identity.snapshotId} · recipe {sunpyData.archive_identity.processingRecipe}. Content integrity only; source FITS not included or authenticated.</p>}
+                {sunpyData?.archive_identity && <p className="text-xs break-all text-slate-400">Verified archive identity: {sunpyData.archive_identity.snapshotId} · recipe {sunpyData.archive_identity.processingRecipe}. Display content integrity; the selected frame's source FITS is {retainedSourceMatchesFrame?'separately retained and rehashed':'not included or authenticated'}.</p>}
+                {retainedSourceMatchesFrame&&<p className="text-xs break-all text-slate-400">Owner-retained source FITS: {retainedImageSource!.id}. Source and display hashes rechecked on read; provider identity and coordinate registration remain unverified.</p>}
               </section>
               {sunpyIntensityGrid ? (
                 <section className={`${activePage === "imagery" ? "" : "hidden"} space-y-2 rounded border border-slate-700 p-3`}>
@@ -2285,7 +2516,7 @@ export default function StarWatcherPanel() {
                   <SolarObservationRaster data={sunpyIntensityGrid.data} size={sunpyIntensityGrid.gridSize} />
                   <SolarObservationFreshness acquiredAt={currentSunpyFrame?.obstime} fetchedAt={sunpyData?.meta?.fetched_at_utc}
                     replay={sunpyData?.meta?.source==='imported_observation_replay'} />
-                  <SolarObservationProcessing frame={currentSunpyFrame} />
+                   <SolarObservationProcessing frame={currentSunpyFrame??undefined} />
                   <p className="text-xs text-slate-400">Native pixel grid, display-normalized. Not co-rotated, not a simulated Sun, and not calibrated radiance. Event registration requires WCS mapping.</p>
                   {sunpyData?.frames?.length ? <SolarSurfaceRegistrationViewer frames={sunpyData.frames} selectedFrameIndex={frameIndex}/> : null}
                 </section>
@@ -2683,6 +2914,7 @@ export default function StarWatcherPanel() {
           </CardContent>
         </Card>
 
+        {activePage === "events" && <><DailySolarEvents /><SolarReasoningBudget /></>}
         <Card id="solar-events" className={`${activePage === "events" ? "" : "hidden"} bg-slate-900/60 border-slate-800`}>
           <CardHeader>
             <CardTitle>Flare List (GOES/HEK)</CardTitle>

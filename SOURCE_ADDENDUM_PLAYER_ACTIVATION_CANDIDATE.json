@@ -1,0 +1,46 @@
+{
+  "observed_at": "2026-11-13T16:25:38.422817+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/SharedLiveRoomPlayerEmbodimentPanel.tsx",
+      "canonical_sha256": "e5464ddffcba2f380c75540e632c0ffe07c63000f643662504670acaaf16e7fe",
+      "export_sha256": "c40e01dcc0f7c5ea3b8f37b81b65f577d4e7f1bd2cacf86f00327c7875517b61",
+      "previous_proposal_sha256": "371c9bab759d1ae51152ddb196f6bc4853bb8d5e5b24b942994b513f3a1c9921",
+      "bytes": 56613,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/SharedLiveRoomPlayerEmbodimentPanel.spec.tsx",
+      "canonical_sha256": "a5b733435e17dc98b16af85663b9fa3c7f330a65517017c5a0f668f250478017",
+      "export_sha256": "18f431d7752baa1cd1103bd27ca6da75f0b1d19fcdc76af5b2e63879b485257b",
+      "previous_proposal_sha256": "02b1af0f222ecf20d7499596245128ed1bf8f0410535c4ad298019de5bc8b3b2",
+      "bytes": 34482,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/minecraftPlayJourney.ts",
+      "canonical_sha256": "812b94a4cfbf593c9ee56bcaf4925aa76a068d78112310fe963071b62476b994",
+      "export_sha256": "e57ae0013f59cc41fa05611a3aaec7a10c551832bab089ffbe0441e79d430fbb"
+    }
+  ],
+  "review": [
+    "Read the complete player panel and test, the unchanged minecraftPlayJourney helper and final production diff. First-party React/TypeScript; mocked authority, pairing and loopback receipts. No runtime profiles, credentials, game assets, private transcripts or third-party source copied.",
+    "Explicit Play verifies an exact chat binding, current room/source/player and finite capability review, then uses separate native startup and private pairing before dispatching the displayed objective. Pickup acknowledgement is distinguished from goal/monitor readiness and game execution.",
+    "The current preset selects registered player capabilities for a finite two-hour lease with manual-input cancellation. The displayed capability set, confirmation and server authority remain separate from chat pairing. Owner controls, bounded review drafts and armed emergency stop retain their existing roles.",
+    "Post-R379 identity isolation remounts setup state when account, chat, room, world, environment, subject or source changes. Scoped fetches reject late headers/JSON; every asynchronous activation boundary checks the same cancellation signal before another request or steering.",
+    "Tests cover six identity/unmount changes during chat inspection plus late authority, launch and pairing responses. Existing tests cover exact finite scope, independent pairing, heartbeat readiness, preserved unsaved choices and serialized polling.",
+    "The unchanged journey helper separates prerequisite stages and creates visible bounded steering context; it does not grant authority or execute actions. Existing policy and startup modules were separately reviewed. Shared schemas, live native services and remaining dependencies retain their own qualification."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal, not a standalone application or public release.",
+    "The identity-isolation change is newer than R379 and awaits installed testing.",
+    "Canceling UI continuation does not cancel or undo a backend operation already admitted. Backend identity, consent and lease enforcement remains independent.",
+    "HTTP and steering receipts are mocked; source tests do not establish two-player consent, live server/client readiness, Minecraft actions or GPT Live continuity."
+  ]
+}

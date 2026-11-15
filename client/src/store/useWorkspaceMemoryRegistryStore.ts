@@ -9,6 +9,10 @@ import {
   type HelixWorkspaceMemoryStorageBackend,
   type HelixWorkspaceMemorySyncStatus,
 } from "@shared/helix-workspace-memory-registry";
+import {
+  HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
+  readCachedAccountProfileIdentity,
+} from "@/lib/workstation/accountCapabilityPolicy";
 
 type UpsertWorkspaceMemoryArtifactInput = {
   artifact_id: string;
@@ -34,7 +38,25 @@ type WorkspaceMemoryRegistryState = {
   buildRegistrySnapshot: () => HelixWorkspaceMemoryRegistrySnapshot;
 };
 
-const STORAGE_KEY = "helix-workspace-memory-registry:v1";
+const STORAGE_PREFIX = "helix-workspace-memory-registry:v2:";
+
+const registryStorageKey = (profileId: string | null | undefined): string =>
+  `${STORAGE_PREFIX}${profileId === undefined
+    ? "unresolved" : profileId === null ? "guest" : `profile:${encodeURIComponent(profileId)}`}`;
+
+function readStoredArtifacts(key: string): Record<string, HelixWorkspaceMemoryArtifact> {
+  try {
+    const raw = typeof window === "undefined" ? null : window.localStorage.getItem(key);
+    const state = (JSON.parse(raw ?? "null") as { state?: { artifacts?: unknown } } | null)?.state;
+    return state?.artifacts && typeof state.artifacts === "object" && !Array.isArray(state.artifacts)
+      ? state.artifacts as Record<string, HelixWorkspaceMemoryArtifact> : {};
+  } catch {
+    return {};
+  }
+}
+
+let currentRegistryStorageKey = registryStorageKey(readCachedAccountProfileIdentity().profileId);
+const initialArtifacts = readStoredArtifacts(currentRegistryStorageKey);
 
 function defaultOwnerScope(
   storageBackend: HelixWorkspaceMemoryStorageBackend,
@@ -80,7 +102,7 @@ function normalizeArtifact(
 export const useWorkspaceMemoryRegistryStore = createWithEqualityFn<WorkspaceMemoryRegistryState>()(
   persist(
     (set, get) => ({
-      artifacts: {},
+      artifacts: initialArtifacts,
       upsertArtifact: (input) => {
         const artifact = normalizeArtifact(input);
         if (!artifact) return;
@@ -125,10 +147,24 @@ export const useWorkspaceMemoryRegistryStore = createWithEqualityFn<WorkspaceMem
       },
     }),
     {
-      name: STORAGE_KEY,
+      name: currentRegistryStorageKey,
+      skipHydration: true,
       partialize: (state) => ({
         artifacts: state.artifacts,
       }),
     },
   ),
 );
+
+if (typeof window !== "undefined") {
+  window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, () => {
+    const profileId = readCachedAccountProfileIdentity().profileId;
+    const nextKey = registryStorageKey(profileId);
+    if (nextKey !== currentRegistryStorageKey) {
+      const artifacts = readStoredArtifacts(nextKey);
+      currentRegistryStorageKey = nextKey;
+      useWorkspaceMemoryRegistryStore.persist.setOptions({ name: nextKey });
+      useWorkspaceMemoryRegistryStore.setState({ artifacts });
+    }
+  });
+}

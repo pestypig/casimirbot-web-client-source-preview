@@ -44,6 +44,7 @@ import {
   type BrowserReasoningBinding,
 } from "@/lib/agent-access/reasoningTaskBinding";
 import { useAgiChatStore } from "@/store/useAgiChatStore";
+import { HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT } from "@/lib/workstation/accountCapabilityPolicy";
 import {
   HELIX_BOUND_AGENT_STEERING_RESULT_EVENT,
   requestBoundAgentSteering,
@@ -209,7 +210,26 @@ export type PlayerAuthorityReviewDraft = {
   leaseMs: number;
 };
 
-export function SharedLiveRoomPlayerEmbodimentPanel({
+export function SharedLiveRoomPlayerEmbodimentPanel(props: React.ComponentProps<typeof ScopedPlayerEmbodimentPanel>) {
+  const activeChatId = useAgiChatStore(state => state.activeId);
+  const [accountEpoch, setAccountEpoch] = useState(0);
+  useEffect(() => {
+    const changed = () => setAccountEpoch(value => value + 1);
+    window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, changed);
+    return () => window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, changed);
+  }, []);
+  const environment = props.environment;
+  return <ScopedPlayerEmbodimentPanel key={JSON.stringify([
+    accountEpoch, activeChatId, props.roomId, props.selfParticipantId, props.isOwner,
+    environment.environment_binding_id, environment.room_source_binding_id,
+    environment.source_id, environment.world_id, environment.connection_status,
+    environment.self_subject_binding?.subject_binding_id,
+    environment.self_subject_binding?.subject_ref, environment.self_subject_binding?.status,
+    props.sourceBinding?.binding_id, props.sourceBinding?.status,
+  ])} {...props} />;
+}
+
+function ScopedPlayerEmbodimentPanel({
   roomId,
   environment,
   selfParticipantId,
@@ -226,6 +246,30 @@ export function SharedLiveRoomPlayerEmbodimentPanel({
   initialReviewDraft?: PlayerAuthorityReviewDraft;
   onReviewDraftChange?: (draft: PlayerAuthorityReviewDraft | null) => void;
 }) {
+  const scope = useRef(new AbortController());
+  useEffect(() => {
+    if (scope.current.signal.aborted) scope.current = new AbortController();
+    const controller = scope.current;
+    const cancel = () => controller.abort();
+    window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, cancel);
+    return () => {
+      cancel();
+      window.removeEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, cancel);
+    };
+  }, []);
+  const fetchScoped = useCallback(async (input: RequestInfo | URL, init?: RequestInit) => {
+    const signal = AbortSignal.any([scope.current.signal, ...(init?.signal ? [init.signal] : [])]);
+    signal.throwIfAborted();
+    const response = await fetch(input, { ...init, signal });
+    signal.throwIfAborted();
+    const readJson = response.json.bind(response);
+    Object.defineProperty(response, "json", { value: async () => {
+      const result = await readJson();
+      signal.throwIfAborted();
+      return result;
+    } });
+    return response;
+  }, []);
   const activeChatId = useAgiChatStore((state) => state.activeId);
   const observedReasoningBinding = useBrowserReasoningBindingStore((state) => state.current);
   const authorityPath = useMemo(
@@ -282,7 +326,7 @@ export function SharedLiveRoomPlayerEmbodimentPanel({
   const load = useCallback(async (signal?: AbortSignal): Promise<void> => {
     try {
       const receipt = await readActionReceipt(
-        await fetch(authorityPath, { signal, credentials: "include" }),
+        await fetchScoped(authorityPath, { signal, credentials: "include" }),
       );
       const next = receipt.authority ?? null;
       setAuthority(next);
@@ -311,7 +355,7 @@ export function SharedLiveRoomPlayerEmbodimentPanel({
           : "Could not load Player Embodiment authority.",
       );
     }
-  }, [authorityPath]);
+  }, [authorityPath, fetchScoped]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -387,7 +431,7 @@ export function SharedLiveRoomPlayerEmbodimentPanel({
     setPlaySemanticMonitorReady(false);
     const inspect = async (): Promise<void> => {
       try {
-        const response = await fetch(readinessPath, {
+        const response = await fetchScoped(readinessPath, {
           method: "POST",
           credentials: "include",
           signal: controller.signal,
@@ -429,7 +473,7 @@ export function SharedLiveRoomPlayerEmbodimentPanel({
       controller.abort();
       if (timer !== null) window.clearTimeout(timer);
     };
-  }, [playObjective, playSteeringAcknowledged, readinessPath]);
+  }, [fetchScoped, playObjective, playSteeringAcknowledged, readinessPath]);
 
   const mutationSelected = selectedCapabilities.some(
     (id) =>
@@ -458,7 +502,7 @@ export function SharedLiveRoomPlayerEmbodimentPanel({
 
   const configureCurrentAuthority = async (): Promise<HelixEnvironmentActionAuthority> => {
     const receipt = await readActionReceipt(
-      await fetch(authorityPath, {
+      await fetchScoped(authorityPath, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -520,7 +564,7 @@ export function SharedLiveRoomPlayerEmbodimentPanel({
     setCopyState("idle");
     try {
       const receipt = await readPairingReceipt(
-        await fetch(pairingPath, {
+        await fetchScoped(pairingPath, {
           method: "POST",
           credentials: "include",
           headers: {
@@ -559,7 +603,7 @@ export function SharedLiveRoomPlayerEmbodimentPanel({
   ): Promise<SafePairingReceipt> => {
     if (!sourceBinding) throw new Error("A current Minecraft source binding is required.");
     return readPairingReceipt(
-      await fetch(`${pairingPath}/local-player-handoff`, {
+      await fetchScoped(`${pairingPath}/local-player-handoff`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -610,6 +654,7 @@ export function SharedLiveRoomPlayerEmbodimentPanel({
 
   const startPlayJourney = async (): Promise<void> => {
     if (busy !== null) return;
+    const signal = scope.current.signal;
     setBusy("play");
     setMessage(null);
     setPlayStatus("Checking the exact Codex task and Minecraft identities…");
@@ -626,6 +671,7 @@ export function SharedLiveRoomPlayerEmbodimentPanel({
         );
       }
       const reasoningBinding = await inspectCurrentReasoningBinding(activeChatId);
+      signal.throwIfAborted();
       setPlayReasoningBinding(reasoningBinding);
       if (
         reasoningBinding.status !== "active" ||
@@ -669,12 +715,14 @@ export function SharedLiveRoomPlayerEmbodimentPanel({
       const currentAuthority = requiresAuthorityWrite
         ? await configureCurrentAuthority()
         : authority;
+      signal.throwIfAborted();
       if (!currentAuthority) {
         throw new Error("A current player-action authority is required.");
       }
 
       setPlayStatus("Launching or reusing the prepared Fabric client and joining localhost…");
-      await launchMinecraftLocalLifecycle();
+      await launchMinecraftLocalLifecycle(signal);
+      signal.throwIfAborted();
       setPlayLaunchConnected(true);
 
       if (!readiness?.ready_for_actions ||
@@ -689,12 +737,14 @@ export function SharedLiveRoomPlayerEmbodimentPanel({
         const idempotencySuffix = Array.from(new Uint8Array(idempotencyDigest))
           .map((value) => value.toString(16).padStart(2, "0"))
           .join("");
+        signal.throwIfAborted();
         await stageLocalPlayerPairing(
           currentAuthority,
           `minecraft-play:${idempotencySuffix}`,
         );
       }
 
+      signal.throwIfAborted();
       const requestId = `minecraft-play:${crypto.randomUUID()}`;
       playRequestIdRef.current = requestId;
       setPlayRequestId(requestId);
@@ -776,7 +826,7 @@ export function SharedLiveRoomPlayerEmbodimentPanel({
     setMessage(null);
     try {
       const receipt = await readActionReceipt(
-        await fetch(
+        await fetchScoped(
           `${authorityPath}/${encodeURIComponent(authority.action_authority_id)}`,
           { method: "DELETE", credentials: "include" },
         ),
@@ -913,7 +963,7 @@ export function SharedLiveRoomPlayerEmbodimentPanel({
             </div>
             <label className="mt-2 block text-[9px] text-cyan-100/75">
               Play objective
-              <textarea
+              <textarea data-helix-control-id="helix.ask.shared_live_room.shared-live-room-player-embodiment-panel.minecraft-play-objective" data-helix-interaction-kind="configure" data-helix-authority-state="blocked_pending_contract"
                 aria-label="Minecraft play objective"
                 value={playObjective}
                 disabled={busy !== null}

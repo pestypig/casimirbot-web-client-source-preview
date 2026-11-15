@@ -222,9 +222,9 @@ function coerceAction(value: unknown): HelixWorkstationAction | null {
       schema_version: HELIX_WORKSTATION_ACTION_SCHEMA_VERSION,
       action,
       payload: {
-        job_id: asNonEmptyString(payloadRecord?.job_id),
-        title: asNonEmptyString(payloadRecord?.title),
-        objective: asNonEmptyString(payloadRecord?.objective),
+        job_id: asNonEmptyString(payloadRecord?.job_id) ?? undefined,
+        title: asNonEmptyString(payloadRecord?.title) ?? undefined,
+        objective: asNonEmptyString(payloadRecord?.objective) ?? undefined,
         preferred_panels: preferredPanels.length > 0 ? preferredPanels : undefined,
         max_steps:
           typeof maxSteps === "number" && Number.isFinite(maxSteps) ? Math.max(1, Math.floor(maxSteps)) : undefined,

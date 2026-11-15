@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { CivilizationDiplomaticMoveLedger } from "./CivilizationDiplomaticMoveLedger";
+import { CivilizationEconomicHistory } from "./CivilizationEconomicHistory";
 import { resolveMoodAsset } from "@/lib/luma-moods";
 
 export type Unga81Affiliation = { countryIso3: string; countryName: string; speakerSegments: number; substantiveSegments: number };
@@ -676,6 +678,8 @@ export function CivilizationDiplomacyOverlay({ hoveredIso3, selectedIso3s, onTog
   </section>;
   return <section aria-label="UN General Debate country evidence" onMouseEnter={onHoverCardEnter} onMouseLeave={onHoverCardLeave} className="absolute bottom-12 right-3 z-[9] max-h-[43%] w-[min(22rem,calc(100%-1.5rem))] overflow-y-auto rounded-lg border border-emerald-200/40 bg-[#06120f]/95 p-3 text-xs text-slate-100 shadow-2xl backdrop-blur">
     <div className="flex items-center gap-2 text-sm font-semibold text-emerald-100"><span aria-hidden="true">💬</span>{focus.length === 2 ? "Compare stated priorities" : "Country statement"}</div>
+    <CivilizationDiplomaticMoveLedger countryIso3s={focus} />
+    <CivilizationEconomicHistory countryIso3s={focus} />
     {previewIso3 && <div className="mt-1 rounded border border-emerald-200/30 bg-emerald-100/5 p-1.5 text-[10px]" aria-label={`Hovered ${previewIso3} statement preview`}>
       <div className="font-semibold text-emerald-100">Hovering {visibleHoverPreview?.countryName ?? previewIso3} · selected comparison stays open</div>
       {visibleHoverPreview?.reviewedBrief?.assertions[0] ? <>

@@ -199,7 +199,7 @@ function chooseSolveVariable(expressionText: string): string | null {
   try {
     const vars = nerdamer(expressionText)
       .variables()
-      .filter((variable) => !SAFE_MATH_IDENTIFIERS.has(variable.toLowerCase()));
+      .filter((variable: string) => !SAFE_MATH_IDENTIFIERS.has(variable.toLowerCase()));
     if (!vars.length) return null;
     return vars.includes("x") ? "x" : vars[0] ?? null;
   } catch {

@@ -51,6 +51,7 @@ function PairingControls({ profileId, chatId, environment, onRuntimeBinding, onD
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [pairing, setPairing] = useState<PairingStatus | null>(null);
+  const [revokePairingIntent, setRevokePairingIntent] = useState<string | null>(null);
   const [previous, setPrevious] = useState<PreviousPairing | null>(() => {
     try {
       const raw = JSON.parse(localStorage.getItem(`${storageKey}:previous`) ?? "null");
@@ -147,6 +148,7 @@ function PairingControls({ profileId, chatId, environment, onRuntimeBinding, onD
         JSON.stringify(value.replacement) !== JSON.stringify(review.replacement)) throw new Error("pairing_scope_mismatch");
     if (!alive.current) return;
     setPairing(value);
+    if (value.state !== "accepted" && value.state !== "pending") setRevokePairingIntent(null);
     if (value.state === "accepted") {
       // A committed acceptance supersedes an earlier uncertain transport or
       // registration error from the same invitation. Do not leave the owner
@@ -519,7 +521,7 @@ function PairingControls({ profileId, chatId, environment, onRuntimeBinding, onD
       className="rounded-md border border-amber-300/35 bg-amber-400/10 p-3 text-amber-50" aria-live="polite">
       <p className="font-semibold">Saved pairing accepted · waiting for this exact task to reconnect</p>
       <p className="mt-1">Full Harness and the task binding recover separately after an update. Keep this pairing; no new invitation is needed.</p>
-      <button type="button" className="mt-2 min-h-11 rounded border border-amber-200/50 px-3 py-2 font-semibold"
+      <button data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.copy-reconnect-request-to-codex" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="mt-2 min-h-11 rounded border border-amber-200/50 px-3 py-2 font-semibold"
         onClick={() => void (async () => {
           try {
             if (!navigator.clipboard?.writeText) throw new Error("clipboard_unavailable");
@@ -531,7 +533,7 @@ function PairingControls({ profileId, chatId, environment, onRuntimeBinding, onD
         <p className="select-text break-words">{exactTaskRecoveryRequest(chatId)}</p></details>
       {pickupCopyStatus && <p>{pickupCopyStatus}</p>}
     </div>}
-    {guidanceStep ? <button type="button" className="rounded border border-cyan-200/40 px-3 py-1.5 font-semibold text-cyan-50"
+    {guidanceStep ? <button data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.highlight-pairing-step" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="rounded border border-cyan-200/40 px-3 py-1.5 font-semibold text-cyan-50"
       onClick={highlightNextPairingStep}>Highlight pairing step</button> : null}
     {pairingEnded && <div className="rounded-lg border border-amber-300/40 bg-amber-400/10 p-3">
       <p className="font-semibold text-amber-100">{recoverableReplacement
@@ -540,7 +542,7 @@ function PairingControls({ profileId, chatId, environment, onRuntimeBinding, onD
       <p className="mt-1 text-amber-50/85">{recoverableReplacement
         ? "Return to the previous pairing below. Task availability and Minecraft run readiness are checked separately."
         : "To connect again, start a new invitation and review the task and chat below."}</p>
-      {!recoverableReplacement && <button type="button" data-helix-guidance-target="task-pairing-renew" disabled={busy} onClick={reviewNewInvitation}
+      {!recoverableReplacement && <button data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.review-a-new-invitation" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" data-helix-guidance-target="task-pairing-renew" disabled={busy} onClick={reviewNewInvitation}
         className="mt-3 min-h-11 rounded-md border border-amber-200/60 bg-amber-200/15 px-3 py-2 font-semibold text-amber-50 focus-visible:outline focus-visible:outline-2 disabled:opacity-50">
         Review a new invitation
       </button>}
@@ -548,7 +550,7 @@ function PairingControls({ profileId, chatId, environment, onRuntimeBinding, onD
     <details className="rounded-md border border-white/10 p-3" open={pairing?.state !== "accepted"}>
     <summary className="cursor-pointer font-semibold text-cyan-50">{pairing?.state === "accepted" ? "Review pairing details and replacement options" : "Review the exact task and invitation"}</summary>
     <label className="block mt-3">Registered AI task
-      <select data-helix-guidance-target="task-pairing-choose" value={review.registrationId} disabled={busy || submitted} onChange={e => change({ registrationId: e.target.value })}>
+      <select data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.select" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" data-helix-guidance-target="task-pairing-choose" value={review.registrationId} disabled={busy || submitted} onChange={e => change({ registrationId: e.target.value })}>
         <option value="">Choose an exact task</option>
         {review.registrationId && !selected && <option value={review.registrationId}>Previously selected task — refresh registration</option>}
         {destinations.map(item => <option key={item.registrationId} value={item.registrationId}>{item.destination.taskId} · {item.destination.clientId}</option>)}
@@ -556,10 +558,10 @@ function PairingControls({ profileId, chatId, environment, onRuntimeBinding, onD
     </label>
     {pairing?.state === "accepted" && <div className="rounded-md border border-cyan-300/20 bg-cyan-400/5 p-3 text-cyan-50">
       <p>This picker shows the registration used by the accepted pairing; it is locked while that pairing is active. To attach a prepared run or change its duration, review a replacement. The current pairing stays active until the selected task accepts the replacement.</p>
-      <button type="button" className="mt-2 min-h-11 rounded-md border border-cyan-300/50 px-3 py-2 font-semibold disabled:opacity-50"
+      <button data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.review-replacement-pairing" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="mt-2 min-h-11 rounded-md border border-cyan-300/50 px-3 py-2 font-semibold disabled:opacity-50"
         disabled={busy} onClick={() => void beginReplacement()}>Review replacement pairing</button>
     </div>}
-    <button type="button" data-helix-guidance-target="task-pairing-refresh" disabled={busy} onClick={() => void refreshTasks()}
+    <button data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.refresh-registered-tasks" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" data-helix-guidance-target="task-pairing-refresh" disabled={busy} onClick={() => void refreshTasks()}
       className="inline-flex min-h-11 items-center rounded-md border border-cyan-300/50 bg-cyan-300/10 px-3 py-2 font-semibold text-cyan-50 hover:bg-cyan-300/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 disabled:cursor-not-allowed disabled:opacity-50">
       Refresh registered tasks
     </button>
@@ -569,7 +571,7 @@ function PairingControls({ profileId, chatId, environment, onRuntimeBinding, onD
       {!destinations.length && destinationRead === "verified" && <p className="font-semibold">No task is available to select yet.</p>}
       <p className="font-semibold">Connect an existing Codex chat</p>
       <p>Only tasks that checked in through CasimirBot MCP appear above; this is not a list of every Codex chat. Send the request below to the existing chat you intend, even if another task is already listed. The task uses the one-step setup tool when available, or compatible check-in and registration tools. This page cannot wake an idle AI task.</p>
-      <button type="button" data-helix-guidance-target="task-pairing-register" className="my-2 min-h-11 rounded-md border border-cyan-300/40 px-3 py-2"
+      <button data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.copy-setup-request-to-codex" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" data-helix-guidance-target="task-pairing-register" className="my-2 min-h-11 rounded-md border border-cyan-300/40 px-3 py-2"
         onClick={() => void (async () => {
           try {
             if (!navigator.clipboard?.writeText) throw new Error("clipboard_unavailable");
@@ -590,36 +592,36 @@ function PairingControls({ profileId, chatId, environment, onRuntimeBinding, onD
       {previous && <p>Previous pairing deadline: {previous.pairing.pairingExpiresAt}.</p>}
       {!submitted && previousChecked && previous && ["expired", "revoked", "superseded"].includes(previous.pairing.state) && <div>
         <p>The previous pairing has ended, so this replacement cannot be approved. Start a new review to continue.</p>
-        <button type="button" disabled={busy}
+        <button data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.review-a-new-invitation.2" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" disabled={busy}
           className="my-2 min-h-11 rounded-md border border-cyan-300/40 px-3 py-2 focus-visible:outline focus-visible:outline-2 disabled:opacity-50"
           onClick={() => void reviewAfterPreviousEnded()}>Review a new invitation</button>
       </div>}
       {previous && (!submitted || (pairing && !["pending", "accepted"].includes(pairing.state))) &&
-        <button type="button" data-helix-guidance-target={recoverableReplacement ? "task-pairing-restore" : undefined}
+        <button data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.return-to-previous-pairing" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" data-helix-guidance-target={recoverableReplacement ? "task-pairing-restore" : undefined}
           className="min-h-11 rounded-md border border-cyan-300/50 bg-cyan-300/10 px-3 py-2 font-semibold text-cyan-50 focus-visible:outline focus-visible:outline-2 disabled:opacity-50"
           disabled={busy} onClick={() => void returnToPrevious()}>Return to previous pairing</button>}
     </div>}
     {selected && <p className="break-all rounded-md border border-white/10 bg-white/5 p-2">Selected task: <strong>{selected.destination.taskId}</strong></p>}
     <label className="block">Invitation expires after
-      <select value={review.invitationSeconds} disabled={busy || submitted} onChange={e => change({ invitationSeconds: Number(e.target.value) as 300 | 900 | 3600 })}>
+      <select data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.select.2" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" value={review.invitationSeconds} disabled={busy || submitted} onChange={e => change({ invitationSeconds: Number(e.target.value) as 300 | 900 | 3600 })}>
         <option value={300}>5 minutes</option><option value={900}>15 minutes</option><option value={3600}>60 minutes</option>
       </select>
     </label>
     <label className="block">Pairing duration
-      <select value={review.pairingSeconds} disabled={busy || submitted} onChange={e => change({ pairingSeconds: Number(e.target.value) as 3600 | 28800 | 86400 })}>
+      <select data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.select.3" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" value={review.pairingSeconds} disabled={busy || submitted} onChange={e => change({ pairingSeconds: Number(e.target.value) as 3600 | 28800 | 86400 })}>
         <option value={3600}>1 hour</option><option value={28800}>8 hours</option><option value={86400}>24 hours</option>
       </select>
     </label>
-    {runChoice && <label className="block"><input type="checkbox" checked={Boolean(review.environment)} disabled={busy || submitted}
+    {runChoice && <label className="block"><input data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.input" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" type="checkbox" checked={Boolean(review.environment)} disabled={busy || submitted}
       onChange={e => change({ environment: e.target.checked ? runChoice : null })} /> Include environment run {runChoice.runId} in room {runChoice.roomId}</label>}
     {runChoice && !environment && <p>Last verified run; availability is checked again when you approve. Keeping this choice does not grant permission.</p>}
-    {!submitted && differentRunAvailable && <button type="button" disabled={busy}
+    {!submitted && differentRunAvailable && <button data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.review-current-environment-run" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" disabled={busy}
       className="my-2 min-h-11 rounded-md border border-cyan-300/40 px-3 py-2 focus-visible:outline focus-visible:outline-2 disabled:opacity-50"
       onClick={() => change({ environment: null })}>
       Review current environment run {currentEnvironment.runId}
     </button>}
     <label className="block">Invitation delivery
-      <select value={review.invitationDelivery ?? "copy"} disabled={busy || submitted}
+      <select data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.select.4" data-helix-interaction-kind="configure" data-helix-authority-state="client_local" value={review.invitationDelivery ?? "copy"} disabled={busy || submitted}
         onChange={e => change({ invitationDelivery: e.target.value === "private_mcp" ? "private_mcp" : e.target.value === "automatic" ? "automatic" : undefined })}>
         <option value="private_mcp">Let this exact task accept privately through MCP (recommended)</option>
         <option value="copy">Copy invitation (manual secret-bearing handoff)</option>
@@ -641,7 +643,7 @@ function PairingControls({ profileId, chatId, environment, onRuntimeBinding, onD
     </button>}
     {submitted && (!pairing || pairing.state === "pending") && <div>
       <p>Canceling also revokes any pairing already created by this request. A replacement does not restore an earlier superseded pairing.</p>
-      <button type="button" className="my-2 min-h-11 rounded-md border border-slate-400 px-3 py-2 focus-visible:outline focus-visible:outline-2 disabled:opacity-50"
+      <button data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.cancel-request-and-review-again" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="my-2 min-h-11 rounded-md border border-slate-400 px-3 py-2 focus-visible:outline focus-visible:outline-2 disabled:opacity-50"
         disabled={busy} onClick={() => void cancelRequest()}>Cancel request and review again</button>
     </div>}
     {review.invitationDelivery === "private_mcp"
@@ -651,11 +653,11 @@ function PairingControls({ profileId, chatId, environment, onRuntimeBinding, onD
       : <p>Use Copy invitation and send it to the selected task for authenticated acceptance.{!automaticAvailable && " Automatic delivery is unavailable for this connection."}</p>}
     {pairing?.state === "pending" && review.invitationDelivery === "automatic" && <>
       {deliveryMessage && <p>{deliveryMessage}</p>}
-      <button type="button" disabled={busy || Boolean(invitationElapsed)} onClick={() => void run(async () => { await deliver(pairing); })}>Reconcile delivery</button>
+      <button data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.reconcile-delivery" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" disabled={busy || Boolean(invitationElapsed)} onClick={() => void run(async () => { await deliver(pairing); })}>Reconcile delivery</button>
     </>}
     {pairing?.state === "pending" && review.invitationDelivery === "private_mcp" && !invitationElapsed && <div>
       <p className="font-semibold">Owner approval recorded. Ask the same task to continue setup.</p>
-      <button type="button" data-helix-guidance-target="task-pairing-handoff" className="my-2 min-h-11 rounded-md border border-cyan-300/40 px-3 py-2"
+      <button data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.copy-continue-request-to-codex" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" data-helix-guidance-target="task-pairing-handoff" className="my-2 min-h-11 rounded-md border border-cyan-300/40 px-3 py-2"
         onClick={() => void (async () => {
           try {
             if (!navigator.clipboard?.writeText) throw new Error("clipboard_unavailable");
@@ -663,7 +665,7 @@ function PairingControls({ profileId, chatId, environment, onRuntimeBinding, onD
             if (alive.current) setPickupCopyStatus("Continue request copied. Paste it into the selected Codex chat, then return here for binding status.");
           } catch { if (alive.current) setPickupCopyStatus("Copy failed. Clipboard access is unavailable; do not copy the invitation secret into chat."); }
         })()}>Copy continue request to Codex</button>
-      <button type="button" className="my-2 ml-2 min-h-11 rounded-md border border-cyan-300/40 px-3 py-2"
+      <button data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.copy-request-for-older-mcp-tools" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="my-2 ml-2 min-h-11 rounded-md border border-cyan-300/40 px-3 py-2"
         onClick={() => void (async () => {
           try {
             if (!navigator.clipboard?.writeText) throw new Error("clipboard_unavailable");
@@ -691,13 +693,24 @@ function PairingControls({ profileId, chatId, environment, onRuntimeBinding, onD
           : `Pairing: ${pairing.state}. Current task availability is checked separately below.`}</p>
       {pairing.state === "accepted" && runtimeMessage && <p>{runtimeMessage}</p>}
       <p>Invitation deadline: {pairing.invitationExpiresAt}. Pairing deadline: {pairing.pairingExpiresAt}.</p>
-      <button type="button" data-helix-guidance-target={pairing.state === "accepted" ? "task-pairing-binding" : "task-pairing-accept"} className="mr-2 min-h-11 rounded-md border border-white/20 px-3 py-2" disabled={busy} onClick={() => void run(async () => {
+      <button data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.check-acceptance" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" data-helix-guidance-target={pairing.state === "accepted" ? "task-pairing-binding" : "task-pairing-accept"} className="mr-2 min-h-11 rounded-md border border-white/20 px-3 py-2" disabled={busy} onClick={() => void run(async () => {
         await refreshPairing(pairing.id);
       })}>Check acceptance</button>
-      <button type="button" className="min-h-11 rounded-md border border-white/20 px-3 py-2" disabled={busy || pairing.state === "revoked"} onClick={() => void run(async () => {
-        const result = await revokePairing(pairing.id);
-        acceptStatus(result.pairing, pairing.id);
-      })}>Revoke pairing</button>
+      <button data-helix-authority-state="client_local" type="button" data-helix-control-id="workstation.panel.agent-access.durable-pairing.review-revocation"
+        data-helix-interaction-kind="human_only" className="min-h-11 rounded-md border border-white/20 px-3 py-2" disabled={busy || pairing.state === "revoked"}
+        onClick={() => setRevokePairingIntent(pairing.id)}>Revoke pairing</button>
+      {revokePairingIntent === pairing.id && pairing.state !== "revoked" && <div role="alert" className="mt-2 rounded-md border border-rose-300/40 p-3 text-rose-100">
+        <p>Revoking this pairing also disconnects this Codex chat and its runtime binding. It cannot be restored; reconnecting requires a new owner-approved invitation. This is not the control for changing only the Minecraft run.</p>
+        <button data-helix-control-id="workstation.panel.agent-access.durable-task-pairing.keep-pairing" data-helix-interaction-kind="human_only" data-helix-authority-state="client_local" type="button" className="mr-2 mt-2 min-h-11 rounded-md border border-white/20 px-3 py-2" disabled={busy}
+          onClick={() => setRevokePairingIntent(null)}>Keep pairing</button>
+        <button data-helix-authority-state="client_local" type="button" data-helix-control-id="workstation.panel.agent-access.durable-pairing.confirm-revocation"
+          data-helix-interaction-kind="human_only" className="mt-2 min-h-11 rounded-md border border-rose-300/50 px-3 py-2" disabled={busy}
+          onClick={() => void run(async () => {
+            if (revokePairingIntent !== pairing.id) return;
+            const result = await revokePairing(pairing.id);
+            acceptStatus(result.pairing, pairing.id);
+          })}>Confirm revoke chat pairing</button>
+      </div>}
     </>}
     {message && <p role="alert">{message}</p>}
   </section>;

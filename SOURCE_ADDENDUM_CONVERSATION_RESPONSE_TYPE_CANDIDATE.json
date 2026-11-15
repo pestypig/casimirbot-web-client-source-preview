@@ -1,0 +1,39 @@
+{
+  "observed_at": "2026-11-14T05:08:35.859800+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "files": [
+    {
+      "path": "client/src/lib/agi/api.ts",
+      "canonical_sha256": "f3e86019a0c817430e79fc74d4e93d393394b5810f565160d8ae354213f018a6",
+      "export_sha256": "d577138451426f41fe9570d16171bf94d1863dfb7cb6670a5f26357b6c8ec00a",
+      "previous_public_sha256": "6a1fd449776ca1f0e94b93b0eefdda29c272b727e62db81e4b3f1e9a5b06e629",
+      "bytes": 146470,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "validation_tests": [
+    {
+      "path": "client/src/lib/agi/__tests__/api.voice-transcribe.spec.ts",
+      "canonical_sha256": "e5f135bd486d4a48e18696b03c1e11b03d05e3c726460d792c7ea820029897ae"
+    }
+  ],
+  "classification": "evidence normalization",
+  "source_frozen": false,
+  "published": false,
+  "review": [
+    "ConversationTurnResponse now declares the active conversation route pending_server_request projection, with the exact request_id, clarify/confirm kind, reason and prompt fields, nullable and optional.",
+    "The existing client clarification reader can access the field without an undeclared-property error.",
+    "Only erased TypeScript annotations changed. No transport, dispatch, pending-request resolution, confirmation or program-authority behavior changed."
+  ],
+  "server_contract_evidence": {
+    "path": "server/routes/agi.plan.ts",
+    "sha256": "82e4d94d0b0f317ca919b9c54f7adc6375e8b0847e46cf4849fb2f760d7c9c22",
+    "response_projection": "    pending_server_request: pendingServerRequest\n      ? {\n          request_id: pendingServerRequest.requestId,\n          kind: pendingServerRequest.kind,\n          reason: pendingServerRequest.reason,\n          prompt: pendingServerRequest.prompt,\n        }\n      : null,\n    fail_reason: failReason,\n    durationMs: Math.max(0, Date.now() - requestStartedAt",
+    "kind_declaration": "type HelixConversationPendingInputKind = \"clarify\" | \"confirm\";"
+  },
+  "limits": [
+    "Static source contract alignment and mocked API tests do not prove a live server clarification round trip or installed acceptance.",
+    "The older extracted conversation handler omits this optional projection; no extracted-handler parity claim is made."
+  ]
+}

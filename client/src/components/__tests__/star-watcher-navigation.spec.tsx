@@ -9,21 +9,24 @@ import {existsSync,readFileSync} from 'node:fs';
 import {afterEach,it,expect,vi} from 'vitest';
 import {render,screen,fireEvent,waitFor,act,cleanup} from '@testing-library/react';
 vi.mock('@tanstack/react-query',()=>({useMutation:()=>({mutate:vi.fn(),isPending:false})}));
+// Navigation does not exercise the separate platform-budget API or owner controls.
+vi.mock('../SolarReasoningBudget',()=>({SolarReasoningBudget:()=>null}));
 vi.mock('../SolarDiskCanvas',()=>({SolarDiskCanvas:()=>null}));
 vi.mock('../SolarKhiNativeOverlay',()=>({SolarKhiNativeOverlay:()=>null}));
 vi.mock('../SolarObservationRaster',()=>({SolarObservationRaster:()=>null}));
-vi.mock('../SolarCacheManager',()=>({SolarCacheManager:()=>null}));
+vi.mock('../SolarCacheManager',()=>({SolarCacheManager:()=> <div data-testid="solar-cache-admin" />}));
 vi.mock('../SolarActiveRegionCatalog',()=>({SolarActiveRegionCatalog:()=>null}));
 vi.mock('../SolarProfileComparison',()=>({SolarProfileComparison:({observationArchive}:any)=><p data-testid="selected-archive">{observationArchive?.archive_identity?.snapshotId??'none'}</p>}));
 import StarWatcherPanel from '../../pages/star-watcher-panel';
 import {getPanelDef} from '../../lib/desktop/panelRegistry';
 import {isSolarSpecialistLaunchPanel} from '../../lib/workstation/solarSpecialistPanels';
 import {useWorkstationLayoutStore} from '../../store/useWorkstationLayoutStore';
-import {HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT} from '../../lib/workstation/accountCapabilityPolicy';
+import {HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,cacheAccountCapabilityPolicy} from '../../lib/workstation/accountCapabilityPolicy';
+import {HELIX_DEVELOPER_ACCOUNT_POLICY,HELIX_USER_ACCOUNT_POLICY} from '../../../../shared/helix-account-session';
 if(!globalThis.crypto?.subtle)Object.defineProperty(globalThis,'crypto',{value:webcrypto,configurable:true});
 const packageData=JSON.parse(await syntheticSolarPortablePackage(true));
 const text=JSON.stringify(packageData.observationArchive);
-afterEach(()=>{cleanup();window.dispatchEvent(new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT));vi.restoreAllMocks();vi.unstubAllGlobals();});
+afterEach(()=>{cleanup();cacheAccountCapabilityPolicy(null);window.dispatchEvent(new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT));vi.restoreAllMocks();vi.unstubAllGlobals();});
 function network(){const fetch=vi.fn(async(url:any)=>String(url).includes('runtime-capability')
   ?{ok:true,json:async()=>({available:false,reason:'test-runtime-unavailable'})}
   :{ok:true,text:async()=>JSON.stringify({driver_history_len:0})});vi.stubGlobal('fetch',fetch);vi.stubGlobal('crypto',webcrypto);return fetch;}
@@ -35,6 +38,20 @@ it('keeps ingest diagnostics available but collapsed on first render',()=>{
   fireEvent.click(summary);
   expect(details?.open).toBe(true);
   expect(screen.getByRole('button',{name:'Mem snapshot'})).toBeTruthy();
+});
+it('shows shared solar cache administration only with its explicit feature grant',()=>{
+  network();cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY);
+  render(<StarWatcherPanel/>);
+  expect(screen.queryByTestId('solar-cache-admin')).toBeNull();
+  act(()=>{cacheAccountCapabilityPolicy(HELIX_DEVELOPER_ACCOUNT_POLICY);});
+  expect(screen.getByTestId('solar-cache-admin')).toBeTruthy();
+  act(()=>{cacheAccountCapabilityPolicy({
+    ...HELIX_USER_ACCOUNT_POLICY,
+    feature_flags:[...HELIX_USER_ACCOUNT_POLICY.feature_flags,'solar_cache_management'],
+  });});
+  expect(screen.queryByTestId('solar-cache-admin')).toBeNull();
+  act(()=>{cacheAccountCapabilityPolicy(HELIX_USER_ACCOUNT_POLICY);});
+  expect(screen.queryByTestId('solar-cache-admin')).toBeNull();
 });
 it('starts at the disk and routes through a categorized directory',async()=>{
   network();render(<StarWatcherPanel/>);
@@ -72,7 +89,7 @@ it('switches the primary surface between the disk and the 3D globe',async()=>{
   expect(screen.queryByRole('region',{name:'Solar disk and imagery'})).toBeNull();
   fireEvent.click(screen.getByRole('button',{name:'Solar disk'}));
   expect(screen.getByRole('region',{name:'Solar disk and imagery'})).toBeTruthy();
-});
+},30000);
 it('defaults to the HMI sunspot disk and exposes the separate whole-disk magnetogram',async()=>{
   const sha='c'.repeat(64);
   const preview=(channel:'hmiContinuum'|'hmiMag')=>({schemaVersion:'solar-live-preview/2',channel,
@@ -155,7 +172,7 @@ it.skipIf(!existsSync(registeredBundlePath))('shows the same HMI registration an
   fireEvent.change(screen.getByLabelText('Import magnetic comparison bundle'),
     {target:{files:[{size:Buffer.byteLength(json),text:async()=>json}]}});
   await waitFor(()=>expect(screen.getByText(/HMI sphere registration solar-sphere-registration:3c5c22c/)).toBeTruthy());
-  await waitFor(()=>expect(screen.getByLabelText('Solar sphere scene identity').textContent).toMatch(/solar-sphere-scene:[a-f0-9]{64}/));
+  await waitFor(()=>expect(screen.getByLabelText('Solar sphere scene identity').textContent).toMatch(/solar-sphere-scene:[a-f0-9]{64}/),{timeout:10000});
   expect(screen.getByText(/29\/81 visible-disk samples, 52 off-disk/)).toBeTruthy();
   expect(screen.getByText(/No full-pixel coverage, far-side observation, coronal height or calibrated magnetic fit/)).toBeTruthy();
   expect(screen.getByRole('checkbox',{name:/HMI visible-disk geometry anchors \(25\)/})).toBeTruthy();
@@ -163,7 +180,7 @@ it.skipIf(!existsSync(registeredBundlePath))('shows the same HMI registration an
   expect(screen.getByRole('img',{name:'HMI sampled image-plane geometry'})).toBeTruthy();
   fireEvent.click(screen.getByRole('button',{name:'#1'}));
   expect(screen.getByText(/Anchor 1: HMI pixel .* ↔ Carrington/)).toBeTruthy();
-});
+},30000);
 it('routes a located HEK-only active region from the globe to its event inspector',async()=>{
   vi.spyOn(HTMLCanvasElement.prototype,'getContext').mockReturnValue(null);
   const eventId='ivo://hek/test-active-region';

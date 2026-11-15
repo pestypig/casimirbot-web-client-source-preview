@@ -1,7 +1,7 @@
 import React from 'react';
-import {Canvas,useThree} from '@react-three/fiber';
+import {Canvas,useFrame,useThree} from '@react-three/fiber';
 import {Line,OrbitControls} from '@react-three/drei';
-import {BufferGeometry,Color,DataTexture,Float32BufferAttribute,LinearFilter,PointsMaterial,Quaternion,RGBAFormat,SRGBColorSpace,UnsignedByteType,Vector3} from 'three';
+import {BufferGeometry,Color,DataTexture,Float32BufferAttribute,LinearFilter,PointsMaterial,Quaternion,RGBAFormat,SRGBColorSpace,UnsignedByteType,Vector3,type Group} from 'three';
 import type {OrbitControls as OrbitControlsImpl} from 'three-stdlib';
 import {deriveSolarEquivalentDipole,solarGlobalRadialMapContentId,solarGlobalRadialMapSchema,type SolarGlobalRadialMap} from '../../../shared/solar-magnetic-dipole';
 import {verifySolarPfssGeometry,type SolarPfssGeometry} from '../../../shared/solar-pfss-geometry';
@@ -14,7 +14,18 @@ import {buildSolarSphereScene,type SolarSphereScene} from '../../../shared/solar
 import {compareDisplayedHmiLosToMapL1,projectRadialL1ToLos} from '../../../shared/solar-magnetic-dipole-los-comparison';
 import {solarActiveRegionMarkers,type SolarActiveRegionEvent,type SolarActiveRegionMarker} from '../../../shared/solar-active-region-markers';
 import {SolarMagneticBundleStorage} from './SolarMagneticBundleStorage';
-import {HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT} from '../lib/workstation/accountCapabilityPolicy';
+import {SolarRobPfssBrowser} from './SolarRobPfssBrowser';
+import {SolarObservationRaster} from './SolarObservationRaster';
+import type {RobPfssParentReceipt,RobPfssSnapshot} from '../../../shared/solar-rob-pfss';
+import {prepareSolarRobPfssViewRecipe,verifySolarRobPfssViewRecipe,
+  type SolarRobPfssEarthImageIdentity,type SolarRobPfssViewRecipe} from '../../../shared/solar-rob-pfss-view-recipe';
+import {projectRobPfssDisplayEndpoints,robPfssImageProjectionSchema,selectRobPfssProjectionImage} from '../../../shared/solar-rob-pfss-image-projection';
+import {SOLAR_GLOBE_TEXTURE_ROTATION_Y} from '../../../shared/solar-globe-texture-frame';
+import {remapSurfaceRgba,sphereEquirectangularChart} from '../../../shared/surface-registration';
+import {solarSurfaceImageMapFromWcs,type SolarObserverGeometry} from '../../../shared/solar-surface-registration';
+import {earthViewPose} from '../lib/solar-earth-view-pose';
+import {HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,readCachedAccountProfileIdentity} from '../lib/workstation/accountCapabilityPolicy';
+import {solarDisplayRgb,type SolarImagePalette} from '../lib/solar-aia193-display';
 
 const MAX_FILE_BYTES=4_000_000;
 const MAX_RETAINED_BUNDLE_BYTES=1_500_000;
@@ -60,6 +71,43 @@ function makeTexture(map:SolarGlobalRadialMap) {
   return texture;
 }
 
+export type EarthFacingArchiveFrame={archiveId:string;instrument:string;wavelengthAngstrom:number;
+  frameIndex:number;observedAtUtc:string;displaySha256:string;declaredFitsSha256:string;
+  retainedSourceImageId?:string;
+  gridSize:number;mapBase64:string;wcsHeader:Record<string,unknown>;observer:SolarObserverGeometry};
+
+function makeEarthFacingTexture(frame:EarthFacingArchiveFrame,palette:SolarImagePalette){
+  const size=frame.gridSize;
+  if(!Number.isInteger(size)||size<32||size>512||
+     frame.mapBase64.length!==4*Math.ceil(size*size*4/3))throw new Error('Archived solar image grid is invalid');
+  const bytes=Uint8Array.from(atob(frame.mapBase64),value=>value.charCodeAt(0));
+  if(bytes.length!==size*size*4)throw new Error('Archived solar image byte count is invalid');
+  const values=new Float32Array(bytes.buffer),rgba=new Uint8ClampedArray(size*size*4);
+  for(let index=0;index<values.length;index++){
+    const value=values[index];
+    if(!Number.isFinite(value)||value<0||value>1)throw new Error('Archived solar image sample is invalid');
+    const offset=index*4;
+    const color=solarDisplayRgb(value,palette);
+    rgba[offset]=color[0];rgba[offset+1]=color[1];rgba[offset+2]=color[2];rgba[offset+3]=255;
+  }
+  const width=Math.min(1024,size*2),height=width/2;
+  const chart=sphereEquirectangularChart(1,width,height,[0,2*Math.PI]);
+  const map=solarSurfaceImageMapFromWcs(chart,size,size,frame.wcsHeader,frame.observer);
+  const projected=remapSurfaceRgba({width:size,height:size,data:rgba},map);
+  const pixels=new Uint8Array(width*height*4);
+  let covered=0;
+  for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+    const from=y*width+x,to=((height-1-y)*width+(width-1-x))*4;
+    if(!projected.valid[from])continue;
+    covered++;
+    pixels.set(projected.image.data.subarray(from*4,from*4+4),to);
+  }
+  const texture=new DataTexture(pixels,width,height,RGBAFormat,UnsignedByteType);
+  texture.colorSpace=SRGBColorSpace;texture.magFilter=LinearFilter;texture.minFilter=LinearFilter;
+  texture.needsUpdate=true;
+  return {texture,coverageFraction:covered/(width*height)};
+}
+
 function DipoleLines({color,opacity}:{color:string;opacity:number}){
   const loops=React.useMemo(()=>[1.2,1.4,1.6].flatMap((shell)=>[0,45,90,135].map((azimuth)=>{
     const points:[number,number,number][]=[];
@@ -96,9 +144,15 @@ function ObservedLosResidualMarkers({diagnostic,dipoleVector,colorBasis}:{diagno
   return <points geometry={geometry} material={material}/>;
 }
 
-function MagneticScene({map,model,diagnostic,registration,showRegistration,selectedAnchorIndex,onAnchorSelect,dipole,showDipole,showDerivedDipole,showPfss,showLos,losColorBasis,catalogMarkers,showCatalogMarkers,selectedCatalogEventId,onCatalogEventSelect,cameraPosition,onCameraChange}:{map:SolarGlobalRadialMap|null;
+function MagneticScene({map,earthTexture,secondaryEarthTexture=null,blendAlpha=1,showEarthImage,surfaceRotationY,earthImagePose=null,secondaryEarthImagePose=null,sceneRotationY=0,sceneRotationRef,fieldPoseRef,model,robSnapshot,secondaryRobSnapshot=null,robLongitudeOffsetDeg,secondaryRobLongitudeOffsetDeg=null,diagnostic,registration,showRegistration,selectedAnchorIndex,onAnchorSelect,dipole,showDipole,showDerivedDipole,showPfss,showRobPfss,showLos,losColorBasis,catalogMarkers,showCatalogMarkers,selectedCatalogEventId,onCatalogEventSelect,cameraPosition,onCameraChange}:{map:SolarGlobalRadialMap|null;
+  earthTexture:DataTexture|null;showEarthImage:boolean;surfaceRotationY:number;
+  secondaryEarthTexture?:DataTexture|null;blendAlpha?:number;sceneRotationY?:number;
+  earthImagePose?:Quaternion|null;secondaryEarthImagePose?:Quaternion|null;
+  sceneRotationRef?:React.RefObject<number>;fieldPoseRef?:React.RefObject<Quaternion>;
   model:SolarPfssGeometry|null;dipole:ReturnType<typeof deriveSolarEquivalentDipole>|null;
-  diagnostic:SolarMagneticLosDiagnostic|null;showDipole:boolean;showDerivedDipole:boolean;showPfss:boolean;showLos:boolean;
+  robSnapshot:RobPfssSnapshot|null;robLongitudeOffsetDeg:number|null;
+  secondaryRobSnapshot?:RobPfssSnapshot|null;secondaryRobLongitudeOffsetDeg?:number|null;
+  diagnostic:SolarMagneticLosDiagnostic|null;showDipole:boolean;showDerivedDipole:boolean;showPfss:boolean;showRobPfss:boolean;showLos:boolean;
   registration:SolarSphereRegistration|null;showRegistration:boolean;
   selectedAnchorIndex:number|null;onAnchorSelect:(index:number)=>void;
   losColorBasis:'map_residual'|'radial_l1_residual';
@@ -106,7 +160,13 @@ function MagneticScene({map,model,diagnostic,registration,showRegistration,selec
   onCatalogEventSelect?:(id:string)=>void;
   cameraPosition:[number,number,number];onCameraChange:(position:[number,number,number])=>void}){
   const controls=React.useRef<OrbitControlsImpl|null>(null);
+  const rotatingGroup=React.useRef<Group>(null);
+  const fieldGroup=React.useRef<Group>(null);
   const {camera}=useThree();
+  useFrame(()=>{
+    if(rotatingGroup.current)rotatingGroup.current.rotation.y=sceneRotationRef?.current??sceneRotationY;
+    if(fieldGroup.current&&fieldPoseRef?.current)fieldGroup.current.quaternion.copy(fieldPoseRef.current);
+  });
   const texture=React.useMemo(()=>map?makeTexture(map):null,[map]);
   const dipoleOrientation=React.useMemo(()=>{
     if(!dipole || dipole.magnitudeGauss<1e-6)return null;
@@ -116,16 +176,37 @@ function MagneticScene({map,model,diagnostic,registration,showRegistration,selec
   React.useEffect(()=>()=>{texture?.dispose();},[texture]);
   return <>
     <ambientLight intensity={0.85}/><directionalLight position={[3,4,5]} intensity={1.3}/>
-    <mesh>
+    <group ref={rotatingGroup} rotation={[0,sceneRotationY,0]}>
+    {/* Three's sphere UV origin is at Cartesian -x; corrected views rotate it to Carrington +x. */}
+    <mesh rotation={[0,surfaceRotationY,0]}>
       <sphereGeometry args={[radius,64,32]}/>
       {texture?<meshBasicMaterial key="radial-map" map={texture}/>:<meshStandardMaterial key="illustrative" color="#cba64f" roughness={1}/>}
     </mesh>
+    {showEarthImage&&earthTexture&&<group quaternion={earthImagePose??undefined}><mesh rotation={[0,surfaceRotationY,0]}>
+      <sphereGeometry args={[radius*1.004,128,64]}/>
+      <meshBasicMaterial map={earthTexture} transparent depthWrite={false}/>
+    </mesh></group>}
+    {showEarthImage&&secondaryEarthTexture&&<group quaternion={secondaryEarthImagePose??undefined}><mesh rotation={[0,surfaceRotationY,0]}>
+      <sphereGeometry args={[radius*1.006,128,64]}/>
+      <meshBasicMaterial map={secondaryEarthTexture} transparent opacity={blendAlpha} depthWrite={false}/>
+    </mesh></group>}
     {showDipole&&<DipoleLines color="#71d7ed" opacity={0.55}/>}
     {showDerivedDipole&&dipoleOrientation&&<group quaternion={dipoleOrientation}><DipoleLines color="#f4d572" opacity={0.8}/></group>}
     {showPfss&&model?.lines.map(line=><Line key={line.lineId}
       points={line.points.map(([r,lat,lon])=>xyz(r,lat,lon))}
       color={line.polarity==='positive'?'#f6a65f':line.polarity==='negative'?'#7595ff':'#b5bbc5'}
       lineWidth={1.4} transparent opacity={0.8}/>)}
+    <group ref={fieldGroup}>
+    {showRobPfss&&robSnapshot?.lines.map(line=><Line key={`rob-${line.lineIndex}`}
+      points={line.points.map(([r,lat,lon])=>xyz(r,lat,(lon+(robLongitudeOffsetDeg??0))%360))}
+      color={line.topology==='closed'?'#e2e8f0':line.polarity==='negative'?'#7298ff':'#f17f7f'}
+      lineWidth={1.2} transparent opacity={secondaryRobSnapshot?0.8*(1-blendAlpha):0.8}/>)}
+    {showRobPfss&&secondaryRobSnapshot?.lines.map(line=><Line key={`rob-next-${line.lineIndex}`}
+      points={line.points.map(([r,lat,lon])=>xyz(r,lat,(lon+(secondaryRobLongitudeOffsetDeg??0))%360))}
+      color={line.topology==='closed'?'#e2e8f0':line.polarity==='negative'?'#7298ff':'#f17f7f'}
+      lineWidth={1.2} transparent opacity={0.8*blendAlpha}/>)}
+    </group>
+    </group>
     {showLos&&diagnostic&&<ObservedLosResidualMarkers diagnostic={diagnostic} dipoleVector={dipole?.vectorGauss??null} colorBasis={losColorBasis}/>}
     {showRegistration&&registration?.anchors.map((anchor,index)=><mesh key={`hmi-geometry-${index}`}
       position={xyz(1.055,anchor.carringtonLatitudeDeg,anchor.carringtonLongitudeDeg)}
@@ -150,14 +231,137 @@ async function readJsonFile(file:File):Promise<unknown>{
   return JSON.parse(await file.text()) as unknown;
 }
 
-export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents=[],selectedCatalogEventId=null,onCatalogEventSelect}:{
+/** A playback-only view: the image can remain visible across an honest model gap. */
+function SolarTemporalMagneticGlobeView({image,referenceImage=null,snapshot,rotationDeg,nextImage=null,nextSnapshot=null,nextRotationDeg=null,blendAlpha=1,fieldPoseRef,preloadImages=[],onPrepared}:{
+  image:EarthFacingArchiveFrame|null;snapshot:RobPfssSnapshot|null;rotationDeg:number|null;
+  referenceImage?:EarthFacingArchiveFrame|null;
+  nextImage?:EarthFacingArchiveFrame|null;nextSnapshot?:RobPfssSnapshot|null;
+  nextRotationDeg?:number|null;blendAlpha?:number;fieldPoseRef?:React.RefObject<Quaternion>;
+  preloadImages?:EarthFacingArchiveFrame[];onPrepared?:(count:number)=>void}){
+  const [cameraPosition,setCameraPosition]=React.useState<[number,number,number]>(initialCamera);
+  const cameraInitialized=React.useRef(false);
+  React.useEffect(()=>{
+    const initial=referenceImage??image;
+    if(initial&&!cameraInitialized.current){
+      cameraInitialized.current=true;
+      setCameraPosition(xyz(6.5,initial.observer.observerCarringtonLatitudeDeg,
+        initial.observer.observerCarringtonLongitudeDeg));
+    }
+  },[referenceImage?.archiveId,referenceImage?.frameIndex,image?.archiveId,image?.frameIndex]);
+  const textureCache=React.useRef(new Map<string,DataTexture>());
+  const project=React.useCallback((frame:EarthFacingArchiveFrame|null)=>{
+    if(!frame)return {texture:null as DataTexture|null,error:null as string|null};
+    const key=`${frame.archiveId}:${frame.frameIndex}:${frame.displaySha256}`;
+    const cached=textureCache.current.get(key);
+    if(cached)return {texture:cached,error:null};
+    try{
+      const result=makeEarthFacingTexture(frame,'sdo_aia193_lct_sqrt/1');
+      textureCache.current.set(key,result.texture);
+      return {texture:result.texture,error:null};
+    }catch(error){return {texture:null,error:error instanceof Error?error.message:'Solar image projection failed'};}
+  },[]);
+  React.useEffect(()=>()=>{for(const texture of textureCache.current.values())texture.dispose();
+    textureCache.current.clear();},[]);
+  const projection=React.useMemo(()=>project(image),[project,image]);
+  const nextProjection=React.useMemo(()=>project(nextImage),[project,nextImage]);
+  React.useEffect(()=>{
+    let cancelled=false,timer:number|undefined;
+    const queue=preloadImages.filter(frame=>!textureCache.current.has(
+      `${frame.archiveId}:${frame.frameIndex}:${frame.displaySha256}`));
+    const step=()=>{
+      if(cancelled)return;
+      const next=queue.shift();
+      if(next){project(next);onPrepared?.(textureCache.current.size);
+        timer=window.setTimeout(step,0);
+      }else onPrepared?.(textureCache.current.size);
+    };
+    timer=window.setTimeout(step,0);
+    return()=>{cancelled=true;if(timer!==undefined)window.clearTimeout(timer);};
+  },[preloadImages,project,onPrepared]);
+  const displayModel=snapshot&&rotationDeg!==null?snapshot:null;
+  const nextDisplayModel=nextSnapshot&&nextRotationDeg!==null?nextSnapshot:null;
+  const referenceObserver=(referenceImage??image)?.observer;
+  const imagePose=referenceObserver&&image?earthViewPose(referenceObserver,image.observer):null;
+  const nextImagePose=referenceObserver&&nextImage?earthViewPose(referenceObserver,nextImage.observer):null;
+  return <section aria-label="Solar time player magnetic globe" className="space-y-2">
+    <div className="h-[440px] overflow-hidden rounded border border-slate-700 bg-black">
+      {projection.texture?<Canvas camera={{position:initialCamera,fov:50}} dpr={[1,1.5]}><MagneticScene
+        map={null} earthTexture={projection.texture} secondaryEarthTexture={nextProjection.texture}
+        blendAlpha={blendAlpha} fieldPoseRef={fieldPoseRef}
+        showEarthImage={Boolean(projection.texture)}
+        surfaceRotationY={SOLAR_GLOBE_TEXTURE_ROTATION_Y}
+        earthImagePose={imagePose} secondaryEarthImagePose={nextImagePose} model={null}
+        robSnapshot={displayModel} robLongitudeOffsetDeg={rotationDeg}
+        secondaryRobSnapshot={nextDisplayModel} secondaryRobLongitudeOffsetDeg={nextRotationDeg}
+        diagnostic={null} registration={null} showRegistration={false}
+        selectedAnchorIndex={null} onAnchorSelect={()=>undefined} dipole={null}
+        showDipole={false} showDerivedDipole={false} showPfss={false}
+        showRobPfss={Boolean(displayModel)} showLos={false} losColorBasis="map_residual"
+        catalogMarkers={[]} showCatalogMarkers={false} selectedCatalogEventId={null}
+        cameraPosition={cameraPosition} onCameraChange={setCameraPosition}/></Canvas>
+        :<div className="grid h-full place-items-center p-5 text-center text-slate-400">Waiting for a source-qualified AIA frame; no illustrative solar surface is shown.</div>}
+    </div>
+    {projection.error&&<p role="alert" className="text-amber-200">Image projection unavailable: {projection.error}</p>}
+    {nextProjection.error&&<p role="alert" className="text-amber-200">Next image projection unavailable: {nextProjection.error}</p>}
+    <p className="text-xs text-slate-400">AIA 193 Å coronal intensity is displayed on the visible geometric sphere using its image WCS; this does not recover emission height. Off-limb light remains in the source frame. ROB lines are a sampled PFSS model, shown only with a same-name GONG candidate and approximate display rotation. The overlay is not validated physical registration.</p>
+  </section>;
+}
+export const SolarTemporalMagneticGlobe=React.memo(SolarTemporalMagneticGlobeView);
+
+export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,earthImage=null,catalogEvents=[],selectedCatalogEventId=null,onCatalogEventSelect}:{
   acquisitionId?:string|null;hmiAcquisitionId?:string|null;catalogEvents?:readonly SolarActiveRegionEvent[];
+  earthImage?:EarthFacingArchiveFrame|null;
   selectedCatalogEventId?:string|null;onCatalogEventSelect?:(id:string)=>void}={}){
   const [map,setMap]=React.useState<SolarGlobalRadialMap|null>(null);
   const [mapContentId,setMapContentId]=React.useState<string|null>(null);
   const [loadedGongAcquisitionId,setLoadedGongAcquisitionId]=React.useState<string|null>(null);
   const accountEpoch=React.useRef(0);
+  const activeProfile=React.useRef(readCachedAccountProfileIdentity().profileId);
   const [model,setModel]=React.useState<SolarPfssGeometry|null>(null);
+  const [robSnapshot,setRobSnapshot]=React.useState<RobPfssSnapshot|null>(null);
+  const [robParentMap,setRobParentMap]=React.useState<SolarGlobalRadialMap|null>(null);
+  const [robParentReceipt,setRobParentReceipt]=React.useState<RobPfssParentReceipt|null>(null);
+  const [robDisplayRotation,setRobDisplayRotation]=React.useState<number|null>(null);
+  const [robViewRecipe,setRobViewRecipe]=React.useState<SolarRobPfssViewRecipe|null>(null);
+  const [showRobParentMap,setShowRobParentMap]=React.useState(false);
+  const [showEarthImage,setShowEarthImage]=React.useState(false);
+  const [earthImagePalette,setEarthImagePalette]=React.useState<SolarImagePalette>('grayscale/1');
+  const [correctedSurfaceUv,setCorrectedSurfaceUv]=React.useState(true);
+  const [showImageEndpointMarkers,setShowImageEndpointMarkers]=React.useState(false);
+  React.useEffect(()=>{if(!robParentReceipt)setShowEarthImage(false);},[robParentReceipt]);
+  React.useEffect(()=>{
+    setEarthImagePalette(earthImage?.instrument.toUpperCase()==='AIA'&&earthImage.wavelengthAngstrom===193
+      ?'sdo_aia193_lct_sqrt/1':'grayscale/1');
+  },[earthImage?.archiveId,earthImage?.frameIndex,earthImage?.instrument,earthImage?.wavelengthAngstrom]);
+  const earthProjection=React.useMemo(()=>{
+    if(!earthImage)return {texture:null as DataTexture|null,coverageFraction:0,error:null as string|null};
+    try{return {...makeEarthFacingTexture(earthImage,earthImagePalette),error:null as string|null};}
+    catch(error){return {texture:null as DataTexture|null,coverageFraction:0,
+      error:error instanceof Error?error.message:'Earth-facing image projection failed'};}
+  },[earthImage,earthImagePalette]);
+  const earthImageIdentity=React.useMemo<SolarRobPfssEarthImageIdentity|null>(()=>earthImage&&earthProjection.texture?{
+    archiveId:earthImage.archiveId,frameIndex:earthImage.frameIndex,instrument:earthImage.instrument,
+    wavelengthAngstrom:earthImage.wavelengthAngstrom,observedAtUtc:earthImage.observedAtUtc,
+    displaySha256:earthImage.displaySha256,declaredFitsSha256:earthImage.declaredFitsSha256,
+    ...(earthImage.retainedSourceImageId?{retainedSourceImageId:earthImage.retainedSourceImageId}:{}),
+    observerCarringtonLongitudeDeg:earthImage.observer.observerCarringtonLongitudeDeg,
+    observerCarringtonLatitudeDeg:earthImage.observer.observerCarringtonLatitudeDeg,
+    projection:'WCS_visible_surface_only',sourceFitsIncluded:false}:null,[earthImage,earthProjection.texture]);
+  const earthImageGrid=React.useMemo(()=>{
+    if(!earthImage||!earthProjection.texture)return null;
+    try{
+      const bytes=Uint8Array.from(atob(earthImage.mapBase64),value=>value.charCodeAt(0));
+      return bytes.length===earthImage.gridSize**2*4?new Float32Array(bytes.buffer):null;
+    }catch{return null;}
+  },[earthImage,earthProjection.texture]);
+  React.useEffect(()=>()=>{earthProjection.texture?.dispose();},[earthProjection.texture]);
+  // Keep the browser's request lifecycle stable across unrelated globe renders.
+  const receiveRobSnapshot=React.useCallback((snapshot:RobPfssSnapshot|null)=>{
+    setRobSnapshot(snapshot);if(snapshot)setCorrectedSurfaceUv(true);
+  },[]);
+  const receiveRobParentMap=React.useCallback((candidate:SolarGlobalRadialMap|null)=>{
+    setRobParentMap(candidate);if(!candidate)setShowRobParentMap(false);
+  },[]);
   const [diagnostic,setDiagnostic]=React.useState<SolarMagneticLosDiagnostic|null>(null);
   const [registration,setRegistration]=React.useState<SolarSphereRegistration|null>(null);
   const [showRegistration,setShowRegistration]=React.useState(true);
@@ -165,6 +369,7 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
   const [showDipole,setShowDipole]=React.useState(true);
   const [showDerivedDipole,setShowDerivedDipole]=React.useState(false);
   const [showPfss,setShowPfss]=React.useState(true);
+  const [showRobPfss,setShowRobPfss]=React.useState(true);
   const [showLos,setShowLos]=React.useState(true);
   const [showCatalogMarkers,setShowCatalogMarkers]=React.useState(true);
   const catalogMarkers=React.useMemo(()=>solarActiveRegionMarkers(catalogEvents),[catalogEvents]);
@@ -213,7 +418,9 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
     catch {setWebglAvailable(false);}
   },[]);
   React.useEffect(()=>{
-    const changed=()=>{accountEpoch.current++;setMap(null);setMapContentId(null);setLoadedGongAcquisitionId(null);setModel(null);setDiagnostic(null);setRegistration(null);setSelectedAnchorIndex(null);
+    const changed=()=>{const next=readCachedAccountProfileIdentity().profileId;
+      if(next===activeProfile.current)return;activeProfile.current=next;
+      accountEpoch.current++;setMap(null);setMapContentId(null);setLoadedGongAcquisitionId(null);setModel(null);setRobSnapshot(null);setRobParentMap(null);setRobParentReceipt(null);setRobDisplayRotation(null);setRobViewRecipe(null);setShowRobParentMap(false);setShowEarthImage(false);setCorrectedSurfaceUv(true);setDiagnostic(null);setRegistration(null);setSelectedAnchorIndex(null);
       clearPresentationAckTimeout();presentationPendingAck.current=null;presentationApplying.current=false;presentationRevision.current++;
       setMcpImportRequest(null);setSelectedMcpImport(null);setLocalGongFile(null);setMcpImportBusy(false);
       setMcpImportMessage('Account changed; selected import cleared.');
@@ -228,9 +435,9 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
       try{
         setMessage('Inspecting retained GONG FITS and preparing a display-only radial map…');
         const accountResponse=await fetch('/api/account/session',{credentials:'include',signal:controller.signal});
-        if(!accountResponse.ok)throw new Error('Developer profile unavailable');
+        if(!accountResponse.ok)throw new Error('Account profile unavailable');
         const account=await accountResponse.json(),profileId=account.session?.profile?.profile_id;
-        if(!profileId||account.account_policy?.account_type!=='developer')throw new Error('Developer profile required');
+        if(!profileId)throw new Error('Signed-in profile required');
         const response=await fetch(`/api/star-watcher/magnetic-archive/display-map?${new URLSearchParams({
           expected_profile_id:profileId,acquisitionId})}`,{credentials:'include',signal:controller.signal});
         if(!response.ok)throw new Error(`FITS display-map preparation failed (${response.status})`);
@@ -242,7 +449,7 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
         if(parsed.source.sha256!==result.acquisition.sha256)throw new Error('FITS source hash mismatch');
         const contentId=await solarGlobalRadialMapContentId(parsed);
         if(controller.signal.aborted||epoch!==accountEpoch.current)return;
-        setMap(parsed);setMapContentId(contentId);setLoadedGongAcquisitionId(acquisitionId);setModel(null);setDiagnostic(null);setRegistration(null);
+        setMap(parsed);setMapContentId(contentId);setLoadedGongAcquisitionId(acquisitionId);setModel(null);setDiagnostic(null);setRegistration(null);setCorrectedSurfaceUv(true);
         setShowDipole(false);setShowDerivedDipole(deriveSolarEquivalentDipole(parsed).magnitudeGauss>=1e-6);
         setMessage(`Loaded GONG display map from ${acquisitionId}; map epoch is from the FITS header, but contributor interval and quality remain unverified.`);
       }catch(error){if(!controller.signal.aborted)setMessage(`GONG display map rejected: ${error instanceof Error?error.message:'unknown failure'}`);}
@@ -256,9 +463,9 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
       try{
         setMessage('Rechecking exact owner-retained GONG and HMI bytes; preparing an exploratory visible-disk LOS comparison…');
         const accountResponse=await fetch('/api/account/session',{credentials:'include',signal:controller.signal});
-        if(!accountResponse.ok)throw new Error('Developer profile unavailable');
+        if(!accountResponse.ok)throw new Error('Account profile unavailable');
         const account=await accountResponse.json(),profileId=account.session?.profile?.profile_id;
-        if(!profileId||account.account_policy?.account_type!=='developer')throw new Error('Developer profile required');
+        if(!profileId)throw new Error('Signed-in profile required');
         const response=await fetch(`/api/star-watcher/magnetic-archive/los-comparison?${new URLSearchParams({
           expected_profile_id:profileId,gongAcquisitionId:acquisitionId,hmiAcquisitionId})}`,
           {credentials:'include',signal:controller.signal});
@@ -296,10 +503,21 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
     return ()=>{cancelled=true;};
   },[map,diagnostic]);
   React.useEffect(()=>{
+    let cancelled=false;setRobViewRecipe(null);
+    if(robSnapshot&&robParentReceipt&&robParentMap&&robDisplayRotation!==null)
+      void prepareSolarRobPfssViewRecipe(robSnapshot,robParentReceipt,cameraPosition,
+        showRobPfss,showRobParentMap,earthImageIdentity,showEarthImage,correctedSurfaceUv,earthImagePalette)
+        .then(value=>{if(!cancelled)setRobViewRecipe(value);})
+        .catch(()=>{if(!cancelled)setRobViewRecipe(null);});
+    return()=>{cancelled=true;};
+  },[robSnapshot,robParentReceipt,robParentMap,robDisplayRotation,cameraPosition,showRobPfss,showRobParentMap,
+    earthImageIdentity,showEarthImage,correctedSurfaceUv,earthImagePalette]);
+  React.useEffect(()=>{
     let cancelled=false;
     const recipe:SolarMagneticViewRecipePayload={schemaVersion:'solar-magnetic-view-recipe/1',
       mapContentId, pfssModelId:model?.modelId??null,
       coordinateFrame:'Carrington_display_cartesian',projection:'perspective',cameraPosition,
+      ...(correctedSurfaceUv?{surfaceUvConvention:'three_sphere_uv_carrington_y_pi/1' as const}:{}),
       cameraTarget:'solar_center',fieldColorScale:'asinh_p98_abs_radial_gauss/1',
       showIllustrativeAxialDipole:showDipole,showMapEquivalentDipole:Boolean(dipole&&dipole.magnitudeGauss>=1e-6&&showDerivedDipole),
       showPfssLines:Boolean(model&&showPfss),
@@ -310,7 +528,7 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
     setViewRecipe(null);
     void prepareSolarMagneticViewRecipe(recipe).then(value=>{if(!cancelled)setViewRecipe(value);});
     return ()=>{cancelled=true;};
-  },[mapContentId,model,diagnostic,dipole,showDipole,showDerivedDipole,showPfss,showLos,losColorBasis,cameraPosition]);
+  },[mapContentId,model,diagnostic,dipole,showDipole,showDerivedDipole,showPfss,showLos,losColorBasis,cameraPosition,correctedSurfaceUv]);
   React.useEffect(()=>{
     let cancelled=false;setSphereScene(null);
     if(map&&viewRecipe)void prepareSolarMagneticComparisonBundle({schemaVersion:'solar-magnetic-comparison-bundle/1',
@@ -355,10 +573,10 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
         pendingRequestId=pending.requestId;
         if(!globeElement.current?.querySelector('canvas'))throw new Error('WebGL globe is not rendered');
         const accountResponse=await fetch('/api/account/session',{credentials:'include',signal:controller.signal});
-        if(!accountResponse.ok)throw new Error('Developer session unavailable');
+        if(!accountResponse.ok)throw new Error('Account session unavailable');
         const account=await accountResponse.json(),profileId=account.session?.profile?.profile_id;
         if(controller.signal.aborted||epoch!==accountEpoch.current)return;
-        if(!profileId||account.account_policy?.account_type!=='developer')throw new Error('Developer profile required');
+        if(!profileId)throw new Error('Signed-in profile required');
         const response=await fetch(`/api/account/solar-research/magnetic-bundles?${new URLSearchParams({
           expected_profile_id:profileId,bundleId:pending.bundleId})}`,
           {credentials:'include',signal:controller.signal});
@@ -486,6 +704,7 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
       setShowPfss(recipe.showPfssLines);
       setShowLos(recipe.showLosMarkers??false);
       setLosColorBasis(recipe.losMarkerColorBasis??'map_residual');
+      setCorrectedSurfaceUv(Boolean(recipe.surfaceUvConvention));
       setCameraPosition(recipe.cameraPosition);
       setMessage(`Replayed display settings ${recipe.recipeId}; no source or model authentication implied.`);
     }catch(error){setMessage(`View recipe rejected: ${error instanceof Error?error.message:'invalid JSON'}`);}
@@ -499,6 +718,7 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
       setShowPfss(bundle.view.showPfssLines);
       setShowLos(bundle.view.showLosMarkers??false);
       setLosColorBasis(bundle.view.losMarkerColorBasis??'map_residual');
+      setCorrectedSurfaceUv(Boolean(bundle.view.surfaceUvConvention));
       setCameraPosition(bundle.view.cameraPosition);
       setMessage(`Replayed local comparison bundle ${bundle.bundleId}; source identities and scientific fit remain unverified.`);
   }
@@ -527,6 +747,67 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
     const link=document.createElement('a');link.href=objectUrl;
     link.download=`${viewRecipe.recipeId}.json`;document.body.appendChild(link);link.click();link.remove();
     setTimeout(()=>URL.revokeObjectURL(objectUrl),0);
+  }
+  async function exportRobView(){
+    if(!robViewRecipe)return;
+    try{
+      const recipe=await verifySolarRobPfssViewRecipe(robViewRecipe);
+      const text=JSON.stringify(recipe,null,2);
+      const bridge=window.casimirDesktop;
+      if(bridge){
+        if(typeof bridge.saveSolarRobPfssView!=='function')
+          throw new Error('This desktop build does not support native ROB view export');
+        const result=await bridge.saveSolarRobPfssView(text);
+        if(result.status==='saved'&&typeof result.fileName==='string'&&
+           !/[\\/]/.test(result.fileName)&&result.fileName.toLowerCase().endsWith('.json')&&
+           Number.isInteger(result.bytes)&&result.bytes>0&&result.bytes<=4_000_000)
+          setMessage(`Saved ${result.fileName} (${result.bytes} bytes). Recipe ${recipe.viewRecipeId}; source FITS files are not included.`);
+        else if(result.status==='cancelled')setMessage('ROB view save cancelled; no file written.');
+        else if(result.status==='failed')setMessage(`ROB view not saved: ${result.reason}`);
+        else throw new Error('Desktop returned an invalid ROB view save receipt');
+        return;
+      }
+      const objectUrl=URL.createObjectURL(new Blob([text],{type:'application/json'}));
+      const link=document.createElement('a');link.href=objectUrl;
+      link.download=`solar-rob-pfss-view-${recipe.viewRecipeId.slice(-64)}.json`;
+      document.body.appendChild(link);link.click();link.remove();
+      setTimeout(()=>URL.revokeObjectURL(objectUrl),1000);
+      setMessage('Browser download requested; verify the JSON file before replay.');
+    }catch(error){setMessage(`ROB view export rejected: ${error instanceof Error?error.message:'invalid view recipe'}`);}
+  }
+  async function loadRobView(file:File){
+    try{
+      if(file.size>MAX_FILE_BYTES)throw new Error('ROB view recipe exceeds the import limit');
+      const recipe=await verifySolarRobPfssViewRecipe(await readJsonFile(file));
+      if(!robSnapshot||!robParentReceipt||!robParentMap||
+         recipe.modelAcquisitionId!==robParentReceipt.modelAcquisitionId||
+         recipe.modelRelativePath!==robSnapshot.relativePath||
+         recipe.modelSha256!==robSnapshot.sourceSha256||
+         recipe.catalogSha256!==robSnapshot.catalogSha256||
+         recipe.modelInputTimeUtc!==robSnapshot.fitsDateObsUtc||
+         recipe.parentCandidateSha256!==robParentReceipt.parentSha256||
+         recipe.parentMapEpochUtc!==robParentReceipt.mapEpochUtc||
+         recipe.longitudeOffsetDeg!==robParentReceipt.displayRotation.earthCarringtonLongitudeApproxDeg)
+        throw new Error('Load the exact retained ROB model and GONG candidate before replay');
+      if(recipe.earthImage&&(!earthImageIdentity||!earthProjection.texture||
+         recipe.earthImage.archiveId!==earthImageIdentity.archiveId||
+         recipe.earthImage.frameIndex!==earthImageIdentity.frameIndex||
+         recipe.earthImage.displaySha256!==earthImageIdentity.displaySha256||
+         recipe.earthImage.declaredFitsSha256!==earthImageIdentity.declaredFitsSha256||
+         recipe.earthImage.retainedSourceImageId!==earthImageIdentity.retainedSourceImageId||
+         recipe.earthImage.observedAtUtc!==earthImageIdentity.observedAtUtc||
+         recipe.earthImage.instrument!==earthImageIdentity.instrument||
+         recipe.earthImage.wavelengthAngstrom!==earthImageIdentity.wavelengthAngstrom||
+         recipe.earthImage.observerCarringtonLongitudeDeg!==earthImageIdentity.observerCarringtonLongitudeDeg||
+         recipe.earthImage.observerCarringtonLatitudeDeg!==earthImageIdentity.observerCarringtonLatitudeDeg))
+        throw new Error('Load the matching verified Earth-facing image archive frame before replay');
+      setCameraPosition(recipe.cameraPosition);
+      setShowRobPfss(recipe.showRobLines);setShowRobParentMap(recipe.showParentCandidateMap);
+      setShowEarthImage(recipe.showEarthImage);
+      setEarthImagePalette(recipe.earthImagePalette??'grayscale/1');
+      setCorrectedSurfaceUv(Boolean(recipe.surfaceUvConvention));
+      setMessage(`Replayed ROB display ${recipe.viewRecipeId}; model-line rotation remains approximate.`);
+    }catch(error){setMessage(`ROB view recipe rejected: ${error instanceof Error?error.message:'invalid JSON'}`);}
   }
   function rejectMcpImport(reason:'cancelled'|'invalid_file'|'storage_failed'|'account_changed'|'renderer_rejected'){
     const pending=mcpImportRequest;if(!pending)return;
@@ -558,13 +839,13 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
   async function convertSelectedLocalGong(){
     const pending=mcpImportRequest,file=localGongFile;
     if(!pending||!file||mcpImportBusy)return;
-    const epoch=accountEpoch.current;setMcpImportBusy(true);setMcpImportMessage('Checking developer session before local GONG conversion…');
+    const epoch=accountEpoch.current;setMcpImportBusy(true);setMcpImportMessage('Checking signed-in session before local GONG conversion…');
     try{
       const accountResponse=await fetch('/api/account/session',{credentials:'include'});
-      if(!accountResponse.ok)throw new Error('Developer profile unavailable');
+      if(!accountResponse.ok)throw new Error('Account profile unavailable');
       const account=await accountResponse.json();
-      if(!account.session?.profile?.profile_id||account.account_policy?.account_type!=='developer')
-        throw new Error('A signed-in developer account is required');
+      if(!account.session?.profile?.profile_id)
+        throw new Error('A signed-in account is required');
       if(epoch!==accountEpoch.current||mcpImportRequestId.current!==pending.requestId)
         throw new Error('Account or import request changed before conversion');
       const form=new FormData();form.append('file',file,file.name);
@@ -581,6 +862,7 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
       const derived=deriveSolarEquivalentDipole(convertedMap);
       const view=await prepareSolarMagneticViewRecipe({schemaVersion:'solar-magnetic-view-recipe/1',
         mapContentId:contentId,pfssModelId:null,coordinateFrame:'Carrington_display_cartesian',projection:'perspective',
+        surfaceUvConvention:'three_sphere_uv_carrington_y_pi/1',
         cameraPosition:initialCamera,cameraTarget:'solar_center',fieldColorScale:'asinh_p98_abs_radial_gauss/1',
         showIllustrativeAxialDipole:false,showMapEquivalentDipole:derived.magnitudeGauss>=1e-6,
         showPfssLines:false,sourceIdentityAuthenticated:false,scientificAdmission:false,quantitativeJoinAllowed:false});
@@ -597,12 +879,12 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
   async function retainSelectedMcpImport(){
     const pending=mcpImportRequest,selected=selectedMcpImport;
     if(!pending||!selected||mcpImportBusy)return;
-    const epoch=accountEpoch.current;setMcpImportBusy(true);setMcpImportMessage('Checking developer profile and retaining the confirmed bundle…');
+    const epoch=accountEpoch.current;setMcpImportBusy(true);setMcpImportMessage('Checking owner profile and retaining the confirmed bundle…');
     try{
       const accountResponse=await fetch('/api/account/session',{credentials:'include'});
-      if(!accountResponse.ok)throw new Error('Developer profile unavailable');
+      if(!accountResponse.ok)throw new Error('Account profile unavailable');
       const account=await accountResponse.json(),profileId=account.session?.profile?.profile_id;
-      if(!profileId||account.account_policy?.account_type!=='developer')throw new Error('A signed-in developer account is required');
+      if(!profileId)throw new Error('A signed-in account is required');
       if(epoch!==accountEpoch.current||mcpImportRequestId.current!==pending.requestId)
         throw new Error('Account or import request changed before confirmation');
       const bundle=selected.bundle;
@@ -635,21 +917,61 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
         throw new Error(ack.error??'Retained bundle readback acknowledgement rejected');
       if(epoch!==accountEpoch.current)return;
       mcpImportRequestId.current=null;setMcpImportRequest(null);setSelectedMcpImport(null);
-      setMcpImportMessage(`Retained ${bundle.bundleId} for this developer profile. MCP must request display separately; no scientific admission.`);
+      setMcpImportMessage(`Retained ${bundle.bundleId} for this account profile. MCP must request display separately; no scientific admission.`);
     }catch(error){setMcpImportMessage(`Import retention failed: ${error instanceof Error?error.message:'unknown failure'}`);
       rejectMcpImport('storage_failed');}
     finally{setMcpImportBusy(false);}
+  }
+  const robActive=robSnapshot!==null&&(showRobPfss||showRobParentMap||showEarthImage);
+  const robCandidateOverlay=robActive&&showRobParentMap&&robParentMap!==null&&robDisplayRotation!==null;
+  const robPairedFrame=robActive&&(showRobParentMap||showEarthImage)&&
+    robParentMap!==null&&robParentReceipt!==null&&robDisplayRotation!==null;
+  const earthImageTimeGapHours=earthImage&&robSnapshot
+    ?Math.abs(Date.parse(earthImage.observedAtUtc)-Date.parse(robSnapshot.fitsDateObsUtc))/3_600_000:null;
+  const robImageEndpoints=React.useMemo(()=>{
+    if(!robSnapshot||!robParentReceipt||!earthImage||!earthProjection.texture)return null;
+    try{return {result:projectRobPfssDisplayEndpoints(robSnapshot,robParentReceipt,
+      selectRobPfssProjectionImage(earthImage)),error:null};}
+    catch(error){return {result:null,error:error instanceof Error?error.message:'Endpoint projection failed'};}
+  },[robSnapshot,robParentReceipt,earthImage,earthProjection.texture]);
+  async function exportRobImageEndpoints(){
+    if(!robImageEndpoints?.result)return;
+    try{
+      const projection=robPfssImageProjectionSchema.parse(robImageEndpoints.result);
+      const text=JSON.stringify(projection,null,2);
+      const bridge=window.casimirDesktop;
+      if(bridge){
+        if(typeof bridge.saveSolarRobImageEndpoints!=='function')
+          throw new Error('This desktop build does not support native endpoint export');
+        const result=await bridge.saveSolarRobImageEndpoints(text);
+        if(result.status==='saved'&&typeof result.fileName==='string'&&
+           !/[\\/]/.test(result.fileName)&&result.fileName.toLowerCase().endsWith('.json')&&
+           Number.isInteger(result.bytes)&&result.bytes>0&&result.bytes<=4_000_000)
+          setMessage(`Saved ${result.fileName} (${result.bytes} bytes). Endpoints are model display coordinates, not verified footpoints.`);
+        else if(result.status==='cancelled')setMessage('Endpoint save cancelled; no file written.');
+        else if(result.status==='failed')setMessage(`Endpoints not saved: ${result.reason}`);
+        else throw new Error('Desktop returned an invalid endpoint save receipt');
+        return;
+      }
+      const objectUrl=URL.createObjectURL(new Blob([text],{type:'application/json'}));
+      const link=document.createElement('a');link.href=objectUrl;
+      link.download=`rob-image-endpoints-${robSnapshot?.sourceSha256.slice(0,12)??'model'}.json`;
+      document.body.appendChild(link);link.click();link.remove();
+      setTimeout(()=>URL.revokeObjectURL(objectUrl),1000);
+      setMessage('Browser endpoint download requested; verify the file before using it.');
+    }catch(error){setMessage(`Endpoint export rejected: ${error instanceof Error?error.message:'invalid projection'}`);}
   }
   return <section aria-label="3D magnetic globe" onPointerDownCapture={markHumanChange}
     onClickCapture={markHumanChange} onChangeCapture={markHumanChange}
     onKeyDownCapture={markHumanChange} onWheelCapture={markHumanChange}
     className="space-y-3 rounded-lg border border-cyan-700/40 bg-slate-950 p-3 text-xs text-slate-200">
     <div><h3 className="text-sm font-semibold text-cyan-100">3D magnetic globe</h3>
-      <p className="mt-1 text-slate-400">Carrington coordinates · drag to rotate, scroll to zoom. Front is a map coordinate, not an Earth-view ephemeris.</p></div>
-    <p className="text-slate-400">Surface colors: red positive / blue negative radial field (display-normalized); when a direct-input mask is supplied, dimmer cells are not marked observed. Cyan lines are illustrative axial; gold lines show the map's l=1 dipole axis with arbitrary loop extent, not a PFSS extrapolation. Orange/blue/gray lines are PFSS models. Mint-to-orange dots are measured HMI LOS residual samples; yellow points are HEK catalog active-region locations. Neither dots nor points are measured field lines.</p>
+       <p className="mt-1 text-slate-400">{robCandidateOverlay?'ROB candidate Carrington map with approximate header-derived line rotation':robActive?'ROB unrotated Earth-reference line frame':'Carrington map coordinates'} · drag to rotate, scroll to zoom. Front is a display coordinate, not an Earth-view ephemeris.</p></div>
+    <p className="text-slate-500">Surface UV frame: {correctedSurfaceUv?'Carrington +x aligned with the 3D sphere and model coordinates':'legacy 180°-offset view replay'}. The view recipe records the corrected convention; absence denotes legacy replay.</p>
+    <p className="text-slate-400">Surface colors: red positive / blue negative radial field (display-normalized); when a direct-input mask is supplied, dimmer cells are not marked observed. Cyan lines are illustrative axial; gold lines show the map's l=1 dipole axis with arbitrary loop extent, not a PFSS extrapolation. Orange/blue/gray lines are locally prepared PFSS models. ROB model lines use red/blue for their encoded first-point sign and pale gray for endpoint-classified loops; their map registration is unverified. Mint-to-orange dots are measured HMI LOS residual samples; yellow points are HEK catalog active-region locations. Neither dots nor points are measured field lines.</p>
     <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(250px,0.65fr)]">
       <div ref={globeElement} className="h-[440px] overflow-hidden rounded border border-slate-700 bg-black">
-        {webglAvailable?<Canvas camera={{position:initialCamera,fov:50}} dpr={[1,1.5]}><MagneticScene map={map} model={model} diagnostic={diagnostic} registration={registration} showRegistration={showRegistration} selectedAnchorIndex={selectedAnchorIndex} onAnchorSelect={setSelectedAnchorIndex} dipole={dipole} showDipole={showDipole} showDerivedDipole={showDerivedDipole} showPfss={showPfss} showLos={showLos} losColorBasis={losColorBasis} catalogMarkers={catalogMarkers} showCatalogMarkers={showCatalogMarkers} selectedCatalogEventId={selectedCatalogEventId} onCatalogEventSelect={onCatalogEventSelect} cameraPosition={cameraPosition} onCameraChange={setCameraPosition}/></Canvas>
+        {webglAvailable?<Canvas camera={{position:initialCamera,fov:50}} dpr={[1,1.5]}><MagneticScene map={robActive?(robCandidateOverlay?robParentMap:null):map} earthTexture={robPairedFrame?earthProjection.texture:null} showEarthImage={robPairedFrame&&showEarthImage} surfaceRotationY={correctedSurfaceUv?SOLAR_GLOBE_TEXTURE_ROTATION_Y:0} model={robActive?null:model} robSnapshot={robSnapshot} robLongitudeOffsetDeg={robPairedFrame?robDisplayRotation:null} diagnostic={robActive?null:diagnostic} registration={robActive?null:registration} showRegistration={showRegistration&&!robActive} showDipole={showDipole&&!robActive} selectedAnchorIndex={selectedAnchorIndex} onAnchorSelect={setSelectedAnchorIndex} dipole={robActive?null:dipole} showDerivedDipole={showDerivedDipole&&!robActive} showPfss={showPfss&&!robActive} showRobPfss={showRobPfss} showLos={showLos&&!robActive} losColorBasis={losColorBasis} catalogMarkers={catalogMarkers} showCatalogMarkers={showCatalogMarkers&&!robActive} selectedCatalogEventId={selectedCatalogEventId} onCatalogEventSelect={onCatalogEventSelect} cameraPosition={cameraPosition} onCameraChange={setCameraPosition}/></Canvas>
           :<div className="grid h-full place-items-center p-5 text-center text-slate-400">WebGL is unavailable. Magnetic metadata and imports remain accessible.</div>}
       </div>
       <div className="space-y-3">
@@ -668,7 +990,7 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
             <p>This confirms profile storage only. It will not display the bundle until MCP issues the separate exact-ID show request.</p>
           </div>}
           <button type="button" disabled={!selectedMcpImport||mcpImportBusy} onClick={()=>void retainSelectedMcpImport()}
-            className="rounded border border-amber-500 px-2 py-1 disabled:opacity-50">Confirm and retain to developer profile</button>
+            className="rounded border border-amber-500 px-2 py-1 disabled:opacity-50">Confirm and retain to profile</button>
           <button type="button" disabled={mcpImportBusy} onClick={()=>rejectMcpImport('cancelled')}
             className="ml-2 rounded border border-slate-600 px-2 py-1 disabled:opacity-50">Cancel</button>
           {mcpImportMessage&&<p role="status" className="break-all text-slate-300">{mcpImportMessage}</p>}
@@ -716,6 +1038,74 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
         <label className="flex gap-2"><input type="checkbox" checked={showDerivedDipole} disabled={!dipole || dipole.magnitudeGauss<1e-6} onChange={event=>setShowDerivedDipole(event.target.checked)}/>Map-derived l=1 dipole approximation (not observed lines or PFSS)</label>
         <p className="border-t border-slate-800 pt-2 font-medium text-slate-100">Modeled corona</p>
         <label className="flex gap-2"><input type="checkbox" checked={showPfss} disabled={!model} onChange={event=>setShowPfss(event.target.checked)}/>Imported PFSS model lines</label>
+        <label className="flex gap-2"><input type="checkbox" checked={showRobPfss} disabled={!robSnapshot} onChange={event=>setShowRobPfss(event.target.checked)}/>ROB published PFSS lines ({robSnapshot?.lines.length??0} display sampled)</label>
+        <label className="flex gap-2"><input type="checkbox" checked={showRobParentMap} disabled={!robParentMap||robDisplayRotation===null} onChange={event=>setShowRobParentMap(event.target.checked)}/>Show matching-name GONG map candidate beneath ROB lines (approximate rotation; registration unverified)</label>
+        <SolarRobPfssBrowser onSnapshot={receiveRobSnapshot} onParentMap={receiveRobParentMap} onParentRotation={setRobDisplayRotation} onParentReceipt={setRobParentReceipt}/>
+        <label className="flex gap-2"><input type="checkbox" checked={showEarthImage}
+          disabled={!robSnapshot||!robParentReceipt||!earthProjection.texture}
+          onChange={event=>setShowEarthImage(event.target.checked)}/>
+          Show WCS-projected Earth-facing archive image on visible hemisphere</label>
+        {earthImage&&<label className="block text-slate-300">Earth-facing image display palette
+          <select aria-label="Earth-facing image display palette" value={earthImagePalette}
+            onChange={event=>setEarthImagePalette(event.target.value as SolarImagePalette)}
+            className="ml-2 rounded border border-slate-600 bg-slate-950 p-1">
+            <option value="grayscale/1">Grayscale</option>
+            {earthImage.instrument.toUpperCase()==='AIA'&&earthImage.wavelengthAngstrom===193&&<>
+              <option value="sdo_aia193_lct_sqrt/1">AIA 193 Å standard color + square-root display</option>
+              <option value="aia_193_bronze/1">Legacy bronze (R176 display)</option>
+            </>}
+          </select>
+        </label>}
+        {earthImagePalette!=='grayscale/1'&&earthImage&&
+          <p className="text-slate-400">The selected color and tone are display transforms of the retained 193 Å intensity grid. They do not change source measurements or add magnetic information.</p>}
+        {earthImage&&earthImageGrid&&<details className="rounded border border-slate-700 p-2">
+          <summary className="cursor-pointer">Full AIA source frame (2D, including off-limb emission)</summary>
+          <SolarObservationRaster data={earthImageGrid} size={earthImage.gridSize} palette={earthImagePalette}/>
+          <p className="text-slate-400">{earthImage.gridSize}×{earthImage.gridSize} retained display grid at {earthImage.observedAtUtc}. This camera-plane frame includes off-limb light; only visible-surface pixels are mapped onto the globe. It is not a measured 3D corona.</p>
+        </details>}
+        {earthImage&&<p className="break-all text-slate-400">Image {earthImage.instrument} {earthImage.wavelengthAngstrom} Å at {earthImage.observedAtUtc} · archive {earthImage.archiveId} · display SHA-256 {earthImage.displaySha256} · declared FITS SHA-256 {earthImage.declaredFitsSha256}. Projected surface coverage {(earthProjection.coverageFraction*100).toFixed(1)}%. {earthImageTimeGapHours!==null&&Number.isFinite(earthImageTimeGapHours)?`Image–ROB input time gap ${earthImageTimeGapHours.toFixed(2)} h.`:''}</p>}
+        {earthProjection.error&&<p className="text-amber-200">Image projection unavailable: {earthProjection.error}</p>}
+        {robImageEndpoints?.error&&<p className="text-amber-200">Model endpoint projection unavailable: {robImageEndpoints.error}</p>}
+        {robImageEndpoints?.result&&<div className="space-y-1 rounded border border-slate-700 p-2">
+          <p>Under the approximate GONG longitude offset, {robImageEndpoints.result.visibleEndpointCount} of {robImageEndpoints.result.nearSurfaceEndpointCount} sampled model endpoints within 0.05 solar radii of the surface project onto this image's visible pixels.</p>
+          <label className="flex gap-2"><input type="checkbox" checked={showImageEndpointMarkers}
+            onChange={event=>setShowImageEndpointMarkers(event.target.checked)}/>Show sampled model endpoint candidates on the Earth-facing image</label>
+          {showImageEndpointMarkers&&earthImage&&earthImageGrid&&<div className="relative w-full max-w-[320px] overflow-hidden border border-slate-600 bg-black">
+            <SolarObservationRaster data={earthImageGrid} size={earthImage.gridSize}/>
+            <svg className="pointer-events-none absolute inset-0 h-full w-full"
+              viewBox={`0 0 ${earthImage.gridSize} ${earthImage.gridSize}`}
+              aria-label="Approximate ROB model endpoint positions over the observed solar image">
+              {robImageEndpoints.result.endpoints.filter(point=>point.canvasPixel).map(point=><circle
+                key={`${point.lineIndex}-${point.endpointIndex}`}
+                cx={point.canvasPixel!.x} cy={point.canvasPixel!.y} r={1.8}
+                fill="none" stroke="#fbbf24" strokeWidth={0.9}/>)}
+            </svg>
+          </div>}
+          <button type="button" onClick={exportRobImageEndpoints} className="rounded border border-slate-600 px-2 py-1">Export projected endpoint pixels JSON</button>
+          <p className="text-amber-200">These are model display coordinates, not independently identified image features. The export labels FITS lower-left and canvas upper-left pixel origins separately. It preserves both source times and hashes; pixel overlap alone cannot validate the PFSS solution.</p>
+        </div>}
+        {!earthImage&&<p className="text-slate-400">For an image layer, load a verified solar observation archive with WCS in the Imagery view and select its frame. The image FITS bytes are not contained in that display archive.</p>}
+        <button type="button" disabled={!robSnapshot||!robParentReceipt||!earthProjection.texture||!earthImage}
+          onClick={()=>{if(earthImage)setCameraPosition(xyz(6.5,earthImage.observer.observerCarringtonLatitudeDeg,
+            earthImage.observer.observerCarringtonLongitudeDeg));}}
+          className="rounded border border-slate-600 px-2 py-1 disabled:opacity-50">Face selected image observer</button>
+        <p className="text-amber-200">The image's WCS locates visible-surface texture geometrically. Its time and instrument may differ from the ROB model input. Image-to-ROB line footpoints and the candidate GONG solver boundary are not independently registered.</p>
+        <button type="button" disabled={!robSnapshot||!robParentReceipt||robDisplayRotation===null}
+          onClick={()=>{if(robDisplayRotation!==null)setCameraPosition(xyz(6.5,0,robDisplayRotation));}}
+          className="rounded border border-amber-600 px-2 py-1 disabled:opacity-50">Face candidate GONG central meridian (approximate)</button>
+        <p className="text-amber-200">Uses the GONG header-derived longitude and an assumed 0° observer latitude. It does not match an Earth-facing satellite image or establish ROB map-to-line registration.</p>
+        <div className="space-y-2 rounded border border-amber-700/50 p-2">
+          <p className="font-medium">Replayable ROB/GONG display</p>
+          <p className="break-all text-slate-400">View ID: {robViewRecipe?.viewRecipeId??'Load and retain the matching-name GONG candidate'}</p>
+          <button type="button" disabled={!robViewRecipe} onClick={exportRobView}
+            className="rounded border border-amber-600 px-2 py-1 disabled:opacity-50">Export ROB view recipe JSON</button>
+          <label className="block">Import ROB view recipe JSON
+            <input type="file" accept="application/json,.json" aria-label="Import ROB view recipe"
+              className="mt-1 block w-full text-xs" onChange={event=>{const file=event.currentTarget.files?.[0];
+                if(file)void loadRobView(file);event.currentTarget.value='';}}/>
+          </label>
+          <p className="text-slate-400">Replays the camera and selected layers only with their matching retained model, candidate-map and optional verified display-archive IDs. Image WCS covers the visible surface; image-to-ROB line registration and solver-input identity remain unverified.</p>
+        </div>
         <p className="border-t border-slate-800 pt-2 font-medium text-slate-100">Conceptual illustration</p>
         <label className="flex gap-2"><input type="checkbox" checked={showDipole} onChange={event=>setShowDipole(event.target.checked)}/>Illustrative axial dipole lines (not current data)</label>
         {diagnostic&&<fieldset className="rounded border border-slate-700 p-2"><legend className="px-1 text-slate-300">Color HMI dots by absolute residual against</legend>
@@ -726,9 +1116,9 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
           if(diagnostic)setCameraPosition(xyz(3.5,diagnostic.hmi.observerCarringtonLatitudeDeg,
             diagnostic.hmi.observerCarringtonLongitudeDeg).map(value=>Number(value.toFixed(4))) as [number,number,number]);
         }} className="rounded border border-slate-600 px-2 py-1 disabled:opacity-50">Face HMI observer</button>
-        <button type="button" disabled={!model} onClick={()=>setCameraPosition(position=>{
+        <button type="button" disabled={!model&&!robSnapshot} onClick={()=>setCameraPosition(position=>{
           const distance=Math.hypot(...position);
-          const fitted=Math.max(6.5,model ? model.solver.sourceSurfaceRadiusSolar*2.6 : 6.5);
+          const fitted=Math.max(6.5,model ? model.solver.sourceSurfaceRadiusSolar*2.6 : robSnapshot?6.5:6.5);
           return position.map(value=>Number((value*fitted/distance).toFixed(4))) as [number,number,number];
         })} className="ml-2 rounded border border-slate-600 px-2 py-1 disabled:opacity-50">Fit full corona</button>
         <div className="space-y-2 rounded border border-slate-700 p-2">
@@ -738,7 +1128,7 @@ export function SolarMagneticGlobe({acquisitionId,hmiAcquisitionId,catalogEvents
           <label className="block">Import view recipe JSON
             <input type="file" accept="application/json,.json" aria-label="Import magnetic view recipe" className="mt-1 block w-full text-xs" onChange={event=>{const file=event.currentTarget.files?.[0];if(file)void loadView(file);event.currentTarget.value='';}}/>
           </label>
-          <p className="text-slate-400">Replays the camera and magnetic layers only after the matching map, model and optional HMI diagnostic are loaded. The transient HEK active-region overlay is not saved by this recipe or comparison bundle. A view ID is not an observation or scientific validation.</p>
+          <p className="text-slate-400">Replays the camera and magnetic layers only after the matching map, model and optional HMI diagnostic are loaded. The ROB layer and transient HEK active-region overlay are not saved by this recipe or comparison bundle. A view ID is not an observation or scientific validation.</p>
         </div>
         <p role="status" className="text-amber-200">{message}</p>
       </div>

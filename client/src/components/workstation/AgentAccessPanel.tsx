@@ -2,11 +2,15 @@ import React from "react";
 import AgentAccessGuide from "@/components/agent-access/AgentAccessGuide";
 import AgentConnectionSetup from "@/components/agent-access/AgentConnectionSetup";
 import LocalPersonalConnectionSetup from "@/components/agent-access/LocalPersonalConnectionSetup";
+import ConnectionHealthPanel from "@/components/agent-access/ConnectionHealthPanel";
+import { SetupContractInbox } from "@/components/agent-access/SetupContractInbox";
 
 export default function AgentAccessPanel() {
   return (
     <div className="min-h-full bg-[radial-gradient(circle_at_top,_rgba(8,145,178,0.12),_transparent_36%),#020617]">
       <div className="px-4 pt-4">
+        <SetupContractInbox />
+        <ConnectionHealthPanel />
         <LocalPersonalConnectionSetup />
         <AgentConnectionSetup />
       </div>

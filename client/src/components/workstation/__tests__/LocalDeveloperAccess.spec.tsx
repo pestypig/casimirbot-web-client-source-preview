@@ -30,11 +30,29 @@ describe("local developer USB setup", () => {
       ? { phase: "inactive", detail: "No grant.", issuerInitialized: false, ownsIssuer: false }
       : { phase: "active", detail: "Local developer access active." });
     window.casimirDesktop = { getRuntimeSnapshot: vi.fn(), localDeveloperAccess: bridge };
-    render(<LocalDeveloperAccess signedIn onChanged={() => {}} />);
+    render(<LocalDeveloperAccess signedIn canBootstrapIssuer onChanged={() => {}} />);
     const activate = await screen.findByRole("button", { name: "Activate this private development profile" });
     fireEvent.click(activate);
     await screen.findByText("Local developer access active.");
     expect(bridge).toHaveBeenCalledWith("activate-self", undefined);
+  });
+  it("does not offer issuer bootstrap to an ordinary profile without an existing issuer", async () => {
+    const bridge = vi.fn(async () => ({ phase: "inactive", detail: "No grant.", issuerInitialized: false, ownsIssuer: false }));
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(), localDeveloperAccess: bridge };
+    render(<LocalDeveloperAccess signedIn onChanged={() => {}} />);
+    await screen.findByText("No grant.");
+    expect(screen.queryByRole("button", { name: "Activate this private development profile" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Create developer issuer on this PC" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Import my USB grant" })).toBeEnabled();
+  });
+  it("offers renewal to an existing issuer owner without base developer policy", async () => {
+    window.casimirDesktop = { getRuntimeSnapshot: vi.fn(), localDeveloperAccess: vi.fn(async () => ({
+      phase: "inactive", detail: "Expired grant.", issuerInitialized: true, ownsIssuer: true,
+    })) };
+    render(<LocalDeveloperAccess signedIn onChanged={() => {}} />);
+    await screen.findByText("Expired grant.");
+    expect(screen.getByRole("button", { name: "Activate this private development profile" })).toBeEnabled();
+    expect(screen.queryByRole("button", { name: "Create developer issuer on this PC" })).toBeNull();
   });
   it("does not infer access from malformed bridge responses", async () => {
     window.casimirDesktop = { getRuntimeSnapshot: vi.fn(), localDeveloperAccess: vi.fn(async () => ({ phase: "active", token: "not-public" })) };

@@ -4,8 +4,13 @@ import { recordWorkstationTimelineEntry } from "@/store/useWorkstationWorkflowTi
 import { emitHelixAskLiveEvent } from "@/lib/helix/liveEventsBus";
 import { HELIX_ASK_CONTEXT_ID } from "@/lib/helix/voice-surface-contract";
 import { useWorkspaceMemoryRegistryStore } from "@/store/useWorkspaceMemoryRegistryStore";
+import {
+  fetchAccountCapabilityPolicy,
+  HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT,
+  readCachedAccountProfileIdentity,
+} from "@/lib/workstation/accountCapabilityPolicy";
 
-const WORKSTATION_NOTES_STORAGE_KEY = "workstation-notes:v1";
+const WORKSTATION_NOTES_STORAGE_PREFIX = "workstation-notes:v2:";
 
 const fallbackNotesStorage = (() => {
   const memory: Record<string, string> = {};
@@ -80,6 +85,7 @@ type WorkstationNotesState = {
   notes: Record<string, WorkstationNote>;
   order: string[];
   active_note_id?: string;
+  storage_scope_key: string;
   createManualNote: (input?: {
     title?: string;
     topic?: string;
@@ -109,6 +115,40 @@ type WorkstationNotesState = {
   deleteNote: (noteId: string) => void;
 };
 
+type PersistedNotes = Pick<WorkstationNotesState, "notes" | "order" | "active_note_id">;
+
+export const notesStorageKeyForProfile = (profileId: string | null | undefined): string =>
+  `${WORKSTATION_NOTES_STORAGE_PREFIX}${profileId === undefined
+    ? "unresolved" : profileId === null ? "guest" : `profile:${encodeURIComponent(profileId)}`}`;
+
+function readStoredNotes(key: string): PersistedNotes {
+  let raw: string | null = null;
+  try { raw = typeof window === "undefined" ? null : window.localStorage.getItem(key); }
+  catch { /* The in-memory fallback remains available. */ }
+  raw ??= fallbackNotesStorage.getItem(key);
+  try {
+    const state = (JSON.parse(raw ?? "null") as { state?: Partial<PersistedNotes> } | null)?.state;
+    const notes = state?.notes && typeof state.notes === "object" && !Array.isArray(state.notes)
+      ? state.notes : {};
+    const order = Array.isArray(state?.order)
+      ? state.order.filter((id): id is string => typeof id === "string" && Boolean(notes[id]))
+      : Object.keys(notes);
+    const active_note_id = typeof state?.active_note_id === "string" && notes[state.active_note_id]
+      ? state.active_note_id : undefined;
+    return { notes, order, active_note_id };
+  } catch {
+    return { notes: {}, order: [], active_note_id: undefined };
+  }
+}
+
+let currentNotesProfileId = readCachedAccountProfileIdentity().profileId;
+let currentNotesStorageKey = notesStorageKeyForProfile(currentNotesProfileId);
+const initialNotes = readStoredNotes(currentNotesStorageKey);
+
+const noteArtifactId = (noteId: string): string =>
+  `workstation-note:${currentNotesStorageKey}:${noteId}`;
+
+
 const slugForNoteId = (value: string): string => {
   const slug = value
     .trim()
@@ -131,12 +171,13 @@ const buildManualNoteId = (title: string, existingIds: string[]): string => {
 
 function registerNoteMemoryArtifact(note: WorkstationNote) {
   useWorkspaceMemoryRegistryStore.getState().upsertArtifact({
-    artifact_id: `workstation-note:${note.id}`,
+    artifact_id: noteArtifactId(note.id),
     artifact_type: "workstation_note",
-    storage_key: WORKSTATION_NOTES_STORAGE_KEY,
+    storage_key: currentNotesStorageKey,
     storage_backend: "localStorage",
-    owner_scope: "browser_guest",
-    sync_status: "profile_candidate",
+    owner_scope: currentNotesProfileId ? "profile" : "browser_guest",
+    profile_id: currentNotesProfileId ?? null,
+    sync_status: currentNotesProfileId ? "profile_candidate" : "local_only",
     title: note.title.trim() || "Untitled note",
     updated_at: note.updated_at,
   });
@@ -145,9 +186,8 @@ function registerNoteMemoryArtifact(note: WorkstationNote) {
 export const useWorkstationNotesStore = create<WorkstationNotesState>()(
   persist(
     (set, get) => ({
-      notes: {},
-      order: [],
-      active_note_id: undefined,
+      ...initialNotes,
+      storage_scope_key: currentNotesStorageKey,
       createManualNote: (input) => {
         const title = input?.title?.trim() || "Untitled note";
         const note = get().upsertWorkflowNote({
@@ -306,7 +346,7 @@ export const useWorkstationNotesStore = create<WorkstationNotesState>()(
       deleteNote: (noteId) =>
         set((state) => {
           if (!state.notes[noteId]) return state;
-          useWorkspaceMemoryRegistryStore.getState().removeArtifact(`workstation-note:${noteId}`);
+          useWorkspaceMemoryRegistryStore.getState().removeArtifact(noteArtifactId(noteId));
           const nextNotes = { ...state.notes };
           delete nextNotes[noteId];
           const nextOrder = state.order.filter((entry) => entry !== noteId);
@@ -320,8 +360,9 @@ export const useWorkstationNotesStore = create<WorkstationNotesState>()(
         }),
     }),
     {
-      name: WORKSTATION_NOTES_STORAGE_KEY,
+      name: currentNotesStorageKey,
       storage: safeNotesStorage,
+      skipHydration: true,
       partialize: (state) => ({
         notes: state.notes,
         order: state.order,
@@ -330,3 +371,18 @@ export const useWorkstationNotesStore = create<WorkstationNotesState>()(
     },
   ),
 );
+
+if (typeof window !== "undefined") {
+  window.addEventListener(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT, () => {
+    const nextProfileId = readCachedAccountProfileIdentity().profileId;
+    const nextKey = notesStorageKeyForProfile(nextProfileId);
+    if (nextKey !== currentNotesStorageKey) {
+      const nextNotes = readStoredNotes(nextKey);
+      currentNotesProfileId = nextProfileId;
+      currentNotesStorageKey = nextKey;
+      useWorkstationNotesStore.persist.setOptions({ name: nextKey });
+      useWorkstationNotesStore.setState({ ...nextNotes, storage_scope_key: nextKey });
+    }
+    if (nextProfileId === undefined) void fetchAccountCapabilityPolicy().catch(() => {});
+  });
+}

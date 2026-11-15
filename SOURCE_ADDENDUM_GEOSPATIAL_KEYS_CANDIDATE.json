@@ -1,0 +1,98 @@
+{
+  "observed_at": "2026-11-13T21:02:23.122238+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/civilization/CivilizationGoogleBasemap.tsx",
+      "canonical_sha256": "42729abd36602c98d3e306c35c6fa6b94b2cdad8f9c537a61ca9495b9794d2b9",
+      "export_sha256": "bdd7418a54fac3586fe7388305efd4629ea368ad1488fdb614917f69ed5c1729",
+      "bytes": 379917,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "806c30f1246987c0dc00fb5e83a9705e383719c63827c382994e8c0200cf396c"
+    },
+    {
+      "path": "client/src/components/civilization/CivilizationGeospatialSettings.tsx",
+      "canonical_sha256": "b7c22a15fd5a58e2b70598043b075c6155eac58f866803d8042e31a8c6b0cdbd",
+      "export_sha256": "7e387632940358c133b1dc0009a4150b64f94485965508589d7c6ea3faa2f121",
+      "bytes": 24987,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "0859c4bbe91de09b293bc4846a3004bf5d9bbdc8dec474aac68f20b8f39d9f45"
+    },
+    {
+      "path": "client/src/components/civilization/civilizationGeospatialClientConfig.ts",
+      "canonical_sha256": "7dbea4bac165785bdbdd186b10fbef426dfcdd38b168061a03cc2b32bc743fbd",
+      "export_sha256": "ea93ac14a06fe416e3ad52afe1706945be18e77d4cc340bab12ba683af64625b",
+      "bytes": 5101,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "dd5ab8a6acee922bc8669a8c0767c494532ed4d8a9a57b7a94aafd4ee8ee3600"
+    },
+    {
+      "path": "client/src/components/civilization/CivilizationGeospatialSettings.spec.tsx",
+      "canonical_sha256": "89d7d7bb57907d880bd4e927e6d5027a71fc0122585707757d6e6c0ee9987fc0",
+      "export_sha256": "89d7d7bb57907d880bd4e927e6d5027a71fc0122585707757d6e6c0ee9987fc0",
+      "bytes": 2028,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/civilization/civilizationGeospatialClientConfig.spec.ts",
+      "canonical_sha256": "72c6b28dbe91361b5fa6794daf5808433630ec72dd06fe8faf647758074f94d8",
+      "export_sha256": "72c6b28dbe91361b5fa6794daf5808433630ec72dd06fe8faf647758074f94d8",
+      "bytes": 2011,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/civilization/civilizationGeospatialWebAccountKey.spec.ts",
+      "canonical_sha256": "a71a289c622140e1844dbfe643206c9ea9fbe09b9e3a829eac40f5241d6d9bd7",
+      "export_sha256": "a71a289c622140e1844dbfe643206c9ea9fbe09b9e3a829eac40f5241d6d9bd7",
+      "bytes": 2799,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    },
+    {
+      "path": "client/src/components/civilization/civilizationGeospatialAccountLifecycle.spec.tsx",
+      "canonical_sha256": "adeca95fa6d627c8437f1da5f565868d5cbd3901f2114fabd850202851491e3c",
+      "export_sha256": "adeca95fa6d627c8437f1da5f565868d5cbd3901f2114fabd850202851491e3c",
+      "bytes": 8338,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": null
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/workstation/accountCapabilityPolicy.ts",
+      "canonical_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "export_sha256": "73997bc3f014bdb7a3516490232d886dda70359bf73297c488f5f529837394d4",
+      "bytes": 7400,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/workstation/accountOperationScope.ts",
+      "canonical_sha256": "126c3c774a9d5ac67ae2b2fb577465fca36ccfea4f9b33c915420afec33d8b90",
+      "export_sha256": "13a5c8dab5137d5d0cd5ad70910dc75828634ac59f4405354ee93f7be21c7faf",
+      "bytes": 602,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed the normalized map/settings/configuration deltas and four focused suites. Website Maps keys use profile-specific browser slots; legacy origin-wide keys are not silently enrolled into an account. Native reads fail closed and explicit native records take precedence over a bundled public browser key.",
+    "Ordinary accounts retain their Maps browser-key entry. Routes credential controls retain the documented developer exception because their service credential is process-wide, not isolated to an owner. Settings describe configuration readiness separately from live API access, billing and Earth Engine registration.",
+    "Reproduced nine lifecycle failures: browser writes after account changes, native read/save/clear receipt reuse, password retention during save, old-account map notifications, loss of a new Routes draft and missing reinspection for another equally capable account.",
+    "The helper now checks initiating profile identity and revision after asynchronous boundaries, permitting initial unknown-session discovery but rejecting subsequent changes and A-to-B-to-A round trips. Retired operations do not mutate browser storage or return old native key receipts.",
+    "Settings use separate guarded mutation slots, immediate submitted-password clearing, current Routes policy checks, refreshed account-view reads and scoped provider/Routes responses. Old completions cannot clear new drafts, publish map-change events or finish a newer operation.",
+    "The map view already sequences key loads and now reloads on an account-profile change. Its delta also corrects account-sign-in recovery wording. SDK/reload behavior is reviewed source only here, not exercised against real Google Maps.",
+    "Seventeen browser checks pass: eleven lifecycle/success cases plus six prior storage/settings cases. Google-key-shaped values are deterministic short digit fixtures, never credentials. No keys from the owner, native writes, Google requests, paid inference or game operation were used."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal; runtime fix 30 is not installed. Tests mock native bridge and HTTP behavior.",
+    "An already-dispatched native write may complete in its original context. Client retirement suppresses stale attribution; it is not native cancellation or rollback. Native account validation remains authoritative.",
+    "Actual SDK loading, reload timing, provider restrictions/billing, native protected storage and ordinary installed-account acceptance remain separate.",
+    "Unchanged map geometry, boundary datasets, diplomacy overlay, provider-status shapes and source interpretation are not requalified by credential tests. Diplomacy overlay additions remain a separate source cohort.",
+    "Malformed provider payloads, all same-account read/write interleavings, storage denial and all browser lifecycle variants remain separate qualifications.",
+    "No scientific operator, adapter grant, proof or certificate change. Five intentional support-contact matches remain in owner publication review."
+  ]
+}

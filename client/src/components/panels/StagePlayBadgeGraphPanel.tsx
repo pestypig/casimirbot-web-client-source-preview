@@ -1,3 +1,4 @@
+import { readStagePlayMailObserverProfile, readStagePlayPacketGoalRelevance } from "./stagePlayEvidenceDisplay";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, CheckCircle2, Copy, Link2, PanelLeftClose, PanelLeftOpen, RadioTower, Search, Trash2, Volume2, Waypoints } from "lucide-react";
@@ -1191,8 +1192,8 @@ function labelize(value: string): string {
   return value.replace(/[._-]/g, " ");
 }
 
-function uniqueSorted(values: string[]): string[] {
-  return Array.from(new Set(values.filter(Boolean))).sort((a: string, b: string) => a.localeCompare(b));
+function uniqueSorted(values: (string | null | undefined)[]): string[] {
+  return Array.from(new Set(values.filter((value): value is string => Boolean(value)))).sort((a: string, b: string) => a.localeCompare(b));
 }
 
 function readClientCoordinate(value: number | undefined): number {
@@ -1870,8 +1871,8 @@ function buildStagePlayMailLoopUnifiedTrace(input: {
     reachedDecision: result.decisionIds.length > 0,
     reachedTerminalCheckpoint:
       result.status === "completed" ||
-      result.lifecycleStage === "voice_completed" ||
-      result.lifecycleStage === "terminal_checkpoint",
+      result.lifecycleStage === "voice_delivered" ||
+      result.lifecycleStage === "completed",
     status: result.status,
     lifecycleStage: result.lifecycleStage ?? null,
     failure: result.failedReason ?? result.skippedReason ?? null,
@@ -1991,7 +1992,7 @@ function buildStagePlayPacketScopedTrace(input: {
   ]);
   const packetRunRefs = selectedPacket?.microReasonerRunRefs ?? [];
   const packetRuns = runs.filter((run) => packetRunRefs.includes(run.runId));
-  const latestJob = latestByIso(mailbox?.jobStates ?? [], (job) => job.updatedAt ?? job.createdAt);
+  const latestJob = latestByIso(mailbox?.jobStates ?? [], (job) => job.updatedAt);
   const latestDecision = latestByIso(selectedDecisions, (decision) => decision.createdAt);
   return {
     schema: "helix.stage_play.packet_trace.v1",
@@ -6299,7 +6300,7 @@ function StagePlayMailLoopLiveOverview({
         presetId: wake.deckPresetId,
         title: wake.deckPresetTitle ?? presetsById.get(wake.deckPresetId)?.title ?? wake.deckPresetId,
         sourceId: wake.sourceIds[0] ?? null,
-        colorKey: wake.packetIds[0] ?? wake.wakeRequestId,
+        colorKey: wake.packetIds?.[0] ?? wake.wakeRequestId,
         reason: "wake deck",
       });
     }
@@ -6348,11 +6349,9 @@ function StagePlayMailLoopLiveOverview({
   const visualProducerState = useVisualSourceCaptureStore((state: { producers: Record<string, VisualSourceCaptureState> }) =>
     visualSource?.sourceId ? state.producers[visualSource.sourceId] ?? null : null
   );
-  const latestPolicy = (mailbox?.watchJobPolicies ?? []).at(-1) ?? null;
   const cadenceMs =
     visualProducerState?.cadence_ms ??
     visualSource?.cadenceMs ??
-    latestPolicy?.nextWakePolicy?.afterMs ??
     STAGE_PLAY_SOURCE_SETUP_DEFAULTS.visualCadenceMs;
   const captureStateLabel = visualProducerState
     ? visualProducerState.stream_active
@@ -7011,11 +7010,7 @@ function StagePlayMailLoopLiveOverview({
         staleAfterMs: 30_000,
         status: primaryMail?.hints.sourceFreshness === "stale" ? "stale" : "fresh",
       },
-      goalRelevance: {
-        goalId,
-        relevance: packet.salience.score ?? 0,
-        reason: packet.salience.reasons.slice(0, 3).join("; ") || labelize(packet.recommendedNext),
-      },
+      goalRelevance: readStagePlayPacketGoalRelevance(packet.packetId, goalId, mailbox?.goalContextUpdates ?? []),
       suggestedDispatch: packetDispatchActions,
       authority: {
         assistantAnswer: false,
@@ -7117,8 +7112,7 @@ function StagePlayMailLoopLiveOverview({
       decisionId: decision?.decisionId ?? null,
       voiceReceiptId: voiceRefs[0] ?? null,
       sourceId: primaryMail?.sourceId ?? visualSource?.sourceId ?? null,
-      observerProfileId: latestPolicy?.observerProfileId ?? null,
-      observerProfileTitle: latestPolicy?.observerProfileTitle ?? null,
+      ...readStagePlayMailObserverProfile(primaryMail, mailbox?.visualObserverProfiles ?? []),
       deck,
       deckVerdict: {
         recommendedNext: packet.arbiter?.recommendedNext ?? packet.recommendedNext,
@@ -7168,8 +7162,7 @@ function StagePlayMailLoopLiveOverview({
     decisionId: null,
     voiceReceiptId: null,
     sourceId: mail.sourceId,
-    observerProfileId: latestPolicy?.observerProfileId ?? null,
-    observerProfileTitle: latestPolicy?.observerProfileTitle ?? null,
+    ...readStagePlayMailObserverProfile(mail, mailbox?.visualObserverProfiles ?? []),
     deck: null,
     deckVerdict: {
       recommendedNext: null,
@@ -7307,9 +7300,9 @@ function StagePlayMailLoopLiveOverview({
       meta: `${formatStagePlayClock(mail.createdAt)} | ${mail.sourceId}`,
       rows: [
         { label: "source", value: mail.sourceId },
-        { label: "freshness", value: mail.hints.sourceFreshness },
-        { label: "analysis", value: labelize(mail.summary.analysisState) },
-        { label: "confidence", value: String(mail.summary.confidence ?? "n/a"), tone: mail.summary.confidence >= 0.7 ? "good" : "warn" },
+        { label: "freshness", value: mail.hints.sourceFreshness ?? "unknown" },
+        { label: "analysis", value: labelize(mail.summary.analysisState ?? "unknown") },
+        { label: "confidence", value: String(mail.summary.confidence ?? "n/a"), tone: typeof mail.summary.confidence === "number" && mail.summary.confidence >= 0.7 ? "good" : "warn" },
         { label: "mail age", value: mail.mailId === latestMail?.mailId ? formatStagePlayMs(mailAgeMs) : formatStagePlayClock(mail.createdAt) },
       ],
       evidenceRefs: mail.evidenceRefs,
@@ -9330,7 +9323,7 @@ const STAGE_PLAY_SOURCE_CLASSES = [
 ] as const;
 
 function defaultDraftParametersForNode(node: StagePlayNodeBuilderType): DraftStagePlayNodeParameter[] {
-  const presets: Record<StagePlayBadgeV1["kind"], [string, string][]> = {
+  const presets: Partial<Record<StagePlayBadgeV1["kind"], [string, string][]>> = {
     observer: [["role", "source_custody"], ["route_policy", "evidence_only"], ["selected_sources", ""]],
     source: [["source_class", ""], ["source_id", ""], ["status", ""], ["descriptor_ref", ""], ["producer_ref", ""], ["latest_ref", ""]],
     compact_observation: [["window", ""], ["fact_summary", ""], ["evidence_refs", ""]],
@@ -9361,7 +9354,7 @@ function defaultDraftParametersForNode(node: StagePlayNodeBuilderType): DraftSta
     missing_evidence: [["question", ""], ["needed_ref", ""], ["status", "missing"]],
   };
 
-  return presets[node.kind].map(([key, value], index) => ({
+  return (presets[node.kind] ?? []).map(([key, value], index) => ({
     id: `${node.kind}:param:${index + 1}`,
     key,
     value,

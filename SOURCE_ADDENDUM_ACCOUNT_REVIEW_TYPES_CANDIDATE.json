@@ -1,0 +1,100 @@
+{
+  "observed_at": "2026-11-13T23:29:35.150135+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/agent-access/CaptainKeyesTaskAccess.tsx",
+      "canonical_sha256": "101145ff7b8c3b116d42b5d4215477a6d7da2c4929275ffe970469a4ef9452f3",
+      "export_sha256": "101145ff7b8c3b116d42b5d4215477a6d7da2c4929275ffe970469a4ef9452f3",
+      "bytes": 15544,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "c5951a216af77ebb72b1a0b43aacf07dad75287811cea5bc190bcde6591a92ee"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/CaptainKeyesTaskAccess.spec.tsx",
+      "canonical_sha256": "8ec8355ac15ed7588cd74d2a59d1dbf7443768eeae0cc101a3fec11ed07d2a49",
+      "export_sha256": "8ec8355ac15ed7588cd74d2a59d1dbf7443768eeae0cc101a3fec11ed07d2a49",
+      "bytes": 16162,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "d0d4fd4afee31189af0cf3d31c8877f71ebff98cef4b0af2cf8cc82e458a1029"
+    },
+    {
+      "path": "client/src/components/agent-access/AgentConnectionSetup.tsx",
+      "canonical_sha256": "56cdc581e688806cf0e8af14e2e5a65f44015f80cd963d9e41d70d3fc90be707",
+      "export_sha256": "c001e644bdaa4c93e2ac592486dc66a4b3a872833ae2363fe3b6ff547a2d6923",
+      "bytes": 120174,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "399330cef38181bc4eb6c7e1d0d937f3ee1d0270e5b518b63b48adb61352839d"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/AgentConnectionSetup.spec.tsx",
+      "canonical_sha256": "1ee45b66a9984d1f22b1a6bc387fd465739aeb487134b59b33c9eb29224279c1",
+      "export_sha256": "a2581598b6e6e8a792d58dc2dcbc1d0392d4d256079126ac117d00741805cdbe",
+      "bytes": 128317,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "0b37c096c743c1be594751d28f325baaa57685d8554e30a1153f2e404c2e9fde"
+    },
+    {
+      "path": "client/src/components/workstation/PersonalMcpDeviceRegistration.tsx",
+      "canonical_sha256": "dca41e253ac202c435809a402d896c100a7fe5fb09a884b1c3cfd786e2ccf7b5",
+      "export_sha256": "dca41e253ac202c435809a402d896c100a7fe5fb09a884b1c3cfd786e2ccf7b5",
+      "bytes": 13717,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "25eba7e72d0b3acdcb8496518823ec7270f2cdd66f9bee645f9c94a9d9e2f3c5"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/PersonalMcpDeviceRegistration.spec.tsx",
+      "canonical_sha256": "1d8d66c264d61c76f2ae6bc39c4aa8e331a61c85a13c00c4ba89a405c1157525",
+      "export_sha256": "680cbd6520dc8a31e8be53b4f00e5154a783d85ed50d398341813d7ded4643b7",
+      "bytes": 14206,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "87d045ab7708385a60851291eea8e31dc518849bcbdbfdf512ecadce2fb85c1e"
+    },
+    {
+      "path": "client/src/components/workstation/AccountSessionPanel.tsx",
+      "canonical_sha256": "d29187da1a7e723244834ea8849f28b0e24d08049cd3c75a465d5751c9c1d921",
+      "export_sha256": "91372702d9671d5d73b280a9e8e658203ede7361c11422ac7eb5a3f31690685c",
+      "bytes": 79471,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "42807995fd4ae181efce91e0958ad12db2dbb8d3a92461d51b35d9ef1c299767"
+    },
+    {
+      "path": "client/src/hooks/usePersonalMcpSavedResume.ts",
+      "canonical_sha256": "e33a76c2564d0cecb5b9482971871ee5fb3c5e24a2db1d8af5a0b9f2e74f1a90",
+      "export_sha256": "e33a76c2564d0cecb5b9482971871ee5fb3c5e24a2db1d8af5a0b9f2e74f1a90",
+      "bytes": 4131,
+      "transformation": "CRLF to LF",
+      "previous_proposal_sha256": "e48f8457e04b2cf35fad0de051766a0f0d2134a22efbaedd4a903fd16e220b8d"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/hooks/__tests__/usePersonalMcpSavedResume.spec.tsx",
+      "canonical_sha256": "81007b45c8cdfe2b9b2905e74fe4e9491207fa0be301337de545b359ab82233c",
+      "export_sha256": "81007b45c8cdfe2b9b2905e74fe4e9491207fa0be301337de545b359ab82233c",
+      "bytes": 7233,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/workstation/__tests__/AccountSessionPanel.i18n.spec.tsx",
+      "canonical_sha256": "ad6c1a026466478edaa4faf73476094afdceeca6fd65e1a8a5542e37c8f6d09a",
+      "export_sha256": "aaa621d7c1f09d59506c0393115948519730160f41aaf8225096ff27b9b8003f",
+      "bytes": 17018,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "review": [
+    "Reviewed the eight exact diffs against SHA-256 snapshots and the existing account/connection/task contracts.",
+    "Captain Keyes now describes the existing neutrino_publish action: single IceCube alert, native event ID, exact destination, source, revision and artifact hashes, and no reasoning. The mounted regression observes status and inspect only; no approval or publishing occurs.",
+    "Connection inspection narrows an unknown result to a non-null object before reading available. Device registration retains its full existing phase union. Saved resume captures the already-checked native function. Subscription rendering explicitly narrows the existing required session.",
+    "Native test fixtures provide the required runtime snapshot method, cover the full native action signature, and retain completion listeners in a typed mutable holder. No production contract is loosened.",
+    "Two initial test assertions were affected by a local encoding-edit error; the fixtures were restored from saved UTF-8 bytes and edits reapplied. Final diff and tests determine acceptance."
+  ],
+  "limits": [
+    "Unfrozen source review, not installed recovery, live OAuth or Discord publication acceptance.",
+    "No new authority or task action is granted. Existing shader/data/metadata export holds and support-contact publication review remain."
+  ]
+}

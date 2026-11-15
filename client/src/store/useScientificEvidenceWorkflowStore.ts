@@ -128,7 +128,7 @@ function mergeWorkflowStatus(
   const incomingIsAtLeastAsStrong = incomingDepthRank > existingDepthRank ||
     (incomingDepthRank === existingDepthRank && incomingRowRank >= existingRowRank);
   const evidenceSource = incomingIsAtLeastAsStrong ? incoming : existing;
-  const merged: ScientificEvidenceWorkflowStatus = {
+  const merged = {
     ...existing,
     pageLoaded: existing.pageLoaded || incoming.pageLoaded,
     sourceId: evidenceSource.sourceId ?? incoming.sourceId ?? existing.sourceId,
@@ -162,7 +162,7 @@ function mergeWorkflowStatus(
       incomingIsAtLeastAsStrong ? [] : incoming.activeBlockers,
     ),
     claimBoundary: "observation_only_not_proof",
-  };
+  } satisfies ScientificEvidenceWorkflowStatus;
   if (merged.sidecarId && !merged.postulateReadyRefs.evidenceSidecarRefs.includes(merged.sidecarId)) {
     merged.postulateReadyRefs.evidenceSidecarRefs = unique([merged.sidecarId], merged.postulateReadyRefs.evidenceSidecarRefs);
   }

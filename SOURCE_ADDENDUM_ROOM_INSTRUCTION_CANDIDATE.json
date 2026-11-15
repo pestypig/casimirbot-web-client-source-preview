@@ -1,0 +1,53 @@
+{
+  "observed_at": "2026-11-13T15:43:53.459107+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeRoomInstructionsPanel.tsx",
+      "canonical_sha256": "ce90f716ea3add4eb2deaa544f38b8b0d5cae4f75c79aa5d4c5adaf21fabaa38",
+      "export_sha256": "ce90f716ea3add4eb2deaa544f38b8b0d5cae4f75c79aa5d4c5adaf21fabaa38",
+      "previous_proposal_sha256": "60c984e88dcc6017f08b7c29be7a8a25130e05443a6296ca6cfd12a4c8b0c237",
+      "bytes": 11682,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/ReviewedRoomInstructionPanel.tsx",
+      "canonical_sha256": "8410e9c6af4060e093668def08fd926247c172375f78ef110ffc8188e37f1c20",
+      "export_sha256": "8410e9c6af4060e093668def08fd926247c172375f78ef110ffc8188e37f1c20",
+      "previous_proposal_sha256": "87cf8ba6338aa5750a1b3833ac5874b5c751f3a93b95b41a5613cff696682d78",
+      "bytes": 6916,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/ReviewedRoomInstructionPanel.spec.tsx",
+      "canonical_sha256": "f68926ca0d761cb9691618efde809e379cda43f709a3f4e6492028f7a0ca1b6d",
+      "export_sha256": "f68926ca0d761cb9691618efde809e379cda43f709a3f4e6492028f7a0ca1b6d",
+      "previous_proposal_sha256": "a3c90094afb12167e2743e31097137e6fea07edf2d6bac3b81ed31aaf2d43de4",
+      "bytes": 11719,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/RoomMissionHandoffReview.ts",
+      "canonical_sha256": "9f8d9e0c99fa2fa0c052da4e7a85abf931a98ade62a2d864f736903f52a5b8b7",
+      "export_sha256": "8135cf99c6911409efc8ab3b3b309014cde812fc81283f0278745090b4682e31"
+    }
+  ],
+  "review": [
+    "Read both complete instruction controls, the shared test file and the unchanged volatile handoff review store. First-party React/TypeScript and synthetic transcript/room fixtures only; no real participant speech, secrets, runtime state, assets or private history copied.",
+    "Browser transfer requires the full matching captured text, current attachment metadata and an explicit owner checkbox/click. Losing source text or changing account/room invalidates review. Transfer does not queue work.",
+    "Native queueing uses exact capture and selection references rather than accepting transcript text. An optional same-world pair is carried as metadata, not command permission. Expected block outcomes are bounded by the shared schema and do not authorize commands or assert build correctness.",
+    "The volatile store holds at most twenty previews without localStorage or cross-tab broadcasting. Server authority, consent and source checks remain separate.",
+    "Fixed a post-R379 presentation bug in both controls: late responses after the request deadline silently retained an uncertain review. The abort check now enters the existing failure path, clears review and provides recovery instructions without an automatic retry. Four regressions failed before; all thirteen tests pass after.",
+    "Three canonical files changed in this cohort. Export transformation is line endings only. Installed timeout recovery remains unverified."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal; not packaged or deployed.",
+    "Shared instruction/build-plan contracts and native/server transfer, dispatch and consent checks remain separate dependencies.",
+    "Mock UI tests do not prove real room speech consent, delivery into a live task, world identity, program execution or GPT Live continuity."
+  ]
+}

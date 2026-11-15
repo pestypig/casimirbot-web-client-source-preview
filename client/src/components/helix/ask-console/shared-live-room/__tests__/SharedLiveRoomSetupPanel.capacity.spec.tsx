@@ -20,11 +20,15 @@ it("offers the developer a distinct text-only profile without changing default r
   fireEvent.change(screen.getByLabelText("Room profile"), { target: { value: "three_human_text" } });
   fireEvent.click(screen.getByRole("button", { name: "Create room" }));
   expect(createRoom).toHaveBeenLastCalledWith("", "three_human_text");
+  fireEvent.change(screen.getByLabelText("Room profile"), { target: { value: "three_person_voice" } });
+  fireEvent.click(screen.getByRole("button", { name: "Create room" }));
+  expect(createRoom).toHaveBeenLastCalledWith("", "three_person_voice");
 });
 
 it("shows the actual capacity of an existing text room in the switcher", () => {
   const controller = { createRoom: vi.fn(), joinRoom: vi.fn(), openRoom: vi.fn(), busyAction: null,
     rooms: [{ room_id: "three", title: "Text evaluation", capacity_profile: "three_human_text",
+      max_participants: 3,
       status: "waiting_for_participant", participants: [
         { participant_id: "host", presence: "present" },
         { participant_id: "departed", presence: "left" },

@@ -13,6 +13,7 @@ import type {
   VoiceSpeakJsonResponse,
   VoiceSpeakPayload,
 } from "@/lib/agi/api";
+import type { VoicePlaybackMetrics } from "@/lib/helix/voice-playback";
 import type {
   VoicePlaybackLifecycleReceiptStatus,
   VoicePlaybackOutcomeReceipt,
@@ -59,8 +60,8 @@ export type HelixAskVoicePlaybackToolTimelineEvent = {
   utteranceId: string;
   text?: string;
   detail: string;
-  utteranceAuthority?: string | null;
-  utteranceSource?: string | null;
+  utteranceAuthority?: VoicePlaybackUtteranceIntent["authority"] | null;
+  utteranceSource?: VoicePlaybackUtteranceIntent["source"] | null;
   debugContext?: InterimVoiceClientHandoffDebug;
   suppressionCause?: "inactive_attempt";
   authorityRejectStage?: "preflight";

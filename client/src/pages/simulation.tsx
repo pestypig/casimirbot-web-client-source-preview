@@ -47,16 +47,16 @@ export default function Simulation() {
   const [temperature, setTemperature] = useState(
     NHM2_SIMULATION_CONTROL_DEFAULTS.temperatureK,
   );
-  const [strokeAmplitude, setStrokeAmplitude] = useState(
+  const [strokeAmplitude, setStrokeAmplitude] = useState<number>(
     NHM2_SIMULATION_CONTROL_DEFAULTS.strokeAmplitudePm,
   );
-  const [burstTime, setBurstTime] = useState(
+  const [burstTime, setBurstTime] = useState<number>(
     NHM2_SIMULATION_CONTROL_DEFAULTS.burstTimeUs,
   );
-  const [cycleTime, setCycleTime] = useState(
+  const [cycleTime, setCycleTime] = useState<number>(
     NHM2_SIMULATION_CONTROL_DEFAULTS.cycleTimeUs,
   );
-  const [xiPoints, setXiPoints] = useState(
+  const [xiPoints, setXiPoints] = useState<number>(
     NHM2_SIMULATION_CONTROL_DEFAULTS.xiPoints,
   );
 

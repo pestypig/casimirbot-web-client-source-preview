@@ -46,6 +46,7 @@ describe("DesktopUpdatePanel", () => {
     runtimeState.nativeBinaryUpdate = false;
     const restartIntoPrivateDevUpdate = vi.fn(async () => ({ phase: "restarting" }));
     window.casimirDesktop = Object.freeze({
+      getRuntimeSnapshot: vi.fn(async () => null),
       getPrivateDevUpdateState: vi.fn(async () => ({
         phase: "ready", runningBuild: "release-main-r55", selectedBuild: "release-main-r55",
         pendingBuild: "release-main-r56", rollbackBuild: "release-main-r54",
@@ -55,7 +56,8 @@ describe("DesktopUpdatePanel", () => {
     });
     render(<DesktopUpdatePanel />);
     expect(await screen.findByText("Staged release-main-r56")).toBeDefined();
-    expect(screen.getByText(/Full Harness must be enabled by its owner again/)).toBeDefined();
+    expect(screen.getByText(/An active owner-approved setup contract can restart Full Harness automatically/)).toBeDefined();
+    expect(screen.getByText(/Otherwise, Full Harness needs owner approval/)).toBeDefined();
     fireEvent.click(screen.getByRole("button", { name: "Later" }));
     expect(screen.getByText("Update ready for later")).toBeDefined();
     expect(restartIntoPrivateDevUpdate).not.toHaveBeenCalled();
@@ -67,6 +69,7 @@ describe("DesktopUpdatePanel", () => {
   it("does not offer a private restart when verification failed", async () => {
     runtimeState.nativeBinaryUpdate = false;
     window.casimirDesktop = Object.freeze({
+      getRuntimeSnapshot: vi.fn(async () => null),
       getPrivateDevUpdateState: vi.fn(async () => ({
         phase: "error", runningBuild: "release-main-r55", selectedBuild: "release-main-r55",
         pendingBuild: "release-main-r56", rollbackBuild: "release-main-r54",

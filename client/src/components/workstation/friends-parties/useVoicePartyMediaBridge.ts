@@ -22,6 +22,21 @@ export const useVoicePartyMediaBridge = (input: {
     ? `${input.party.party_id}|${input.self.participant_id}`
     : null;
   const identityRef = useRef<string | null>(null);
+  const generation = useRef(0);
+  const mounted = useRef(false);
+
+  useEffect(() => {
+    mounted.current = true;
+    setProjection(INITIAL_VOICE_PARTY_MEDIA_PROJECTION);
+    return () => {
+      mounted.current = false;
+      generation.current++;
+      const bridge = bridgeRef.current;
+      bridgeRef.current = null;
+      identityRef.current = null;
+      if (bridge) void bridge.close().catch(() => undefined);
+    };
+  }, [identity]);
 
   useEffect(() => {
     if (bridgeRef.current && identityRef.current === identity && input.party) {
@@ -29,21 +44,21 @@ export const useVoicePartyMediaBridge = (input: {
     }
   }, [identity, input.party]);
 
-  useEffect(() => () => {
-    const bridge = bridgeRef.current;
+  const start = useCallback(async () => {
+    if (!mounted.current || !input.party || !input.self || !identity) return;
+    const attempt = ++generation.current;
+    const previous = bridgeRef.current;
     bridgeRef.current = null;
     identityRef.current = null;
-    if (bridge) void bridge.close();
-  }, []);
-
-  const start = useCallback(async () => {
-    if (!input.party || !input.self || !identity) return;
-    if (bridgeRef.current) await bridgeRef.current.close().catch(() => undefined);
+    if (previous) await previous.close().catch(() => undefined);
+    if (!mounted.current || generation.current !== attempt) return;
     const bridge = createVoicePartyMediaBridge({
       party: input.party,
       self: input.self,
       api: input.api,
-      onProjection: setProjection,
+      onProjection: next => {
+        if (mounted.current && generation.current === attempt) setProjection(next);
+      },
     });
     bridgeRef.current = bridge;
     identityRef.current = identity;
@@ -51,9 +66,12 @@ export const useVoicePartyMediaBridge = (input: {
   }, [identity, input.api, input.party, input.self]);
 
   const stop = useCallback(async () => {
+    generation.current++;
     const bridge = bridgeRef.current;
     bridgeRef.current = null;
     identityRef.current = null;
+    if (mounted.current) setProjection(current => ({ ...current, state: "closed",
+      peer_audio_connected: false, remote_audio_playback_ready: false }));
     if (bridge) await bridge.close().catch(() => undefined);
   }, []);
 

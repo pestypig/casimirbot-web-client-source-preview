@@ -19,8 +19,9 @@ export const pairingStatusSchema = z.object({
 }).strict();
 export const pairingInvitationRequestSchema = z.object({
   requestId: z.string().min(3).max(120), registrationId: ref, chatId: ref, environment,
+  setupContractRequestId: z.string().uuid().optional(),
   invitationSeconds: z.union([z.literal(300), z.literal(900), z.literal(3600)]),
-  pairingSeconds: z.union([z.literal(3600), z.literal(28800), z.literal(86400)]),
+  pairingSeconds: z.number().int().min(900).max(86400),
   invitationDelivery: z.enum(["automatic", "private_mcp"]).optional(),
   replacement: z.object({ pairingId: ref, revision: z.number().int().positive() }).strict().optional(),
 }).strict();

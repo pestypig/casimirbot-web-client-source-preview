@@ -14,7 +14,7 @@ export type HelixAskLiveMediaBoundary = {
   readProviderOutputStream(): HelixAskLiveRuntimeMediaStreamLike | null;
   readProviderInputEnabled(): boolean;
   replaceProviderInputAudioTrack(track: HelixAskLiveRuntimeTrackLike, options?: { enableExternalAudio?: boolean }): Promise<boolean>;
-  restoreProviderInputAudioTrack(): Promise<boolean>;
+  restoreProviderInputAudioTrack(expectedTrack?: HelixAskLiveRuntimeTrackLike): Promise<boolean>;
 };
 
 const boundaries = new Map<string, {
@@ -33,8 +33,8 @@ export const registerHelixAskLiveMediaBoundary = (input: {
     readProviderInputEnabled: () => input.controller.getMicrophoneEnabled(),
     replaceProviderInputAudioTrack: (track, options) =>
       input.controller.replaceProviderInputAudioTrack(track, options),
-    restoreProviderInputAudioTrack: () =>
-      input.controller.restoreProviderInputAudioTrack(),
+    restoreProviderInputAudioTrack: (expectedTrack) =>
+      input.controller.restoreProviderInputAudioTrack(expectedTrack),
   };
   boundaries.set(input.realtimeSessionId, {
     controller: input.controller,

@@ -1,0 +1,70 @@
+{
+  "observed_at": "2026-11-13T15:30:23.793587+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/agent-access/DurableTaskPairing.tsx",
+      "canonical_sha256": "1d45f9f18b3392712dcc3a9c2eca0daeda561ab0741ed59db899fd3dd20020c5",
+      "export_sha256": "c54a64a9d438e307dc5ad6c7a033ad6c841eb6b35e44ea6c27e524f419b506cd",
+      "previous_proposal_sha256": "c8231717eb9f95caf3ae59024676f43c053b0f1b13edc2fc52683a1348051a65",
+      "bytes": 54334,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/DurableTaskPairing.spec.tsx",
+      "canonical_sha256": "8be8da269662728e41148e8dda83a70bc803b28c69966f42857ce0e3f01729be",
+      "export_sha256": "b3d65e2854c50ed796e5f190c64727aa0e59c88b1ef3290d13cf1461a7c0fa9a",
+      "previous_proposal_sha256": "46e0637ad6b6d82f6388f54912163912ab1b90c35d25ec94b2dbfcccdba98bc7",
+      "bytes": 74989,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/LocalPersonalConnectionSetup.tsx",
+      "canonical_sha256": "adf587b45dcc66558aa611442bb9eaddf93a01e2bdfdb851052d733686cac85e",
+      "export_sha256": "dc884c97dd949a51598e6120f748365266cd6ac2edf698c08af4332bf9c7fd33",
+      "previous_proposal_sha256": "058cf9cf10fa95724165fd708bb352284ec3d6e25a9f1bd45cccd1209b3269fd",
+      "bytes": 10395,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/agent-access/__tests__/LocalPersonalConnectionSetup.spec.tsx",
+      "canonical_sha256": "fc2a558f6fb740a46849b9bfdb0979d4a9c73a851dad29463ab2803a823aca26",
+      "export_sha256": "3dec68bbe655faaee2f7d02eb57d3a0f90222cdeb0632c9ce47c78044e181fc1",
+      "previous_proposal_sha256": "0f4cf1b10353b0a108ccbc46a5e7d9d97bd37b25b9437bf7ba94f4feb24c6b28",
+      "bytes": 8292,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/lib/agent-access/durablePairing.ts",
+      "canonical_sha256": "ca4ee4adad1bad3a602c256c65ec9f61e201ee480490e07d109c8f6183c0c714",
+      "export_sha256": "4c27c31784a832b70bc0950b9e5f3cca38d0a5b9bb7ef2f33e33eb6e541aa2f6",
+      "previous_proposal_sha256": "cc02abf6e97090729a1e4a76f01694663e75b98e5b3a16f121fe1add2d649832",
+      "bytes": 8840,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [
+    {
+      "path": "client/src/lib/agent-access/__tests__/durablePairing.spec.ts",
+      "canonical_sha256": "829e6b829b985d5f21e0cbf5578499f2a49ab7e3f5fd8fe84228d8d9b3e9d046",
+      "export_sha256": "f3a7b4ed4876b38beb28c737d4c48ac58ac9f645d8cf6c4d0bc4be041cd7c565"
+    }
+  ],
+  "review": [
+    "Read three complete production modules and three tests, plus omitted synthetic local-connection fixture. First-party source and synthetic identifiers only; no live pairing IDs, invitation secrets, profiles or private history exported.",
+    "Durable pairing retains owner/chat-scoped review metadata and exact request identity. Unknown writes reconcile the same request. Automatic recovery reads never issue consent or new invitations. Fresh registration resets approval; account/chat changes unmount prior operations.",
+    "Accepted pairing, live runtime binding and task registration are separate states. Runtime matching checks pairing/profile/chat/run/expiry. Replacement and cancellation retain prior reviewed metadata until a verified server result permits transition; local deadlines alone cannot prove grant expiry.",
+    "Private MCP delivery is the default for a fresh review. Existing manual consent is preserved. Invitation secrets remain transient; secret-free setup requests are separate from manual claim handles. Explicit revocation has a separate confirmation.",
+    "Local personal-tool inspection is separately feature-gated and read-only. Identical valid tunnel notifications preserve its observation, changed/malformed events invalidate it, and deadline/late-result checks prevent stale display. It neither starts a tunnel nor grants a clock/program action.",
+    "No canonical source edits in this cohort. Export transformation is line endings only."
+  ],
+  "limits": [
+    "Private source proposal only; not frozen, committed, pushed or newly packaged.",
+    "Mock tests do not establish owner consent, live account/device identity, installed MCP availability or game authority.",
+    "Shared schemas, local-connection fixture, native bridge, storage helpers and other imports remain separate dependencies.",
+    "Registration and historical success are observations, not active grant authority."
+  ]
+}

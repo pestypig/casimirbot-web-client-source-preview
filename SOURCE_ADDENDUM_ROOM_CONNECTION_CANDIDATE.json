@@ -1,0 +1,42 @@
+{
+  "observed_at": "2026-11-13T15:48:17.457013+00:00",
+  "public_base_head": "a67c35738e3e702ee3cb719cacb0b601e452d3ca",
+  "canonical_base_head": "2113d0e7547b018220da38d6adc4f36b5718fcd4",
+  "source_frozen": false,
+  "published": false,
+  "files": [
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/NativeRoomConnectionPanel.tsx",
+      "canonical_sha256": "85a96dd4cd2824bed941d513553198fd37db423fd11e72066714d802345876d3",
+      "export_sha256": "85a96dd4cd2824bed941d513553198fd37db423fd11e72066714d802345876d3",
+      "previous_proposal_sha256": "c2b0657561735bfa761c20eb2621dddad283eaf5532384d6a4afec65d9864bbe",
+      "bytes": 45213,
+      "transformation": "CRLF to LF"
+    },
+    {
+      "path": "client/src/components/helix/ask-console/shared-live-room/__tests__/NativeRoomConnectionPanel.spec.tsx",
+      "canonical_sha256": "d57a7108d582d29bfc420849c7fb6beeb70fb2905a89b6b60c0245c4c686fa70",
+      "export_sha256": "d57a7108d582d29bfc420849c7fb6beeb70fb2905a89b6b60c0245c4c686fa70",
+      "previous_proposal_sha256": "62c7f3cc309a6f6db06108b48edab93434c3f7eb9623beb99eafe0ec84b07c8b",
+      "bytes": 45641,
+      "transformation": "CRLF to LF"
+    }
+  ],
+  "unchanged_reviewed_files": [],
+  "review": [
+    "Read complete room connection panel and test file. First-party React code and mocked room/Auth0/Discord/native fixtures. No live bearer, profile state, audio, invitations, assets or private Git history exported.",
+    "Native room authorization remains purpose-scoped, owner-initiated and separate from account linking, task pairing and source admission. Recovery distinguishes a saved grant under recheck from denied service access; the authorization deadline and cancellation are visible.",
+    "Joins use an authority/room/invitation-derived request key and no automatic repeat. Access denial and account/disconnect changes clear rooms. Explicit browser opening names the selected authority and room.",
+    "Task selection can be reviewed before room text admission while full mission controls remain separate. A single text owner retains drafts across portal changes. Ordinary human conversation does not trigger developer interpreter reads.",
+    "Discord bridging requires the exact active GPT Live session and verified ticket/participant consent at its separate boundary. Hosted Minecraft context is read-only and tied to an explicit source/world; world changes release the existing context selection. These are source behavior and mocked tests, not live qualification.",
+    "Fixed a post-R379 presentation bug: the shared request helper accepted responses after its abort deadline. The helper now rejects them. Two regressions failed before and all 33 tests passed after.",
+    "Remaining review concern: hosted source-list and source-selection callbacks do not carry a separate room/session generation check. The common abort check now protects canceled requests, but switching selected rooms during these requests needs a focused follow-up before installed continuity acceptance.",
+    "Two canonical files changed; line-ending normalization is the only export transformation."
+  ],
+  "limits": [
+    "Unfrozen unpublished source proposal, not a package, deployment or installed acceptance.",
+    "Shared contracts, native services, text owner, voice bridge and other child controls remain separate dependencies.",
+    "Voice/WebSocket/native transcription are mocked. No live sign-in, room join, speech, provider call, player session or game action performed.",
+    "Room/source callback scope concern is recorded for follow-up; this proposal is not release-ready."
+  ]
+}

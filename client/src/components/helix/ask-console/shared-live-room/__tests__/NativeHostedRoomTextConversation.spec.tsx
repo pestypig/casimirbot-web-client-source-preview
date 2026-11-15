@@ -33,6 +33,36 @@ const props = (roomId: string) => ({ roomId, authority: "https://rooms.test", se
   participants: [{ participant_id: self, display_name: "Owner" }], closed: false });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
+it("shows a bounded room-text read diagnostic and clears it after recovery", async () => {
+  const fetcher = vi.fn()
+    .mockResolvedValueOnce(new Response(JSON.stringify({ error: "room_forbidden" }), { status: 403 }))
+    .mockResolvedValueOnce(json(list(roomA, [])));
+  vi.stubGlobal("fetch", fetcher);
+  const { result } = renderHook(() => useNativeHostedRoomTextConversation({ ...props(roomA) }));
+  await waitFor(() => expect(result.current.error).toBe("Room messages could not be loaded. (room_forbidden)"));
+  expect(result.current.admitted).toBe(false);
+  act(() => window.dispatchEvent(new Event(HELIX_ACCOUNT_CAPABILITY_POLICY_EVENT)));
+  await waitFor(() => expect(result.current.admitted).toBe(true));
+  expect(result.current.error).toBe("");
+  expect(fetcher).toHaveBeenCalledTimes(2);
+});
+
+it.each([
+  ["room_connection_changed", "room_connection_changed"],
+  ["room_account_unavailable", "room_account_unavailable"],
+  ["account_policy_blocked", "account_policy_blocked"],
+  ["unexpected_private_detail", "HTTP 403"],
+])("shows only the safe room-text denial %s", async (serverCode, visibleCode) => {
+  vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({
+    error: serverCode, message: "private account detail must stay hidden",
+  }), { status: 403 })));
+  const { result } = renderHook(() => useNativeHostedRoomTextConversation({ ...props(roomA) }));
+  await waitFor(() => expect(result.current.error)
+    .toBe(`Room messages could not be loaded. (${visibleCode})`));
+  expect(result.current.error).not.toContain("private account detail");
+  expect(result.current.admitted).toBe(false);
+});
+
 it("posts a slash request as exact human text without granting model access", async () => {
   vi.stubGlobal("crypto", webcrypto);
   const requests: Array<Record<string, unknown>> = [];
