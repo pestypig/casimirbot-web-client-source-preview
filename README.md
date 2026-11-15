@@ -1,3 +1,7 @@
+## Website guide update after desktop .85
+
+The [website addendum](SOURCE_ADDENDUM_ALPHA85_WEBSITE.json) pins the getting-started guide to canonical commit `4beb2624da8a18bae604cc7bc339832dedfb5402`. It adds verified public pilot downloads and current availability notes. The signed desktop installer remains pinned to its own source commit; attended Minecraft/GPT Live is still unqualified. Earlier source inventories remain dated evidence.
+
 ## Consolidated .83 source checkpoint
 
 The [frozen selected-source inventory](SOURCE_FREEZE_DESKTOP_ALPHA83.json) pins 2151 selected paths to canonical commit `7e5414c4b2eaac794f8cb0a46bfa53570631c68a`, with exact export hashes and any declared transformations or exceptions. The generated documentation catalog is explicitly held at its older reviewed public bytes; it is not the catalog in the .83 desktop. Earlier candidate notes below are historical preparation evidence. Existing omitted-dependency and license notices remain in force. This source-only checkpoint does not establish signed-desktop, website, scientific or live-game acceptance.

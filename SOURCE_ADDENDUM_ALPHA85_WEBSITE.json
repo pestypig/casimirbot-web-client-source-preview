@@ -1,0 +1,11 @@
+{
+  "schema": "casimirbot.website_release_addendum.v1",
+  "canonical_source_commit": "4beb2624da8a18bae604cc7bc339832dedfb5402",
+  "selected_path": "client/src/pages/getting-started.tsx",
+  "canonical_git_sha256": "3cac342f7f4b8fcdd9788691c5c486b8ab515b82bc7c5277beb89ba16a6ede23",
+  "export_sha256": "3cac342f7f4b8fcdd9788691c5c486b8ab515b82bc7c5277beb89ba16a6ede23",
+  "transformation": "LF normalization only",
+  "scope": "Verified public Minecraft pilot download links, exact compatibility and Friends availability notes",
+  "signed_installer_source_commit": "a104f8d70299369d331dc20d4af2110ba26590bb",
+  "limits": "Website guide change after signed build; attended Minecraft/GPT Live remains unqualified. Other selected paths and prior held inventories are unchanged."
+}

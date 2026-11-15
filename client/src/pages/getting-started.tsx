@@ -1,6 +1,9 @@
 import { useEffect, type ReactNode } from "react";
 import { ArrowRight, CheckCircle2, Download, ExternalLink, ShieldCheck } from "lucide-react";
 
+const minecraftPilotRelease = "https://github.com/pestypig/casimirbot-minecraft-releases/releases/tag/minecraft-1.21.8-pilot.1";
+const minecraftPilotDownload = "https://github.com/pestypig/casimirbot-minecraft-releases/releases/download/minecraft-1.21.8-pilot.1";
+
 const minecraftPilotMods = [
   {
     filename: "HelixFabricSensor-0.4.19.jar",
@@ -198,7 +201,7 @@ export default function GettingStartedPage() {
 
       <section id="friends-and-shared-chats" className="scroll-mt-8 border-t border-white/10 py-12">
         <h2 className="text-2xl font-semibold text-white">Friends and shared chats</h2>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300"><strong>Private pilot:</strong> these controls are being qualified in numbered test builds. Check the availability for your installed build before following this guide. Quantum-sticker delivery and the full two-way streaming workflow are still under qualification.</p>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300"><strong>Alpha workflow:</strong> use desktop 0.1.0-alpha.85 or later and check your account’s available controls. Friend messages, emoji, quantum stickers, and paired Codex stream sharing have passed two-profile checks. Hosted Agent API continuation remains a separate access and model-funding path; following a friend does not start it.</p>
         <ol className="mt-4 max-w-3xl list-decimal space-y-3 pl-5 text-sm leading-7 text-slate-300">
           <li>Open <strong>Friends &amp; Voice Parties</strong> in CasimirBot. Choose a handle, search for your friend’s exact handle, and send a friend request. Your friend accepts it in <strong>Received requests</strong>.</li>
           <li>Check the signed-in handle, then choose your friend in <strong>Friends chat board</strong>. Type a message, including ordinary emoji if you like, and choose <strong>Send message</strong>. Reopen that conversation to find its saved messages.</li>
@@ -225,13 +228,14 @@ export default function GettingStartedPage() {
 
       <section id="minecraft-companion-with-friends" className="scroll-mt-8 border-t border-white/10 py-12">
         <h2 className="text-2xl font-semibold text-white">Minecraft Companion with friends</h2>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">The hosted Discord and Minecraft Companion workflow is a private pilot. The sensor and Companion mods have passed clean dedicated-server startup and restart together on the baseline below. Live game actions and delivery into GPT Live still need an attended check. Public mod downloads will be added after release qualification; use the exact files supplied for your pilot session.</p>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">The hosted Discord and Minecraft Companion workflow remains a pilot. The sensor and Companion mods below have passed clean dedicated-server startup and restart together. Live game actions and delivery into GPT Live still need an attended check; these downloads do not claim a finished Companion workflow.</p>
         <div className="mt-5 max-w-3xl rounded-2xl border border-white/15 bg-slate-900 p-4 sm:p-5">
-          <h3 className="font-semibold text-white">Private pilot files</h3>
-          <p className="mt-2 text-sm leading-6 text-slate-300">These checksums identify the files used in the clean-server check. They are not public download links or confirmation of attended gameplay. Keep the supplied license and notices with your download.</p>
+          <h3 className="font-semibold text-white">Download the pilot mods</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-300">Download the individual JARs below, or get the <a className="text-cyan-200 underline" href={`${minecraftPilotDownload}/CasimirBot-Minecraft-1.21.8-pilot.1.zip`}>complete pilot bundle</a> with installation instructions, checksums, license and notices. Read the <a className="text-cyan-200 underline" href={minecraftPilotRelease}>release notes and compatibility limits</a> before installing. Keep the license and notices with your download.</p>
+          <p className="mt-2 text-sm leading-6 text-slate-300">Minecraft Java <strong>1.21.8</strong>, Java <strong>21</strong>, Fabric Loader <strong>0.18.4 or newer</strong> (tested: 0.18.4), and Fabric API <strong>0.136.1+1.21.8</strong>. Download Fabric and Fabric API separately using the official links below.</p>
           <dl className="mt-4 space-y-4">
             {minecraftPilotMods.map((mod) => <div key={mod.filename}>
-              <dt className="break-all font-mono text-sm text-cyan-200">{mod.filename}</dt>
+              <dt className="break-all font-mono text-sm text-cyan-200"><a className="underline" href={`${minecraftPilotDownload}/${mod.filename}`}>{mod.filename}</a></dt>
               <dd className="mt-1 text-xs text-slate-300"><span className="font-medium">SHA-256: </span><code className="break-all select-all">{mod.sha256}</code></dd>
             </div>)}
           </dl>
@@ -261,7 +265,7 @@ export default function GettingStartedPage() {
           <li>Start with a terrain observation. For a movement test, approve a short move to a marked waypoint and check the adapter’s reported position. Use <strong>Load shared reports</strong> in the room mission to view the result the owner shared with the room. Report reading requires both you and the owner to be present; room membership alone is not enough. An empty report list means no report is currently shared, not that an action succeeded.</li>
         </ol>
         <p className="mt-5 max-w-3xl text-sm leading-7 text-slate-300">If game context stops arriving, check the sensor’s latest observation, the selected room and world, and the Discord bridge status. Reconnect GPT Live and select the source again if its session changed. After a world change, verify and select the new source before continuing.</p>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">Explore the <a className="text-cyan-200 underline" href="https://github.com/pestypig/casimirbot-minecraft-fabric-core-source-preview">Minecraft Fabric/core source preview</a> for selected implementation files and their license. Use the qualified mod downloads for installation when they become available.</p>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">Explore the <a className="text-cyan-200 underline" href="https://github.com/pestypig/casimirbot-minecraft-fabric-core-source-preview">Minecraft Fabric/core source preview</a> for selected implementation files and their license. It is not a complete independently buildable mod kit. Use the versioned pilot downloads above for installation.</p>
       </section>
 
       <section className="border-t border-white/10 py-12">
